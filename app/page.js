@@ -138,11 +138,23 @@ const loadSettings = async () => {
   }
 };
 
-  const loadUserData = async () => {
+const loadUserData = async () => {
     if (!userProfile) return;
     setRecentWorks(userProfile.recent_works || []);
     setBookmarks(userProfile.bookmarks || []);
   };
+
+  useEffect(() => {
+    if (user && userProfile && showReaderPanel) {
+      loadUserData();
+    }
+  }, [user, userProfile, showReaderPanel]);
+
+  useEffect(() => {
+    if (showReaderMessagesModal && user && userProfile) {
+      loadReaderMessages();
+    }
+  }, [showReaderMessagesModal, user, userProfile]);
 
   const loadReaderMessages = async () => {
     if (!user) return;
@@ -241,53 +253,68 @@ const loadSettings = async () => {
     }
   };
 
- const handleLogin = async () => {
-  if (!authForm.email || !authForm.password) {
-    alert('Введите email и пароль!');
-    return;
-  }
-
-  // АДМИН - проверяем БЕЗ Supabase!
-  if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
-    setIsAdmin(true);
-    setShowAuthModal(false);
-    setAuthForm({ nickname: '', email: '', password: '' });
-    return; // ← ВЫХОДИМ! Без Supabase!
-  }
-
-  // ОБЫЧНЫЙ ЮЗЕР - через Supabase
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: authForm.email,
-    password: authForm.password
-  });
-
-  if (error) {
-    alert('Ошибка входа: ' + error.message);
-    return;
-  }
-
-  if (data.user) {
-    setUser(data.user);
-    
-    const { data: profile } = await supabase
-      .from('reader_profiles')
-      .select('*')
-      .eq('user_id', data.user.id)
-      .single();
-    
-    if (profile) {
-      if (profile.is_banned) {
-        alert('Ваш аккаунт заблокирован!');
-        await supabase.auth.signOut();
-        return;
-      }
-      setUserProfile(profile);
+  const handleLogin = async () => {
+    if (!authForm.email || !authForm.password) {
+      alert('Введите email и пароль!');
+      return;
     }
-    
-    setShowAuthModal(false);
-    setAuthForm({ nickname: '', email: '', password: '' });
-  }
-};
+
+    // АДМИН - проверяем БЕЗ Supabase!
+    if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      setUser({ email: ADMIN_EMAIL, id: 'admin' });
+      setShowAuthModal(false);
+      setAuthForm({ nickname: '', email: '', password: '' });
+      return;
+    }
+
+    // ОБЫЧНЫЙ ЮЗЕР - через Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: authForm.email,
+      password: authForm.password
+    });
+
+    if (error) {
+      alert('Ошибка входа: ' + error.message);
+      return;
+    }
+
+    if (data.user) {
+      setUser(data.user);
+      
+      const { data: profile } = await supabase
+        .from('reader_profiles')
+        .select('*')
+        .eq('user_id', data.user.id)
+        .single();
+      
+      if (profile) {
+        if (profile.is_banned) {
+          alert('Ваш аккаунт заблокирован!');
+          await supabase.auth.signOut();
+          return;
+        }
+        setUserProfile(profile);
+        setIsAdmin(false);
+      }
+      
+      setShowAuthModal(false);
+      setAuthForm({ nickname: '', email: '', password: '' });
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isAdmin) {
+      setIsAdmin(false);
+      setUser(null);
+    } else {
+      await supabase.auth.signOut();
+      setUser(null);
+      setUserProfile(null);
+    }
+    setShowReaderPanel(false);
+    setShowAdminPanel(false);
+  };
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {
