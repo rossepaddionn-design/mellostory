@@ -63,30 +63,13 @@ export default function Home() {
     checkUser();
   }, []);
 
-  useEffect(() => {
-    if (user && userProfile && showReaderPanel) {
-      loadUserData();
-    }
-  }, [user, userProfile, showReaderPanel]);
-
-  useEffect(() => {
-    if (showReaderMessagesModal && user && userProfile) {
-      loadReaderMessages();
-    }
-  }, [showReaderMessagesModal, user, userProfile]);
-
-const checkUser = async () => {
-  // СНАЧАЛА проверяем localStorage - это админ?
-  const isAdminStored = localStorage.getItem('isAdmin');
-  if (isAdminStored === 'true') {
-    setIsAdmin(true);
-    return; // Админ найден, выходим!
-  }
-  // Проверяем обычного юзера через Supabase
+ const checkUser = async () => {
   const { data: { session } } = await supabase.auth.getSession();
+  
   if (session) {
     setUser(session.user);
     
+    // Проверяем: это обычный читатель?
     const { data: profile } = await supabase
       .from('reader_profiles')
       .select('*')
@@ -102,29 +85,15 @@ const checkUser = async () => {
       }
       setUserProfile(profile);
       setIsAdmin(false);
+    } else if (session.user.email === ADMIN_EMAIL) {
+      // Email совпадает с админским И нет профиля читателя = это админ
+      setIsAdmin(true);
     }
   }
 };
 
 const loadWorks = async () => {
   setLoading(true);
-  
-  // Проверяем кеш
-  const cached = localStorage.getItem('works_cache');
-  const cacheTime = localStorage.getItem('works_cache_time');
-  
-  // Если кеш свежий (< 30 минут), используем его
-  if (cached && cacheTime && Date.now() - Number(cacheTime) < 1800000) {
-    const cachedData = JSON.parse(cached);
-    setWorks(cachedData);
-    setCompletedWorks(cachedData.filter(w => w.status === 'Завершён'));
-    setOngoingWorks(cachedData.filter(w => w.status === 'В процессе'));
-    setMinificWorks(cachedData.filter(w => w.category === 'minific'));
-    setLongficWorks(cachedData.filter(w => w.category === 'longfic'));
-    setNovelWorks(cachedData.filter(w => w.category === 'novel'));
-    setLoading(false);
-    return;
-  }
   
   const { data, error } = await supabase
     .from('works')
@@ -143,10 +112,6 @@ const loadWorks = async () => {
     setMinificWorks(worksData.filter(w => w.category === 'minific'));
     setLongficWorks(worksData.filter(w => w.category === 'longfic'));
     setNovelWorks(worksData.filter(w => w.category === 'novel'));
-    
-    // Сохраняем в кеш
-    localStorage.setItem('works_cache', JSON.stringify(worksData));
-    localStorage.setItem('works_cache_time', Date.now().toString());
   }
   setLoading(false);
 };
