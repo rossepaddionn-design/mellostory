@@ -52,8 +52,8 @@ export default function Home() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
 
-  const ADMIN_PASSWORD = 'mellostory2025';
-  const ADMIN_EMAIL = 'admin@mellostory.com';
+  const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
+  const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
 
   const HEADER_BG_IMAGE = 'https://i.ibb.co/fddxZvDn/aen05-BYOFdhjog-R9-Dx-UOt-Tw-XTMY2ku8-CX051-K4-VTo-FWSch-DNOv-Ze-BU9-DAAj7ksm-KDl-Nr75a-A-Yor-Pq-Cd5.jpg';
 
