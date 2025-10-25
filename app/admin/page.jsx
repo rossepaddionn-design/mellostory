@@ -414,7 +414,7 @@ export default function AdminPanel() {
               Войти
             </button>
           </form>
-          <p className="text-gray-500 text-xs sm:text-sm text-center mt-4">Пароль: mellostory2025</p>
+          <p className="text-gray-500 text-xs sm:text-sm text-center mt-4">Пароль</p>
         </div>
       </div>
     );

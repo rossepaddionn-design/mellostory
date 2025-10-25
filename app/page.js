@@ -52,10 +52,10 @@ export default function Home() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
 
-  const ADMIN_PASSWORD = 'mellostory2025';
-  const ADMIN_EMAIL = 'admin@mellostory.com';
+  const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
+  const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
 
-  const HEADER_BG_IMAGE = 'https://i.ibb.co/fddxZvDn/aen05-BYOFdhjog-R9-Dx-UOt-Tw-XTMY2ku8-CX051-K4-VTo-FWSch-DNOv-Ze-BU9-DAAj7ksm-KDl-Nr75a-A-Yor-Pq-Cd5.jpg';
+  const HEADER_BG_IMAGE = 'https://i.ibb.co/MqDBKhy/001.jpg';
 
   useEffect(() => {
     loadWorks();
@@ -1153,7 +1153,7 @@ export default function Home() {
               {t.about}
             </h2>
             <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
-              <p>Здесь информация об авторе...</p>
+              <p>Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!</p>
             </div>
           </div>
         </div>
