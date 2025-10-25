@@ -588,8 +588,7 @@ export default function AdminPanel() {
                   <label className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg p-4 sm:p-6 cursor-pointer transition mb-4">
                     <ImageIcon size={20} className="sm:w-6 sm:h-6" />
                     <span className="text-sm sm:text-base">Загрузить изображения</span>
-<input type="file" accept="image/*" multiple onChange={(e) => handleImageUpload(e, 'work')} className="hidden" />
-
+                    <input type="file" accept="image/*" multiple onChange={(e) => handleImageUpload(e, 'work')} className="hidden" />
                   </label>
 
                   {workForm.character_images.length > 0 && (
@@ -638,7 +637,18 @@ export default function AdminPanel() {
                     <button onClick={insertTooltip} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Пояснение"><HelpCircle size={18} className="sm:w-5 sm:h-5" /></button>
                   </div>
 
-                  <textarea ref={editorRef} value={chapterForm.content} onChange={(e) => setChapterForm({...chapterForm, content: e.target.value})} className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4" placeholder="Текст главы..." style={{ fontFamily: 'monospace', wordWrap: 'break-word' }} />
+                  <div 
+                    ref={editorRef}
+                    contentEditable
+                    onInput={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
+                    className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
+                    style={{ 
+                      whiteSpace: 'pre-wrap',
+                      wordWrap: 'break-word'
+                    }}
+                    suppressContentEditableWarning={true}
+                    dangerouslySetInnerHTML={{ __html: chapterForm.content }}
+                  />
 
                   <div className="mb-4">
                     <label className="block text-xs sm:text-sm text-gray-400 mb-2">Примечание автора к главе</label>
