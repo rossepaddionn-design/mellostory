@@ -76,12 +76,17 @@ export default function Home() {
   }, [showReaderMessagesModal, user, userProfile]);
 
 const checkUser = async () => {
+  // СНАЧАЛА проверяем localStorage - это админ?
+  const isAdminStored = localStorage.getItem('isAdmin');
+  if (isAdminStored === 'true') {
+    setIsAdmin(true);
+    return; // Админ найден, выходим!
+  }
+  // Проверяем обычного юзера через Supabase
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
     setUser(session.user);
     
-    // Проверяем: это админ из кода или обычный юзер?
-    // Админ НЕ должен быть в reader_profiles!
     const { data: profile } = await supabase
       .from('reader_profiles')
       .select('*')
@@ -96,80 +101,77 @@ const checkUser = async () => {
         return;
       }
       setUserProfile(profile);
-      setIsAdmin(false);  // Явно говорим: не админ!
-    } else if (session.user.email === ADMIN_EMAIL) {
-      // Email админа, но нет профиля → это настоящий админ
-      setIsAdmin(true);
+      setIsAdmin(false);
     }
   }
 };
 
-  const loadWorks = async () => {
-    setLoading(true);
-    
-    // Проверяем кеш
-    const cached = localStorage.getItem('works_cache');
-    const cacheTime = localStorage.getItem('works_cache_time');
-    
-    // Если кеш свежий (< 30 минут), используем его
-    if (cached && cacheTime && Date.now() - Number(cacheTime) < 1800000) {
-      const cachedData = JSON.parse(cached);
-      setWorks(cachedData);
-      setCompletedWorks(cachedData.filter(w => w.status === 'Завершён'));
-      setOngoingWorks(cachedData.filter(w => w.status === 'В процессе'));
-      setMinificWorks(cachedData.filter(w => w.category === 'minific'));
-      setLongficWorks(cachedData.filter(w => w.category === 'longfic'));
-      setNovelWorks(cachedData.filter(w => w.category === 'novel'));
-      setLoading(false);
-      return;
-    }
-    
-    const { data, error } = await supabase
-      .from('works')
-      .select('id, title, cover_url, direction, rating, status, category, description, created_at')
-      .eq('is_draft', false)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    
-    if (error) {
-      console.error('Ошибка загрузки работ:', error);
-    } else {
-      const worksData = data || [];
-      setWorks(worksData);
-      setCompletedWorks(worksData.filter(w => w.status === 'Завершён'));
-      setOngoingWorks(worksData.filter(w => w.status === 'В процессе'));
-      setMinificWorks(worksData.filter(w => w.category === 'minific'));
-      setLongficWorks(worksData.filter(w => w.category === 'longfic'));
-      setNovelWorks(worksData.filter(w => w.category === 'novel'));
-      
-      // Сохраняем в кеш
-      localStorage.setItem('works_cache', JSON.stringify(worksData));
-      localStorage.setItem('works_cache_time', Date.now().toString());
-    }
+const loadWorks = async () => {
+  setLoading(true);
+  
+  // Проверяем кеш
+  const cached = localStorage.getItem('works_cache');
+  const cacheTime = localStorage.getItem('works_cache_time');
+  
+  // Если кеш свежий (< 30 минут), используем его
+  if (cached && cacheTime && Date.now() - Number(cacheTime) < 1800000) {
+    const cachedData = JSON.parse(cached);
+    setWorks(cachedData);
+    setCompletedWorks(cachedData.filter(w => w.status === 'Завершён'));
+    setOngoingWorks(cachedData.filter(w => w.status === 'В процессе'));
+    setMinificWorks(cachedData.filter(w => w.category === 'minific'));
+    setLongficWorks(cachedData.filter(w => w.category === 'longfic'));
+    setNovelWorks(cachedData.filter(w => w.category === 'novel'));
     setLoading(false);
-  };
+    return;
+  }
+  
+  const { data, error } = await supabase
+    .from('works')
+    .select('id, title, cover_url, direction, rating, status, category, description, created_at')
+    .eq('is_draft', false)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  
+  if (error) {
+    console.error('Ошибка загрузки работ:', error);
+  } else {
+    const worksData = data || [];
+    setWorks(worksData);
+    setCompletedWorks(worksData.filter(w => w.status === 'Завершён'));
+    setOngoingWorks(worksData.filter(w => w.status === 'В процессе'));
+    setMinificWorks(worksData.filter(w => w.category === 'minific'));
+    setLongficWorks(worksData.filter(w => w.category === 'longfic'));
+    setNovelWorks(worksData.filter(w => w.category === 'novel'));
+    
+    // Сохраняем в кеш
+    localStorage.setItem('works_cache', JSON.stringify(worksData));
+    localStorage.setItem('works_cache_time', Date.now().toString());
+  }
+  setLoading(false);
+};
 
-  const loadSettings = async () => {
-    try {
-      const cachedColor = localStorage.getItem('titleColor');
-      if (cachedColor) {
-        setTitleColor(cachedColor);
-      }
-
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('title_color')
-        .eq('id', 1)
-        .maybeSingle();
-      
-      if (data && !error && data.title_color && data.title_color.trim() !== '') {
-        setTitleColor(data.title_color);
-        localStorage.setItem('titleColor', data.title_color);
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки настроек:', err);
+const loadSettings = async () => {
+  try {
+    const cachedColor = localStorage.getItem('titleColor');
+    if (cachedColor) {
+      setTitleColor(cachedColor);
     }
-  };
+
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('title_color')
+      .eq('id', 1)
+      .maybeSingle();
+    
+    if (data && !error && data.title_color && data.title_color.trim() !== '') {
+      setTitleColor(data.title_color);
+      localStorage.setItem('titleColor', data.title_color);
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки настроек:', err);
+  }
+};
 
   const loadUserData = async () => {
     if (!userProfile) return;
