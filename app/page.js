@@ -274,68 +274,53 @@ const checkUser = async () => {
     }
   };
 
-  const handleLogin = async () => {
-    if (!authForm.email || !authForm.password) {
-      alert('Введите email и пароль!');
-      return;
-    }
+ const handleLogin = async () => {
+  if (!authForm.email || !authForm.password) {
+    alert('Введите email и пароль!');
+    return;
+  }
 
-    if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: ADMIN_EMAIL,
-        password: ADMIN_PASSWORD
-      });
+  // АДМИН - проверяем БЕЗ Supabase!
+  if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
+    setIsAdmin(true);
+    setShowAuthModal(false);
+    setAuthForm({ nickname: '', email: '', password: '' });
+    return; // ← ВЫХОДИМ! Без Supabase!
+  }
 
-      if (!error && data.user) {
-        setUser(data.user);
-        setIsAdmin(true);
-        setShowAuthModal(false);
-        setAuthForm({ nickname: '', email: '', password: '' });
+  // ОБЫЧНЫЙ ЮЗЕР - через Supabase
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: authForm.email,
+    password: authForm.password
+  });
+
+  if (error) {
+    alert('Ошибка входа: ' + error.message);
+    return;
+  }
+
+  if (data.user) {
+    setUser(data.user);
+    
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('*')
+      .eq('user_id', data.user.id)
+      .single();
+    
+    if (profile) {
+      if (profile.is_banned) {
+        alert('Ваш аккаунт заблокирован!');
+        await supabase.auth.signOut();
         return;
       }
+      setUserProfile(profile);
     }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: authForm.email,
-      password: authForm.password
-    });
-
-    if (error) {
-      alert('Ошибка входа: ' + error.message);
-      return;
-    }
-
-    if (data.user) {
-      setUser(data.user);
-      
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('*')
-        .eq('user_id', data.user.id)
-        .single();
-      
-      if (profile) {
-        if (profile.is_banned) {
-          alert('Ваш аккаунт заблокирован!');
-          await supabase.auth.signOut();
-          return;
-        }
-        setUserProfile(profile);
-      }
-      
-      setShowAuthModal(false);
-      setAuthForm({ nickname: '', email: '', password: '' });
-    }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setUserProfile(null);
-    setIsAdmin(false);
-    setShowReaderPanel(false);
-    setShowAdminPanel(false);
-  };
+    
+    setShowAuthModal(false);
+    setAuthForm({ nickname: '', email: '', password: '' });
+  }
+};
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {
