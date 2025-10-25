@@ -75,26 +75,34 @@ export default function Home() {
     }
   }, [showReaderMessagesModal, user, userProfile]);
 
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      setUser(session.user);
-      
-      if (session.user.email === ADMIN_EMAIL) {
-        setIsAdmin(true);
-      } else {
-        const { data: profile } = await supabase
-          .from('reader_profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        if (profile) {
-          setUserProfile(profile);
-        }
+const checkUser = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    setUser(session.user);
+    
+    // Проверяем: это админ из кода или обычный юзер?
+    // Админ НЕ должен быть в reader_profiles!
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single();
+    
+    if (profile) {
+      // Это обычный читатель
+      if (profile.is_banned) {
+        alert('Ваш аккаунт заблокирован!');
+        await supabase.auth.signOut();
+        return;
       }
+      setUserProfile(profile);
+      setIsAdmin(false);  // Явно говорим: не админ!
+    } else if (session.user.email === ADMIN_EMAIL) {
+      // Email админа, но нет профиля → это настоящий админ
+      setIsAdmin(true);
     }
-  };
+  }
+};
 
   const loadWorks = async () => {
     setLoading(true);
