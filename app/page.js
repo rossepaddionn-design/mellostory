@@ -63,7 +63,7 @@ export default function Home() {
     checkUser();
   }, []);
 
- const checkUser = async () => {
+const checkUser = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
@@ -88,6 +88,13 @@ export default function Home() {
     } else if (session.user.email === ADMIN_EMAIL) {
       // Email совпадает с админским И нет профиля читателя = это админ
       setIsAdmin(true);
+    }
+  } else {
+    // Проверяем localStorage для админа
+    const adminSession = localStorage.getItem('admin_session');
+    if (adminSession === 'true') {
+      setIsAdmin(true);
+      setUser({ email: ADMIN_EMAIL, id: 'admin' });
     }
   }
 };
@@ -253,68 +260,70 @@ const loadUserData = async () => {
     }
   };
 
-  const handleLogin = async () => {
-    if (!authForm.email || !authForm.password) {
-      alert('Введите email и пароль!');
-      return;
-    }
+const handleLogin = async () => {
+  if (!authForm.email || !authForm.password) {
+    alert('Введите email и пароль!');
+    return;
+  }
 
-    // АДМИН - проверяем БЕЗ Supabase!
-    if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      setUser({ email: ADMIN_EMAIL, id: 'admin' });
-      setShowAuthModal(false);
-      setAuthForm({ nickname: '', email: '', password: '' });
-      return;
-    }
+  // АДМИН - проверяем БЕЗ Supabase!
+  if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
+    setIsAdmin(true);
+    setUser({ email: ADMIN_EMAIL, id: 'admin' });
+    localStorage.setItem('admin_session', 'true'); // Сохраняем в localStorage
+    setShowAuthModal(false);
+    setAuthForm({ nickname: '', email: '', password: '' });
+    return;
+  }
 
-    // ОБЫЧНЫЙ ЮЗЕР - через Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: authForm.email,
-      password: authForm.password
-    });
+  // ОБЫЧНЫЙ ЮЗЕР - через Supabase
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: authForm.email,
+    password: authForm.password
+  });
 
-    if (error) {
-      alert('Ошибка входа: ' + error.message);
-      return;
-    }
+  if (error) {
+    alert('Ошибка входа: ' + error.message);
+    return;
+  }
 
-    if (data.user) {
-      setUser(data.user);
-      
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('*')
-        .eq('user_id', data.user.id)
-        .single();
-      
-      if (profile) {
-        if (profile.is_banned) {
-          alert('Ваш аккаунт заблокирован!');
-          await supabase.auth.signOut();
-          return;
-        }
-        setUserProfile(profile);
-        setIsAdmin(false);
+  if (data.user) {
+    setUser(data.user);
+    
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('*')
+      .eq('user_id', data.user.id)
+      .single();
+    
+    if (profile) {
+      if (profile.is_banned) {
+        alert('Ваш аккаунт заблокирован!');
+        await supabase.auth.signOut();
+        return;
       }
-      
-      setShowAuthModal(false);
-      setAuthForm({ nickname: '', email: '', password: '' });
-    }
-  };
-
-  const handleLogout = async () => {
-    if (isAdmin) {
+      setUserProfile(profile);
       setIsAdmin(false);
-      setUser(null);
-    } else {
-      await supabase.auth.signOut();
-      setUser(null);
-      setUserProfile(null);
     }
-    setShowReaderPanel(false);
-    setShowAdminPanel(false);
-  };
+    
+    setShowAuthModal(false);
+    setAuthForm({ nickname: '', email: '', password: '' });
+  }
+};
+
+const handleLogout = async () => {
+  if (isAdmin) {
+    setIsAdmin(false);
+    setUser(null);
+    localStorage.removeItem('admin_session'); // Удаляем из localStorage
+  } else {
+    await supabase.auth.signOut();
+    setUser(null);
+    setUserProfile(null);
+  }
+  setShowReaderPanel(false);
+  setShowAdminPanel(false);
+};
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {
@@ -1006,9 +1015,9 @@ const loadUserData = async () => {
                     return (
                       <div
                         key={work.id}
-                        className={`transition-all duration-700 ${
-                          isExpanded 
-                            ? 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 p-4 sm:p-8' 
+          className={`transition-all duration-700 ${
+  isExpanded 
+    ? 'fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-95 p-4 sm:p-8 overflow-y-auto' 
                             : 'w-full max-w-sm sm:max-w-md'
                         }`}
                       >
@@ -1018,7 +1027,7 @@ const loadUserData = async () => {
                               e.stopPropagation();
                               setExpandedWork(null);
                             }}
-                            className="absolute top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-60"
+className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[110]"
                           >
                             <X size={24} className="sm:w-8 sm:h-8" />
                           </button>
