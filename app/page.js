@@ -979,7 +979,7 @@ const handleLogout = async () => {
   </div>
 </div>
 
-{/* MAIN CONTENT */}
+      {/* MAIN CONTENT */}
       <main className="relative pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen">
         <div className="max-w-7xl mx-auto relative z-10">
           {loading ? (
@@ -1027,103 +1027,102 @@ const handleLogout = async () => {
                     return (
                       <div
                         key={work.id}
-                        className={`transition-all duration-700 ${
-                          isExpanded 
-                            ? 'fixed inset-0 z-[9999] bg-black' 
-                            : 'w-full max-w-[280px] sm:max-w-[320px]'
+          className={`transition-all duration-700 ${
+  isExpanded 
+? 'fixed inset-0 z-[9999] flex items-center justify-center bg-black p-4 sm:p-8 overflow-y-auto' 
+: 'w-full max-w-[280px] sm:max-w-[320px]'
                         }`}
                       >
-                        {isExpanded ? (
-                          <div className="h-full overflow-y-auto">
-                            <div className="min-h-screen flex items-center justify-center p-4 sm:p-8">
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedWork(null);
-                                }}
-                                className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[10000] shadow-2xl"
-                              >
-                                <X size={24} className="sm:w-8 sm:h-8" />
-                              </button>
-                              
-                              <div 
-                                className="bg-gray-900 rounded-2xl overflow-hidden border-4 border-red-500 shadow-2xl w-full"
-                                style={{ maxWidth: '1000px' }}
-                              >
-                                <div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black rounded-2xl">
-                                  <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-                                    {work.cover_url ? (
-                                      <Image 
-                                        src={work.cover_url} 
-                                        alt={work.title} 
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 400px"
-                                        priority
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                        Нет обложки
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col justify-between">
-                                    <div>
-                                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
-                                      <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
-                                        <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
-                                        <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
-                                        <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
-                                      </div>
-                                      <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 max-h-60 sm:max-h-96 overflow-y-auto">
-                                        <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.description}</p>
-                                      </div>
-                                    </div>
-                                    <Link 
-                                      href={`/work/${work.id}`}
-                                      className="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      {t.startReading}
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div 
-                            className="bg-gray-900 rounded-2xl overflow-hidden border-4 hover:border-red-500 transition-all duration-300 shadow-2xl hover:shadow-red-600/50 cursor-pointer"
-                            style={{ borderColor: isCenter ? titleColor : '#7f1d1d' }}
-                            onClick={() => setExpandedWork(work.id)}
+                        {isExpanded && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedWork(null);
+                            }}
+className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[10000] shadow-2xl"
                           >
-                            <div className="aspect-[2/3] bg-gray-800 relative">
-                              {work.cover_url ? (
-                                <Image 
-                                  src={work.cover_url} 
-                                  alt={work.title} 
-                                  fill
-                                  className="object-cover"
-                                  sizes="(max-width: 640px) 100vw, 400px"
-                                  priority={idx === currentSlide}
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                  Нет обложки
+                            <X size={24} className="sm:w-8 sm:h-8" />
+                          </button>
+                        )}
+                        
+                        <div 
+                          className={`bg-gray-900 rounded-2xl overflow-hidden border-4 hover:border-red-500 transition-all duration-300 shadow-2xl hover:shadow-red-600/50 ${!isExpanded && 'cursor-pointer'}`}
+                          style={{ 
+                            borderColor: isCenter ? titleColor : '#7f1d1d',
+                            maxWidth: isExpanded ? '1000px' : 'auto',
+                            width: '100%'
+                          }}
+                          onClick={() => !isExpanded && setExpandedWork(work.id)}
+                        >
+                          {isExpanded ? (
+<div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
+                              <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
+                                {work.cover_url ? (
+                                  <Image 
+                                    src={work.cover_url} 
+                                    alt={work.title} 
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 400px"
+                                    priority
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                                    Нет обложки
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex flex-col justify-between">
+                                <div>
+                                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
+                                  <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
+                                    <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
+                                    <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
+                                    <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
+                                  </div>
+                                  <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 max-h-60 sm:max-h-96 overflow-y-auto">
+                                    <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.description}</p>
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <div className="p-4 sm:p-6 bg-black">
-                              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-2 sm:mb-3 text-white">{work.title}</h3>
-                              <p className="text-xs sm:text-sm text-gray-400 text-center line-clamp-3 mb-3 sm:mb-4">{work.description}</p>
-                              <div className="flex gap-2 justify-center flex-wrap">
-                                <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
-                                <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
-                                <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
+                                <Link 
+                                  href={`/work/${work.id}`}
+                                  className="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {t.startReading}
+                                </Link>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          ) : (
+                            <>
+                              <div className="aspect-[2/3] bg-gray-800 relative">
+                                {work.cover_url ? (
+                                  <Image 
+                                    src={work.cover_url} 
+                                    alt={work.title} 
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 100vw, 400px"
+                                    priority={idx === currentSlide}
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                                    Нет обложки
+                                  </div>
+                                )}
+                              </div>
+                              <div className="p-4 sm:p-6 bg-black">
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-2 sm:mb-3 text-white">{work.title}</h3>
+                                <p className="text-xs sm:text-sm text-gray-400 text-center line-clamp-3 mb-3 sm:mb-4">{work.description}</p>
+                                <div className="flex gap-2 justify-center flex-wrap">
+                                  <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
+                                  <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
+                                  <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
