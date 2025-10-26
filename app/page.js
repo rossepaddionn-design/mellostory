@@ -57,6 +57,18 @@ export default function Home() {
 
   const HEADER_BG_IMAGE = 'https://i.ibb.co/MqDBKhy/001.jpg';
 
+  // Блокировка скролла при открытии карточки
+  useEffect(() => {
+    if (expandedWork) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [expandedWork]);
+
   useEffect(() => {
     loadWorks();
     loadSettings();
@@ -1017,8 +1029,8 @@ const handleLogout = async () => {
                         key={work.id}
           className={`transition-all duration-700 ${
   isExpanded 
-    ? 'fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-95 p-4 sm:p-8 overflow-y-auto' 
-                            : 'w-full max-w-sm sm:max-w-md'
+? 'fixed inset-0 z-[9999] flex items-center justify-center bg-black p-4 sm:p-8 overflow-y-auto' 
+: 'w-full max-w-[280px] sm:max-w-[320px]'
                         }`}
                       >
                         {isExpanded && (
@@ -1027,7 +1039,7 @@ const handleLogout = async () => {
                               e.stopPropagation();
                               setExpandedWork(null);
                             }}
-className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[110]"
+className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[10000] shadow-2xl"
                           >
                             <X size={24} className="sm:w-8 sm:h-8" />
                           </button>
@@ -1043,7 +1055,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                           onClick={() => !isExpanded && setExpandedWork(work.id)}
                         >
                           {isExpanded ? (
-                            <div className="flex flex-col sm:grid sm:grid-cols-[300px_1fr] md:grid-cols-[400px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[90vh] overflow-y-auto">
+<div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
                               <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
                                 {work.cover_url ? (
                                   <Image 
