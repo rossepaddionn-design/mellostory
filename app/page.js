@@ -980,7 +980,7 @@ const handleLogout = async () => {
 </div>
 
       {/* MAIN CONTENT */}
-      <main className="relative pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen">
+      <main className="pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen">
         <div className="max-w-7xl mx-auto relative z-10">
           {loading ? (
             <div className="text-center py-12 sm:py-20">
@@ -1152,7 +1152,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
         </div>
 
         {/* ABOUT SECTION */}
-        <div className="max-w-4xl mx-auto mt-16 sm:mt-32 relative z-10">
+        <div className="max-w-4xl mx-auto mt-16 sm:mt-32 relative z-0">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center" style={{
               fontFamily: "'Playfair Display', Georgia, serif",
@@ -1167,7 +1167,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
         </div>
 
         {/* DISCLAIMERS */}
-        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 space-y-4 sm:space-y-6 relative z-10">
+        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 space-y-4 sm:space-y-6 relative z-0">
           <div className="bg-red-900 bg-opacity-30 border-2 sm:border-4 border-red-600 rounded-xl sm:rounded-2xl p-4 sm:p-8">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-red-500 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
