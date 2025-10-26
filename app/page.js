@@ -58,19 +58,16 @@ export default function Home() {
   const HEADER_BG_IMAGE = 'https://i.ibb.co/MqDBKhy/001.jpg';
 
   // Блокировка скролла при открытии карточки
-useEffect(() => {
-  if (expandedWork) {
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'unset';
-    document.documentElement.style.overflow = 'unset';
-  }
-  return () => {
-    document.body.style.overflow = 'unset';
-    document.documentElement.style.overflow = 'unset';
-  };
-}, [expandedWork]);
+  useEffect(() => {
+    if (expandedWork) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [expandedWork]);
 
   useEffect(() => {
     loadWorks();
@@ -552,23 +549,11 @@ const handleLogout = async () => {
     }));
   };
 
-return (
-    <div className="min-h-screen text-white overflow-x-hidden relative">
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://i.ibb.co/Pv95n6yD/01-2-1-1.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
-        }}
-      />
-      <div className="fixed inset-0 z-0 bg-black bg-opacity-50" />
+  return (
+    <div className="min-h-screen text-white overflow-x-hidden bg-black">
 
-      <div className="relative z-10">
-        {/* AUTH MODAL */}
-        {showAuthModal && (
+      {/* AUTH MODAL */}
+      {showAuthModal && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
           <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-8 border-2 border-red-600">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -1042,11 +1027,11 @@ return (
                     return (
                       <div
                         key={work.id}
-className={`transition-all duration-700 ${
-  isExpanded 
-    ? 'fixed inset-0 z-[99999] bg-black overflow-y-auto' 
-    : 'w-full max-w-[280px] sm:max-w-[320px]'
-}`}
+                        className={`transition-all duration-700 ${
+                          isExpanded 
+                            ? 'fixed inset-0 z-[9999] bg-black' 
+                            : 'w-full max-w-[280px] sm:max-w-[320px]'
+                        }`}
                       >
                         {isExpanded ? (
                           <div className="h-full overflow-y-auto">
@@ -1210,10 +1195,9 @@ className={`transition-all duration-700 ${
       </main>
 
 {/* FOOTER */}
-<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-10 border-t border-gray-800">
+<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
   <p className="text-base sm:text-lg">MelloStory © 2025</p>
 </footer>
-      </div>
     </div>
   );
 }
