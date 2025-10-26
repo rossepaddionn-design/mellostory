@@ -1194,7 +1194,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
       </main>
 
 {/* FOOTER */}
-<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative border-t border-gray-800">
+<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
   <p className="text-base sm:text-lg">MelloStory © 2025</p>
 </footer>
     </div>
