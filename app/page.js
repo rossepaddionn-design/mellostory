@@ -550,16 +550,17 @@ const handleLogout = async () => {
   };
 
 return (
-    <div 
-      className="min-h-screen text-white overflow-x-hidden"
-      style={{
-        backgroundImage: 'url(https://i.ibb.co/Pv95n6yD/01-2-1-1.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor: '#000'
-      }}
-    >
+    <div className="min-h-screen text-white overflow-x-hidden relative">
+      <div 
+        className="fixed inset-0 -z-10 blur-sm"
+        style={{
+          backgroundImage: 'url(https://i.ibb.co/Pv95n6yD/01-2-1-1.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#000'
+        }}
+      />
 
       {/* AUTH MODAL */}
       {showAuthModal && (
@@ -1161,22 +1162,16 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
         </div>
 
         {/* ABOUT SECTION */}
-        <div className="max-w-4xl mx-auto mt-16 sm:mt-32 relative z-0">
+        <div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center" style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              color: titleColor
-            }}>
-              {t.about}
-            </h2>
             <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
               <p>Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!</p>
             </div>
           </div>
         </div>
 
-        {/* DISCLAIMERS */}
-        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 space-y-4 sm:space-y-6 relative z-0">
+    {/* DISCLAIMERS */}
+        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 space-y-3 sm:space-y-4 relative z-0">
           <div className="bg-red-900 bg-opacity-30 border-2 sm:border-4 border-red-600 rounded-xl sm:rounded-2xl p-4 sm:p-8">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-red-500 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
@@ -1188,7 +1183,6 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
             </h3>
             <p className="text-xs sm:text-sm md:text-base text-gray-200 leading-relaxed text-justify">{t.disclaimerText}</p>
           </div>
-
           <div className="bg-gray-900 border-2 sm:border-4 border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-8">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
@@ -1200,12 +1194,21 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
             <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-justify">{t.copyrightText}</p>
           </div>
         </div>
+
+        {/* НОВОСТИ */}
+        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
+          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
+            <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
+              <p>Здесь будут появляться новости о новых работах и обновлениях сайта.</p>
+            </div>
+          </div>
+        </div>
       </main>
 
-{/* FOOTER */}
-<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
-  <p className="text-base sm:text-lg">MelloStory © 2025</p>
-</footer>
+      {/* FOOTER */}
+      <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
+        <p className="text-base sm:text-lg">MelloStory © 2025</p>
+      </footer>
     </div>
   );
 }
