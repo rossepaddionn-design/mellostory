@@ -549,8 +549,17 @@ const handleLogout = async () => {
     }));
   };
 
-  return (
-    <div className="min-h-screen text-white overflow-x-hidden bg-black">
+return (
+    <div 
+      className="min-h-screen text-white overflow-x-hidden"
+      style={{
+        backgroundImage: 'url(https://i.ibb.co/Pv95n6yD/01-2-1-1.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#000'
+      }}
+    >
 
       {/* AUTH MODAL */}
       {showAuthModal && (
