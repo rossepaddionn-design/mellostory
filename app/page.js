@@ -552,9 +552,9 @@ const handleLogout = async () => {
 return (
     <div className="min-h-screen text-white overflow-x-hidden relative">
       <div 
-        className="fixed inset-0 -z-10 blur-sm"
+        className="fixed inset-0 -z-10"
         style={{
-          backgroundImage: 'url(https://i.ibb.co/Pv95n6yD/01-2-1-1.jpg)',
+          backgroundImage: 'url(https://i.ibb.co/tpQCnsSb/033-1.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
