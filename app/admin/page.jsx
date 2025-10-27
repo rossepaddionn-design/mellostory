@@ -65,6 +65,15 @@ export default function AdminPanel() {
     }
   }, [selectedWork?.id]);
 
+  // СИНХРОНИЗАЦИЯ РЕДАКТОРА С СОДЕРЖИМЫМ ГЛАВЫ
+  useEffect(() => {
+    if (editorRef.current && chapterForm.content) {
+      editorRef.current.innerHTML = chapterForm.content;
+    } else if (editorRef.current && !chapterForm.content) {
+      editorRef.current.innerHTML = '';
+    }
+  }, [selectedChapter?.id, chapterForm.content]);
+
   const loadWorks = async () => {
     try {
       setLoading(true);
