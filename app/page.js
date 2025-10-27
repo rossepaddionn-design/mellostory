@@ -1069,61 +1069,68 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                           }}
                           onClick={() => !isExpanded && setExpandedWork(work.id)}
                         >
-                          {isExpanded ? (
-<div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
-                              <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-                                {work.cover_url ? (
-                                  <Image 
-                                    src={work.cover_url} 
-                                    alt={work.title} 
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, 400px"
-                                    priority
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                    Нет обложки
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex flex-col justify-between">
-                                <div>
-<h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
-                                  
-                                  {/* ФАНДОМ И ПЕЙРИНГ */}
-                                  {(work.fandom || work.pairing) && (
-                                    <div className="mb-3 space-y-1">
-                                      {work.fandom && (
-                                        <div className="text-xs sm:text-sm">
-                                          <span className="text-gray-400">Фандом: </span>
-                                          <span className="text-gray-200">{work.fandom}</span>
-                                        </div>
-                                      )}
-                                      {work.pairing && (
-                                        <div className="text-xs sm:text-sm">
-                                          <span className="text-gray-400">Пейринг: </span>
-                                          <span className="text-gray-200">{work.pairing}</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                  
-                                  <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
-                                    <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
-                                    <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
-                                    <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
-                                  </div>
-                                </div>
-                                <Link 
-                                  href={`/work/${work.id}`}
-                                  className="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {t.startReading}
-                                </Link>
-                              </div>
-                            </div>
+{isExpanded ? (
+  <div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
+    <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
+      {work.cover_url ? (
+        <Image 
+          src={work.cover_url} 
+          alt={work.title} 
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 400px"
+          priority
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+          Нет обложки
+        </div>
+      )}
+    </div>
+    
+    <div className="flex flex-col justify-between">
+      <div>
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
+        
+        {/* ФАНДОМ И ПЕЙРИНГ */}
+        {(work.fandom || work.pairing) && (
+          <div className="mb-3 space-y-1">
+            {work.fandom && (
+              <div className="text-xs sm:text-sm">
+                <span className="text-gray-400">Фандом: </span>
+                <span className="text-gray-200">{work.fandom}</span>
+              </div>
+            )}
+            {work.pairing && (
+              <div className="text-xs sm:text-sm">
+                <span className="text-gray-400">Пейринг: </span>
+                <span className="text-gray-200">{work.pairing}</span>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* ОПИСАНИЕ */}
+        {work.description && (
+          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 leading-relaxed">{work.description}</p>
+        )}
+        
+        <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
+          <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
+          <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
+          <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
+        </div>
+      </div>
+      
+      <Link 
+        href={`/work/${work.id}`}
+        className="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {t.startReading}
+      </Link>
+    </div>
+  </div>
                           ) : (
                             <>
                               <div className="aspect-[2/3] bg-gray-800 relative">
