@@ -126,7 +126,7 @@ export default function WorkPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600 mb-4"></div>
           <p className="text-lg sm:text-xl text-gray-400">{t.loading}</p>
@@ -155,9 +155,9 @@ export default function WorkPage() {
     (typeof work.character_images === 'string' && work.character_images ? work.character_images.split(',').map(s => s.trim()) : []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
       {/* HEADER - АДАПТИВНЫЙ */}
-      <header className="bg-gray-900 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8">
+      <header className="bg-gray-950 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8">
         <div className="max-w-6xl mx-auto">
           <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-red-500 transition text-sm sm:text-base">
             <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
@@ -252,14 +252,14 @@ export default function WorkPage() {
             )}
 
             {/* ОПИСАНИЕ */}
-            <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 border-2 border-red-900 mb-4 sm:mb-6">
+            <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-2 border-red-900 mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-2 sm:mb-3">{t.description}</h2>
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.description}</p>
             </div>
 
             {/* ПРИМЕЧАНИЕ АВТОРА */}
             {work.author_note && (
-              <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-4 sm:mb-6">
+              <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-4 sm:mb-6">
                 <h2 className="text-base sm:text-lg font-bold text-red-500 mb-2">{t.authorNote}</h2>
                 <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.author_note}</p>
               </div>
@@ -321,7 +321,7 @@ export default function WorkPage() {
         </div>
 
         {/* ГЛАВЫ */}
-        <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 lg:p-8 border-2 border-red-900">
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 lg:p-8 border-2 border-red-900">
           <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4 sm:mb-6">
             {t.chapters} ({chapters.length})
           </h3>
@@ -334,7 +334,7 @@ export default function WorkPage() {
                 <Link
                   key={chapter.id}
                   href={`/work/${workId}/chapter/${chapter.id}`}
-                  className="block bg-gray-800 hover:bg-gray-700 rounded-lg p-3 sm:p-5 border-2 border-gray-700 hover:border-red-600 transition-all duration-300 group"
+                  className="block bg-gray-750 hover:bg-gray-700 rounded-lg p-3 sm:p-5 border-2 border-gray-600 hover:border-red-600 transition-all duration-300 group"
                 >
                   <div className="flex justify-between items-start gap-2 sm:gap-4">
                     <div className="flex-1 min-w-0">

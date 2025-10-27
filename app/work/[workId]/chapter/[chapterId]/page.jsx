@@ -169,7 +169,7 @@ export default function ChapterPage() {
     
     return (
       <div key={comment.id} style={{ marginLeft: depth > 0 ? (depth > maxDepth ? '20px' : '20px') : '0' }} className="mb-3 sm:mb-4">
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700">
+        <div className="bg-gray-750 bg-opacity-95 rounded-lg p-3 sm:p-4 border border-gray-600">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
             <div className="flex-1 min-w-0">
               <span className="font-semibold text-red-500 text-sm sm:text-base break-words">{comment.user_nickname}</span>
@@ -307,9 +307,9 @@ export default function ChapterPage() {
   const nextChapter = getNextChapter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
       {/* HEADER - АДАПТИВНЫЙ */}
-      <header className="bg-gray-900 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40">
+      <header className="bg-gray-950 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto">
           {/* НАВИГАЦИЯ */}
           <div className="flex justify-between items-center mb-2 sm:mb-4">
@@ -398,7 +398,7 @@ export default function ChapterPage() {
         </div>
 
         {/* ТЕКСТ ГЛАВЫ */}
-        <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
           <div 
             className="prose prose-invert max-w-none leading-relaxed text-gray-300"
             style={{ fontSize: `${fontSize}px`, wordBreak: 'break-word' }}
@@ -408,7 +408,7 @@ export default function ChapterPage() {
 
         {/* ИЗОБРАЖЕНИЯ */}
         {chapter.images && chapter.images.length > 0 && (
-          <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
+          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
             <h3 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">{t.images}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {chapter.images.map((img, i) => (
@@ -422,7 +422,7 @@ export default function ChapterPage() {
 
         {/* ПРИМЕЧАНИЕ АВТОРА */}
         {chapter.author_note && (
-          <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-6 sm:mb-8">
+          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-6 sm:mb-8">
             <h3 className="text-base sm:text-lg font-bold text-red-500 mb-2">{t.authorNote}</h3>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{chapter.author_note}</p>
           </div>
@@ -430,7 +430,7 @@ export default function ChapterPage() {
 
         {/* АУДИО */}
         {chapter.audio_url && (
-          <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
+          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
             <h3 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">{t.audio}</h3>
             <div className="space-y-3">
               {JSON.parse(chapter.audio_url).map((audio, i) => (
@@ -479,7 +479,7 @@ export default function ChapterPage() {
         </div>
 
         {/* КОММЕНТАРИИ */}
-        <div className="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900">
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
             <MessageSquare size={24} className="sm:w-9 sm:h-9" />
             <span className="break-words">{t.comments} ({mainComments.length})</span>
@@ -492,7 +492,7 @@ export default function ChapterPage() {
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={4}
                 placeholder={t.addComment}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:border-red-600 mb-3"
+                className="w-full bg-gray-850 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:border-red-600 mb-3"
               />
               <button
                 onClick={sendComment}
