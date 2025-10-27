@@ -127,22 +127,24 @@ const [workForm, setWorkForm] = useState({
     setLoading(true);
     
 const workData = {
-      title: workForm.title.trim(),
-      direction: workForm.direction,
-      category: workForm.category,
-      rating: workForm.rating,
-      status: workForm.status,
-      fandom: workForm.fandom.trim(),
-      pairing: workForm.pairing.trim(),
-      description: workForm.description.trim(),
-      author_note: workForm.author_note.trim(),
-      genres: workForm.genres ? workForm.genres.split(',').map(s => s.trim()).filter(s => s) : [],
-      tags: workForm.tags ? workForm.tags.split(',').map(s => s.trim()).filter(s => s) : [],
-      spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.split(',').map(s => s.trim()).filter(s => s) : [],
-      character_images: workForm.character_images || [],
-      cover_url: workForm.cover_image,
-      is_draft: isDraft
-    };
+  title: workForm.title.trim(),
+  direction: workForm.direction,
+  category: workForm.category,
+  rating: workForm.rating,
+  status: workForm.status,
+  fandom: workForm.fandom.trim() || null,
+  pairing: workForm.pairing.trim() || null,
+  description: workForm.description.trim(),
+  author_note: workForm.author_note.trim(),
+  genres: workForm.genres ? workForm.genres.split(',').map(s => s.trim()).filter(s => s) : [],
+  tags: workForm.tags ? workForm.tags.split(',').map(s => s.trim()).filter(s => s) : [],
+  spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.split(',').map(s => s.trim()).filter(s => s) : [],
+  character_images: workForm.character_images || [],
+  cover_url: workForm.cover_image,
+  is_draft: isDraft
+};
+
+console.log('📤 Отправляю данные:', workData); // ← ДОБАВЬ ЭТУ СТРОКУ
 
     try {
       let result;
