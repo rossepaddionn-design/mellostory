@@ -400,8 +400,13 @@ export default function ChapterPage() {
         {/* ТЕКСТ ГЛАВЫ */}
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
           <div 
-            className="prose prose-invert max-w-none leading-relaxed text-gray-300"
-            style={{ fontSize: `${fontSize}px`, wordBreak: 'break-word' }}
+            className="prose prose-invert max-w-none text-gray-300"
+            style={{ 
+              fontSize: `${fontSize}px`, 
+              wordBreak: 'break-word',
+              whiteSpace: 'normal',
+              lineHeight: '1.8'
+            }}
             dangerouslySetInnerHTML={{ __html: chapter.content }}
           />
         </div>

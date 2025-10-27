@@ -386,10 +386,14 @@ export default function AdminPanel() {
     }));
   };
 
-  const formatText = (command) => {
-    document.execCommand(command, false, null);
-    editorRef.current?.focus();
-  };
+const formatText = (command, value = null) => {
+  if (command === 'undo' || command === 'redo') {
+    document.execCommand(command);
+  } else {
+    document.execCommand(command, false, value);
+  }
+  editorRef.current?.focus();
+};
 
 const insertTooltip = () => {
     const word = window.getSelection().toString();
@@ -515,7 +519,7 @@ const insertTooltip = () => {
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold break-words">{selectedWork.isNew ? 'Новая работа' : `Редактирование`}</h2>
             </div>
 
-            <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
+<div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('workInfo')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">Шапка работы</h3>
                 {sectionsExpanded.workInfo ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -673,15 +677,15 @@ const insertTooltip = () => {
                   <div 
                     ref={editorRef}
                     contentEditable
-                    onInput={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
+                    onBlur={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
                     className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
                     style={{ 
-                      whiteSpace: 'pre-wrap',
+                      whiteSpace: 'normal',
                       wordWrap: 'break-word'
                     }}
                     suppressContentEditableWarning={true}
-                  >
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: chapterForm.content }}
+                  />
 
                   <div className="mb-4">
                     <label className="block text-xs sm:text-sm text-gray-400 mb-2">Примечание автора к главе</label>
