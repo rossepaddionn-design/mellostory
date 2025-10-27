@@ -391,7 +391,7 @@ export default function AdminPanel() {
     editorRef.current?.focus();
   };
 
-  const insertTooltip = () => {
+const insertTooltip = () => {
     const word = window.getSelection().toString();
     if (!word) {
       alert('Выделите слово!');
@@ -644,41 +644,44 @@ export default function AdminPanel() {
                     <button onClick={() => formatText('justifyRight')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Вправо"><AlignRight size={18} className="sm:w-5 sm:h-5" /></button>
                     <div className="w-px bg-gray-600 shrink-0"></div>
                     <select
-  onChange={(e) => {
-    if (e.target.value) {
-      document.execCommand('fontName', false, e.target.value);
-      editorRef.current?.focus();
-      e.target.value = '';
-    }
-  }}
-  className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs sm:text-sm shrink-0"
-  defaultValue=""
->
-  <option value="">Шрифты</option>
-  <option value="Georgia">Georgia</option>
-  <option value="Arial">Arial</option>
-  <option value="Courier New">Courier</option>
-  <option value="Times New Roman">Times</option>
-  <option value="Verdana">Verdana</option>
-  <option value="Comic Sans MS">Comic Sans</option>
-  <option value="Trebuchet MS">Trebuchet</option>
-</select>
-<div className="w-px bg-gray-600 shrink-0"></div>
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          document.execCommand('fontName', false, e.target.value);
+                          editorRef.current?.focus();
+                          e.target.value = '';
+                        }
+                      }}
+                      className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs sm:text-sm shrink-0"
+                      defaultValue=""
+                    >
+                      <option value="">Шрифты</option>
+                      <option value="Georgia">Georgia</option>
+                      <option value="Arial">Arial</option>
+                      <option value="Courier New">Courier</option>
+                      <option value="Times New Roman">Times</option>
+                      <option value="Verdana">Verdana</option>
+                      <option value="Comic Sans MS">Comic Sans</option>
+                      <option value="Trebuchet MS">Trebuchet</option>
+                    </select>
+                    <div className="w-px bg-gray-600 shrink-0"></div>
                     <button onClick={insertTooltip} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Пояснение"><HelpCircle size={18} className="sm:w-5 sm:h-5" /></button>
+                    <div className="w-px bg-gray-600 shrink-0"></div>
+                    <button onClick={() => formatText('undo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Отменить">↶</button>
+                    <button onClick={() => formatText('redo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Повторить">↷</button>
                   </div>
 
-<div 
-  ref={editorRef}
-  contentEditable
-  onInput={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
-  className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
-  style={{ 
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word'
-  }}
-  suppressContentEditableWarning={true}
->
-</div>
+                  <div 
+                    ref={editorRef}
+                    contentEditable
+                    onInput={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
+                    className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
+                    style={{ 
+                      whiteSpace: 'pre-wrap',
+                      wordWrap: 'break-word'
+                    }}
+                    suppressContentEditableWarning={true}
+                  >
+                  </div>
 
                   <div className="mb-4">
                     <label className="block text-xs sm:text-sm text-gray-400 mb-2">Примечание автора к главе</label>
