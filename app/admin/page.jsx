@@ -21,12 +21,14 @@ export default function AdminPanel() {
     chapterList: false
   });
 
-  const [workForm, setWorkForm] = useState({
+const [workForm, setWorkForm] = useState({
     title: '',
     direction: 'Слэш',
     category: 'minific',
     rating: 'NC-21',
     status: 'В процессе',
+    fandom: '',
+    pairing: '',
     description: '',
     author_note: '',
     genres: '',
@@ -124,12 +126,14 @@ export default function AdminPanel() {
 
     setLoading(true);
     
-    const workData = {
+const workData = {
       title: workForm.title.trim(),
       direction: workForm.direction,
       category: workForm.category,
       rating: workForm.rating,
       status: workForm.status,
+      fandom: workForm.fandom.trim(),
+      pairing: workForm.pairing.trim(),
       description: workForm.description.trim(),
       author_note: workForm.author_note.trim(),
       genres: workForm.genres ? workForm.genres.split(',').map(s => s.trim()).filter(s => s) : [],
@@ -484,20 +488,22 @@ const insertTooltip = () => {
                     <div className="flex gap-2 w-full sm:w-auto">
                       <button onClick={() => { 
                         setSelectedWork(work); 
-                        setWorkForm({
-                          title: work.title,
-                          direction: work.direction,
-                          category: work.category || 'minific',
-                          rating: work.rating,
-                          status: work.status,
-                          description: work.description || '',
-                          author_note: work.author_note || '',
-                          genres: work.genres?.join(', ') || '',
-                          tags: work.tags?.join(', ') || '',
-                          spoiler_tags: work.spoiler_tags?.join(', ') || '',
-                          character_images: work.character_images || [],
-                          cover_image: work.cover_url || null
-                        }); 
+setWorkForm({
+  title: work.title,
+  direction: work.direction,
+  category: work.category || 'minific',
+  rating: work.rating,
+  status: work.status,
+  fandom: work.fandom || '',
+  pairing: work.pairing || '',
+  description: work.description || '',
+  author_note: work.author_note || '',
+  genres: work.genres?.join(', ') || '',
+  tags: work.tags?.join(', ') || '',
+  spoiler_tags: work.spoiler_tags?.join(', ') || '',
+  character_images: work.character_images || [],
+  cover_image: work.cover_url || null
+}); 
                       }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm">
                         Редактировать
                       </button>
@@ -549,7 +555,7 @@ const insertTooltip = () => {
                     <div className="md:col-span-9 space-y-3 sm:space-y-4">
                       <input value={workForm.title} onChange={(e) => setWorkForm({...workForm, title: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-red-600" placeholder="Название работы" />
                       
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
                         <div>
                           <label className="block text-xs text-gray-400 mb-1 sm:mb-2">Направление:</label>
                           <select value={workForm.direction} onChange={(e) => setWorkForm({...workForm, direction: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-2 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600">
@@ -579,6 +585,8 @@ const insertTooltip = () => {
                         </div>
                       </div>
 
+                      <input value={workForm.fandom} onChange={(e) => setWorkForm({...workForm, fandom: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Фандом" />
+                      <input value={workForm.pairing} onChange={(e) => setWorkForm({...workForm, pairing: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Пейринг" />
                       <input value={workForm.genres} onChange={(e) => setWorkForm({...workForm, genres: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Жанры (через запятую)" />
                       <input value={workForm.tags} onChange={(e) => setWorkForm({...workForm, tags: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Теги (через запятую)" />
                       <input value={workForm.spoiler_tags} onChange={(e) => setWorkForm({...workForm, spoiler_tags: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Спойлеры (через запятую)" />

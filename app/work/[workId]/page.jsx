@@ -47,7 +47,7 @@ export default function WorkPage() {
       const [workRes, chaptersRes, viewsRes] = await Promise.all([
         supabase
           .from('works')
-          .select('id, title, description, cover_url, direction, rating, status, category, genres, tags, spoiler_tags, character_images, author_note')
+          .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
           .eq('id', workId)
           .eq('is_draft', false)
           .single(),
@@ -182,12 +182,30 @@ export default function WorkPage() {
             </div>
           </div>
 
-          {/* ОПИСАНИЕ И ИНФО */}
+{/* ОПИСАНИЕ И ИНФО */}
           <div>
             {/* НАЗВАНИЕ */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red-600 mb-3 sm:mb-4 break-words" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               {work.title}
             </h1>
+
+            {/* ФАНДОМ И ПЕЙРИНГ */}
+            {(work.fandom || work.pairing) && (
+              <div className="mb-4 sm:mb-5 space-y-2">
+                {work.fandom && (
+                  <div>
+                    <span className="text-gray-400 text-xs sm:text-sm">Фандом: </span>
+                    <span className="text-gray-200 text-sm sm:text-base break-words">{work.fandom}</span>
+                  </div>
+                )}
+                {work.pairing && (
+                  <div>
+                    <span className="text-gray-400 text-xs sm:text-sm">Пейринг: </span>
+                    <span className="text-gray-200 text-sm sm:text-base break-words">{work.pairing}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* БЕЙДЖИ + СЧЁТЧИК */}
             <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
