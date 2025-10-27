@@ -560,7 +560,14 @@ return (
           backgroundRepeat: 'no-repeat',
           backgroundColor: '#000'
         }}
-      />
+      >
+        <img 
+          src="https://i.ibb.co/tpQCnsSb/033-1.jpg" 
+          alt="" 
+          style={{display: 'none'}} 
+          fetchpriority="high"
+        />
+      </div>
 
       {/* AUTH MODAL */}
       {showAuthModal && (
@@ -871,13 +878,19 @@ return (
 
 {/* HEADER */}
 <div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
+  <img 
+    src={HEADER_BG_IMAGE} 
+    alt="" 
+    style={{display: 'none'}} 
+    fetchpriority="high"
+  />
   <div className="max-w-7xl mx-auto">
     {/* РАМКА С ГРАДИЕНТОМ */}
     <div 
       className="relative overflow-hidden rounded-lg"
       style={{
         padding: '3px',
-        background: 'linear-gradient(135deg, #dc2626 0%, #000000 50%, #dc2626 100%)'
+        background: 'linear-gradient(135deg, #dc2626 0%, #000000ff 50%, #dc2626 100%)'
       }}
     >
       {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
