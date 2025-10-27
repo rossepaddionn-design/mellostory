@@ -55,7 +55,7 @@ export default function Home() {
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
 
-  const HEADER_BG_IMAGE = 'https://i.ibb.co/MqDBKhy/001.jpg';
+const HEADER_BG_IMAGE = '/images/header-bg.jpg';
 
   // Блокировка скролла при открытии карточки
   useEffect(() => {
@@ -114,9 +114,9 @@ const checkUser = async () => {
 const loadWorks = async () => {
   setLoading(true);
   
-  const { data, error } = await supabase
+const { data, error } = await supabase
     .from('works')
-    .select('id, title, cover_url, direction, rating, status, category, description, created_at')
+    .select('id, title, cover_url, direction, rating, status, category, fandom, pairing, description, created_at')
     .eq('is_draft', false)
     .order('created_at', { ascending: false })
     .limit(20);
@@ -550,11 +550,16 @@ const handleLogout = async () => {
   };
 
 return (
-    <div className="min-h-screen text-white overflow-x-hidden relative">
+    <>
+      {/* PRELOAD критических изображений */}
+      <link rel="preload" href="/images/main-bg.jpg" as="image" />
+      <link rel="preload" href="/images/header-bg.jpg" as="image" />
+      
+      <div className="min-h-screen text-white overflow-x-hidden relative">
       <div 
         className="fixed inset-0 -z-10"
         style={{
-          backgroundImage: 'url(https://i.ibb.co/tpQCnsSb/033-1.jpg)',
+          backgroundImage: 'url(/images/main-bg.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -1084,14 +1089,30 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                               </div>
                               <div className="flex flex-col justify-between">
                                 <div>
-                                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
+<h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-red-600">{work.title}</h3>
+                                  
+                                  {/* ФАНДОМ И ПЕЙРИНГ */}
+                                  {(work.fandom || work.pairing) && (
+                                    <div className="mb-3 space-y-1">
+                                      {work.fandom && (
+                                        <div className="text-xs sm:text-sm">
+                                          <span className="text-gray-400">Фандом: </span>
+                                          <span className="text-gray-200">{work.fandom}</span>
+                                        </div>
+                                      )}
+                                      {work.pairing && (
+                                        <div className="text-xs sm:text-sm">
+                                          <span className="text-gray-400">Пейринг: </span>
+                                          <span className="text-gray-200">{work.pairing}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  
                                   <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
                                     <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
                                     <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
                                     <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
-                                  </div>
-                                  <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 max-h-60 sm:max-h-96 overflow-y-auto">
-                                    <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.description}</p>
                                   </div>
                                 </div>
                                 <Link 
@@ -1208,7 +1229,8 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
         <p className="text-base sm:text-lg">MelloStory © 2025</p>
-      </footer>
+</footer>
     </div>
+    </>
   );
 }
