@@ -382,12 +382,21 @@ export default function ChapterPage() {
           </h1>
         </div>
 
-        {/* ТЕКСТ ГЛАВЫ */}
+{/* ТЕКСТ ГЛАВЫ */}
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              .chapter-text-content * {
+                font-size: 12px !important;
+              }
+              .chapter-text-content {
+                font-size: 12px !important;
+              }
+            `
+          }} />
           <div 
-            className="text-gray-300"
+            className="chapter-text-content text-gray-300"
             style={{ 
-              fontSize: '12px',
               wordBreak: 'break-word',
               whiteSpace: 'normal',
               lineHeight: '1.8'
