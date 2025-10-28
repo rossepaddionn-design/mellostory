@@ -386,11 +386,81 @@ export default function ChapterPage() {
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
           <style dangerouslySetInnerHTML={{
             __html: `
+              /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
               .chapter-text-content * {
                 font-size: 12px !important;
               }
               .chapter-text-content {
                 font-size: 12px !important;
+              }
+              
+              /* ДЛЯ ПК - 13.5px */
+              @media (min-width: 640px) {
+                .chapter-text-content * {
+                  font-size: 13.5px !important;
+                }
+                .chapter-text-content {
+                  font-size: 13.5px !important;
+                }
+              }
+              
+              /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
+              [title] {
+                cursor: pointer;
+                position: relative;
+              }
+              
+              .explanation-tooltip-click {
+                position: absolute;
+                bottom: calc(100% + 5px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(15, 15, 15, 0.98);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 12px;
+                white-space: normal;
+                max-width: 280px;
+                z-index: 9999;
+                border: 2px solid #dc2626;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                line-height: 1.4;
+                text-align: center;
+                animation: tooltipFadeIn 0.2s ease;
+              }
+              
+              .explanation-tooltip-click::after {
+                content: '';
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 0;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid #dc2626;
+              }
+              
+              @keyframes tooltipFadeIn {
+                from {
+                  opacity: 0;
+                  transform: translateX(-50%) translateY(-5px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateX(-50%) translateY(0);
+                }
+              }
+              
+              /* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
+              @media (max-width: 640px) {
+                .explanation-tooltip-click {
+                  max-width: 200px;
+                  font-size: 11px;
+                  padding: 6px 10px;
+                }
               }
             `
           }} />

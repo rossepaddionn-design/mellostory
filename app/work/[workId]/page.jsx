@@ -52,6 +52,75 @@ useEffect(() => {
     }
   }, [workId]);
 
+  // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ (ТОЛЬКО ДЛЯ ПРОСМОТРА ГЛАВ)
+  useEffect(() => {
+    if (!chapter) return;
+
+    const handleExplanationClick = (e) => {
+      const target = e.target.closest('[title]');
+      
+      if (!target || !target.hasAttribute('title')) return;
+      
+      const titleText = target.getAttribute('title');
+      if (!titleText) return;
+      
+      // Проверяем, что это элемент с красным текстом (пояснение)
+      const computedStyle = window.getComputedStyle(target);
+      const isRedText = computedStyle.color === 'rgb(220, 38, 38)' || 
+                        target.style.color === 'rgb(220, 38, 38)' ||
+                        target.style.color === '#dc2626';
+      
+      if (!isRedText) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Проверяем, есть ли уже открытое окошко
+      const existingTooltip = target.querySelector('.explanation-tooltip-click');
+      
+      if (existingTooltip) {
+        // Если окошко открыто - закрываем
+        existingTooltip.remove();
+      } else {
+        // Закрываем все другие окошки
+        document.querySelectorAll('.explanation-tooltip-click').forEach(t => t.remove());
+        
+        // Создаём окошко
+        const tooltip = document.createElement('div');
+        tooltip.className = 'explanation-tooltip-click';
+        tooltip.textContent = titleText;
+        
+        // Позиционирование
+        target.style.position = 'relative';
+        target.appendChild(tooltip);
+      }
+    };
+    
+    // Добавляем обработчик
+    document.addEventListener('click', handleExplanationClick);
+    
+    // Убираем стандартное поведение title (всплывающая подсказка при наведении)
+    const elements = document.querySelectorAll('[title]');
+    elements.forEach(el => {
+      el.addEventListener('mouseenter', (e) => {
+        e.target.setAttribute('data-original-title', e.target.getAttribute('title'));
+        e.target.removeAttribute('title');
+      });
+      el.addEventListener('mouseleave', (e) => {
+        const originalTitle = e.target.getAttribute('data-original-title');
+        if (originalTitle) {
+          e.target.setAttribute('title', originalTitle);
+          e.target.removeAttribute('data-original-title');
+        }
+      });
+    });
+    
+    // Очистка
+    return () => {
+      document.removeEventListener('click', handleExplanationClick);
+    };
+  }, [chapter]);
+
   const loadAllData = async () => {
     setLoading(true);
     
