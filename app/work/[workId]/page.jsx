@@ -346,14 +346,14 @@ setLoading(false);
             {/* ОПИСАНИЕ */}
             <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-2 border-red-900 mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-2 sm:mb-3">{t.description}</h2>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.description}</p>
+              <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '12px' }}>{work.description}</p>
             </div>
 
             {/* ПРИМЕЧАНИЕ АВТОРА */}
             {work.author_note && (
               <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-4 sm:mb-6">
                 <h2 className="text-base sm:text-lg font-bold text-red-500 mb-2">{t.authorNote}</h2>
-                <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{work.author_note}</p>
+                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '12px' }}>{chapter.author_note}</p>
               </div>
             )}
 

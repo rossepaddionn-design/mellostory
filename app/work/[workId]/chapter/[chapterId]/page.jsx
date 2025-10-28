@@ -387,7 +387,7 @@ export default function ChapterPage() {
           <div 
             className="prose prose-invert max-w-none text-gray-300"
             style={{ 
-              fontSize: `${fontSize}px`, 
+              fontSize: '12px', 
               wordBreak: 'break-word',
               whiteSpace: 'normal',
               lineHeight: '1.8'
