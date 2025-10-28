@@ -680,9 +680,6 @@ setWorkForm({
                     <div className="w-px bg-gray-600 shrink-0"></div>
                     <button onClick={insertTooltip} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Пояснение"><HelpCircle size={18} className="sm:w-5 sm:h-5" /></button>
                     <div className="w-px bg-gray-600 shrink-0"></div>
-                    <button onClick={() => formatText('undo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Отменить">↶</button>
-                    <button onClick={() => formatText('redo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Повторить">↷</button>
-                    <div className="w-px bg-gray-600 shrink-0"></div>
                     <button 
                       onClick={() => {
                         if (editorRef.current) {
@@ -746,8 +743,10 @@ setWorkForm({
                         document.execCommand('insertHTML', false, '<br><br>');
                       }
                     }}
-                    onBlur={(e) => {
-                      setChapterForm({...chapterForm, content: e.currentTarget.innerHTML});
+                    onBlur={() => {
+                      if (editorRef.current) {
+                        setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
+                      }
                     }}
                     className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
                     style={{ 
