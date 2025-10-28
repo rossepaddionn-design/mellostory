@@ -61,11 +61,11 @@ const [workForm, setWorkForm] = useState({
     }
   }, [isAuth]);
 
-  useEffect(() => {
-    if (selectedWork && selectedWork.id) {
-      loadChapters(selectedWork.id);
-    }
-  }, [selectedWork?.id]);
+useEffect(() => {
+  if (editorRef.current && selectedChapter) {
+    editorRef.current.innerHTML = chapterForm.content || '';
+  }
+}, [selectedChapter?.id]);
 
   // СИНХРОНИЗАЦИЯ РЕДАКТОРА С СОДЕРЖИМЫМ ГЛАВЫ
   useEffect(() => {
