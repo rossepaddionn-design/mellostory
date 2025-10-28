@@ -686,9 +686,6 @@ setWorkForm({
                     <button 
                       onClick={() => {
                         if (editorRef.current) {
-                          const selection = window.getSelection();
-                          const range = selection.getRangeAt(0);
-                          
                           const content = editorRef.current.innerHTML;
                           const tempDiv = document.createElement('div');
                           tempDiv.innerHTML = content;
@@ -701,7 +698,6 @@ setWorkForm({
                           });
                           
                           editorRef.current.innerHTML = tempDiv.innerHTML;
-                          setChapterForm({...chapterForm, content: tempDiv.innerHTML});
                           editorRef.current.focus();
                         }
                       }} 
@@ -743,8 +739,6 @@ setWorkForm({
                       range.collapse(false);
                       selection.removeAllRanges();
                       selection.addRange(range);
-                      
-                      setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -752,7 +746,7 @@ setWorkForm({
                         document.execCommand('insertHTML', false, '<br><br>');
                       }
                     }}
-                    onInput={(e) => {
+                    onBlur={(e) => {
                       setChapterForm({...chapterForm, content: e.currentTarget.innerHTML});
                     }}
                     className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
@@ -761,6 +755,7 @@ setWorkForm({
                       wordWrap: 'break-word'
                     }}
                     suppressContentEditableWarning={true}
+                    dangerouslySetInnerHTML={{ __html: chapterForm.content }}
                   />
 
                   <div className="mb-4">
