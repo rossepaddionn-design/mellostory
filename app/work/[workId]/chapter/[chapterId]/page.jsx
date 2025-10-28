@@ -58,28 +58,19 @@ export default function ChapterPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId, workId]);
-  // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
+// ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
 
     const handleExplanationClick = (e) => {
       const target = e.target;
       
-      // Получаем title атрибут
+      // Проверяем наличие класса tooltip-word ИЛИ title атрибута
+      const hasTooltipClass = target.classList.contains('tooltip-word');
       const titleText = target.getAttribute('title');
+      
+      if (!titleText && !hasTooltipClass) return;
       if (!titleText) return;
-      
-      // Проверяем цвет (должен быть красным)
-      const computedStyle = window.getComputedStyle(target);
-      const color = computedStyle.color;
-      
-      // Красный может быть в разных форматах: rgb(220, 38, 38), #dc2626, red
-      const isRed = color.includes('220, 38, 38') || 
-                    color.includes('255, 0, 0') ||
-                    target.style.color === '#dc2626' ||
-                    target.style.color === 'red';
-      
-      if (!isRed) return;
       
       e.preventDefault();
       e.stopPropagation();
@@ -453,19 +444,19 @@ export default function ChapterPage() {
             __html: `
               /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
               .chapter-text-content * {
-                font-size: 12px !important;
+                font-size: 14px !important;
               }
               .chapter-text-content {
-                font-size: 12px !important;
+                font-size: 14px !important;
               }
               
-              /* ДЛЯ ПК - 15px */
+              /* ДЛЯ ПК - 14px */
               @media (min-width: 640px) {
                 .chapter-text-content * {
-                  font-size: 15px !important;
+                  font-size: 14px !important;
                 }
                 .chapter-text-content {
-                  font-size: 15px !important;
+                  font-size: 14px !important;
                 }
               }
               
