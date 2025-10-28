@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useParams } from 'next/navigation';
-import { ChevronLeft, ChevronDown, ChevronUp, BookOpen, Clock, AlertTriangle, Image as ImageIcon, ChevronRight, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronDown, ChevronUp, BookOpen, Clock, AlertTriangle, Image as ImageIcon, ChevronRight, Star, X } from 'lucide-react';
 
 export default function WorkPage() {
   const params = useParams();
@@ -14,6 +14,11 @@ export default function WorkPage() {
   const [loading, setLoading] = useState(true);
   const [showSpoilers, setShowSpoilers] = useState(false);
   const [viewCount, setViewCount] = useState(0);
+    const [averageRating, setAverageRating] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
+  const [userRating, setUserRating] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const carouselRef = useRef(null);
   const hasIncrementedView = useRef(false);
 
@@ -33,7 +38,14 @@ export default function WorkPage() {
     views: 'Просмотров'
   };
 
-  useEffect(() => {
+useEffect(() => {
+    // Проверка авторизации
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    checkUser();
+
     if (workId) {
       loadAllData();
       incrementViewCount();
@@ -44,7 +56,7 @@ export default function WorkPage() {
     setLoading(true);
     
     try {
-      const [workRes, chaptersRes, viewsRes] = await Promise.all([
+const [workRes, chaptersRes, viewsRes, ratingsRes] = await Promise.all([
         supabase
           .from('works')
           .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
@@ -61,7 +73,11 @@ export default function WorkPage() {
           .from('work_views')
           .select('view_count')
           .eq('work_id', workId)
-          .single()
+          .single(),
+        supabase
+          .from('work_ratings')
+          .select('rating, user_id')
+          .eq('work_id', workId)
       ]);
 
       if (workRes.error) {
@@ -79,11 +95,26 @@ export default function WorkPage() {
       if (viewsRes.data) {
         setViewCount(viewsRes.data.view_count);
       }
+      if (ratingsRes.data && ratingsRes.data.length > 0) {
+        const ratings = ratingsRes.data;
+        const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+        const avg = sum / ratings.length;
+        setAverageRating(avg);
+        setTotalRatings(ratings.length);
+        
+        // Проверяем оценку текущего пользователя
+        if (currentUser) {
+          const userRate = ratings.find(r => r.user_id === currentUser.id);
+          if (userRate) {
+            setUserRating(userRate.rating);
+          }
+        }
+      }
     } catch (err) {
       console.error('Ошибка загрузки данных:', err);
     }
 
-    setLoading(false);
+setLoading(false);
   };
 
   const incrementViewCount = async () => {
@@ -107,6 +138,38 @@ export default function WorkPage() {
         if (data) {
           setViewCount(data.view_count);
         }
+      }
+    } catch (err) {
+      console.error('Ошибка:', err);
+    }
+  };
+
+  const submitRating = async (rating) => {
+    if (!currentUser) {
+      alert('Войдите, чтобы оставить оценку');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('work_ratings')
+        .upsert({
+          work_id: workId,
+          user_id: currentUser.id,
+          rating: rating,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'work_id,user_id'
+        });
+
+      if (error) {
+        console.error('Ошибка сохранения оценки:', error);
+        alert('Ошибка сохранения оценки');
+      } else {
+        setUserRating(rating);
+        setShowRatingModal(false);
+        // Перезагружаем оценки
+        loadAllData();
       }
     } catch (err) {
       console.error('Ошибка:', err);
@@ -224,11 +287,22 @@ export default function WorkPage() {
                 </span>
               )}
               
-              {/* СЧЁТЧИК ПРОСМОТРОВ */}
+              {/* СЧЁТЧИК ПРОЧТЕНИЙ */}
               <div className="bg-gray-800 bg-opacity-60 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border border-gray-700">
-                <Eye size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-                <span className="text-gray-300">{viewCount.toLocaleString()}</span>
+                <BookOpen size={14} className="sm:w-4 sm:h-4 text-gray-400" />
+                <span className="text-gray-300">Прочтений: {viewCount.toLocaleString()}</span>
               </div>
+              
+              {/* ОЦЕНКА */}
+              <button
+                onClick={() => setShowRatingModal(true)}
+                className="bg-yellow-900 bg-opacity-40 hover:bg-opacity-60 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border border-yellow-700 hover:border-yellow-500 transition"
+              >
+                <Star size={14} className="sm:w-4 sm:h-4 text-yellow-400" fill={userRating ? 'currentColor' : 'none'} />
+                <span className="text-yellow-300">
+                  Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}
+                </span>
+              </button>
             </div>
 
             {/* ЖАНРЫ */}
@@ -380,6 +454,57 @@ export default function WorkPage() {
           )}
         </div>
       </main>
+      {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
+        {showRatingModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+            <div className="bg-gray-900 rounded-xl p-6 sm:p-8 max-w-md w-full border-2 border-red-900 relative">
+              <button
+                onClick={() => setShowRatingModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+              >
+                <X size={24} />
+              </button>
+              
+              <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4">
+                Оцените работу
+              </h3>
+              
+              {!currentUser ? (
+                <p className="text-gray-400 text-center py-4">
+                  Войдите, чтобы оставить оценку
+                </p>
+              ) : (
+                <>
+                  <p className="text-gray-300 mb-6 text-sm sm:text-base">
+                    {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+                  </p>
+                  
+                  <div className="grid grid-cols-5 gap-2 sm:gap-3">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => submitRating(num)}
+                        className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
+                          userRating === num
+                            ? 'bg-yellow-600 text-white'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {totalRatings > 0 && (
+                    <p className="text-gray-500 text-center mt-4 text-xs sm:text-sm">
+                      Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
     </div>
   );
 }

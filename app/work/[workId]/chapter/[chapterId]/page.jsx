@@ -16,7 +16,7 @@ export default function ChapterPage() {
   const [work, setWork] = useState(null);
   const [allChapters, setAllChapters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [fontSize, setFontSize] = useState(18);
+  const [fontSize, setFontSize] = useState(14);
   const [showChapterList, setShowChapterList] = useState(false);
 
   const [comments, setComments] = useState([]);
@@ -324,22 +324,7 @@ export default function ChapterPage() {
             
             {/* КНОПКИ УПРАВЛЕНИЯ */}
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-              {/* Размер шрифта */}
-              <div className="flex items-center gap-1 sm:gap-2">
-                <button 
-                  onClick={() => setFontSize(Math.max(14, fontSize - 2))} 
-                  className="bg-gray-800 hover:bg-gray-700 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm"
-                >
-                  A-
-                </button>
-                <button 
-                  onClick={() => setFontSize(Math.min(28, fontSize + 2))} 
-                  className="bg-gray-800 hover:bg-gray-700 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm"
-                >
-                  A+
-                </button>
-              </div>
-              
+
               {/* Список глав - мобильная кнопка */}
               <button
                 onClick={() => setShowChapterList(true)}
