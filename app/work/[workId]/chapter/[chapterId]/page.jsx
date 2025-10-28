@@ -385,9 +385,9 @@ export default function ChapterPage() {
         {/* ТЕКСТ ГЛАВЫ */}
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
           <div 
-           className="max-w-none text-gray-300"
+            className="text-gray-300"
             style={{ 
-              fontSize: '12px', 
+              fontSize: '12px',
               wordBreak: 'break-word',
               whiteSpace: 'normal',
               lineHeight: '1.8'
