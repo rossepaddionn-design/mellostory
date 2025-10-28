@@ -58,61 +58,66 @@ export default function ChapterPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId, workId]);
-
   // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
 
     const handleExplanationClick = (e) => {
-      const target = e.target.closest('[title]');
+      const target = e.target;
       
-      if (!target || !target.hasAttribute('title')) return;
-      
+      // Получаем title атрибут
       const titleText = target.getAttribute('title');
       if (!titleText) return;
       
+      // Проверяем цвет (должен быть красным)
       const computedStyle = window.getComputedStyle(target);
-      const isRedText = computedStyle.color === 'rgb(220, 38, 38)' || 
-                        target.style.color === 'rgb(220, 38, 38)' ||
-                        target.style.color === '#dc2626';
+      const color = computedStyle.color;
       
-      if (!isRedText) return;
+      // Красный может быть в разных форматах: rgb(220, 38, 38), #dc2626, red
+      const isRed = color.includes('220, 38, 38') || 
+                    color.includes('255, 0, 0') ||
+                    target.style.color === '#dc2626' ||
+                    target.style.color === 'red';
+      
+      if (!isRed) return;
       
       e.preventDefault();
       e.stopPropagation();
       
-      const existingTooltip = target.querySelector('.explanation-tooltip-click');
+      // Убираем title чтобы не показывалась стандартная подсказка
+      target.removeAttribute('title');
+      target.setAttribute('data-tooltip-text', titleText);
       
-      if (existingTooltip) {
-        existingTooltip.remove();
+      // Проверяем существующий tooltip
+      let tooltip = target.querySelector('.explanation-tooltip-click');
+      
+      if (tooltip) {
+        // Закрываем
+        tooltip.remove();
+        target.setAttribute('title', titleText);
       } else {
-        document.querySelectorAll('.explanation-tooltip-click').forEach(t => t.remove());
+        // Закрываем все другие
+        document.querySelectorAll('.explanation-tooltip-click').forEach(t => {
+          const parent = t.parentElement;
+          if (parent) {
+            const savedTitle = parent.getAttribute('data-tooltip-text');
+            if (savedTitle) parent.setAttribute('title', savedTitle);
+          }
+          t.remove();
+        });
         
-        const tooltip = document.createElement('div');
+        // Создаём новый
+        tooltip = document.createElement('div');
         tooltip.className = 'explanation-tooltip-click';
         tooltip.textContent = titleText;
         
         target.style.position = 'relative';
+        target.style.display = 'inline-block';
         target.appendChild(tooltip);
       }
     };
     
     document.addEventListener('click', handleExplanationClick);
-    
-    const elements = document.querySelectorAll('[title]');
-    elements.forEach(el => {
-      el.addEventListener('mouseenter', (e) => {
-        e.target.setAttribute('data-original-title', e.target.getAttribute('title'));
-        e.target.removeAttribute('title');
-      });
-      el.addEventListener('mouseleave', (e) => {
-        const originalTitle = e.target.getAttribute('data-original-title');
-        if (originalTitle) {
-          e.target.setAttribute('title', originalTitle);
-          e.target.removeAttribute('data-original-title');
-        }
-      });
-    });
     
     return () => {
       document.removeEventListener('click', handleExplanationClick);
@@ -454,13 +459,13 @@ export default function ChapterPage() {
                 font-size: 12px !important;
               }
               
-              /* ДЛЯ ПК - 13.5px */
+              /* ДЛЯ ПК - 15px */
               @media (min-width: 640px) {
                 .chapter-text-content * {
-                  font-size: 13.5px !important;
+                  font-size: 15px !important;
                 }
                 .chapter-text-content {
-                  font-size: 13.5px !important;
+                  font-size: 15px !important;
                 }
               }
               
