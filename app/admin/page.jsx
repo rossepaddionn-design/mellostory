@@ -684,11 +684,27 @@ setWorkForm({
                     <button onClick={() => formatText('redo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Повторить">↷</button>
                   </div>
 
-                  <div 
-                    ref={editorRef}
-                    contentEditable
-                    onBlur={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
-                    className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
+<div 
+  ref={editorRef}
+  contentEditable
+  onPaste={(e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    
+    // Удаляем все inline стили color
+    tempDiv.querySelectorAll('*').forEach(el => {
+      el.style.color = '';
+      if (el.style.length === 0) {
+        el.removeAttribute('style');
+      }
+    });
+    
+    document.execCommand('insertHTML', false, tempDiv.innerHTML);
+  }}
+  onBlur={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
+  className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
                     style={{ 
                       whiteSpace: 'normal',
                       wordWrap: 'break-word'
