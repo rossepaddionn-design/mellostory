@@ -69,12 +69,10 @@ const [workForm, setWorkForm] = useState({
 
   // СИНХРОНИЗАЦИЯ РЕДАКТОРА С СОДЕРЖИМЫМ ГЛАВЫ
   useEffect(() => {
-    if (editorRef.current && chapterForm.content) {
-      editorRef.current.innerHTML = chapterForm.content;
-    } else if (editorRef.current && !chapterForm.content) {
-      editorRef.current.innerHTML = '';
+    if (editorRef.current) {
+      editorRef.current.innerHTML = chapterForm.content || '';
     }
-  }, [selectedChapter?.id, chapterForm.content]);
+  }, [selectedChapter?.id]);
 
   const loadWorks = async () => {
     try {
@@ -754,7 +752,6 @@ setWorkForm({
                       wordWrap: 'break-word'
                     }}
                     suppressContentEditableWarning={true}
-                    dangerouslySetInnerHTML={{ __html: chapterForm.content }}
                   />
 
                   <div className="mb-4">
