@@ -59,6 +59,66 @@ export default function ChapterPage() {
     }
   }, [chapterId, workId]);
 
+  // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
+  useEffect(() => {
+    if (!chapter) return;
+
+    const handleExplanationClick = (e) => {
+      const target = e.target.closest('[title]');
+      
+      if (!target || !target.hasAttribute('title')) return;
+      
+      const titleText = target.getAttribute('title');
+      if (!titleText) return;
+      
+      const computedStyle = window.getComputedStyle(target);
+      const isRedText = computedStyle.color === 'rgb(220, 38, 38)' || 
+                        target.style.color === 'rgb(220, 38, 38)' ||
+                        target.style.color === '#dc2626';
+      
+      if (!isRedText) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const existingTooltip = target.querySelector('.explanation-tooltip-click');
+      
+      if (existingTooltip) {
+        existingTooltip.remove();
+      } else {
+        document.querySelectorAll('.explanation-tooltip-click').forEach(t => t.remove());
+        
+        const tooltip = document.createElement('div');
+        tooltip.className = 'explanation-tooltip-click';
+        tooltip.textContent = titleText;
+        
+        target.style.position = 'relative';
+        target.appendChild(tooltip);
+      }
+    };
+    
+    document.addEventListener('click', handleExplanationClick);
+    
+    const elements = document.querySelectorAll('[title]');
+    elements.forEach(el => {
+      el.addEventListener('mouseenter', (e) => {
+        e.target.setAttribute('data-original-title', e.target.getAttribute('title'));
+        e.target.removeAttribute('title');
+      });
+      el.addEventListener('mouseleave', (e) => {
+        const originalTitle = e.target.getAttribute('data-original-title');
+        if (originalTitle) {
+          e.target.setAttribute('title', originalTitle);
+          e.target.removeAttribute('data-original-title');
+        }
+      });
+    });
+    
+    return () => {
+      document.removeEventListener('click', handleExplanationClick);
+    };
+  }, [chapter]);
+
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
