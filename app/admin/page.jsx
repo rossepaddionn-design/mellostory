@@ -649,7 +649,7 @@ setWorkForm({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-4 p-3 sm:p-4 bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
+<div className="sticky top-16 z-30 flex flex-wrap gap-2 mb-4 p-3 sm:p-4 bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto shadow-lg">
                     <button onClick={() => formatText('bold')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Жирный"><Bold size={18} className="sm:w-5 sm:h-5" /></button>
                     <button onClick={() => formatText('italic')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Курсив"><Italic size={18} className="sm:w-5 sm:h-5" /></button>
                     <div className="w-px bg-gray-600 shrink-0"></div>
@@ -682,35 +682,85 @@ setWorkForm({
                     <div className="w-px bg-gray-600 shrink-0"></div>
                     <button onClick={() => formatText('undo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Отменить">↶</button>
                     <button onClick={() => formatText('redo')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Повторить">↷</button>
+                    <div className="w-px bg-gray-600 shrink-0"></div>
+                    <button 
+                      onClick={() => {
+                        if (editorRef.current) {
+                          const selection = window.getSelection();
+                          const range = selection.getRangeAt(0);
+                          
+                          const content = editorRef.current.innerHTML;
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = content;
+                          
+                          tempDiv.querySelectorAll('*').forEach(el => {
+                            el.style.color = '';
+                            if (el.style.length === 0) {
+                              el.removeAttribute('style');
+                            }
+                          });
+                          
+                          editorRef.current.innerHTML = tempDiv.innerHTML;
+                          setChapterForm({...chapterForm, content: tempDiv.innerHTML});
+                          editorRef.current.focus();
+                        }
+                      }} 
+                      className="p-2 hover:bg-gray-700 rounded shrink-0 bg-purple-600 hover:bg-purple-700" 
+                      title="Удалить цвет текста"
+                    >
+                      🎨
+                    </button>
                   </div>
 
-<div 
-  ref={editorRef}
-  contentEditable
-  onPaste={(e) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = text;
-    
-    // Удаляем все inline стили color
-    tempDiv.querySelectorAll('*').forEach(el => {
-      el.style.color = '';
-      if (el.style.length === 0) {
-        el.removeAttribute('style');
-      }
-    });
-    
-    document.execCommand('insertHTML', false, tempDiv.innerHTML);
-  }}
-  onBlur={(e) => setChapterForm({...chapterForm, content: e.currentTarget.innerHTML})}
-  className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
+                  <div 
+                    ref={editorRef}
+                    contentEditable
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      
+                      const selection = window.getSelection();
+                      if (!selection.rangeCount) return;
+                      const range = selection.getRangeAt(0);
+                      
+                      const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
+                      const tempDiv = document.createElement('div');
+                      tempDiv.innerHTML = text;
+                      
+                      tempDiv.querySelectorAll('*').forEach(el => {
+                        el.style.color = '';
+                        if (el.style.length === 0) {
+                          el.removeAttribute('style');
+                        }
+                      });
+                      
+                      const fragment = document.createDocumentFragment();
+                      while (tempDiv.firstChild) {
+                        fragment.appendChild(tempDiv.firstChild);
+                      }
+                      
+                      range.deleteContents();
+                      range.insertNode(fragment);
+                      range.collapse(false);
+                      selection.removeAllRanges();
+                      selection.addRange(range);
+                      
+                      setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.execCommand('insertHTML', false, '<br><br>');
+                      }
+                    }}
+                    onInput={(e) => {
+                      setChapterForm({...chapterForm, content: e.currentTarget.innerHTML});
+                    }}
+                    className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
                     style={{ 
                       whiteSpace: 'normal',
                       wordWrap: 'break-word'
                     }}
                     suppressContentEditableWarning={true}
-                    dangerouslySetInnerHTML={{ __html: chapterForm.content }}
                   />
 
                   <div className="mb-4">
