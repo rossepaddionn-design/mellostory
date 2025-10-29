@@ -450,13 +450,13 @@ export default function ChapterPage() {
                 font-size: 14px !important;
               }
               
-              /* ДЛЯ ПК - 14px */
+              /* ДЛЯ ПК - 15px */
               @media (min-width: 640px) {
                 .chapter-text-content * {
-                  font-size: 14px !important;
+                  font-size: 15px !important;
                 }
                 .chapter-text-content {
-                  font-size: 14px !important;
+                  font-size: 15px !important;
                 }
               }
               
@@ -466,25 +466,25 @@ export default function ChapterPage() {
                 position: relative;
               }
               
-              .explanation-tooltip-click {
-                position: absolute;
-                bottom: calc(100% + 5px);
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(15, 15, 15, 0.98);
-                color: #fff;
-                padding: 8px 12px;
-                border-radius: 8px;
-                font-size: 12px;
-                white-space: normal;
-                max-width: 280px;
-                z-index: 9999;
-                border: 2px solid #dc2626;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-                line-height: 1.4;
-                text-align: center;
-                animation: tooltipFadeIn 0.2s ease;
-              }
+.explanation-tooltip-click {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 15, 0.98);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;  /* ← ИЗМЕНЕНО */
+  max-width: 280px;
+  z-index: 9999;
+  border: 2px solid #dc2626;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  line-height: 1.4;
+  text-align: center;
+  animation: tooltipFadeIn 0.2s ease;
+}
               
               .explanation-tooltip-click::after {
                 content: '';
@@ -523,6 +523,7 @@ export default function ChapterPage() {
           <div 
             className="chapter-text-content text-gray-300"
             style={{ 
+              fontSize: '14px',
               wordBreak: 'break-word',
               whiteSpace: 'normal',
               lineHeight: '1.8'
