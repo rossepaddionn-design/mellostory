@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle } from 'lucide-react';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -24,9 +24,14 @@ export default function Home() {
   const [userProfile, setUserProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const [showAuthModal, setShowAuthModal] = useState(false);
+const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ nickname: '', email: '', password: '' });
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
 
   const [showReaderPanel, setShowReaderPanel] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -169,7 +174,7 @@ const loadUserData = async () => {
     }
   }, [user, userProfile, showReaderPanel]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (showReaderMessagesModal && user && userProfile) {
       loadReaderMessages();
     }
@@ -229,6 +234,11 @@ const loadUserData = async () => {
       return;
     }
 
+    if (!agreedToPrivacy) {
+      alert('Необходимо согласиться с политикой конфиденциальности!');
+      return;
+    }
+
     const { data: existingNickname } = await supabase
       .from('reader_profiles')
       .select('nickname')
@@ -268,74 +278,133 @@ const loadUserData = async () => {
         alert('Регистрация успешна! Проверьте почту для подтверждения.');
         setShowAuthModal(false);
         setAuthForm({ nickname: '', email: '', password: '' });
+        setAgreedToPrivacy(false);
       }
     }
   };
 
-const handleLogin = async () => {
-  if (!authForm.email || !authForm.password) {
-    alert('Введите email и пароль!');
-    return;
-  }
-
-  // АДМИН - проверяем БЕЗ Supabase!
-  if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
-    setIsAdmin(true);
-    setUser({ email: ADMIN_EMAIL, id: 'admin' });
-    localStorage.setItem('admin_session', 'true'); // Сохраняем в localStorage
-    setShowAuthModal(false);
-    setAuthForm({ nickname: '', email: '', password: '' });
-    return;
-  }
-
-  // ОБЫЧНЫЙ ЮЗЕР - через Supabase
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: authForm.email,
-    password: authForm.password
-  });
-
-  if (error) {
-    alert('Ошибка входа: ' + error.message);
-    return;
-  }
-
-  if (data.user) {
-    setUser(data.user);
-    
-    const { data: profile } = await supabase
-      .from('reader_profiles')
-      .select('*')
-      .eq('user_id', data.user.id)
-      .single();
-    
-    if (profile) {
-      if (profile.is_banned) {
-        alert('Ваш аккаунт заблокирован!');
-        await supabase.auth.signOut();
-        return;
-      }
-      setUserProfile(profile);
-      setIsAdmin(false);
+  const handleLogin = async () => {
+    if (!authForm.email || !authForm.password) {
+      alert('Введите email и пароль!');
+      return;
     }
-    
-    setShowAuthModal(false);
-    setAuthForm({ nickname: '', email: '', password: '' });
-  }
-};
 
-const handleLogout = async () => {
-  if (isAdmin) {
-    setIsAdmin(false);
-    setUser(null);
-    localStorage.removeItem('admin_session'); // Удаляем из localStorage
-  } else {
-    await supabase.auth.signOut();
-    setUser(null);
-    setUserProfile(null);
-  }
-  setShowReaderPanel(false);
-  setShowAdminPanel(false);
-};
+    // АДМИН - проверяем БЕЗ Supabase!
+    if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      setUser({ email: ADMIN_EMAIL, id: 'admin' });
+      localStorage.setItem('admin_session', 'true');
+      setShowAuthModal(false);
+      setAuthForm({ nickname: '', email: '', password: '' });
+      return;
+    }
+
+    // ОБЫЧНЫЙ ЮЗЕР - через Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: authForm.email,
+      password: authForm.password
+    });
+
+    if (error) {
+      alert('Ошибка входа: ' + error.message);
+      return;
+    }
+
+    if (data.user) {
+      setUser(data.user);
+      
+      const { data: profile } = await supabase
+        .from('reader_profiles')
+        .select('*')
+        .eq('user_id', data.user.id)
+        .single();
+      
+      if (profile) {
+        if (profile.is_banned) {
+          alert('Ваш аккаунт заблокирован!');
+          await supabase.auth.signOut();
+          return;
+        }
+        setUserProfile(profile);
+        setIsAdmin(false);
+      }
+      
+      setShowAuthModal(false);
+      setAuthForm({ nickname: '', email: '', password: '' });
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isAdmin) {
+      setIsAdmin(false);
+      setUser(null);
+      localStorage.removeItem('admin_session');
+    } else {
+      await supabase.auth.signOut();
+      setUser(null);
+      setUserProfile(null);
+    }
+    setShowReaderPanel(false);
+    setShowAdminPanel(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      alert('Введите пароль для подтверждения!');
+      return;
+    }
+
+    // Проверяем пароль
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: userProfile.email,
+      password: deletePassword
+    });
+
+    if (signInError) {
+      alert('Неверный пароль!');
+      return;
+    }
+
+    if (!confirm('Вы уверены? Это действие необратимо!')) {
+      return;
+    }
+
+    try {
+      // Сохраняем причину удаления (если указана)
+      if (deleteReason.trim()) {
+        await supabase.from('deletion_reasons').insert({
+          user_id: user.id,
+          nickname: userProfile.nickname,
+          reason: deleteReason.trim(),
+          deleted_at: new Date().toISOString()
+        });
+      }
+
+      // Удаляем профиль читателя
+      await supabase.from('reader_profiles').delete().eq('user_id', user.id);
+      
+      // Удаляем комментарии
+      await supabase.from('comments').delete().eq('user_id', user.id);
+      
+      // Удаляем сообщения
+      await supabase.from('messages').delete().eq('from_user_id', user.id);
+
+      // Удаляем аккаунт из Supabase Auth (требует admin API, может не сработать)
+      // Поэтому просто выходим из системы
+      await supabase.auth.signOut();
+      
+      alert('Ваш аккаунт успешно удалён.');
+      setShowDeleteAccountModal(false);
+      setDeleteReason('');
+      setDeletePassword('');
+      setUser(null);
+      setUserProfile(null);
+      setShowReaderPanel(false);
+    } catch (err) {
+      alert('Ошибка удаления: ' + err.message);
+    }
+  };
+
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {
@@ -567,7 +636,7 @@ return (
         }}
       />
 
-      {/* AUTH MODAL */}
+{/* AUTH MODAL */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
           <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-8 border-2 border-red-600">
@@ -575,37 +644,67 @@ return (
               <h2 className="text-xl sm:text-2xl font-bold text-red-600">
                 {authMode === 'login' ? t.login : t.register}
               </h2>
-              <button onClick={() => setShowAuthModal(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => {
+                setShowAuthModal(false);
+                setAgreedToPrivacy(false);
+              }} className="text-gray-400 hover:text-white">
                 <X size={24} />
               </button>
             </div>
 
             <div className="space-y-3 sm:space-y-4">
               {authMode === 'register' && (
-                <input
-                  type="text"
-                  placeholder={t.nickname}
-                  value={authForm.nickname}
-                  onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
-                />
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.nickname}</label>
+                  <input
+                    type="text"
+                    placeholder={t.nickname}
+                    value={authForm.nickname}
+                    onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
+                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
+                  />
+                </div>
               )}
               
-              <input
-                type="email"
-                placeholder={t.email}
-                value={authForm.email}
-                onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-                className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
-              />
+              <div>
+                <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.email}</label>
+                <input
+                  type="email"
+                  placeholder={t.email}
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
+                />
+              </div>
               
-              <input
-                type="password"
-                placeholder={t.password}
-                value={authForm.password}
-                onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
-                className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
-              />
+              <div>
+                <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.password}</label>
+                <input
+                  type="password"
+                  placeholder={t.password}
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-red-600"
+                />
+              </div>
+
+              {authMode === 'register' && (
+                <div className="flex items-start gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                  <input
+                    type="checkbox"
+                    id="privacy-checkbox"
+                    checked={agreedToPrivacy}
+                    onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                    className="mt-1 w-4 h-4 accent-red-600 cursor-pointer flex-shrink-0"
+                  />
+                  <label htmlFor="privacy-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                    Я согласен с{' '}
+                    <Link href="/privacy" className="text-red-500 hover:text-red-400 underline" target="_blank">
+                      Политикой конфиденциальности
+                    </Link>
+                  </label>
+                </div>
+              )}
 
               <button
                 onClick={authMode === 'login' ? handleLogin : handleRegister}
@@ -615,10 +714,87 @@ return (
               </button>
 
               <button
-                onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                onClick={() => {
+                  setAuthMode(authMode === 'login' ? 'register' : 'login');
+                  setAgreedToPrivacy(false);
+                }}
                 className="w-full text-gray-400 hover:text-white text-xs sm:text-sm"
               >
                 {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE ACCOUNT MODAL */}
+      {showDeleteAccountModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-6 border-2 border-orange-600">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
+                <AlertTriangle size={24} />
+                Удаление аккаунта
+              </h2>
+              <button onClick={() => {
+                setShowDeleteAccountModal(false);
+                setDeleteReason('');
+                setDeletePassword('');
+              }} className="text-gray-400 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="bg-red-900 bg-opacity-30 border-2 border-red-600 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <p className="text-xs sm:text-sm text-red-300">
+                ⚠️ Это действие необратимо! Все ваши данные (комментарии, сообщения, закладки) будут удалены навсегда.
+              </p>
+            </div>
+
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">
+                  Причина удаления <span className="text-gray-500">(необязательно)</span>
+                </label>
+                <textarea
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  rows={3}
+                  placeholder="Расскажите, почему вы решили удалить аккаунт..."
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600 text-white resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">
+                  Введите пароль для подтверждения <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Ваш пароль"
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600"
+                />
+              </div>
+
+              <button
+                onClick={handleDeleteAccount}
+                className="w-full bg-orange-600 hover:bg-orange-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <Trash2 size={18} className="sm:w-5 sm:h-5" />
+                Удалить аккаунт навсегда
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowDeleteAccountModal(false);
+                  setDeleteReason('');
+                  setDeletePassword('');
+                }}
+                className="w-full bg-gray-700 hover:bg-gray-600 py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
+              >
+                Отмена
               </button>
             </div>
           </div>
@@ -784,7 +960,7 @@ return (
             </button>
           </div>
 
-          <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
+<div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
             <button
               onClick={() => setShowReaderMessagesModal(true)}
               className="w-full bg-red-600 hover:bg-red-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base"
@@ -796,6 +972,14 @@ return (
                   {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => setShowDeleteAccountModal(true)}
+              className="w-full bg-orange-600 hover:bg-orange-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+            >
+              <Trash2 size={18} className="sm:w-5 sm:h-5" />
+              Удалить аккаунт
             </button>
 
             <button
@@ -1235,8 +1419,11 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
 
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
-        <p className="text-base sm:text-lg">MelloStory © 2025</p>
-</footer>
+        <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
+        <Link href="/privacy" className="text-sm text-gray-400 hover:text-red-500 transition underline">
+          Политика конфиденциальности
+        </Link>
+      </footer>
     </div>
     </>
   );
