@@ -60,7 +60,7 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
 
-const HEADER_BG_IMAGE = '/images/header-bg.jpg';
+const HEADER_BG_IMAGE = '/images/header-bg-v2.jpg';
 
   // Блокировка скролла при открытии карточки
   useEffect(() => {
