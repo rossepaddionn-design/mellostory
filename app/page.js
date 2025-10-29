@@ -1373,6 +1373,15 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
           )}
         </div>
 
+        {/* НОВОСТИ */}
+        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
+          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
+            <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
+              <p>Здесь будут появляться новости о новых работах и обновлениях сайта.</p>
+            </div>
+          </div>
+        </div>
+
         {/* ABOUT SECTION */}
         <div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
@@ -1404,15 +1413,6 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
               <span className="text-base sm:text-2xl md:text-3xl">{t.copyrightTitle}</span>
             </h3>
             <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-justify">{t.copyrightText}</p>
-          </div>
-        </div>
-
-        {/* НОВОСТИ */}
-        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
-          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
-            <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
-              <p>Здесь будут появляться новости о новых работах и обновлениях сайта.</p>
-            </div>
           </div>
         </div>
       </main>
