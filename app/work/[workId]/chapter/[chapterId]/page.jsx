@@ -477,34 +477,40 @@ export default function ChapterPage() {
                 }
               }
               
-              /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
-              [title] {
-                cursor: pointer;
-                position: relative;
-              }
-              
-              .explanation-tooltip-click {
-                position: fixed !important;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%) !important;
-                background: rgba(15, 15, 15, 0.98);
-                color: #fff;
-                padding: 12px 16px;
-                border-radius: 12px;
-                font-size: 13px;
-                white-space: pre-wrap;
-                max-width: 90vw;
-                max-height: 60vh;
-                overflow-y: auto;
-                z-index: 99999;
-                border: 2px solid #dc2626;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-                line-height: 1.6;
-                text-align: left;
-                animation: tooltipFadeIn 0.3s ease;
-                word-wrap: break-word;
-              }
+/* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
+[title] {
+  cursor: pointer;
+  position: relative;
+}
+
+/* 🔥 ДОБАВЬ ЭТО: */
+.tooltip-word {
+  position: static !important;
+  display: inline !important;
+}
+
+.explanation-tooltip-click {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  background: rgba(15, 15, 15, 0.98);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  white-space: pre-wrap;
+  max-width: 90vw;
+  max-height: 60vh;
+  overflow-y: auto;
+  z-index: 99999;
+  border: 2px solid #dc2626;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  line-height: 1.6;
+  text-align: left;
+  animation: tooltipFadeIn 0.3s ease;
+  word-wrap: break-word;
+}
               
               @keyframes tooltipFadeIn {
                 from {
