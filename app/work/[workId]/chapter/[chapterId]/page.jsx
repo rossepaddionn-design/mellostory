@@ -58,7 +58,7 @@ export default function ChapterPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId, workId]);
-// ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
+  // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
 
@@ -67,7 +67,7 @@ export default function ChapterPage() {
       
       // Проверяем наличие класса tooltip-word ИЛИ title атрибута
       const hasTooltipClass = target.classList.contains('tooltip-word');
-      const titleText = target.getAttribute('title');
+      const titleText = target.getAttribute('title') || target.getAttribute('data-tooltip-text');
       
       if (!titleText && !hasTooltipClass) return;
       if (!titleText) return;
@@ -75,19 +75,41 @@ export default function ChapterPage() {
       e.preventDefault();
       e.stopPropagation();
       
+      // Проверяем существующий tooltip У ЭТОГО ЭЛЕМЕНТА
+      let tooltip = target.querySelector('.explanation-tooltip-click');
+      
+      if (tooltip) {
+        // ЗАКРЫВАЕМ при повторном клике
+        tooltip.remove();
+        // Возвращаем title обратно
+        if (!target.getAttribute('title')) {
+          target.setAttribute('title', titleText);
+        }
+        return; // ВАЖНО: выходим из функции
+      }
+      
+      // Закрываем все другие окошки
+      document.querySelectorAll('.explanation-tooltip-click').forEach(t => {
+        t.remove();
+      });
+      
       // Убираем title чтобы не показывалась стандартная подсказка
       target.removeAttribute('title');
       target.setAttribute('data-tooltip-text', titleText);
       
-      // Проверяем существующий tooltip
-      let tooltip = target.querySelector('.explanation-tooltip-click');
+      // Создаём новый tooltip
+      tooltip = document.createElement('div');
+      tooltip.className = 'explanation-tooltip-click';
+      tooltip.textContent = titleText;
       
-      if (tooltip) {
-        // Закрываем
-        tooltip.remove();
-        target.setAttribute('title', titleText);
-      } else {
-        // Закрываем все другие
+      target.style.position = 'relative';
+      target.style.display = 'inline-block';
+      target.appendChild(tooltip);
+    };
+    
+    // Закрываем tooltip при клике вне элемента
+    const handleDocumentClick = (e) => {
+      if (!e.target.classList.contains('tooltip-word')) {
         document.querySelectorAll('.explanation-tooltip-click').forEach(t => {
           const parent = t.parentElement;
           if (parent) {
@@ -96,22 +118,15 @@ export default function ChapterPage() {
           }
           t.remove();
         });
-        
-        // Создаём новый
-        tooltip = document.createElement('div');
-        tooltip.className = 'explanation-tooltip-click';
-        tooltip.textContent = titleText;
-        
-        target.style.position = 'relative';
-        target.style.display = 'inline-block';
-        target.appendChild(tooltip);
       }
     };
     
     document.addEventListener('click', handleExplanationClick);
+    document.addEventListener('click', handleDocumentClick);
     
     return () => {
       document.removeEventListener('click', handleExplanationClick);
+      document.removeEventListener('click', handleDocumentClick);
     };
   }, [chapter]);
 
@@ -443,19 +458,21 @@ export default function ChapterPage() {
           <style dangerouslySetInnerHTML={{
             __html: `
               /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
-              .chapter-text-content * {
+              .chapter-text-content {
                 font-size: 14px !important;
               }
-              .chapter-text-content {
+              
+              .chapter-text-content * {
                 font-size: 14px !important;
               }
               
               /* ДЛЯ ПК - 15px */
               @media (min-width: 640px) {
-                .chapter-text-content * {
+                .chapter-text-content {
                   font-size: 15px !important;
                 }
-                .chapter-text-content {
+                
+                .chapter-text-content * {
                   font-size: 15px !important;
                 }
               }
@@ -466,60 +483,51 @@ export default function ChapterPage() {
                 position: relative;
               }
               
-.explanation-tooltip-click {
-  position: absolute;
-  bottom: calc(100% + 5px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15, 15, 15, 0.98);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  white-space: nowrap;  /* ← ИЗМЕНЕНО */
-  max-width: 280px;
-  z-index: 9999;
-  border: 2px solid #dc2626;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  line-height: 1.4;
-  text-align: center;
-  animation: tooltipFadeIn 0.2s ease;
-}
-              
-              .explanation-tooltip-click::after {
-                content: '';
-                position: absolute;
-                top: 100%;
+              .explanation-tooltip-click {
+                position: fixed !important;
+                top: 50%;
                 left: 50%;
-                transform: translateX(-50%);
-                width: 0;
-                height: 0;
-                border-left: 8px solid transparent;
-                border-right: 8px solid transparent;
-                border-top: 8px solid #dc2626;
+                transform: translate(-50%, -50%) !important;
+                background: rgba(15, 15, 15, 0.98);
+                color: #fff;
+                padding: 12px 16px;
+                border-radius: 12px;
+                font-size: 13px;
+                white-space: pre-wrap;
+                max-width: 90vw;
+                max-height: 60vh;
+                overflow-y: auto;
+                z-index: 99999;
+                border: 2px solid #dc2626;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+                line-height: 1.6;
+                text-align: left;
+                animation: tooltipFadeIn 0.3s ease;
+                word-wrap: break-word;
               }
               
               @keyframes tooltipFadeIn {
                 from {
                   opacity: 0;
-                  transform: translateX(-50%) translateY(-5px);
+                  transform: translate(-50%, -50%) scale(0.9);
                 }
                 to {
                   opacity: 1;
-                  transform: translateX(-50%) translateY(0);
+                  transform: translate(-50%, -50%) scale(1);
                 }
               }
               
               /* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
               @media (max-width: 640px) {
                 .explanation-tooltip-click {
-                  max-width: 200px;
-                  font-size: 11px;
-                  padding: 6px 10px;
+                  max-width: 85vw;
+                  font-size: 12px;
+                  padding: 10px 14px;
                 }
               }
             `
           }} />
+          
           <div 
             className="chapter-text-content text-gray-300"
             style={{ 
