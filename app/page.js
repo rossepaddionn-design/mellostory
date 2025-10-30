@@ -1898,9 +1898,9 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
         )}
         
         {/* ОПИСАНИЕ */}
-        {work.description && (
-          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 leading-relaxed">{work.description}</p>
-        )}
+{work.description && (
+  <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 leading-relaxed whitespace-pre-wrap break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{work.description}</p>
+)}
         
         <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
           <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
