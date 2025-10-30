@@ -33,6 +33,15 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
 
+  const [showUpdatesModal, setShowUpdatesModal] = useState(false);
+  const [siteUpdates, setSiteUpdates] = useState([]);
+  
+  const [featuredWorks, setFeaturedWorks] = useState([]);
+  const [showFeaturedModal, setShowFeaturedModal] = useState(false);
+  const [selectedFeaturedPosition, setSelectedFeaturedPosition] = useState(null);
+  const [featuredWorkSearch, setFeaturedWorkSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
   const [showReaderPanel, setShowReaderPanel] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
@@ -78,6 +87,8 @@ const HEADER_BG_IMAGE = '/images/header-bg-v2.jpg';
     loadWorks();
     loadSettings();
     checkUser();
+    loadSiteUpdates();
+    loadFeaturedWorks();
   }, []);
 
 const checkUser = async () => {
@@ -139,6 +150,130 @@ const { data, error } = await supabase
   }
   setLoading(false);
 };
+
+const loadSiteUpdates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_updates')
+        .select('*')
+        .order('published_date', { ascending: false })
+        .limit(10);
+      
+      if (error) throw error;
+      setSiteUpdates(data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки обновлений:', err);
+    }
+  };
+
+  const loadFeaturedWorks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('featured_works')
+        .select('*, works(id, title, cover_url)')
+        .order('position', { ascending: true });
+      
+      if (error) throw error;
+      setFeaturedWorks(data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки популярных работ:', err);
+    }
+  };
+
+  const searchWorksForFeatured = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('works')
+        .select('id, title')
+        .ilike('title', `%${query}%`)
+        .limit(5);
+      
+      if (error) throw error;
+      setSearchResults(data || []);
+    } catch (err) {
+      console.error('Ошибка поиска:', err);
+    }
+  };
+
+  const setFeaturedWork = async (workId, position) => {
+    try {
+      // Получаем данные работы
+      const { data: work } = await supabase
+        .from('works')
+        .select('id, title')
+        .eq('id', workId)
+        .single();
+
+      if (!work) {
+        alert('Работа не найдена!');
+        return;
+      }
+
+      // Получаем количество просмотров
+      const { data: viewData } = await supabase
+        .from('work_views')
+        .select('view_count')
+        .eq('work_id', workId)
+        .single();
+
+      const viewsCount = viewData?.view_count || 0;
+
+      // Проверяем, есть ли уже работа на этой позиции
+      const { data: existing } = await supabase
+        .from('featured_works')
+        .select('id')
+        .eq('position', position)
+        .single();
+
+      if (existing) {
+        // Обновляем существующую
+        const { error } = await supabase
+          .from('featured_works')
+          .update({ work_id: workId, views_count: viewsCount })
+          .eq('position', position);
+
+        if (error) throw error;
+      } else {
+        // Создаём новую
+        const { error } = await supabase
+          .from('featured_works')
+          .insert({ work_id: workId, position, views_count: viewsCount });
+
+        if (error) throw error;
+      }
+
+      alert('✅ Популярная работа добавлена!');
+      setShowFeaturedModal(false);
+      setSelectedFeaturedPosition(null);
+      setFeaturedWorkSearch('');
+      setSearchResults([]);
+      loadFeaturedWorks();
+    } catch (err) {
+      alert('❌ Ошибка: ' + err.message);
+    }
+  };
+
+  const removeFeaturedWork = async (position) => {
+    if (!confirm('Удалить работу из популярных?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('featured_works')
+        .delete()
+        .eq('position', position);
+
+      if (error) throw error;
+      alert('✅ Работа удалена!');
+      loadFeaturedWorks();
+    } catch (err) {
+      alert('❌ Ошибка: ' + err.message);
+    }
+  };
 
 const loadSettings = async () => {
   try {
@@ -688,21 +823,39 @@ return (
                 />
               </div>
 
-              {authMode === 'register' && (
-                <div className="flex items-start gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
-                  <input
-                    type="checkbox"
-                    id="privacy-checkbox"
-                    checked={agreedToPrivacy}
-                    onChange={(e) => setAgreedToPrivacy(e.target.checked)}
-                    className="mt-1 w-4 h-4 accent-red-600 cursor-pointer flex-shrink-0"
-                  />
-                  <label htmlFor="privacy-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
-                    Я согласен с{' '}
-                    <Link href="/privacy" className="text-red-500 hover:text-red-400 underline" target="_blank">
-                      Политикой конфиденциальности
-                    </Link>
-                  </label>
+{authMode === 'register' && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <input
+                      type="checkbox"
+                      id="privacy-checkbox"
+                      checked={agreedToPrivacy}
+                      onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-red-600 cursor-pointer flex-shrink-0"
+                    />
+                    <label htmlFor="privacy-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                      Я согласен с{' '}
+                      <Link href="/privacy" className="text-red-500 hover:text-red-400 underline" target="_blank">
+                        Политикой конфиденциальности
+                      </Link>
+                    </label>
+                  </div>
+
+                  <div className="flex items-start gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <input
+                      type="checkbox"
+                      id="terms-checkbox"
+                      checked={agreedToPrivacy}
+                      onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-red-600 cursor-pointer flex-shrink-0"
+                    />
+                    <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                      Я согласен с{' '}
+                      <Link href="/terms" className="text-red-500 hover:text-red-400 underline" target="_blank">
+                        Пользовательским соглашением
+                      </Link>
+                    </label>
+                  </div>
                 </div>
               )}
 
@@ -796,6 +949,93 @@ return (
               >
                 Отмена
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+{/* UPDATES MODAL */}
+      {showUpdatesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-gray-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col border-2 border-red-600">
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700">
+              <h2 className="text-xl sm:text-2xl font-bold text-red-600 flex items-center gap-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+                Обновления сайта
+              </h2>
+              <button onClick={() => setShowUpdatesModal(false)} className="text-gray-400 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {siteUpdates.length === 0 ? (
+                <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                  <p className="text-gray-500">Пока нет обновлений</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {siteUpdates.map((update) => (
+                    <div 
+                      key={update.id}
+                      className={`bg-gray-800 rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
+                        update.type === 'new_work' ? 'border-red-600' : 'border-gray-700'
+                      }`}
+                      onClick={() => {
+                        window.location.href = `/work/${update.work_id}`;
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-1">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          {update.type === 'new_work' ? (
+                            <>
+                              <span className="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded mb-2">
+                                НОВАЯ РАБОТА
+                              </span>
+                              <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
+                                {update.work_title}
+                              </h3>
+                              <p className="text-gray-400 text-sm">
+                                Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
+                                })}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
+                                {update.work_title}
+                              </h3>
+                              <p className="text-gray-300 text-sm mb-1">
+                                {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
+                                  day: 'numeric',
+                                  month: 'long'
+                                })}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -950,7 +1190,7 @@ return (
         </div>
       )}
 
-      {/* READER PANEL */}
+{/* READER PANEL */}
       {showReaderPanel && userProfile && (
         <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-gray-900 border-l-2 border-red-600 z-40 overflow-y-auto shadow-2xl">
           <div className="sticky top-0 bg-gray-900 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center">
@@ -960,10 +1200,50 @@ return (
             </button>
           </div>
 
-<div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
+          <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
+            <button
+              onClick={() => {
+                setShowUpdatesModal(true);
+                loadSiteUpdates();
+              }}
+              className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
+              style={{
+                background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+              Обновления
+              {siteUpdates.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
+                  {siteUpdates.length}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={() => setShowReaderMessagesModal(true)}
-              className="w-full bg-red-600 hover:bg-red-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base"
+              className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
+              style={{
+                background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+              }}
             >
               <MessageSquare size={18} className="sm:w-5 sm:h-5" />
               Мои сообщения
@@ -976,7 +1256,17 @@ return (
 
             <button
               onClick={() => setShowDeleteAccountModal(true)}
-              className="w-full bg-orange-600 hover:bg-orange-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+              style={{
+                background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+              }}
             >
               <Trash2 size={18} className="sm:w-5 sm:h-5" />
               Удалить аккаунт
@@ -984,7 +1274,17 @@ return (
 
             <button
               onClick={handleLogout}
-              className="w-full bg-gray-700 hover:bg-gray-600 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+              style={{
+                background: 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)';
+              }}
             >
               <LogOut size={18} className="sm:w-5 sm:h-5" />
               {t.logout}
@@ -1054,6 +1354,282 @@ return (
               <LogOut size={18} className="sm:w-5 sm:h-5" />
               {t.logout}
             </button>
+          </div>
+        </div>
+)}
+
+      {/* ADMIN MANAGEMENT MODAL */}
+      {showManagementModal && isAdmin && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
+          <div className="bg-gray-900 rounded-lg w-full max-w-6xl h-[95vh] sm:h-[90vh] flex flex-col border-2 border-red-600">
+            <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700">
+              <h2 className="text-lg sm:text-2xl font-bold text-red-600">Управление сайтом</h2>
+              <button onClick={() => setShowManagementModal(false)} className="text-gray-400 hover:text-white">
+                <X size={20} className="sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            <div className="flex border-b border-gray-700">
+              <button
+                onClick={() => setManagementTab('comments')}
+                className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+                  managementTab === 'comments' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                }`}
+              >
+                Комментарии
+              </button>
+              <button
+                onClick={() => setManagementTab('messages')}
+                className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+                  managementTab === 'messages' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                }`}
+              >
+                Сообщения
+              </button>
+              <button
+                onClick={() => setManagementTab('users')}
+                className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+                  managementTab === 'users' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                }`}
+              >
+                Пользователи
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+              {managementTab === 'comments' && (
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+                    Последние комментарии ({comments.length})
+                  </h3>
+                  {comments.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Комментариев пока нет</p>
+                  ) : (
+                    comments.map((comment) => (
+                      <div key={comment.id} className="bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-white font-semibold text-sm sm:text-base">{comment.nickname}</p>
+                            <p className="text-gray-400 text-xs">
+                              {comment.works?.title} - Глава {comment.chapters?.chapter_number}
+                            </p>
+                            <p className="text-gray-500 text-xs">
+                              {new Date(comment.created_at).toLocaleString('ru-RU')}
+                            </p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              if (!confirm('Удалить комментарий?')) return;
+                              const { error } = await supabase.from('comments').delete().eq('id', comment.id);
+                              if (error) {
+                                alert('Ошибка: ' + error.message);
+                              } else {
+                                loadManagementData();
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-400"
+                          >
+                            <Trash2 size={16} className="sm:w-5 sm:h-5" />
+                          </button>
+                        </div>
+                        <p className="text-gray-300 text-xs sm:text-sm mt-2 whitespace-pre-wrap break-words">
+                          {comment.text}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {managementTab === 'messages' && (
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+                    Сообщения от читателей ({messages.length})
+                  </h3>
+                  {messages.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Сообщений пока нет</p>
+                  ) : (
+                    messages.map((msg) => (
+                      <div 
+                        key={msg.id} 
+                        className={`bg-gray-800 rounded-lg p-3 sm:p-4 border-2 ${
+                          msg.is_read ? 'border-gray-700' : 'border-yellow-600'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-white font-semibold text-sm sm:text-base">
+                              {msg.from_nickname} ({msg.from_email})
+                            </p>
+                            <p className="text-gray-500 text-xs">
+                              {new Date(msg.created_at).toLocaleString('ru-RU')}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => deleteMessage(msg.id)}
+                            className="text-red-500 hover:text-red-400"
+                          >
+                            <Trash2 size={16} className="sm:w-5 sm:h-5" />
+                          </button>
+                        </div>
+                        <div className="bg-gray-900 rounded p-2 sm:p-3 mb-2">
+                          <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words">
+                            {msg.message}
+                          </p>
+                        </div>
+                        {msg.admin_reply ? (
+                          <div className="bg-red-900 bg-opacity-20 rounded p-2 sm:p-3 border border-red-600">
+                            <p className="text-xs text-red-400 mb-1">Ваш ответ:</p>
+                            <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words">
+                              {msg.admin_reply}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            {selectedMessage?.id === msg.id ? (
+                              <div>
+                                <textarea
+                                  value={replyText}
+                                  onChange={(e) => setReplyText(e.target.value)}
+                                  rows={3}
+                                  placeholder="Напишите ответ..."
+                                  className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 text-xs sm:text-sm focus:outline-none focus:border-red-600 text-white"
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => replyToMessage(msg.id)}
+                                    className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs sm:text-sm"
+                                  >
+                                    Отправить
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedMessage(null);
+                                      setReplyText('');
+                                    }}
+                                    className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs sm:text-sm"
+                                  >
+                                    Отмена
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setSelectedMessage(msg)}
+                                className="text-red-500 hover:text-red-400 text-xs sm:text-sm flex items-center gap-1"
+                              >
+                                <Reply size={14} className="sm:w-4 sm:h-4" />
+                                Ответить
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {managementTab === 'users' && (
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+                    Пользователи ({allUsers.length})
+                  </h3>
+                  {allUsers.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Пользователей пока нет</p>
+                  ) : (
+                    allUsers.map((u) => (
+                      <div 
+                        key={u.id} 
+                        className={`bg-gray-800 rounded-lg p-3 sm:p-4 border-2 ${
+                          u.is_banned ? 'border-red-600' : 'border-gray-700'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-white font-semibold text-sm sm:text-base">{u.nickname}</p>
+                            <p className="text-gray-400 text-xs">{u.email}</p>
+                            <p className="text-gray-500 text-xs">
+                              Регистрация: {new Date(u.created_at).toLocaleDateString('ru-RU')}
+                            </p>
+                            {u.is_banned && (
+                              <span className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded mt-1">
+                                ЗАБЛОКИРОВАН
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => toggleUserBan(u.user_id, u.is_banned)}
+                            className={`px-3 py-1 rounded text-xs sm:text-sm font-bold ${
+                              u.is_banned 
+                                ? 'bg-green-600 hover:bg-green-700' 
+                                : 'bg-red-600 hover:bg-red-700'
+                            }`}
+                          >
+                            {u.is_banned ? 'Разблокировать' : 'Заблокировать'}
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+{/* FEATURED WORKS MANAGEMENT MODAL */}
+      {showFeaturedModal && isAdmin && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-6 border-2 border-red-600">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-red-600">
+                Добавить популярную работу (Позиция {selectedFeaturedPosition})
+              </h2>
+              <button onClick={() => {
+                setShowFeaturedModal(false);
+                setSelectedFeaturedPosition(null);
+                setFeaturedWorkSearch('');
+                setSearchResults([]);
+              }} className="text-gray-400 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">Поиск работы по названию:</label>
+                <input
+                  type="text"
+                  value={featuredWorkSearch}
+                  onChange={(e) => {
+                    setFeaturedWorkSearch(e.target.value);
+                    searchWorksForFeatured(e.target.value);
+                  }}
+                  placeholder="Начните вводить название..."
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+                />
+              </div>
+
+              {searchResults.length > 0 && (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 max-h-64 overflow-y-auto">
+                  {searchResults.map((work) => (
+                    <button
+                      key={work.id}
+                      onClick={() => setFeaturedWork(work.id, selectedFeaturedPosition)}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-700 transition border-b border-gray-700 last:border-b-0"
+                    >
+                      <p className="text-white font-semibold">{work.title}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {searchResults.length === 0 && featuredWorkSearch.trim() !== '' && (
+                <p className="text-gray-500 text-sm text-center py-4">Работы не найдены</p>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -1373,6 +1949,79 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
           )}
         </div>
 
+        {/* FEATURED WORKS */}
+        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{ color: titleColor }}>
+            🔥 Популярные работы
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {[1, 2, 3].map((position) => {
+              const featured = featuredWorks.find(f => f.position === position);
+              
+              return (
+                <div 
+                  key={position}
+                  className="bg-gray-900 rounded-xl p-6 border-2 border-gray-700 hover:border-red-500 transition aspect-square flex flex-col items-center justify-center gap-4"
+                >
+                  {featured ? (
+                    <>
+                      <Link href={`/work/${featured.work_id}`} className="text-center flex-1 flex flex-col justify-center">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4 line-clamp-3">
+                          {featured.works?.title}
+                        </h3>
+                        <div className="flex items-center justify-center gap-4 text-gray-400">
+                          <div className="flex items-center gap-1">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                              <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <span className="text-sm">{featured.views_count || 0}</span>
+                          </div>
+                        </div>
+                      </Link>
+                      {isAdmin && (
+                        <button
+                          onClick={() => removeFeaturedWork(position)}
+                          className="text-red-500 hover:text-red-400 text-xs"
+                        >
+                          Удалить
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {isAdmin ? (
+                        <button
+                          onClick={() => {
+                            setSelectedFeaturedPosition(position);
+                            setShowFeaturedModal(true);
+                          }}
+                          className="w-full h-full flex items-center justify-center"
+                        >
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                          </svg>
+                        </button>
+                      ) : (
+                        <div className="text-gray-600 text-center">
+                          <p className="text-sm">Скоро здесь появится популярная работа</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* НОВОСТИ */}
         <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
@@ -1420,9 +2069,15 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
         <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
-        <Link href="/privacy" className="text-sm text-gray-400 hover:text-red-500 transition underline">
-          Политика конфиденциальности
-        </Link>
+        <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
+          <Link href="/privacy" className="text-sm text-gray-400 hover:text-red-500 transition underline">
+            Политика конфиденциальности
+          </Link>
+          <span className="text-gray-600">•</span>
+          <Link href="/terms" className="text-sm text-gray-400 hover:text-red-500 transition underline">
+            Пользовательское соглашение
+          </Link>
+        </div>
       </footer>
     </div>
     </>
