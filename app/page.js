@@ -1072,9 +1072,9 @@ return (
       {showReaderMessagesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
           <div className="bg-gray-900 rounded-lg w-full max-w-4xl h-[95vh] sm:h-[85vh] flex flex-col border-2 border-red-600">
-            <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700">
-              <h2 className="text-lg sm:text-2xl font-bold text-red-600 flex items-center gap-2">
-                <Mail size={20} className="sm:w-7 sm:h-7" />
+<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
+  <h2 className="text-lg sm:text-2xl font-bold text-red-600 flex items-center gap-2">
+    <Mail size={20} className="sm:w-7 sm:h-7" />
                 Мои сообщения
               </h2>
               <button onClick={() => {
@@ -1082,7 +1082,7 @@ return (
                 setSelectedReaderMessage(null);
                 setNewMessageText('');
                 setReplyMessageText('');
-              }} className="text-gray-400 hover:text-white">
+              }} className="text-gray-400 hover:text-white self-end sm:self-auto">
                 <X size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
@@ -1229,24 +1229,21 @@ return (
 
           <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
 <button
-  onClick={() => {
-    setShowUpdatesModal(true);
-    loadSiteUpdates();
-  }}
+  onClick={() => setShowReaderMessagesModal(true)}
   className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
   style={{
-    background: siteUpdates.length > 0 
-      ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'  // КРАСНЫЙ
-      : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)', // СЕРЫЙ
+    background: readerMessages.some(m => m.admin_reply && !m.is_read)
+      ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'  // КРАСНЫЙ если есть новые
+      : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)', // СЕРЫЙ если нет
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.background = siteUpdates.length > 0
+    e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
       ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
       : 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.background = siteUpdates.length > 0
+    e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
       ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
       : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
   }}
