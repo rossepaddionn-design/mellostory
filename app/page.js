@@ -166,7 +166,7 @@ const loadSiteUpdates = async () => {
     }
   };
 
-  const loadFeaturedWorks = async () => {
+const loadFeaturedWorks = async () => {
     try {
       const { data, error } = await supabase
         .from('featured_works')
@@ -174,7 +174,34 @@ const loadSiteUpdates = async () => {
         .order('position', { ascending: true });
       
       if (error) throw error;
-      setFeaturedWorks(data || []);
+
+      // Загружаем просмотры и оценки для каждой работы
+      const worksWithStats = await Promise.all((data || []).map(async (featured) => {
+        // Загружаем просмотры
+        const { data: viewData } = await supabase
+          .from('work_views')
+          .select('view_count')
+          .eq('work_id', featured.work_id)
+          .single();
+
+        // Загружаем среднюю оценку
+        const { data: ratingData } = await supabase
+          .from('work_ratings')
+          .select('rating')
+          .eq('work_id', featured.work_id);
+
+        const averageRating = ratingData && ratingData.length > 0
+          ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
+          : null;
+
+        return {
+          ...featured,
+          views_count: viewData?.view_count || 0,
+          average_rating: averageRating
+        };
+      }));
+
+      setFeaturedWorks(worksWithStats);
     } catch (err) {
       console.error('Ошибка загрузки популярных работ:', err);
     }
@@ -1965,8 +1992,8 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                 >
                   {featured ? (
                     <>
-                      <Link href={`/work/${featured.work_id}`} className="flex-1 flex flex-col justify-center">
-                        <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2">
+                      <Link href={`/work/${featured.work_id}`} className="flex-1 flex flex-col justify-center items-center text-center">
+                        <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 w-full">
                           {featured.works?.title}
                         </h3>
                         <div className="flex items-center justify-center gap-3 text-gray-400 text-sm">
@@ -1981,7 +2008,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                             </svg>
-                            <span>-</span>
+                            <span>{featured.average_rating ? featured.average_rating.toFixed(1) : '-'}</span>
                           </div>
                         </div>
                       </Link>
