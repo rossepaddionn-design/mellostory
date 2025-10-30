@@ -56,10 +56,10 @@ const [workForm, setWorkForm] = useState({
   };
 
   useEffect(() => {
-  if (selectedWork?.id && !selectedWork.isNew) {
-    loadChapters(selectedWork.id);
-  }
-}, [selectedWork]);
+    if (isAuth) {
+      loadWorks();
+    }
+  }, [isAuth]);
 
 useEffect(() => {
   if (editorRef.current && selectedChapter) {
@@ -164,10 +164,9 @@ console.log('📤 Отправляю данные:', workData); // ← ДОБА�
       alert(isDraft ? 'Черновик сохранён!' : 'Работа опубликована!');
       await loadWorks();
       
-if (result.data && result.data[0]) {
-  setSelectedWork(result.data[0]);
-  await loadChapters(result.data[0].id);
-}
+      if (result.data && result.data[0]) {
+        setSelectedWork(result.data[0]);
+      }
     } catch (err) {
       alert('Ошибка: ' + err.message);
     } finally {
@@ -489,7 +488,6 @@ const insertTooltip = () => {
                     <div className="flex gap-2 w-full sm:w-auto">
                       <button onClick={() => { 
                         setSelectedWork(work); 
-                        loadChapters(work.id);
 setWorkForm({
   title: work.title,
   direction: work.direction,
