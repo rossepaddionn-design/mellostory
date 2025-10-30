@@ -486,27 +486,30 @@ const insertTooltip = () => {
                       <p className="text-gray-500 text-xs sm:text-sm">{work.is_draft ? '📝 Черновик' : '✅ Опубликовано'}</p>
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
-                      <button onClick={() => { 
-                        setSelectedWork(work); 
-setWorkForm({
-  title: work.title,
-  direction: work.direction,
-  category: work.category || 'minific',
-  rating: work.rating,
-  status: work.status,
-  fandom: work.fandom || '',
-  pairing: work.pairing || '',
-  description: work.description || '',
-  author_note: work.author_note || '',
-  genres: work.genres?.join(', ') || '',
-  tags: work.tags?.join(', ') || '',
-  spoiler_tags: work.spoiler_tags?.join(', ') || '',
-  character_images: work.character_images || [],
-  cover_image: work.cover_url || null
-}); 
-                      }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm">
-                        Редактировать
-                      </button>
+<button onClick={async () => { 
+  const workToEdit = work;
+  setSelectedWork(workToEdit); 
+  setWorkForm({
+    title: workToEdit.title,
+    direction: workToEdit.direction,
+    category: workToEdit.category || 'minific',
+    rating: workToEdit.rating,
+    status: workToEdit.status,
+    fandom: workToEdit.fandom || '',
+    pairing: workToEdit.pairing || '',
+    description: workToEdit.description || '',
+    author_note: workToEdit.author_note || '',
+    genres: workToEdit.genres?.join(', ') || '',
+    tags: workToEdit.tags?.join(', ') || '',
+    spoiler_tags: workToEdit.spoiler_tags?.join(', ') || '',
+    character_images: workToEdit.character_images || [],
+    cover_image: workToEdit.cover_url || null
+  });
+  // Загружаем главы сразу
+  await loadChapters(workToEdit.id);
+}} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm">
+  Редактировать
+</button>
                       <button onClick={() => deleteWork(work.id)} className="bg-red-900 hover:bg-red-800 p-2 rounded-lg transition">
                         <Trash2 size={16} className="sm:w-5 sm:h-5" />
                       </button>
