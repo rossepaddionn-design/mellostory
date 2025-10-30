@@ -455,84 +455,101 @@ export default function ChapterPage() {
 
 {/* ТЕКСТ ГЛАВЫ */}
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
-              .chapter-text-content {
-                font-size: 14px !important;
-              }
-              
-              .chapter-text-content * {
-                font-size: 14px !important;
-              }
-              
-              /* ДЛЯ ПК - 15px */
-              @media (min-width: 640px) {
-                .chapter-text-content {
-                  font-size: 15px !important;
-                }
-                
-                .chapter-text-content * {
-                  font-size: 15px !important;
-                }
-              }
-              
-/* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
-[title] {
-  cursor: pointer;
-  position: relative;
-}
+<style dangerouslySetInnerHTML={{
+  __html: `
+    /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
+    .chapter-text-content {
+      font-size: 14px !important;
+      line-height: 1.8 !important;
+    }
+    
+    .chapter-text-content * {
+      font-size: 14px !important;
+    }
+    
+    /* СТАНДАРТНЫЕ ОТСТУПЫ МЕЖДУ АБЗАЦАМИ */
+    .chapter-text-content br {
+      display: block;
+      content: "";
+      margin: 0.4em 0;
+    }
+    
+    /* Убираем лишние отступы для двойных <br> */
+    .chapter-text-content br + br {
+      display: none;
+    }
+    
+    /* ДЛЯ ПК - 16px */
+    @media (min-width: 640px) {
+      .chapter-text-content {
+        font-size: 16px !important;
+        line-height: 1.8 !important;
+      }
+      
+      .chapter-text-content * {
+        font-size: 16px !important;
+      }
+      
+      .chapter-text-content br {
+        margin: 0.5em 0;
+      }
+    }
 
-/* 🔥 ДОБАВЬ ЭТО: */
-.tooltip-word {
-  position: static !important;
-  display: inline !important;
-}
+    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
+    [title] {
+      cursor: pointer;
+      position: relative;
+    }
 
-.explanation-tooltip-click {
-  position: fixed !important;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) !important;
-  background: rgba(15, 15, 15, 0.98);
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  white-space: pre-wrap;
-  max-width: 90vw;
-  max-height: 60vh;
-  overflow-y: auto;
-  z-index: 99999;
-  border: 2px solid #dc2626;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-  line-height: 1.6;
-  text-align: left;
-  animation: tooltipFadeIn 0.3s ease;
-  word-wrap: break-word;
-}
-              
-              @keyframes tooltipFadeIn {
-                from {
-                  opacity: 0;
-                  transform: translate(-50%, -50%) scale(0.9);
-                }
-                to {
-                  opacity: 1;
-                  transform: translate(-50%, -50%) scale(1);
-                }
-              }
-              
-              /* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
-              @media (max-width: 640px) {
-                .explanation-tooltip-click {
-                  max-width: 85vw;
-                  font-size: 12px;
-                  padding: 10px 14px;
-                }
-              }
-            `
-          }} />
+    .tooltip-word {
+      position: static !important;
+      display: inline !important;
+    }
+
+    .explanation-tooltip-click {
+      position: fixed !important;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) !important;
+      background: rgba(15, 15, 15, 0.98);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-width: 90vw;
+      max-height: 60vh;
+      overflow-y: auto;
+      z-index: 99999;
+      border: 2px solid #dc2626;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+      line-height: 1.6;
+      text-align: left;
+      animation: tooltipFadeIn 0.3s ease;
+      word-wrap: break-word;
+    }
+    
+    @keyframes tooltipFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    
+    /* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
+    @media (max-width: 640px) {
+      .explanation-tooltip-click {
+        max-width: 85vw;
+        font-size: 12px;
+        padding: 10px 14px;
+      }
+    }
+  `
+}} />
           
           <div 
             className="chapter-text-content text-gray-300"
