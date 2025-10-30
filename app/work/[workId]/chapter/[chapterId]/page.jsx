@@ -467,14 +467,14 @@ export default function ChapterPage() {
       font-size: 14px !important;
     }
     
-    /* СТАНДАРТНЫЕ ОТСТУПЫ МЕЖДУ АБЗАЦАМИ */
+    /* СТАНДАРТНЫЕ ОТСТУПЫ МЕЖДУ АБЗАЦАМИ - ТОЛЬКО ДЛЯ ТЕКСТА ГЛАВЫ */
     .chapter-text-content br {
       display: block;
       content: "";
       margin: 0.4em 0;
     }
     
-    /* Убираем лишние отступы для двойных <br> */
+    /* Убираем лишние отступы для двойных <br> - ТОЛЬКО ДЛЯ ТЕКСТА ГЛАВЫ */
     .chapter-text-content br + br {
       display: none;
     }
@@ -495,7 +495,7 @@ export default function ChapterPage() {
       }
     }
 
-    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (КЛИК) */
+    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ */
     [title] {
       cursor: pointer;
       position: relative;
@@ -540,7 +540,6 @@ export default function ChapterPage() {
       }
     }
     
-    /* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
     @media (max-width: 640px) {
       .explanation-tooltip-click {
         max-width: 85vw;
