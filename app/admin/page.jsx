@@ -489,6 +489,7 @@ const insertTooltip = () => {
                     <div className="flex gap-2 w-full sm:w-auto">
                       <button onClick={() => { 
                         setSelectedWork(work); 
+                        loadChapters(work.id);
 setWorkForm({
   title: work.title,
   direction: work.direction,
