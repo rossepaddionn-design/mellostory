@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle, Reply } from 'lucide-react';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -1949,10 +1949,10 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
           )}
         </div>
 
-        {/* FEATURED WORKS */}
-        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{ color: titleColor }}>
-            🔥 Популярные работы
+{/* FEATURED WORKS */}
+        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-white">
+            Популярные работы
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {[1, 2, 3].map((position) => {
@@ -1961,34 +1961,34 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
               return (
                 <div 
                   key={position}
-                  className="bg-gray-900 rounded-xl p-6 border-2 border-gray-700 hover:border-red-500 transition aspect-square flex flex-col items-center justify-center gap-4"
+                  className="bg-gray-900 rounded-xl p-4 border-2 border-gray-700 hover:border-red-500 transition h-32 sm:h-36 flex flex-col justify-between"
                 >
                   {featured ? (
                     <>
-                      <Link href={`/work/${featured.work_id}`} className="text-center flex-1 flex flex-col justify-center">
-                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4 line-clamp-3">
+                      <Link href={`/work/${featured.work_id}`} className="flex-1 flex flex-col justify-center">
+                        <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2">
                           {featured.works?.title}
                         </h3>
-                        <div className="flex items-center justify-center gap-4 text-gray-400">
+                        <div className="flex items-center justify-center gap-3 text-gray-400 text-sm">
                           <div className="flex items-center gap-1">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                             </svg>
+                            <span>{featured.views_count || 0}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                              <circle cx="12" cy="12" r="3"/>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                             </svg>
-                            <span className="text-sm">{featured.views_count || 0}</span>
+                            <span>-</span>
                           </div>
                         </div>
                       </Link>
                       {isAdmin && (
                         <button
                           onClick={() => removeFeaturedWork(position)}
-                          className="text-red-500 hover:text-red-400 text-xs"
+                          className="text-red-500 hover:text-red-400 text-xs mt-2"
                         >
                           Удалить
                         </button>
@@ -2004,14 +2004,14 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                           }}
                           className="w-full h-full flex items-center justify-center"
                         >
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
                             <line x1="12" y1="5" x2="12" y2="19"/>
                             <line x1="5" y1="12" x2="19" y2="12"/>
                           </svg>
                         </button>
                       ) : (
-                        <div className="text-gray-600 text-center">
-                          <p className="text-sm">Скоро здесь появится популярная работа</p>
+                        <div className="text-gray-600 text-center h-full flex items-center justify-center">
+                          <p className="text-xs">Скоро здесь появится популярная работа</p>
                         </div>
                       )}
                     </>
@@ -2021,7 +2021,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
             })}
           </div>
         </div>
-
+        
         {/* НОВОСТИ */}
         <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
