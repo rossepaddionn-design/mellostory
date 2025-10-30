@@ -162,6 +162,14 @@ console.log('📤 Отправляю данные:', workData); // ← ДОБА�
       if (result.error) throw result.error;
 
       alert(isDraft ? 'Черновик сохранён!' : 'Работа опубликована!');
+      // Добавляем обновление, если публикуем новую работу
+if (!isDraft && !selectedWork.id) {
+  await supabase.from('site_updates').insert({
+    work_id: result.data[0].id,
+    work_title: workData.title,
+    type: 'new_work'
+  });
+}
       await loadWorks();
       
       if (result.data && result.data[0]) {
@@ -214,6 +222,16 @@ console.log('📤 Отправляю данные:', workData); // ← ДОБА�
       }
 
       if (result.error) throw result.error;
+      // Добавляем обновление о новой главе
+if (isPublished && !selectedChapter) {
+  await supabase.from('site_updates').insert({
+    work_id: selectedWork.id,
+    work_title: workForm.title,
+    chapter_number: chapterData.chapter_number,
+    chapter_title: chapterData.title,
+    type: 'new_chapter'
+  });
+}
 
       if (isPublished && selectedWork.is_draft) {
         await supabase
