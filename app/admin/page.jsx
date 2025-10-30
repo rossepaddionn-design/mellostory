@@ -164,9 +164,10 @@ console.log('📤 Отправляю данные:', workData); // ← ДОБА�
       alert(isDraft ? 'Черновик сохранён!' : 'Работа опубликована!');
       await loadWorks();
       
-      if (result.data && result.data[0]) {
-        setSelectedWork(result.data[0]);
-      }
+if (result.data && result.data[0]) {
+  setSelectedWork(result.data[0]);
+  await loadChapters(result.data[0].id);
+}
     } catch (err) {
       alert('Ошибка: ' + err.message);
     } finally {
