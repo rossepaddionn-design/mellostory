@@ -506,7 +506,11 @@ const insertTooltip = () => {
                     <div className="flex gap-2 w-full sm:w-auto">
 <button onClick={async () => { 
   const workToEdit = work;
-  setSelectedWork(workToEdit); 
+  
+  // СНАЧАЛА загружаем главы
+  await loadChapters(workToEdit.id);
+  
+  // ПОТОМ устанавливаем форму и работу
   setWorkForm({
     title: workToEdit.title,
     direction: workToEdit.direction,
@@ -523,8 +527,8 @@ const insertTooltip = () => {
     character_images: workToEdit.character_images || [],
     cover_image: workToEdit.cover_url || null
   });
-  // Загружаем главы сразу
-  await loadChapters(workToEdit.id);
+  
+  setSelectedWork(workToEdit);
 }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm">
   Редактировать
 </button>
