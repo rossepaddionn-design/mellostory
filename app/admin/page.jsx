@@ -56,10 +56,10 @@ const [workForm, setWorkForm] = useState({
   };
 
   useEffect(() => {
-    if (isAuth) {
-      loadWorks();
-    }
-  }, [isAuth]);
+  if (selectedWork?.id && !selectedWork.isNew) {
+    loadChapters(selectedWork.id);
+  }
+}, [selectedWork]);
 
 useEffect(() => {
   if (editorRef.current && selectedChapter) {
