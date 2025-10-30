@@ -507,10 +507,6 @@ const insertTooltip = () => {
 <button onClick={async () => { 
   const workToEdit = work;
   
-  // СНАЧАЛА загружаем главы
-  await loadChapters(workToEdit.id);
-  
-  // ПОТОМ устанавливаем форму и работу
   setWorkForm({
     title: workToEdit.title,
     direction: workToEdit.direction,
@@ -529,6 +525,12 @@ const insertTooltip = () => {
   });
   
   setSelectedWork(workToEdit);
+  
+  // АВТОМАТИЧЕСКИ ОТКРЫВАЕМ СЕКЦИЮ С ГЛАВАМИ!
+  setSectionsExpanded(prev => ({ ...prev, chapterList: true }));
+  
+  // Загружаем главы
+  await loadChapters(workToEdit.id);
 }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm">
   Редактировать
 </button>
