@@ -332,6 +332,7 @@ const loadUserData = async () => {
 
   useEffect(() => {
     if (user && userProfile && showReaderPanel) {
+      loadReaderMessages();
       loadUserData();
     }
   }, [user, userProfile, showReaderPanel]);
@@ -1078,7 +1079,7 @@ return (
                 Мои сообщения
               </h2>
               <button onClick={() => {
-                setShowReaderMessagesModal(false);
+                setShowUpdatesModal(true)
                 setSelectedReaderMessage(null);
                 setNewMessageText('');
                 setReplyMessageText('');
