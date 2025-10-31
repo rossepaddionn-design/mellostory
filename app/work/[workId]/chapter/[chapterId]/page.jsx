@@ -474,10 +474,6 @@ export default function ChapterPage() {
       margin: 0.4em 0;
     }
     
-    /* Убираем лишние отступы для двойных <br> - ТОЛЬКО ДЛЯ ТЕКСТА ГЛАВЫ */
-    .chapter-text-content br + br {
-      display: none;
-    }
     
     /* ДЛЯ ПК - 16px */
     @media (min-width: 640px) {
