@@ -1013,9 +1013,19 @@ return (
                       className={`bg-gray-800 rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
                         update.type === 'new_work' ? 'border-red-600' : 'border-gray-700'
                       }`}
-                      onClick={() => {
-                        window.location.href = `/work/${update.work_id}`;
-                      }}
+onClick={async () => {
+  // Удаляем обновление из базы
+  await supabase
+    .from('site_updates')
+    .delete()
+    .eq('id', update.id);
+  
+  // Перезагружаем список
+  loadSiteUpdates();
+  
+  // Переходим на работу
+  window.location.href = `/work/${update.work_id}`;
+}}
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 mt-1">
@@ -1076,17 +1086,20 @@ return (
 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
   <h2 className="text-lg sm:text-2xl font-bold text-red-600 flex items-center gap-2">
     <Mail size={20} className="sm:w-7 sm:h-7" />
-                Мои сообщения
-              </h2>
-              <button onClick={() => {
-                setShowUpdatesModal(true)
-                setSelectedReaderMessage(null);
-                setNewMessageText('');
-                setReplyMessageText('');
-              }} className="text-gray-400 hover:text-white self-end sm:self-auto">
-                <X size={20} className="sm:w-6 sm:h-6" />
-              </button>
-            </div>
+    Мои сообщения
+  </h2>
+  <button 
+    onClick={() => {
+      setShowReaderMessagesModal(false);
+      setSelectedReaderMessage(null);
+      setNewMessageText('');
+      setReplyMessageText('');
+    }} 
+    className="text-gray-400 hover:text-white self-end sm:self-auto z-50"
+  >
+    <X size={20} className="sm:w-6 sm:h-6" />
+  </button>
+</div>
 
             <div className="flex-1 overflow-y-auto p-3 sm:p-6">
               <div className="bg-gray-800 rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2 border-gray-700">
