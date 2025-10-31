@@ -1229,26 +1229,29 @@ return (
           </div>
 
           <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
-<button
-  onClick={() => setShowReaderMessagesModal(true)}
-  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
-  style={{
-    background: readerMessages.some(m => m.admin_reply && !m.is_read)
-      ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'  // КРАСНЫЙ если есть новые
-      : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)', // СЕРЫЙ если нет
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
-      ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
-      : 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
-      ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
-      : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
-  }}
->
+            <button
+              onClick={() => {
+                setShowUpdatesModal(true);
+                loadSiteUpdates();
+              }}
+              className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
+              style={{
+                background: siteUpdates.length > 0
+                  ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+                  : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = siteUpdates.length > 0
+                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                  : 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = siteUpdates.length > 0
+                  ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+                  : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+              }}
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
                 <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                 <path d="M2 17l10 5 10-5"/>
@@ -1266,14 +1269,20 @@ return (
               onClick={() => setShowReaderMessagesModal(true)}
               className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
               style={{
-                background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+                background: readerMessages.some(m => m.admin_reply && !m.is_read)
+                  ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+                  : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+                e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
+                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                  : 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+                e.currentTarget.style.background = readerMessages.some(m => m.admin_reply && !m.is_read)
+                  ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+                  : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
               }}
             >
               <MessageSquare size={18} className="sm:w-5 sm:h-5" />
