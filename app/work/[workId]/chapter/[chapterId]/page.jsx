@@ -459,45 +459,56 @@ export default function ChapterPage() {
   __html: `
     /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
     .chapter-text-content {
-      font-size: 14px !important;
+      font-size: 16px !important;
       line-height: 1.8 !important;
+      font-family: Georgia, 'Times New Roman', serif !important;
+      color: #d1d5db !important;
+      text-align: justify !important;
+      width: 100% !important;
+      max-width: 100% !important;
     }
     
+    /* УБИРАЕМ ВСЕ ПОСТОРОННИЕ СТИЛИ */
     .chapter-text-content * {
-      font-size: 14px !important;
+      font-size: inherit !important;
+      line-height: inherit !important;
+      font-family: inherit !important;
+      color: inherit !important;
     }
     
-    /* СТАНДАРТНЫЕ ОТСТУПЫ МЕЖДУ АБЗАЦАМИ - ТОЛЬКО ДЛЯ ТЕКСТА ГЛАВЫ */
+    /* СОХРАНЯЕМ ЖИРНЫЙ И КУРСИВ */
+    .chapter-text-content strong,
+    .chapter-text-content b {
+      font-weight: bold !important;
+    }
+    
+    .chapter-text-content em,
+    .chapter-text-content i {
+      font-style: italic !important;
+    }
+    
+    /* ОТСТУПЫ МЕЖДУ АБЗАЦАМИ */
     .chapter-text-content br {
       display: block;
       content: "";
-      margin: 0.4em 0;
+      margin: 0.5em 0;
     }
     
-    
-    /* ДЛЯ ПК - 16px */
-    @media (min-width: 640px) {
+    /* ДЛЯ МОБИЛЬНЫХ */
+    @media (max-width: 640px) {
       .chapter-text-content {
-        font-size: 16px !important;
-        line-height: 1.8 !important;
-      }
-      
-      .chapter-text-content * {
-        font-size: 16px !important;
+        font-size: 14px !important;
       }
       
       .chapter-text-content br {
-        margin: 0.5em 0;
+        margin: 0.4em 0;
       }
     }
 
     /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ */
-    [title] {
-      cursor: pointer;
-      position: relative;
-    }
-
     .tooltip-word {
+      color: #ef4444 !important;
+      cursor: help !important;
       position: static !important;
       display: inline !important;
     }

@@ -695,104 +695,93 @@ const insertTooltip = () => {
                     <button onClick={() => formatText('justifyCenter')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Центр"><AlignCenter size={18} className="sm:w-5 sm:h-5" /></button>
                     <button onClick={() => formatText('justifyRight')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Вправо"><AlignRight size={18} className="sm:w-5 sm:h-5" /></button>
                     <div className="w-px bg-gray-600 shrink-0"></div>
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          document.execCommand('fontName', false, e.target.value);
-                          editorRef.current?.focus();
-                          e.target.value = '';
-                        }
-                      }}
-                      className="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs sm:text-sm shrink-0"
-                      defaultValue=""
-                    >
-                      <option value="">Шрифты</option>
-                      <option value="Georgia">Georgia</option>
-                      <option value="Arial">Arial</option>
-                      <option value="Courier New">Courier</option>
-                      <option value="Times New Roman">Times</option>
-                      <option value="Verdana">Verdana</option>
-                      <option value="Comic Sans MS">Comic Sans</option>
-                      <option value="Trebuchet MS">Trebuchet</option>
-                    </select>
-                    <div className="w-px bg-gray-600 shrink-0"></div>
-                    <button onClick={insertTooltip} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Пояснение"><HelpCircle size={18} className="sm:w-5 sm:h-5" /></button>
-                    <div className="w-px bg-gray-600 shrink-0"></div>
-                    <button 
-                      onClick={() => {
-                        if (editorRef.current) {
-                          const content = editorRef.current.innerHTML;
-                          const tempDiv = document.createElement('div');
-                          tempDiv.innerHTML = content;
-                          
-                          tempDiv.querySelectorAll('*').forEach(el => {
-                            el.style.color = '';
-                            if (el.style.length === 0) {
-                              el.removeAttribute('style');
-                            }
-                          });
-                          
-                          editorRef.current.innerHTML = tempDiv.innerHTML;
-                          editorRef.current.focus();
-                        }
-                      }} 
-                      className="p-2 hover:bg-gray-700 rounded shrink-0 bg-purple-600 hover:bg-purple-700" 
-                      title="Удалить цвет текста"
-                    >
-                      🎨
-                    </button>
+<button 
+  onClick={() => {
+    if (!editorRef.current) return;
+    
+    const content = editorRef.current.innerHTML;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    // Удаляем ВСЕ inline-стили и классы
+    tempDiv.querySelectorAll('*').forEach(el => {
+      // Сохраняем только выравнивание и пояснения
+      const align = el.style.textAlign;
+      const title = el.getAttribute('title');
+      const tooltipClass = el.classList.contains('tooltip-word');
+      
+      // Удаляем все стили
+      el.removeAttribute('style');
+      el.removeAttribute('class');
+      
+      // Возвращаем выравнивание если было
+      if (align) el.style.textAlign = align;
+      
+      // Возвращаем пояснение если было
+      if (title) {
+        el.setAttribute('title', title);
+        el.classList.add('tooltip-word');
+        el.style.color = '#ef4444';
+        el.style.cursor = 'help';
+      }
+    });
+    
+    editorRef.current.innerHTML = tempDiv.innerHTML;
+    setChapterForm({...chapterForm, content: tempDiv.innerHTML});
+    editorRef.current.focus();
+  }} 
+  className="p-2 hover:bg-gray-700 rounded shrink-0 bg-purple-600 hover:bg-purple-700" 
+  title="Очистить форматирование (сохранит жирный, курсив, выравнивание)"
+>
+  🧹
+</button>
                   </div>
 
                   <div 
                     ref={editorRef}
                     contentEditable
-                    onPaste={(e) => {
-                      e.preventDefault();
-                      
-                      const selection = window.getSelection();
-                      if (!selection.rangeCount) return;
-                      const range = selection.getRangeAt(0);
-                      
-                      const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
-                      const tempDiv = document.createElement('div');
-                      tempDiv.innerHTML = text;
-                      
-                      tempDiv.querySelectorAll('*').forEach(el => {
-                        el.style.color = '';
-                        if (el.style.length === 0) {
-                          el.removeAttribute('style');
-                        }
-                      });
-                      
-                      const fragment = document.createDocumentFragment();
-                      while (tempDiv.firstChild) {
-                        fragment.appendChild(tempDiv.firstChild);
-                      }
-                      
-                      range.deleteContents();
-                      range.insertNode(fragment);
-                      range.collapse(false);
-                      selection.removeAllRanges();
-                      selection.addRange(range);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        document.execCommand('insertHTML', false, '<br><br>');
-                      }
-                    }}
-                    onBlur={() => {
-                      if (editorRef.current) {
-                        setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
-                      }
-                    }}
-                    className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-base sm:text-lg leading-relaxed text-white mb-4 overflow-auto"
-                    style={{ 
-                      whiteSpace: 'normal',
-                      wordWrap: 'break-word'
-                    }}
-                    suppressContentEditableWarning={true}
-                  />
+onPaste={(e) => {
+  e.preventDefault();
+  
+  // Получаем ТОЛЬКО текст без форматирования
+  const text = e.clipboardData.getData('text/plain');
+  
+  // Разбиваем на строки
+  const lines = text.split('\n');
+  
+  // Создаём HTML с <br> между строками
+  const cleanHTML = lines.join('<br>');
+  
+  // Вставляем через execCommand
+  document.execCommand('insertHTML', false, cleanHTML);
+  
+  // Обновляем состояние
+  if (editorRef.current) {
+    setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
+  }
+}}
+onKeyDown={(e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '<br><br>');
+  }
+}}
+onBlur={() => {
+  if (editorRef.current) {
+    setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
+  }
+}}
+className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-white mb-4 overflow-auto"
+style={{ 
+  fontSize: '16px',
+  lineHeight: '1.8',
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word',
+  fontFamily: 'Georgia, "Times New Roman", serif',
+  textAlign: 'left'
+}}
+suppressContentEditableWarning={true}
+/>
 
                   <div className="mb-4">
                     <label className="block text-xs sm:text-sm text-gray-400 mb-2">Примечание автора к главе</label>
