@@ -14,15 +14,14 @@ export default function TermsOfService() {
           backgroundColor: '#000'
         }}
       />
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <Link 
+<div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        <a 
           href="/"
           className="inline-flex items-center gap-2 text-red-500 hover:text-red-400 mb-6 sm:mb-8 transition"
         >
           <ChevronLeft size={20} />
           Вернуться на главную
-        </Link>
+        </a>
 
         <div className="bg-gray-900 bg-opacity-95 rounded-2xl p-6 sm:p-10 border-2 border-red-600">
           <h1 className="text-3xl sm:text-4xl font-bold text-red-500 mb-6 sm:mb-8">
