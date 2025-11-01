@@ -561,16 +561,29 @@ const insertTooltip = () => {
               {sectionsExpanded.workInfo && (
                 <div className="p-4 sm:p-6 border-t border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
-                    <div className="md:col-span-3">
-                      <label className="block text-xs sm:text-sm text-gray-400 mb-2">Обложка</label>
-                      {workForm.cover_image ? (
-                        <div className="relative group max-w-xs mx-auto md:max-w-none">
-                          <img src={workForm.cover_image} alt="Cover" className="w-full aspect-[2/3] object-cover rounded-lg border-2 border-gray-700" />
-                          <button onClick={() => setWorkForm({...workForm, cover_image: null})} className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 p-2 rounded-full opacity-0 group-hover:opacity-100 transition">
-                            <X size={16} className="sm:w-5 sm:h-5" />
-                          </button>
-                        </div>
-                      ) : (
+<div className="md:col-span-3">
+  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Обложка</label>
+  {workForm.cover_image ? (
+    <div className="max-w-xs mx-auto md:max-w-none">
+      <div className="relative group mb-3">
+        <img src={workForm.cover_image} alt="Cover" className="w-full aspect-[2/3] object-cover rounded-lg border-2 border-gray-700" />
+        <button 
+          onClick={() => setWorkForm({...workForm, cover_image: null})} 
+          className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
+          title="Удалить обложку"
+        >
+          <X size={16} className="sm:w-5 sm:h-5" />
+        </button>
+      </div>
+      
+      {/* КНОПКА СМЕНЫ ОБЛОЖКИ */}
+      <label className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg cursor-pointer transition text-sm">
+        <ImageIcon size={16} />
+        Сменить обложку
+        <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+      </label>
+    </div>
+  ) : (
                         <label className="flex flex-col items-center justify-center h-48 sm:h-64 bg-gray-800 hover:bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer transition">
                           <ImageIcon size={24} className="sm:w-8 sm:h-8 text-gray-500 mb-2" />
                           <span className="text-gray-500 text-xs sm:text-sm text-center">Загрузить обложку</span>
