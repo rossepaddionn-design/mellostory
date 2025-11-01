@@ -146,7 +146,7 @@ console.log('📤 Отправляю данные:', workData); // ← ДОБА�
 
     try {
       let result;
-      if (selectedWork && selectedWork.id && !selectedWork.isNew) {
+      if (selectedWork?.id) {
         result = await supabase
           .from('works')
           .update(workData)
