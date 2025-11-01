@@ -457,7 +457,6 @@ export default function ChapterPage() {
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
 <style dangerouslySetInnerHTML={{
   __html: `
-    /* ОСНОВНЫЕ СТИЛИ ТЕКСТА ГЛАВЫ */
     .chapter-text-content {
       font-size: 16px !important;
       line-height: 1.8 !important;
@@ -466,11 +465,10 @@ export default function ChapterPage() {
       text-align: justify !important;
       width: 100% !important;
       max-width: 100% !important;
-      white-space: pre-line !important;
+      white-space: pre-wrap !important;
       word-break: break-word !important;
     }
     
-    /* УБИРАЕМ ВСЕ ПОСТОРОННИЕ СТИЛИ (кроме пояснений) */
     .chapter-text-content *:not(.tooltip-word):not(.explanation-tooltip-click) {
       font-size: inherit !important;
       font-family: inherit !important;
@@ -480,7 +478,6 @@ export default function ChapterPage() {
       margin: 0 !important;
     }
     
-    /* СОХРАНЯЕМ ЖИРНЫЙ И КУРСИВ */
     .chapter-text-content strong,
     .chapter-text-content b {
       font-weight: bold !important;
@@ -491,26 +488,22 @@ export default function ChapterPage() {
       font-style: italic !important;
     }
     
-    /* ПЕРЕНОСЫ АБЗАЦЕВ - ВАЖНО! */
     .chapter-text-content br {
       display: block !important;
-      content: "" !important;
-      margin: 0.8em 0 !important;
     }
     
-    /* МОБИЛЬНАЯ ВЕРСИЯ */
     @media (max-width: 640px) {
       .chapter-text-content {
         font-size: 14px !important;
         text-align: left !important;
+        white-space: pre-wrap !important;
       }
       
       .chapter-text-content br {
-        margin: 0.6em 0 !important;
+        display: block !important;
       }
     }
 
-    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (?) */
     .tooltip-word {
       color: #ef4444 !important;
       cursor: help !important;
