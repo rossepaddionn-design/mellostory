@@ -359,7 +359,7 @@ export default function PrivacyPolicy() {
                 <li>Предоставим рекомендации пользователям по защите их аккаунтов</li>
               </ul>
             </section>
-
+            
             <section>
               <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">14. Изменения в Политике</h2>
               <p>
