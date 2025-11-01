@@ -457,7 +457,7 @@ export default function ChapterPage() {
         <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
 <style dangerouslySetInnerHTML={{
   __html: `
-    /* РАЗМЕР ШРИФТА ТЕКСТА ГЛАВЫ */
+    /* ОСНОВНЫЕ СТИЛИ ТЕКСТА ГЛАВЫ */
     .chapter-text-content {
       font-size: 16px !important;
       line-height: 1.8 !important;
@@ -466,14 +466,18 @@ export default function ChapterPage() {
       text-align: justify !important;
       width: 100% !important;
       max-width: 100% !important;
+      white-space: pre-line !important;
+      word-break: break-word !important;
     }
     
-    /* УБИРАЕМ ВСЕ ПОСТОРОННИЕ СТИЛИ */
-    .chapter-text-content * {
+    /* УБИРАЕМ ВСЕ ПОСТОРОННИЕ СТИЛИ (кроме пояснений) */
+    .chapter-text-content *:not(.tooltip-word):not(.explanation-tooltip-click) {
       font-size: inherit !important;
-      line-height: inherit !important;
       font-family: inherit !important;
       color: inherit !important;
+      background: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
     
     /* СОХРАНЯЕМ ЖИРНЫЙ И КУРСИВ */
@@ -487,30 +491,34 @@ export default function ChapterPage() {
       font-style: italic !important;
     }
     
-    /* ОТСТУПЫ МЕЖДУ АБЗАЦАМИ */
+    /* ПЕРЕНОСЫ АБЗАЦЕВ - ВАЖНО! */
     .chapter-text-content br {
-      display: block;
-      content: "";
-      margin: 0.5em 0;
+      display: block !important;
+      content: "" !important;
+      margin: 0.8em 0 !important;
     }
     
-    /* ДЛЯ МОБИЛЬНЫХ */
+    /* МОБИЛЬНАЯ ВЕРСИЯ */
     @media (max-width: 640px) {
       .chapter-text-content {
         font-size: 14px !important;
+        text-align: left !important;
       }
       
       .chapter-text-content br {
-        margin: 0.4em 0;
+        margin: 0.6em 0 !important;
       }
     }
 
-    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ */
+    /* СТИЛИ ДЛЯ ПОЯСНЕНИЙ (?) */
     .tooltip-word {
       color: #ef4444 !important;
       cursor: help !important;
       position: static !important;
       display: inline !important;
+      font-size: inherit !important;
+      font-family: inherit !important;
+      background: none !important;
     }
 
     .explanation-tooltip-click {
@@ -518,22 +526,22 @@ export default function ChapterPage() {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) !important;
-      background: rgba(15, 15, 15, 0.98);
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      white-space: pre-wrap;
-      max-width: 90vw;
-      max-height: 60vh;
-      overflow-y: auto;
-      z-index: 99999;
-      border: 2px solid #dc2626;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-      line-height: 1.6;
-      text-align: left;
-      animation: tooltipFadeIn 0.3s ease;
-      word-wrap: break-word;
+      background: rgba(15, 15, 15, 0.98) !important;
+      color: #fff !important;
+      padding: 12px 16px !important;
+      border-radius: 12px !important;
+      font-size: 13px !important;
+      white-space: pre-wrap !important;
+      max-width: 90vw !important;
+      max-height: 60vh !important;
+      overflow-y: auto !important;
+      z-index: 99999 !important;
+      border: 2px solid #dc2626 !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7) !important;
+      line-height: 1.6 !important;
+      text-align: left !important;
+      animation: tooltipFadeIn 0.3s ease !important;
+      word-wrap: break-word !important;
     }
     
     @keyframes tooltipFadeIn {
@@ -549,24 +557,18 @@ export default function ChapterPage() {
     
     @media (max-width: 640px) {
       .explanation-tooltip-click {
-        max-width: 85vw;
-        font-size: 12px;
-        padding: 10px 14px;
+        max-width: 85vw !important;
+        font-size: 12px !important;
+        padding: 10px 14px !important;
       }
     }
   `
 }} />
           
-          <div 
-            className="chapter-text-content text-gray-300"
-            style={{ 
-              fontSize: '14px',
-              wordBreak: 'break-word',
-              whiteSpace: 'normal',
-              lineHeight: '1.8'
-            }}
-            dangerouslySetInnerHTML={{ __html: chapter.content }}
-          />
+<div 
+  className="chapter-text-content text-gray-300"
+  dangerouslySetInnerHTML={{ __html: chapter.content }}
+/>
         </div>
 
         {/* ИЗОБРАЖЕНИЯ */}

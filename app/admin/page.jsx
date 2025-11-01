@@ -695,6 +695,8 @@ const insertTooltip = () => {
                     <button onClick={() => formatText('justifyCenter')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Центр"><AlignCenter size={18} className="sm:w-5 sm:h-5" /></button>
                     <button onClick={() => formatText('justifyRight')} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Вправо"><AlignRight size={18} className="sm:w-5 sm:h-5" /></button>
                     <div className="w-px bg-gray-600 shrink-0"></div>
+                    <button onClick={insertTooltip} className="p-2 hover:bg-gray-700 rounded shrink-0" title="Пояснение"><HelpCircle size={18} className="sm:w-5 sm:h-5" /></button>
+<div className="w-px bg-gray-600 shrink-0"></div>
 <button 
   onClick={() => {
     if (!editorRef.current) return;
