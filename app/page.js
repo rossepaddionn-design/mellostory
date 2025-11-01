@@ -58,6 +58,11 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
 
   const [showManagementModal, setShowManagementModal] = useState(false);
+  const [newsText, setNewsText] = useState('Здесь будут появляться новости о новых работах и обновлениях сайта.');
+const [aboutText, setAboutText] = useState('Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!');
+const [editingSection, setEditingSection] = useState(null);
+const [editText, setEditText] = useState('');
+const [showEditModal, setShowEditModal] = useState(false);
   const [managementTab, setManagementTab] = useState('comments');
   const [comments, setComments] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -311,14 +316,18 @@ const loadSettings = async () => {
 
     const { data, error } = await supabase
       .from('site_settings')
-      .select('title_color')
+      .select('title_color, news_text, about_text')
       .eq('id', 1)
       .maybeSingle();
     
-    if (data && !error && data.title_color && data.title_color.trim() !== '') {
-      setTitleColor(data.title_color);
-      localStorage.setItem('titleColor', data.title_color);
-    }
+if (data && !error) {
+  if (data.title_color && data.title_color.trim() !== '') {
+    setTitleColor(data.title_color);
+    localStorage.setItem('titleColor', data.title_color);
+  }
+  if (data.news_text) setNewsText(data.news_text);
+  if (data.about_text) setAboutText(data.about_text);
+}
   } catch (err) {
     console.error('Ошибка загрузки настроек:', err);
   }
@@ -714,6 +723,33 @@ const loadUserData = async () => {
       alert('❌ Ошибка: ' + err.message);
     }
   };
+  
+  const saveText = async () => {
+  try {
+    const updateData = editingSection === 'news' 
+      ? { news_text: editText } 
+      : { about_text: editText };
+
+    const { error } = await supabase
+      .from('site_settings')
+      .upsert({ id: 1, ...updateData }, { onConflict: 'id' });
+
+    if (error) throw error;
+    
+    if (editingSection === 'news') {
+      setNewsText(editText);
+    } else {
+      setAboutText(editText);
+    }
+    
+    setShowEditModal(false);
+    setEditingSection(null);
+    setEditText('');
+    alert('✅ Текст сохранён!');
+  } catch (err) {
+    alert('❌ Ошибка: ' + err.message);
+  }
+};
 
   const translations = {
     ru: {
@@ -1687,6 +1723,41 @@ onClick={async () => {
         </div>
       )}
 
+{/* EDIT TEXT MODAL */}
+{showEditModal && isAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-2xl p-4 sm:p-6 border-2 border-red-600">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-red-600">
+          {editingSection === 'news' ? 'Редактировать новости' : 'Редактировать информацию'}
+        </h2>
+        <button onClick={() => {
+          setShowEditModal(false);
+          setEditingSection(null);
+          setEditText('');
+        }} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <textarea
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+        rows={10}
+        className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 mb-4 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white resize-none"
+        placeholder="Введите текст..."
+      />
+
+      <button
+        onClick={saveText}
+        className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg font-bold transition"
+      >
+        Сохранить
+      </button>
+    </div>
+  </div>
+)}
+
 {/* HEADER */}
 <div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
   <div className="max-w-7xl mx-auto">
@@ -2075,23 +2146,55 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
           </div>
         </div>
         
-        {/* НОВОСТИ */}
-        <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
-          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
-            <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
-              <p>Здесь будут появляться новости о новых работах и обновлениях сайта.</p>
-            </div>
-          </div>
-        </div>
+{/* НОВОСТИ */}
+<div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
+  <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
+    {isAdmin && (
+      <button
+        onClick={() => {
+          setEditingSection('news');
+          setEditText(newsText);
+          setShowEditModal(true);
+        }}
+        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
+        title="Редактировать новости"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    )}
+    <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+      <p>{newsText}</p>
+    </div>
+  </div>
+</div>
 
-        {/* ABOUT SECTION */}
-        <div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
-          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2" style={{ borderColor: titleColor }}>
-            <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base">
-              <p>Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!</p>
-            </div>
-          </div>
-        </div>
+{/* ABOUT SECTION */}
+<div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
+  <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
+    {isAdmin && (
+      <button
+        onClick={() => {
+          setEditingSection('about');
+          setEditText(aboutText);
+          setShowEditModal(true);
+        }}
+        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
+        title="Редактировать информацию"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    )}
+    <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+      <p>{aboutText}</p>
+    </div>
+  </div>
+</div>
 
     {/* DISCLAIMERS */}
         <div className="max-w-3xl mx-auto mt-8 sm:mt-12 space-y-3 sm:space-y-4 relative z-0">
