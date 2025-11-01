@@ -49,6 +49,7 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
 
   const [showReaderMessagesModal, setShowReaderMessagesModal] = useState(false);
+  const [showBookmarksModal, setShowBookmarksModal] = useState(false);
   const [readerMessages, setReaderMessages] = useState([]);
   const [selectedReaderMessage, setSelectedReaderMessage] = useState(null);
   const [newMessageText, setNewMessageText] = useState('');
@@ -336,7 +337,41 @@ if (data && !error) {
 const loadUserData = async () => {
     if (!userProfile) return;
     setRecentWorks(userProfile.recent_works || []);
-    setBookmarks(userProfile.bookmarks || []);
+    await loadBookmarks();
+  };
+
+  const loadBookmarks = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('bookmarks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (error) throw error;
+      setBookmarks(data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки закладок:', err);
+    }
+  };
+
+  const deleteBookmark = async (bookmarkId) => {
+    if (!confirm('Удалить закладку?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('id', bookmarkId);
+      
+      if (error) throw error;
+      loadBookmarks();
+    } catch (err) {
+      alert('Ошибка удаления: ' + err.message);
+    }
   };
 
   useEffect(() => {
@@ -1343,6 +1378,34 @@ onClick={async () => {
               )}
             </button>
 
+<button
+  onClick={() => {
+    setShowBookmarksModal(true);
+    loadBookmarks();
+  }}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+  style={{
+    background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+  }}
+>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+  </svg>
+  Мои закладки
+  {bookmarks.length > 0 && (
+    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
+      {bookmarks.length}
+    </span>
+  )}
+</button>
+
             <button
               onClick={() => setShowDeleteAccountModal(true)}
               className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
@@ -2216,11 +2279,104 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
                 <path d="M14.83 14.83a4 4 0 1 1 0-5.66"/>
               </svg>
               <span className="text-base sm:text-2xl md:text-3xl">{t.copyrightTitle}</span>
-            </h3>
+</h3>
             <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-justify">{t.copyrightText}</p>
           </div>
         </div>
       </main>
+
+      {/* BOOKMARKS MODAL */}
+      {showBookmarksModal && userProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-gray-900 rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col border-2 border-blue-600">
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-blue-600 flex items-center gap-2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Мои закладки
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                  Максимум 10 закладок. Удалите старую, чтобы добавить новую.
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowBookmarksModal(false)} 
+                className="text-gray-400 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {bookmarks.length === 0 ? (
+                <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto mb-3 text-gray-600">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p className="text-gray-500">У вас пока нет закладок</p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Выделите текст в главе и создайте закладку
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {bookmarks.map((bookmark, index) => {
+                    const displayText = bookmark.selected_text.length > 100 
+                      ? bookmark.selected_text.slice(0, 100) + '...' 
+                      : bookmark.selected_text;
+                    
+                    return (
+                      <div 
+                        key={bookmark.id}
+                        className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700 hover:border-blue-500 transition"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                                {index + 1}
+                              </span>
+                              <h3 className="text-white font-semibold text-sm sm:text-base line-clamp-1">
+                                {bookmark.work_title}
+                              </h3>
+                            </div>
+                            <p className="text-gray-400 text-xs mb-2">
+                              Глава {bookmark.chapter_number}
+                            </p>
+                            <a
+                              href={`/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}#bookmark-${bookmark.id}`}
+                              className="inline-block bg-gray-900 rounded px-3 py-2 mb-2 text-xs sm:text-sm text-gray-300 hover:bg-gray-700 transition max-w-full overflow-hidden"
+                              onClick={() => setShowBookmarksModal(false)}
+                            >
+                              <span className="text-yellow-400">📌</span> {displayText}
+                            </a>
+                            <p className="text-gray-500 text-xs">
+                              Создано: {new Date(bookmark.created_at).toLocaleDateString('ru-RU', {
+                                day: 'numeric',
+                                month: 'long',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => deleteBookmark(bookmark.id)}
+                            className="text-red-500 hover:text-red-400 ml-2"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">

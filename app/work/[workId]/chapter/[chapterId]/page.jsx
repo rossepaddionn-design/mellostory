@@ -26,6 +26,9 @@ export default function ChapterPage() {
   const [userProfile, setUserProfile] = useState(null);
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
   const commentsPerPage = 10;
+const [showBookmarkButton, setShowBookmarkButton] = useState(false);
+  const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
+  const [selectedText, setSelectedText] = useState('');
 
   const t = {
     backToWork: 'К описанию работы',
@@ -57,6 +60,105 @@ export default function ChapterPage() {
       // Скроллим наверх при смене главы
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+// ОБРАБОТЧИК ВЫДЕЛЕНИЯ ТЕКСТА
+  useEffect(() => {
+    if (!chapter) return;
+
+    const chapterTextElement = document.querySelector('.chapter-text-content');
+    if (!chapterTextElement) return;
+
+    chapterTextElement.addEventListener('mouseup', handleTextSelection);
+    chapterTextElement.addEventListener('touchend', handleTextSelection);
+
+    // Скрываем кнопку при клике вне
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.bookmark-button') && !e.target.closest('.chapter-text-content')) {
+        setShowBookmarkButton(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      chapterTextElement.removeEventListener('mouseup', handleTextSelection);
+      chapterTextElement.removeEventListener('touchend', handleTextSelection);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [chapter]);
+
+  // СКРОЛЛ К ЗАКЛАДКЕ
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#bookmark-') && chapter) {
+      const bookmarkId = hash.replace('#bookmark-', '');
+      
+      setTimeout(async () => {
+        try {
+          const { data: bookmark } = await supabase
+            .from('bookmarks')
+            .select('selected_text, text_position')
+            .eq('id', bookmarkId)
+            .single();
+
+          if (bookmark) {
+            const chapterTextElement = document.querySelector('.chapter-text-content');
+            const fullText = chapterTextElement?.textContent || '';
+            
+            if (bookmark.text_position >= 0 && fullText.includes(bookmark.selected_text)) {
+              const textNode = findTextNode(chapterTextElement, bookmark.selected_text);
+              if (textNode) {
+                const range = document.createRange();
+                range.setStart(textNode, 0);
+                range.setEnd(textNode, bookmark.selected_text.length);
+                
+                const rect = range.getBoundingClientRect();
+                window.scrollTo({
+                  top: rect.top + window.scrollY - 100,
+                  behavior: 'smooth'
+                });
+
+                // Подсветка на 3 секунды
+                const span = document.createElement('span');
+                span.style.backgroundColor = 'rgba(59, 130, 246, 0.3)';
+                span.style.padding = '2px 4px';
+                span.style.borderRadius = '4px';
+                span.textContent = bookmark.selected_text;
+                
+                range.deleteContents();
+                range.insertNode(span);
+
+                setTimeout(() => {
+                  const parent = span.parentNode;
+                  parent.replaceChild(document.createTextNode(bookmark.selected_text), span);
+                }, 3000);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Ошибка загрузки закладки:', err);
+        }
+      }, 500);
+    }
+  }, [chapter, chapterId]);
+
+  const findTextNode = (element, text) => {
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.includes(text)) {
+        return node;
+      }
+    }
+    return null;
+  };
+
   }, [chapterId, workId]);
   // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
@@ -140,6 +242,76 @@ export default function ChapterPage() {
         .eq('user_id', session.user.id)
         .single();
       if (profile) setUserProfile(profile);
+    }
+  };
+
+const handleTextSelection = () => {
+    const selection = window.getSelection();
+    const text = selection.toString().trim();
+    
+    if (text.length > 0 && text.length <= 500) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      setSelectedText(text);
+      setBookmarkPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + window.scrollY - 50
+      });
+      setShowBookmarkButton(true);
+    } else {
+      setShowBookmarkButton(false);
+    }
+  };
+
+  const createBookmark = async () => {
+    if (!user || !userProfile) {
+      alert('Войдите, чтобы создать закладку!');
+      return;
+    }
+
+    if (!selectedText) {
+      alert('Выделите текст!');
+      return;
+    }
+
+    try {
+      // Проверяем лимит закладок
+      const { data: existingBookmarks } = await supabase
+        .from('bookmarks')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (existingBookmarks && existingBookmarks.length >= 10) {
+        alert('Максимум 10 закладок! Удалите старую, чтобы добавить новую.');
+        return;
+      }
+
+      // Находим позицию текста в главе
+      const chapterTextElement = document.querySelector('.chapter-text-content');
+      const fullText = chapterTextElement?.textContent || '';
+      const textPosition = fullText.indexOf(selectedText);
+
+      // Создаём закладку
+      const { error } = await supabase
+        .from('bookmarks')
+        .insert({
+          user_id: user.id,
+          work_id: workId,
+          work_title: work?.title || 'Без названия',
+          chapter_id: chapterId,
+          chapter_number: chapter?.chapter_number || 0,
+          selected_text: selectedText,
+          text_position: textPosition
+        });
+
+      if (error) throw error;
+
+      alert('✅ Закладка создана!');
+      setShowBookmarkButton(false);
+      window.getSelection().removeAllRanges();
+    } catch (err) {
+      alert('Ошибка создания закладки: ' + err.message);
     }
   };
 
@@ -562,7 +734,29 @@ export default function ChapterPage() {
   className="chapter-text-content text-gray-300"
   dangerouslySetInnerHTML={{ __html: chapter.content }}
 />
-        </div>
+</div>
+
+        {/* КНОПКА СОЗДАНИЯ ЗАКЛАДКИ */}
+        {showBookmarkButton && user && (
+          <div
+            className="bookmark-button fixed z-50"
+            style={{
+              left: `${bookmarkPosition.x}px`,
+              top: `${bookmarkPosition.y}px`,
+              transform: 'translateX(-50%)'
+            }}
+          >
+            <button
+              onClick={createBookmark}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-2xl flex items-center gap-2 text-sm font-bold border-2 border-blue-400 animate-bounce"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              Создать закладку
+            </button>
+          </div>
+        )}
 
         {/* ИЗОБРАЖЕНИЯ */}
         {chapter.images && chapter.images.length > 0 && (
