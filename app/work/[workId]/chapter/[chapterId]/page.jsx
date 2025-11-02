@@ -64,46 +64,31 @@ export default function ChapterPage() {
 useEffect(() => {
     if (!chapter) return;
 
-    let touchTimeout;
-
     const handleSelection = () => {
-      setTimeout(() => {
-        const selection = window.getSelection();
-        const text = selection?.toString().trim();
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      
+      if (text.length > 0 && text.length <= 500) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
         
-        if (text && text.length > 0 && text.length <= 500) {
-          const range = selection.getRangeAt(0);
-          const rect = range.getBoundingClientRect();
-          
-          setSelectedText(text);
-          setBookmarkPosition({
-            x: window.scrollX + rect.left + (rect.width / 2),
-            y: window.scrollY + rect.top - 50
-          });
-          setShowBookmarkButton(true);
-        }
-      }, 100);
-    };
-
-    const handleTouchEnd = () => {
-      clearTimeout(touchTimeout);
-      touchTimeout = setTimeout(handleSelection, 150);
+        setSelectedText(text);
+        setBookmarkPosition({
+          x: window.scrollX + rect.left + (rect.width / 2),
+          y: window.scrollY + rect.top - 45
+        });
+        setShowBookmarkButton(true);
+      } else {
+        setShowBookmarkButton(false);
+      }
     };
 
     document.addEventListener('mouseup', handleSelection);
-    document.addEventListener('touchend', handleTouchEnd);
-    
-    document.addEventListener('selectionchange', () => {
-      const sel = window.getSelection();
-      if (!sel || sel.toString().trim().length === 0) {
-        setShowBookmarkButton(false);
-      }
-    });
+    document.addEventListener('touchend', handleSelection);
 
     return () => {
-      clearTimeout(touchTimeout);
       document.removeEventListener('mouseup', handleSelection);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchend', handleSelection);
     };
   }, [chapter]);
 
