@@ -74,8 +74,8 @@ useEffect(() => {
         
         setSelectedText(text);
         setBookmarkPosition({
-          x: window.scrollX + rect.left + (rect.width / 2),
-          y: window.scrollY + rect.top - 45
+          x: rect.left + (rect.width / 2),
+          y: rect.top - 45
         });
         setShowBookmarkButton(true);
       } else {
