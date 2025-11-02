@@ -26,10 +26,9 @@ export default function ChapterPage() {
   const [userProfile, setUserProfile] = useState(null);
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
   const commentsPerPage = 10;
-const [showBookmarkButton, setShowBookmarkButton] = useState(false);
+  const [showBookmarkButton, setShowBookmarkButton] = useState(false);
   const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
   const [selectedText, setSelectedText] = useState('');
-
   const t = {
     backToWork: 'К описанию работы',
     backToMain: 'На главную',
@@ -50,17 +49,18 @@ const [showBookmarkButton, setShowBookmarkButton] = useState(false);
     chapters: 'Главы'
   };
 
-useEffect(() => {
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  useEffect(() => {
     if (chapterId && workId) {
       loadAllData();
+      // Скроллим наверх при смене главы
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId, workId]);
 
-  // ОБРАБОТЧИК ВЫДЕЛЕНИЯ ТЕКСТА
-  useEffect(() => {
-
-// ОБРАБОТЧИК ВЫДЕЛЕНИЯ ТЕКСТА
   useEffect(() => {
     if (!chapter) return;
 
@@ -70,7 +70,6 @@ useEffect(() => {
     chapterTextElement.addEventListener('mouseup', handleTextSelection);
     chapterTextElement.addEventListener('touchend', handleTextSelection);
 
-    // Скрываем кнопку при клике вне
     const handleClickOutside = (e) => {
       if (!e.target.closest('.bookmark-button') && !e.target.closest('.chapter-text-content')) {
         setShowBookmarkButton(false);
@@ -85,80 +84,6 @@ useEffect(() => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [chapter]);
-
-  // СКРОЛЛ К ЗАКЛАДКЕ
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#bookmark-') && chapter) {
-      const bookmarkId = hash.replace('#bookmark-', '');
-      
-      setTimeout(async () => {
-        try {
-          const { data: bookmark } = await supabase
-            .from('bookmarks')
-            .select('selected_text, text_position')
-            .eq('id', bookmarkId)
-            .single();
-
-          if (bookmark) {
-            const chapterTextElement = document.querySelector('.chapter-text-content');
-            const fullText = chapterTextElement?.textContent || '';
-            
-            if (bookmark.text_position >= 0 && fullText.includes(bookmark.selected_text)) {
-              const textNode = findTextNode(chapterTextElement, bookmark.selected_text);
-              if (textNode) {
-                const range = document.createRange();
-                range.setStart(textNode, 0);
-                range.setEnd(textNode, bookmark.selected_text.length);
-                
-                const rect = range.getBoundingClientRect();
-                window.scrollTo({
-                  top: rect.top + window.scrollY - 100,
-                  behavior: 'smooth'
-                });
-
-                // Подсветка на 3 секунды
-                const span = document.createElement('span');
-                span.style.backgroundColor = 'rgba(59, 130, 246, 0.3)';
-                span.style.padding = '2px 4px';
-                span.style.borderRadius = '4px';
-                span.textContent = bookmark.selected_text;
-                
-                range.deleteContents();
-                range.insertNode(span);
-
-                setTimeout(() => {
-                  const parent = span.parentNode;
-                  parent.replaceChild(document.createTextNode(bookmark.selected_text), span);
-                }, 3000);
-              }
-            }
-          }
-        } catch (err) {
-          console.error('Ошибка загрузки закладки:', err);
-        }
-      }, 500);
-    }
-  }, [chapter, chapterId]);
-
-  const findTextNode = (element, text) => {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
-    );
-
-    let node;
-    while ((node = walker.nextNode())) {
-      if (node.textContent.includes(text)) {
-        return node;
-      }
-    }
-    return null;
-  };
-
-  }, [chapterId, workId]);
   // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
@@ -231,19 +156,6 @@ useEffect(() => {
     };
   }, [chapter]);
 
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      setUser(session.user);
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-      if (profile) setUserProfile(profile);
-    }
-  };
-
 const handleTextSelection = () => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
@@ -275,7 +187,6 @@ const handleTextSelection = () => {
     }
 
     try {
-      // Проверяем лимит закладок
       const { data: existingBookmarks } = await supabase
         .from('bookmarks')
         .select('id')
@@ -286,12 +197,10 @@ const handleTextSelection = () => {
         return;
       }
 
-      // Находим позицию текста в главе
       const chapterTextElement = document.querySelector('.chapter-text-content');
       const fullText = chapterTextElement?.textContent || '';
       const textPosition = fullText.indexOf(selectedText);
 
-      // Создаём закладку
       const { error } = await supabase
         .from('bookmarks')
         .insert({
@@ -311,6 +220,19 @@ const handleTextSelection = () => {
       window.getSelection().removeAllRanges();
     } catch (err) {
       alert('Ошибка создания закладки: ' + err.message);
+    }
+  };
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      setUser(session.user);
+      const { data: profile } = await supabase
+        .from('reader_profiles')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+      if (profile) setUserProfile(profile);
     }
   };
 
@@ -733,9 +655,8 @@ const handleTextSelection = () => {
   className="chapter-text-content text-gray-300"
   dangerouslySetInnerHTML={{ __html: chapter.content }}
 />
-</div>
+ </div>
 
-        {/* КНОПКА СОЗДАНИЯ ЗАКЛАДКИ */}
         {showBookmarkButton && user && (
           <div
             className="bookmark-button fixed z-50"
