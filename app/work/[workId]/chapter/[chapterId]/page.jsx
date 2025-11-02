@@ -61,29 +61,37 @@ export default function ChapterPage() {
     }
   }, [chapterId, workId]);
 
-  useEffect(() => {
+useEffect(() => {
     if (!chapter) return;
 
-    const chapterTextElement = document.querySelector('.chapter-text-content');
-    if (!chapterTextElement) return;
-
-    chapterTextElement.addEventListener('mouseup', handleTextSelection);
-    chapterTextElement.addEventListener('touchend', handleTextSelection);
-
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.bookmark-button') && !e.target.closest('.chapter-text-content')) {
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      
+      if (text.length > 0 && text.length <= 500) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        setSelectedText(text);
+        setBookmarkPosition({
+          x: window.scrollX + rect.left + (rect.width / 2),
+          y: window.scrollY + rect.top - 45
+        });
+        setShowBookmarkButton(true);
+      } else {
         setShowBookmarkButton(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('mouseup', handleSelection);
+    document.addEventListener('touchend', handleSelection);
 
     return () => {
-      chapterTextElement.removeEventListener('mouseup', handleTextSelection);
-      chapterTextElement.removeEventListener('touchend', handleTextSelection);
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mouseup', handleSelection);
+      document.removeEventListener('touchend', handleSelection);
     };
   }, [chapter]);
+
   // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
@@ -155,27 +163,6 @@ export default function ChapterPage() {
       document.removeEventListener('click', handleDocumentClick);
     };
   }, [chapter]);
-
-const handleTextSelection = () => {
-    setTimeout(() => {
-      const selection = window.getSelection();
-      const text = selection.toString().trim();
-      
-      if (text.length > 0 && text.length <= 500) {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        
-        setSelectedText(text);
-        setBookmarkPosition({
-          x: rect.left + (rect.width / 2),
-          y: rect.bottom + window.scrollY + 10
-        });
-        setShowBookmarkButton(true);
-      } else {
-        setShowBookmarkButton(false);
-      }
-    }, 10);
-  };
 
   const createBookmark = async () => {
     if (!user || !userProfile) {
@@ -660,24 +647,20 @@ const handleTextSelection = () => {
  </div>
 
 {showBookmarkButton && user && (
-          <div
-            className="bookmark-button fixed z-50 pointer-events-none"
+          <button
+            onClick={createBookmark}
+            className="fixed z-[9999] bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full shadow-2xl border-2 border-gray-500"
             style={{
               left: `${bookmarkPosition.x}px`,
               top: `${bookmarkPosition.y}px`,
               transform: 'translateX(-50%)'
             }}
+            title="Создать закладку"
           >
-            <button
-              onClick={createBookmark}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg shadow-2xl flex items-center gap-2 text-xs font-bold border-2 border-gray-400 pointer-events-auto"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-              </svg>
-              Создать закладку
-            </button>
-          </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
         )}
 
         {/* ИЗОБРАЖЕНИЯ */}
