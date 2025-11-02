@@ -26,9 +26,6 @@ export default function ChapterPage() {
   const [userProfile, setUserProfile] = useState(null);
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
   const commentsPerPage = 10;
-  const [showBookmarkButton, setShowBookmarkButton] = useState(false);
-  const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
-  const [selectedText, setSelectedText] = useState('');
   const t = {
     backToWork: 'К описанию работы',
     backToMain: 'На главную',
@@ -60,38 +57,6 @@ export default function ChapterPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId, workId]);
-
-useEffect(() => {
-    if (!chapter) return;
-
-    const chapterContent = document.querySelector('.chapter-text-content');
-    if (!chapterContent) return;
-
-    const handleSelection = () => {
-      const selection = window.getSelection();
-      const text = selection?.toString().trim();
-      
-      if (text && text.length > 0 && text.length <= 500 && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        
-        setSelectedText(text);
-        setBookmarkPosition({
-          x: rect.right,
-          y: rect.top + window.scrollY
-        });
-        setShowBookmarkButton(true);
-      }
-    };
-
-    chapterContent.addEventListener('mouseup', handleSelection);
-    chapterContent.addEventListener('touchend', handleSelection);
-
-    return () => {
-      chapterContent.removeEventListener('mouseup', handleSelection);
-      chapterContent.removeEventListener('touchend', handleSelection);
-    };
-  }, [chapter]);
 
   // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
@@ -164,54 +129,6 @@ useEffect(() => {
       document.removeEventListener('click', handleDocumentClick);
     };
   }, [chapter]);
-
-  const createBookmark = async () => {
-    if (!user || !userProfile) {
-      alert('Войдите, чтобы создать закладку!');
-      return;
-    }
-
-    if (!selectedText) {
-      alert('Выделите текст!');
-      return;
-    }
-
-    try {
-      const { data: existingBookmarks } = await supabase
-        .from('bookmarks')
-        .select('id')
-        .eq('user_id', user.id);
-
-      if (existingBookmarks && existingBookmarks.length >= 10) {
-        alert('Максимум 10 закладок! Удалите старую, чтобы добавить новую.');
-        return;
-      }
-
-      const chapterTextElement = document.querySelector('.chapter-text-content');
-      const fullText = chapterTextElement?.textContent || '';
-      const textPosition = fullText.indexOf(selectedText);
-
-      const { error } = await supabase
-        .from('bookmarks')
-        .insert({
-          user_id: user.id,
-          work_id: workId,
-          work_title: work?.title || 'Без названия',
-          chapter_id: chapterId,
-          chapter_number: chapter?.chapter_number || 0,
-          selected_text: selectedText,
-          text_position: textPosition
-        });
-
-      if (error) throw error;
-
-      alert('✅ Закладка создана!');
-      setShowBookmarkButton(false);
-      window.getSelection().removeAllRanges();
-    } catch (err) {
-      alert('Ошибка создания закладки: ' + err.message);
-    }
-  };
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -646,23 +563,6 @@ useEffect(() => {
   dangerouslySetInnerHTML={{ __html: chapter.content }}
 />
  </div>
-
-{showBookmarkButton && user && (
-          <button
-            onClick={createBookmark}
-            className="fixed z-[9999] bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full shadow-2xl border-2 border-gray-500"
- style={{
-  left: `${bookmarkPosition.x}px`,
-  top: `${bookmarkPosition.y}px`,
-  transform: 'translate(-100%, -50%)'
-}}
-            title="Создать закладку"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-            </svg>
-          </button>
-        )}
 
         {/* ИЗОБРАЖЕНИЯ */}
         {chapter.images && chapter.images.length > 0 && (
