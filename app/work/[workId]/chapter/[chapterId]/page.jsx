@@ -7,19 +7,6 @@ import { useParams } from 'next/navigation';
 import { MessageSquare, Reply, Trash2, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 
 export default function ChapterPage() {
-  useEffect(() => {
-    // Запрещаем автомасштабирование на мобильных
-    const metaViewport = document.querySelector('meta[name="viewport"]');
-    if (metaViewport) {
-      metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
-    }
-    
-    return () => {
-      if (metaViewport) {
-        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1');
-      }
-    };
-  }, []);
   const params = useParams();
   const router = useRouter();
   const workId = params.workId;
@@ -77,34 +64,32 @@ export default function ChapterPage() {
 useEffect(() => {
     if (!chapter) return;
 
-    const handleSelection = (e) => {
-      requestAnimationFrame(() => {
-        const selection = window.getSelection();
-        const text = selection?.toString().trim();
+    const chapterContent = document.querySelector('.chapter-text-content');
+    if (!chapterContent) return;
+
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      const text = selection?.toString().trim();
+      
+      if (text && text.length > 0 && text.length <= 500 && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
         
-        if (text && text.length > 0 && text.length <= 500) {
-          const range = selection.getRangeAt(0);
-          const rects = range.getClientRects();
-          const rect = rects[rects.length - 1] || range.getBoundingClientRect();
-          
-          setSelectedText(text);
-          setBookmarkPosition({
-            x: rect.left + (rect.width / 2),
-            y: rect.top - 45
-          });
-          setShowBookmarkButton(true);
-        } else {
-          setShowBookmarkButton(false);
-        }
-      });
+        setSelectedText(text);
+        setBookmarkPosition({
+          x: rect.right,
+          y: rect.top + window.scrollY
+        });
+        setShowBookmarkButton(true);
+      }
     };
 
-    document.addEventListener('mouseup', handleSelection);
-    document.addEventListener('touchend', handleSelection, { passive: true });
+    chapterContent.addEventListener('mouseup', handleSelection);
+    chapterContent.addEventListener('touchend', handleSelection);
 
     return () => {
-      document.removeEventListener('mouseup', handleSelection);
-      document.removeEventListener('touchend', handleSelection);
+      chapterContent.removeEventListener('mouseup', handleSelection);
+      chapterContent.removeEventListener('touchend', handleSelection);
     };
   }, [chapter]);
 
@@ -664,14 +649,13 @@ useEffect(() => {
 
 {showBookmarkButton && user && (
           <button
-            onMouseDown={(e) => e.preventDefault()}
             onClick={createBookmark}
-            className="fixed z-[9999] bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full shadow-2xl border-2 border-gray-500 pointer-events-auto"
-            style={{
-              left: `${bookmarkPosition.x}px`,
-              top: `${bookmarkPosition.y}px`,
-              transform: 'translateX(-50%)'
-            }}
+            className="fixed z-[9999] bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full shadow-2xl border-2 border-gray-500"
+ style={{
+  left: `${bookmarkPosition.x}px`,
+  top: `${bookmarkPosition.y}px`,
+  transform: 'translate(-100%, -50%)'
+}}
             title="Создать закладку"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
