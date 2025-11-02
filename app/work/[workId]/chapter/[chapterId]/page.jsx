@@ -50,16 +50,15 @@ const [showBookmarkButton, setShowBookmarkButton] = useState(false);
     chapters: 'Главы'
   };
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  useEffect(() => {
+useEffect(() => {
     if (chapterId && workId) {
       loadAllData();
-      // Скроллим наверх при смене главы
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }, [chapterId, workId]);
+
+  // ОБРАБОТЧИК ВЫДЕЛЕНИЯ ТЕКСТА
+  useEffect(() => {
 
 // ОБРАБОТЧИК ВЫДЕЛЕНИЯ ТЕКСТА
   useEffect(() => {
