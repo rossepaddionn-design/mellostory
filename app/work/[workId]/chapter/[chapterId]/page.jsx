@@ -157,22 +157,24 @@ export default function ChapterPage() {
   }, [chapter]);
 
 const handleTextSelection = () => {
-    const selection = window.getSelection();
-    const text = selection.toString().trim();
-    
-    if (text.length > 0 && text.length <= 500) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
       
-      setSelectedText(text);
-      setBookmarkPosition({
-        x: rect.left + rect.width / 2,
-        y: rect.top + window.scrollY - 50
-      });
-      setShowBookmarkButton(true);
-    } else {
-      setShowBookmarkButton(false);
-    }
+      if (text.length > 0 && text.length <= 500) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        setSelectedText(text);
+        setBookmarkPosition({
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom + window.scrollY + 10
+        });
+        setShowBookmarkButton(true);
+      } else {
+        setShowBookmarkButton(false);
+      }
+    }, 10);
   };
 
   const createBookmark = async () => {
@@ -657,9 +659,9 @@ const handleTextSelection = () => {
 />
  </div>
 
-        {showBookmarkButton && user && (
+{showBookmarkButton && user && (
           <div
-            className="bookmark-button fixed z-50"
+            className="bookmark-button fixed z-50 pointer-events-none"
             style={{
               left: `${bookmarkPosition.x}px`,
               top: `${bookmarkPosition.y}px`,
@@ -668,7 +670,7 @@ const handleTextSelection = () => {
           >
             <button
               onClick={createBookmark}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-2xl flex items-center gap-2 text-sm font-bold border-2 border-blue-400 animate-bounce"
+              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg shadow-2xl flex items-center gap-2 text-xs font-bold border-2 border-gray-400 pointer-events-auto"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
