@@ -44,7 +44,7 @@ const [workForm, setWorkForm] = useState({
     title: '',
     content: '',
     author_note: '',
-    chapter_number: 1,
+    chapter_number: '',
     images: [],
     audio_files: []
   });
@@ -60,12 +60,6 @@ const [workForm, setWorkForm] = useState({
       loadWorks();
     }
   }, [isAuth]);
-
-useEffect(() => {
-  if (editorRef.current && selectedChapter) {
-    editorRef.current.innerHTML = chapterForm.content || '';
-  }
-}, [selectedChapter?.id]);
 
   // СИНХРОНИЗАЦИЯ РЕДАКТОРА С СОДЕРЖИМЫМ ГЛАВЫ
   useEffect(() => {
@@ -182,7 +176,7 @@ if (!isDraft && !selectedWork.id) {
     }
   };
 
-  const saveChapter = async (isPublished) => {
+ const saveChapter = async (isPublished) => {
     if (!selectedWork || selectedWork.isNew || !selectedWork.id) {
       alert('Сначала сохраните работу!');
       return;
@@ -190,6 +184,11 @@ if (!isDraft && !selectedWork.id) {
 
     if (!chapterForm.title.trim() || !chapterForm.content.trim()) {
       alert('Заполните название и текст главы!');
+      return;
+    }
+
+    if (!chapterForm.chapter_number || chapterForm.chapter_number.toString().trim() === '') {
+      alert('Укажите номер главы!');
       return;
     }
 
@@ -245,21 +244,41 @@ if (isPublished && !selectedChapter) {
         alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
       }
 
-      await loadChapters(selectedWork.id);
+await loadChapters(selectedWork.id);
+      setSelectedChapter(null);
       setChapterForm({
         title: '',
         content: '',
         author_note: '',
-        chapter_number: chapters.length + 1,
+        chapter_number: '',
         images: [],
         audio_files: []
       });
-      setSelectedChapter(null);
+      if (editorRef.current) {
+        editorRef.current.innerHTML = '';
+      }
     } catch (err) {
       alert('Ошибка: ' + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const createNewChapter = () => {
+    setSelectedChapter(null);
+    setChapterForm({
+      title: '',
+      content: '',
+      author_note: '',
+      chapter_number: '',
+      images: [],
+      audio_files: []
+    });
+    if (editorRef.current) {
+      editorRef.current.innerHTML = '';
+    }
+    setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const deleteWork = async (id) => {
@@ -677,14 +696,31 @@ const insertTooltip = () => {
               {sectionsExpanded.chapterEditor && (
                 <div className="p-4 sm:p-6 border-t border-gray-700">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-                    <div>
+<div>
                       <label className="block text-xs sm:text-sm text-gray-400 mb-2">Номер главы</label>
-                      <input type="number" value={chapterForm.chapter_number} onChange={(e) => setChapterForm({...chapterForm, chapter_number: parseInt(e.target.value) || 1})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-red-600" />
+                      <input 
+                        type="text" 
+                        value={chapterForm.chapter_number} 
+                        onChange={(e) => setChapterForm({...chapterForm, chapter_number: e.target.value})} 
+                        className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-red-600" 
+                        placeholder="1, 2, I, II, III..." 
+                      />
                     </div>
                     <div>
                       <label className="block text-xs sm:text-sm text-gray-400 mb-2">Название главы</label>
                       <input value={chapterForm.title} onChange={(e) => setChapterForm({...chapterForm, title: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-red-600" placeholder="Глава 1: Начало" />
                     </div>
+</div>
+
+                  {/* КНОПКА НОВАЯ ГЛАВА */}
+                  <div className="mb-4">
+                    <button 
+                      onClick={createNewChapter}
+                      className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-3 rounded-lg transition text-sm sm:text-base font-semibold"
+                    >
+                      <Plus size={20} />
+                      ➕ Новая глава
+                    </button>
                   </div>
 
 <div className="sticky top-16 z-30 flex flex-wrap gap-2 mb-4 p-3 sm:p-4 bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto shadow-lg">
@@ -801,10 +837,7 @@ suppressContentEditableWarning={true}
                         <Upload size={18} className="sm:w-5 sm:h-5" />
                         {loading ? 'Публикация...' : 'Опубликовать'}
                       </button>
-                      <button onClick={() => {
-                        setSelectedChapter(null);
-                        setChapterForm({ title: '', content: '', author_note: '', chapter_number: chapters.length + 1, images: [], audio_files: [] });
-                      }} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition text-sm sm:text-base">
+<button onClick={createNewChapter} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition text-sm sm:text-base">
                         Очистить
                       </button>
                     </div>
@@ -907,16 +940,20 @@ suppressContentEditableWarning={true}
                               <p className="text-xs sm:text-sm text-gray-400 mt-1">{chapter.is_published ? '✅ Опубликовано' : '📝 Черновик'}</p>
                             </div>
                             <div className="flex gap-2 w-full sm:w-auto">
-                              <button onClick={() => {
+<button onClick={() => {
                                 setSelectedChapter(chapter);
-                                setChapterForm({
+                                const newForm = {
                                   title: chapter.title,
                                   content: chapter.content,
                                   author_note: chapter.author_note || '',
                                   chapter_number: chapter.chapter_number,
                                   images: chapter.images || [],
                                   audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
-                                });
+                                };
+                                setChapterForm(newForm);
+                                if (editorRef.current) {
+                                  editorRef.current.innerHTML = chapter.content || '';
+                                }
                                 setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition">
