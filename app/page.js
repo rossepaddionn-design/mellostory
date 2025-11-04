@@ -36,12 +36,6 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUpdatesModal, setShowUpdatesModal] = useState(false);
   const [siteUpdates, setSiteUpdates] = useState([]);
   
-  const [featuredWorks, setFeaturedWorks] = useState([]);
-  const [showFeaturedModal, setShowFeaturedModal] = useState(false);
-  const [selectedFeaturedPosition, setSelectedFeaturedPosition] = useState(null);
-  const [featuredWorkSearch, setFeaturedWorkSearch] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-
   const [showReaderPanel, setShowReaderPanel] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
@@ -90,7 +84,6 @@ const HEADER_BG_IMAGE = '/images/header-bg-v2.jpg';
     loadSettings();
     checkUser();
     loadSiteUpdates();
-    loadFeaturedWorks();
   }, []);
 
 const checkUser = async () => {
@@ -165,130 +158,6 @@ const loadSiteUpdates = async () => {
       setSiteUpdates(data || []);
     } catch (err) {
       console.error('Ошибка загрузки обновлений:', err);
-    }
-  };
-
-const loadFeaturedWorks = async () => {
-  try {
-    const { data, error } = await supabase
-      .from('featured_works')
-      .select(`
-        position,
-        work_id,
-        works!inner(id, title, cover_url),
-        work_views!inner(view_count),
-        work_ratings(rating)
-      `)
-      .order('position', { ascending: true });
-    
-    if (error) throw error;
-
-    const worksWithStats = (data || []).map((featured) => ({
-      ...featured,
-      views_count: featured.work_views?.view_count || 0,
-      average_rating: featured.work_ratings && featured.work_ratings.length > 0
-        ? featured.work_ratings.reduce((sum, r) => sum + r.rating, 0) / featured.work_ratings.length
-        : null
-    }));
-
-    setFeaturedWorks(worksWithStats);
-  } catch (err) {
-    console.error('Ошибка загрузки популярных работ:', err);
-  }
-};
-
-  const searchWorksForFeatured = async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('works')
-        .select('id, title')
-        .ilike('title', `%${query}%`)
-        .limit(5);
-      
-      if (error) throw error;
-      setSearchResults(data || []);
-    } catch (err) {
-      console.error('Ошибка поиска:', err);
-    }
-  };
-
-  const setFeaturedWork = async (workId, position) => {
-    try {
-      // Получаем данные работы
-      const { data: work } = await supabase
-        .from('works')
-        .select('id, title')
-        .eq('id', workId)
-        .single();
-
-      if (!work) {
-        alert('Работа не найдена!');
-        return;
-      }
-
-      // Получаем количество просмотров
-      const { data: viewData } = await supabase
-        .from('work_views')
-        .select('view_count')
-        .eq('work_id', workId)
-        .single();
-
-      const viewsCount = viewData?.view_count || 0;
-
-      // Проверяем, есть ли уже работа на этой позиции
-      const { data: existing } = await supabase
-        .from('featured_works')
-        .select('id')
-        .eq('position', position)
-        .single();
-
-      if (existing) {
-        // Обновляем существующую
-        const { error } = await supabase
-          .from('featured_works')
-          .update({ work_id: workId, views_count: viewsCount })
-          .eq('position', position);
-
-        if (error) throw error;
-      } else {
-        // Создаём новую
-        const { error } = await supabase
-          .from('featured_works')
-          .insert({ work_id: workId, position, views_count: viewsCount });
-
-        if (error) throw error;
-      }
-
-      alert('✅ Популярная работа добавлена!');
-      setShowFeaturedModal(false);
-      setSelectedFeaturedPosition(null);
-      setFeaturedWorkSearch('');
-      setSearchResults([]);
-      loadFeaturedWorks();
-    } catch (err) {
-      alert('❌ Ошибка: ' + err.message);
-    }
-  };
-
-  const removeFeaturedWork = async (position) => {
-    if (!confirm('Удалить работу из популярных?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('featured_works')
-        .delete()
-        .eq('position', position);
-
-      if (error) throw error;
-      alert('✅ Работа удалена!');
-      loadFeaturedWorks();
-    } catch (err) {
-      alert('❌ Ошибка: ' + err.message);
     }
   };
 
@@ -1640,61 +1509,6 @@ onClick={async () => {
         </div>
       )}
 
-{/* FEATURED WORKS MANAGEMENT MODAL */}
-      {showFeaturedModal && isAdmin && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-6 border-2 border-red-600">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-red-600">
-                Добавить популярную работу (Позиция {selectedFeaturedPosition})
-              </h2>
-              <button onClick={() => {
-                setShowFeaturedModal(false);
-                setSelectedFeaturedPosition(null);
-                setFeaturedWorkSearch('');
-                setSearchResults([]);
-              }} className="text-gray-400 hover:text-white">
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-300 text-sm mb-2">Поиск работы по названию:</label>
-                <input
-                  type="text"
-                  value={featuredWorkSearch}
-                  onChange={(e) => {
-                    setFeaturedWorkSearch(e.target.value);
-                    searchWorksForFeatured(e.target.value);
-                  }}
-                  placeholder="Начните вводить название..."
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
-                />
-              </div>
-
-              {searchResults.length > 0 && (
-                <div className="bg-gray-800 rounded-lg border border-gray-700 max-h-64 overflow-y-auto">
-                  {searchResults.map((work) => (
-                    <button
-                      key={work.id}
-                      onClick={() => setFeaturedWork(work.id, selectedFeaturedPosition)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-700 transition border-b border-gray-700 last:border-b-0"
-                    >
-                      <p className="text-white font-semibold">{work.title}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {searchResults.length === 0 && featuredWorkSearch.trim() !== '' && (
-                <p className="text-gray-500 text-sm text-center py-4">Работы не найдены</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
 {/* EDIT TEXT MODAL */}
 {showEditModal && isAdmin && (
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
@@ -2045,79 +1859,7 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
           )}
         </div>
 
-{/* FEATURED WORKS */}
-        <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-white">
-            Популярные работы
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            {[1, 2, 3].map((position) => {
-              const featured = featuredWorks.find(f => f.position === position);
-              
-              return (
-                <div 
-                  key={position}
-                  className="bg-gray-900 rounded-xl p-4 border-2 border-gray-700 hover:border-red-500 transition h-32 sm:h-36 flex flex-col justify-between"
-                >
-                  {featured ? (
-                    <>
-                      <Link href={`/work/${featured.work_id}`} className="flex-1 flex flex-col justify-center items-center text-center">
-                        <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 w-full">
-                          {featured.works?.title}
-                        </h3>
-                        <div className="flex items-center justify-center gap-3 text-gray-400 text-sm">
-                          <div className="flex items-center gap-1">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                            </svg>
-                            <span>{featured.views_count || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                            </svg>
-                            <span>{featured.average_rating ? featured.average_rating.toFixed(1) : '-'}</span>
-                          </div>
-                        </div>
-                      </Link>
-                      {isAdmin && (
-                        <button
-                          onClick={() => removeFeaturedWork(position)}
-                          className="text-red-500 hover:text-red-400 text-xs mt-2"
-                        >
-                          Удалить
-                        </button>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {isAdmin ? (
-                        <button
-                          onClick={() => {
-                            setSelectedFeaturedPosition(position);
-                            setShowFeaturedModal(true);
-                          }}
-                          className="w-full h-full flex items-center justify-center"
-                        >
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                          </svg>
-                        </button>
-                      ) : (
-                        <div className="text-gray-600 text-center h-full flex items-center justify-center">
-                          <p className="text-xs">Скоро здесь появится популярная работа</p>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        
+
 {/* НОВОСТИ */}
 <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
   <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
