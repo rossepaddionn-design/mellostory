@@ -169,45 +169,33 @@ const loadSiteUpdates = async () => {
   };
 
 const loadFeaturedWorks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('featured_works')
-        .select('*, works(id, title, cover_url)')
-        .order('position', { ascending: true });
-      
-      if (error) throw error;
+  try {
+    const { data, error } = await supabase
+      .from('featured_works')
+      .select(`
+        position,
+        work_id,
+        works!inner(id, title, cover_url),
+        work_views!inner(view_count),
+        work_ratings(rating)
+      `)
+      .order('position', { ascending: true });
+    
+    if (error) throw error;
 
-      // Загружаем просмотры и оценки для каждой работы
-      const worksWithStats = await Promise.all((data || []).map(async (featured) => {
-        // Загружаем просмотры
-        const { data: viewData } = await supabase
-          .from('work_views')
-          .select('view_count')
-          .eq('work_id', featured.work_id)
-          .single();
+    const worksWithStats = (data || []).map((featured) => ({
+      ...featured,
+      views_count: featured.work_views?.view_count || 0,
+      average_rating: featured.work_ratings && featured.work_ratings.length > 0
+        ? featured.work_ratings.reduce((sum, r) => sum + r.rating, 0) / featured.work_ratings.length
+        : null
+    }));
 
-        // Загружаем среднюю оценку
-        const { data: ratingData } = await supabase
-          .from('work_ratings')
-          .select('rating')
-          .eq('work_id', featured.work_id);
-
-        const averageRating = ratingData && ratingData.length > 0
-          ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
-          : null;
-
-        return {
-          ...featured,
-          views_count: viewData?.view_count || 0,
-          average_rating: averageRating
-        };
-      }));
-
-      setFeaturedWorks(worksWithStats);
-    } catch (err) {
-      console.error('Ошибка загрузки популярных работ:', err);
-    }
-  };
+    setFeaturedWorks(worksWithStats);
+  } catch (err) {
+    console.error('Ошибка загрузки популярных работ:', err);
+  }
+};
 
   const searchWorksForFeatured = async (query) => {
     if (!query.trim()) {
