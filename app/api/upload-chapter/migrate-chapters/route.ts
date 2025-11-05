@@ -1,16 +1,14 @@
-import { put } from '@vercel/blob';
+import { put, del, list } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST() {
   try {
-    // Инициализируем Supabase
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // 1. Загружаем ВСЕ главы где есть текст в content
     const { data: chapters, error } = await supabase
       .from('chapters')
       .select('id, work_id, chapter_number, content')
@@ -18,6 +16,7 @@ export async function POST() {
       .neq('content', '');
 
     if (error) throw error;
+    
     if (!chapters || chapters.length === 0) {
       return NextResponse.json({ 
         success: true, 
@@ -29,21 +28,34 @@ export async function POST() {
     let migrated = 0;
     const errors: any[] = [];
 
-    // 2. Мигрируем каждую главу
     for (const chapter of chapters) {
       try {
-        // Загружаем текст в Blob
+        if (!chapter.content || chapter.content.trim() === '') {
+          continue;
+        }
+
         const filename = `works/${chapter.work_id}/chapter-${chapter.chapter_number}.txt`;
+        
+        try {
+          const { blobs } = await list({ 
+            prefix: `works/${chapter.work_id}/chapter-${chapter.chapter_number}` 
+          });
+          for (const blob of blobs) {
+            await del(blob.url);
+          }
+        } catch (e) {
+          // Игнорируем
+        }
+        
         const blob = await put(filename, chapter.content, {
           access: 'public',
         });
 
-        // Обновляем запись: ссылка + очищаем content
         const { error: updateError } = await supabase
           .from('chapters')
           .update({
             text_blob_url: blob.url,
-            content: null  // Очищаем!
+            content: null
           })
           .eq('id', chapter.id);
 
@@ -68,7 +80,7 @@ export async function POST() {
   } catch (error: any) {
     console.error('Ошибка миграции:', error);
     return NextResponse.json(
-      { error: error.message },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }
