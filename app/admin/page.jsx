@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
+import { uploadChapterText, deleteChapterText } from '@/lib/blobStorage';
 import { Save, Upload, Trash2, Plus, Bold, Italic, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, Music, HelpCircle, X, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AdminPanel() {
@@ -182,10 +183,17 @@ if (!isDraft && !selectedWork.id) {
       return;
     }
 
-    if (!chapterForm.title.trim() || !chapterForm.content.trim()) {
-      alert('Заполните название и текст главы!');
-      return;
-    }
+if (!chapterForm.title.trim()) {
+  alert('Заполните название главы!');
+  return;
+}
+
+// Проверяем текст из редактора напрямую
+const editorContent = editorRef.current?.innerHTML || '';
+if (!editorContent.trim()) {
+  alert('Заполните текст главы!');
+  return;
+}
 
     if (!chapterForm.chapter_number || chapterForm.chapter_number.toString().trim() === '') {
       alert('Укажите номер главы!');
@@ -194,16 +202,25 @@ if (!isDraft && !selectedWork.id) {
 
     setLoading(true);
 
-    const chapterData = {
-      work_id: selectedWork.id,
-      title: chapterForm.title.trim(),
-      content: chapterForm.content,
-      author_note: chapterForm.author_note.trim(),
-      chapter_number: chapterForm.chapter_number,
-      images: chapterForm.images,
-      audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
-      is_published: isPublished
-    };
+// 1. Загружаем текст в Blob (editorContent уже объявлен выше)
+const textBlobUrl = await uploadChapterText(
+  selectedWork.id, 
+  chapterForm.chapter_number, 
+  editorContent  // ← Используем уже существующую переменную
+);
+
+// 3. Создаём данные главы
+const chapterData = {
+  work_id: selectedWork.id,
+  title: chapterForm.title.trim(),
+  text_blob_url: textBlobUrl,
+  content: null,  // Текст теперь в Blob
+  author_note: chapterForm.author_note.trim(),
+  chapter_number: chapterForm.chapter_number,
+  images: chapterForm.images,
+  audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
+  is_published: isPublished
+};
 
     try {
       let result;
@@ -940,23 +957,35 @@ suppressContentEditableWarning={true}
                               <p className="text-xs sm:text-sm text-gray-400 mt-1">{chapter.is_published ? '✅ Опубликовано' : '📝 Черновик'}</p>
                             </div>
                             <div className="flex gap-2 w-full sm:w-auto">
-<button onClick={() => {
-                                setSelectedChapter(chapter);
-                                const newForm = {
-                                  title: chapter.title,
-                                  content: chapter.content,
-                                  author_note: chapter.author_note || '',
-                                  chapter_number: chapter.chapter_number,
-                                  images: chapter.images || [],
-                                  audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
-                                };
-                                setChapterForm(newForm);
-                                if (editorRef.current) {
-                                  editorRef.current.innerHTML = chapter.content || '';
-                                }
-                                setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                              }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition">
+<button onClick={async () => {
+  setSelectedChapter(chapter);
+  
+  // ЗАГРУЖАЕМ ТЕКСТ ИЗ BLOB ЕСЛИ ЕСТЬ
+  let chapterContent = chapter.content || '';
+  if (chapter.text_blob_url) {
+    try {
+      const response = await fetch(chapter.text_blob_url);
+      chapterContent = await response.text();
+    } catch (error) {
+      console.error('Ошибка загрузки текста:', error);
+    }
+  }
+  
+  const newForm = {
+    title: chapter.title,
+    content: chapterContent,  // ← ТЕПЕРЬ БЕРЁМ ИЗ BLOB!
+    author_note: chapter.author_note || '',
+    chapter_number: chapter.chapter_number,
+    images: chapter.images || [],
+    audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
+  };
+  setChapterForm(newForm);
+  if (editorRef.current) {
+    editorRef.current.innerHTML = chapterContent;
+  }
+  setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition">
                                 Редактировать
                               </button>
                               <button onClick={() => deleteChapter(chapter.id)} className="bg-red-900 hover:bg-red-800 p-2 rounded-lg transition">

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { getChapterText } from '@/lib/blobStorage';
 import { useParams } from 'next/navigation';
 import { MessageSquare, Reply, Trash2, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 
@@ -173,7 +174,22 @@ export default function ChapterPage() {
           .order('created_at', { ascending: true })
       ]);
 
-      if (chapterRes.data) setChapter(chapterRes.data);
+      if (chapterRes.data) {
+  const chapterData = chapterRes.data;
+  
+  // Если текст в Blob — загружаем оттуда
+  if (chapterData.text_blob_url) {
+    try {
+      const textContent = await getChapterText(chapterData.text_blob_url);
+      chapterData.content = textContent;
+    } catch (error) {
+      console.error('Ошибка загрузки текста из Blob:', error);
+      // Fallback: используем старый content если есть
+    }
+  }
+  
+  setChapter(chapterData);
+}
       if (workRes.data) setWork(workRes.data);
       if (chaptersRes.data) setAllChapters(chaptersRes.data);
       if (commentsRes.data) setComments(commentsRes.data || []);
