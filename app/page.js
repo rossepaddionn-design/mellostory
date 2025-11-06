@@ -1269,49 +1269,6 @@ onClick={async () => {
               </div>
             </div>
 
-{/* МИГРАЦИЯ В VERCEL BLOB */}
-<div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 rounded-xl p-3 sm:p-4">
-  <div className="flex items-start gap-2">
-    <div className="flex-shrink-0 text-xl">⚡</div>
-    <div className="flex-1">
-      <h3 className="font-bold text-yellow-900 dark:text-yellow-200 mb-2 text-sm sm:text-base">
-        Миграция в Blob
-      </h3>
-      <p className="text-xs text-yellow-800 dark:text-yellow-300 mb-3">
-        Перенеси тексты глав из Supabase в Vercel Blob
-      </p>
-      <button
-        onClick={async () => {
-          if (!confirm('Мигрировать все главы в Vercel Blob?')) return;
-          
-          try {
-            setLoading(true);
-            const response = await fetch('/api/migrate-chapters', {
-              method: 'POST',
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-              alert(`✅ ${result.message}`);
-            } else {
-              alert(`❌ Ошибка: ${result.error}`);
-            }
-          } catch (error) {
-            alert(`❌ Ошибка: ${error.message}`);
-          } finally {
-            setLoading(false);
-          }
-        }}
-        disabled={loading}
-        className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white px-3 py-2 rounded-lg font-medium text-xs sm:text-sm transition"
-      >
-        {loading ? '⏳ Миграция...' : '🚀 Запустить'}
-      </button>
-    </div>
-  </div>
-</div>
-
             <button
               onClick={() => window.location.href = '/admin'}
               className="w-full bg-blue-600 hover:bg-blue-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
