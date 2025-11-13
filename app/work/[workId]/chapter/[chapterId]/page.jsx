@@ -610,7 +610,7 @@ export default function ChapterPage() {
               {JSON.parse(chapter.audio_url).map((audio, i) => (
                 <div key={i} className="bg-gray-800 rounded-lg p-3 border border-gray-700">
                   <p className="text-xs sm:text-sm text-gray-300 mb-2 break-words">{audio.name}</p>
-                  <audio controls className="w-full" src={audio.data}>
+                  <audio controls className="w-full" src={audio.url || audio.data}>
                     Ваш браузер не поддерживает аудио.
                   </audio>
                 </div>
