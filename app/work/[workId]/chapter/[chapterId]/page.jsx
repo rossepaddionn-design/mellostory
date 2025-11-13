@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getChapterText } from '@/lib/blobStorage';
 import { useParams } from 'next/navigation';
-import { MessageSquare, Reply, Trash2, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 
 export default function ChapterPage() {
   const params = useParams();
@@ -20,13 +20,6 @@ export default function ChapterPage() {
   const [fontSize, setFontSize] = useState(14);
   const [showChapterList, setShowChapterList] = useState(false);
 
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
-  const [replyTo, setReplyTo] = useState(null);
-  const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [currentCommentPage, setCurrentCommentPage] = useState(1);
-  const commentsPerPage = 10;
   const t = {
     backToWork: 'К описанию работы',
     backToMain: 'На главную',
@@ -36,20 +29,10 @@ export default function ChapterPage() {
     authorNote: 'Примечание автора',
     images: 'Изображения',
     audio: 'Аудио',
-    comments: 'Комментарии',
-    addComment: 'Написать комментарий',
-    reply: 'Ответить',
-    cancel: 'Отмена',
-    send: 'Отправить',
-    loginToComment: 'Войдите, чтобы оставить комментарий',
     previousChapter: 'Предыдущая',
     nextChapter: 'Следующая',
     chapters: 'Главы'
   };
-
-  useEffect(() => {
-    checkUser();
-  }, []);
 
   useEffect(() => {
     if (chapterId && workId) {
@@ -131,48 +114,29 @@ export default function ChapterPage() {
     };
   }, [chapter]);
 
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      setUser(session.user);
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-      if (profile) setUserProfile(profile);
-    }
-  };
-
   const loadAllData = async () => {
     setLoading(true);
-    setCurrentCommentPage(1);
 
     try {
-      const [chapterRes, workRes, chaptersRes, commentsRes] = await Promise.all([
-        supabase
-          .from('chapters')
-          .select('*')
-          .eq('id', chapterId)
-          .eq('is_published', true)
-          .single(),
-        supabase
-          .from('works')
-          .select('title, id')
-          .eq('id', workId)
-          .single(),
-        supabase
-          .from('chapters')
-          .select('id, chapter_number, title')
-          .eq('work_id', workId)
-          .eq('is_published', true)
-          .order('chapter_number', { ascending: true }),
-        supabase
-          .from('comments')
-          .select('*')
-          .eq('chapter_id', chapterId)
-          .order('created_at', { ascending: true })
-      ]);
+const [chapterRes, workRes, chaptersRes] = await Promise.all([
+  supabase
+    .from('chapters')
+    .select('*')
+    .eq('id', chapterId)
+    .eq('is_published', true)
+    .single(),
+  supabase
+    .from('works')
+    .select('title, id')
+    .eq('id', workId)
+    .single(),
+  supabase
+    .from('chapters')
+    .select('id, chapter_number, title')
+    .eq('work_id', workId)
+    .eq('is_published', true)
+    .order('chapter_number', { ascending: true })
+]);
 
       if (chapterRes.data) {
   const chapterData = chapterRes.data;
@@ -192,140 +156,12 @@ export default function ChapterPage() {
 }
       if (workRes.data) setWork(workRes.data);
       if (chaptersRes.data) setAllChapters(chaptersRes.data);
-      if (commentsRes.data) setComments(commentsRes.data || []);
 
     } catch (err) {
       console.error('Ошибка загрузки данных:', err);
     }
 
     setLoading(false);
-  };
-
-  const sendComment = async () => {
-    if (!newComment.trim() || !user || !userProfile) {
-      alert('Напишите комментарий!');
-      return;
-    }
-
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        chapter_id: chapterId,
-        user_id: user.id,
-        user_nickname: userProfile.nickname,
-        comment_text: newComment.trim(),
-        parent_comment_id: replyTo
-      });
-
-    if (error) {
-      alert('Ошибка: ' + error.message);
-    } else {
-      setNewComment('');
-      setReplyTo(null);
-      await loadAllData();
-    }
-  };
-
-  const deleteComment = async (commentId, userId) => {
-    if (user?.id !== userId) {
-      alert('Вы можете удалять только свои комментарии!');
-      return;
-    }
-
-    if (!confirm('Удалить комментарий?')) return;
-
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', commentId);
-
-    if (error) {
-      alert('Ошибка: ' + error.message);
-    } else {
-      await loadAllData();
-    }
-  };
-
-  const getCommentReplies = (parentId) => {
-    return comments.filter(c => c.parent_comment_id === parentId);
-  };
-
-  const renderComment = (comment, depth = 0) => {
-    const replies = getCommentReplies(comment.id);
-    const maxDepth = 3; // Ограничиваем вложенность на мобильных
-    
-    return (
-      <div key={comment.id} style={{ marginLeft: depth > 0 ? (depth > maxDepth ? '20px' : '20px') : '0' }} className="mb-3 sm:mb-4">
-        <div className="bg-gray-750 bg-opacity-95 rounded-lg p-3 sm:p-4 border border-gray-600">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-            <div className="flex-1 min-w-0">
-              <span className="font-semibold text-red-500 text-sm sm:text-base break-words">{comment.user_nickname}</span>
-              <span className="text-gray-500 text-xs ml-2 block sm:inline">
-                {new Date(comment.created_at).toLocaleString('ru-RU', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </span>
-            </div>
-            <div className="flex gap-2 flex-shrink-0">
-              {user && depth < maxDepth && (
-                <button
-                  onClick={() => setReplyTo(comment.id)}
-                  className="text-gray-400 hover:text-red-500 text-xs sm:text-sm flex items-center gap-1"
-                >
-                  <Reply size={12} className="sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t.reply}</span>
-                </button>
-              )}
-              {user?.id === comment.user_id && (
-                <button
-                  onClick={() => deleteComment(comment.id, comment.user_id)}
-                  className="text-gray-400 hover:text-red-500"
-                >
-                  <Trash2 size={12} className="sm:w-4 sm:h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-          <p className="text-gray-300 whitespace-pre-wrap break-words text-sm sm:text-base">{comment.comment_text}</p>
-          
-          {replyTo === comment.id && (
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows={3}
-                placeholder={`Ответ для ${comment.user_nickname}...`}
-                className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-red-600 mb-2"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={sendComment}
-                  className="bg-red-600 hover:bg-red-700 px-3 sm:px-4 py-2 rounded text-xs sm:text-sm"
-                >
-                  {t.send}
-                </button>
-                <button
-                  onClick={() => { setReplyTo(null); setNewComment(''); }}
-                  className="bg-gray-700 hover:bg-gray-600 px-3 sm:px-4 py-2 rounded text-xs sm:text-sm"
-                >
-                  {t.cancel}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {replies.length > 0 && (
-          <div className="mt-2">
-            {replies.map(reply => renderComment(reply, depth + 1))}
-          </div>
-        )}
-      </div>
-    );
   };
 
   const getPreviousChapter = () => {
@@ -358,13 +194,6 @@ export default function ChapterPage() {
     router.push(`/work/${workId}/chapter/${chId}`);
     setShowChapterList(false);
   };
-
-  const mainComments = comments.filter(c => !c.parent_comment_id);
-  const totalCommentPages = Math.ceil(mainComments.length / commentsPerPage);
-  const paginatedComments = mainComments.slice(
-    (currentCommentPage - 1) * commentsPerPage,
-    currentCommentPage * commentsPerPage
-  );
 
   if (loading) {
     return (
@@ -649,125 +478,6 @@ export default function ChapterPage() {
             </button>
           ) : (
             <div className="hidden sm:block"></div>
-          )}
-        </div>
-
-        {/* КОММЕНТАРИИ */}
-        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-            <MessageSquare size={24} className="sm:w-9 sm:h-9" />
-            <span className="break-words">{t.comments} ({mainComments.length})</span>
-          </h2>
-
-          {user && userProfile ? (
-            <div className="mb-6 sm:mb-8">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows={4}
-                placeholder={t.addComment}
-                className="w-full bg-gray-850 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:border-red-600 mb-3"
-              />
-              <button
-                onClick={sendComment}
-                disabled={!newComment.trim()}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {t.send}
-              </button>
-            </div>
-          ) : (
-            <div className="mb-6 sm:mb-8 bg-gray-800 rounded-lg p-4 sm:p-6 border border-gray-700 text-center">
-              <p className="text-gray-400 text-sm sm:text-base">{t.loginToComment}</p>
-            </div>
-          )}
-
-          <div className="mb-6">
-            {mainComments.length === 0 ? (
-              <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">Комментариев пока нет. Будьте первым!</p>
-            ) : (
-              paginatedComments.map(comment => renderComment(comment))
-            )}
-          </div>
-
-          {/* ПАГИНАЦИЯ КОММЕНТАРИЕВ */}
-          {totalCommentPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-4 sm:pt-6 border-t border-gray-700 flex-wrap">
-              <button
-                onClick={() => setCurrentCommentPage(Math.max(1, currentCommentPage - 1))}
-                disabled={currentCommentPage === 1}
-                className="bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed px-2 sm:px-3 py-2 rounded flex items-center gap-1 sm:gap-2"
-              >
-                <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
-              </button>
-
-              {/* УМНАЯ ПАГИНАЦИЯ - показываем не все страницы на мобильном */}
-              {totalCommentPages <= 5 ? (
-                Array.from({ length: totalCommentPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentCommentPage(page)}
-                    className={`px-2 sm:px-3 py-2 rounded transition text-sm sm:text-base ${
-                      currentCommentPage === page
-                        ? 'bg-red-600 text-white'
-                        : 'bg-gray-800 hover:bg-gray-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))
-              ) : (
-                <>
-                  {currentCommentPage > 2 && (
-                    <>
-                      <button
-                        onClick={() => setCurrentCommentPage(1)}
-                        className="px-2 sm:px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-base"
-                      >
-                        1
-                      </button>
-                      {currentCommentPage > 3 && <span className="text-gray-500">...</span>}
-                    </>
-                  )}
-                  
-                  {[currentCommentPage - 1, currentCommentPage, currentCommentPage + 1]
-                    .filter(p => p > 0 && p <= totalCommentPages)
-                    .map(page => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentCommentPage(page)}
-                        className={`px-2 sm:px-3 py-2 rounded transition text-sm sm:text-base ${
-                          currentCommentPage === page
-                            ? 'bg-red-600 text-white'
-                            : 'bg-gray-800 hover:bg-gray-700'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  
-                  {currentCommentPage < totalCommentPages - 1 && (
-                    <>
-                      {currentCommentPage < totalCommentPages - 2 && <span className="text-gray-500">...</span>}
-                      <button
-                        onClick={() => setCurrentCommentPage(totalCommentPages)}
-                        className="px-2 sm:px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-base"
-                      >
-                        {totalCommentPages}
-                      </button>
-                    </>
-                  )}
-                </>
-              )}
-
-              <button
-                onClick={() => setCurrentCommentPage(Math.min(totalCommentPages, currentCommentPage + 1))}
-                disabled={currentCommentPage === totalCommentPages}
-                className="bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed px-2 sm:px-3 py-2 rounded flex items-center gap-1 sm:gap-2"
-              >
-                <ChevronRight size={16} className="sm:w-5 sm:h-5" />
-              </button>
-            </div>
           )}
         </div>
       </main>
