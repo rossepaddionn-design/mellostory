@@ -2076,6 +2076,71 @@ style={{
   </div>
 </div>
 
+{/* МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ */}
+{showPopularEditModal && isAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="bg-gray-900 rounded-lg w-full max-w-md p-6 border-2 border-red-600">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-red-600">
+          Редактировать работу #{editingPopularIndex + 1}
+        </h2>
+        <button 
+          onClick={() => {
+            setShowPopularEditModal(false);
+            setEditingPopularIndex(null);
+            setEditPopularForm({ title: '', rating: '', views: '' });
+          }} 
+          className="text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Название работы</label>
+          <input
+            type="text"
+            value={editPopularForm.title}
+            onChange={(e) => setEditPopularForm({...editPopularForm, title: e.target.value})}
+            placeholder="Введите название"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Оценка</label>
+          <input
+            type="text"
+            value={editPopularForm.rating}
+            onChange={(e) => setEditPopularForm({...editPopularForm, rating: e.target.value})}
+            placeholder="Например: 9.5"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Прочтения</label>
+          <input
+            type="text"
+            value={editPopularForm.views}
+            onChange={(e) => setEditPopularForm({...editPopularForm, views: e.target.value})}
+            placeholder="Например: 15.2K"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <button
+          onClick={() => savePopularWork(editingPopularIndex)}
+          className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg font-bold transition"
+        >
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 {/* НОВОСТИ */}
 <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
  <div className="bg-black rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
