@@ -50,8 +50,16 @@ const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [showManagementModal, setShowManagementModal] = useState(false);
   const [newsText, setNewsText] = useState('Здесь будут появляться новости о новых работах и обновлениях сайта.');
-const [aboutText, setAboutText] = useState('Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!');
-const [editingSection, setEditingSection] = useState(null);
+  const [aboutText, setAboutText] = useState('Ранее я публиковала свои работы на Фикбуке под именем Rossepadion, поэтому "старые" произведения будут иметь обложки с этим псевдонимом. Однако все новые фанфики и романы будут выходить под новым именем. Этот сайт сейчас находится в разработке и будет постепенно улучшаться, а также пополняться новыми работами. Буду признательна за ваши отзывы и обратную связь!');
+const [popularWorks, setPopularWorks] = useState([
+  { id: 1, title: '', rating: '', views: '' },
+  { id: 2, title: '', rating: '', views: '' },
+  { id: 3, title: '', rating: '', views: '' }
+]);
+const [showPopularEditModal, setShowPopularEditModal] = useState(false);
+const [editingPopularIndex, setEditingPopularIndex] = useState(null);
+const [editPopularForm, setEditPopularForm] = useState({ title: '', rating: '', views: '' });
+  const [editingSection, setEditingSection] = useState(null);
 const [editText, setEditText] = useState('');
 const [showEditModal, setShowEditModal] = useState(false);
   const [managementTab, setManagementTab] = useState('comments');
@@ -186,6 +194,16 @@ const loadSiteUpdates = async () => {
 
 const loadSettings = async () => {
   try {
+    // ЗАГРУЗКА ПОПУЛЯРНЫХ РАБОТ
+    const cachedPopular = localStorage.getItem('popularWorks');
+    if (cachedPopular) {
+      try {
+        setPopularWorks(JSON.parse(cachedPopular));
+      } catch (e) {
+        console.error('Ошибка парсинга popularWorks:', e);
+      }
+    }
+
     const cachedColor = localStorage.getItem('titleColor');
     if (cachedColor) {
       setTitleColor(cachedColor);
@@ -610,6 +628,24 @@ if (data && !error) {
     setEditingSection(null);
     setEditText('');
     alert('✅ Текст сохранён!');
+  } catch (err) {
+    alert('❌ Ошибка: ' + err.message);
+  }
+};
+
+const savePopularWork = (index) => {
+  try {
+    const updatedWorks = [...popularWorks];
+    updatedWorks[index] = { ...editPopularForm, id: index + 1 };
+
+    // Сохраняем в localStorage
+    localStorage.setItem('popularWorks', JSON.stringify(updatedWorks));
+    
+    setPopularWorks(updatedWorks);
+    setShowPopularEditModal(false);
+    setEditingPopularIndex(null);
+    setEditPopularForm({ title: '', rating: '', views: '' });
+    alert('✅ Популярная работа сохранена!');
   } catch (err) {
     alert('❌ Ошибка: ' + err.message);
   }
@@ -1739,11 +1775,18 @@ onClick={async () => {
   }}
   className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
   style={{
-    backgroundColor: '#7f1d1d',
-    boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)',
+    color: '#000000'
   }}
-  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#991b1b'}
-  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7f1d1d'}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)';
+  }}
 >
   <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
 </button>
@@ -1755,11 +1798,18 @@ onClick={async () => {
   }}
   className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
   style={{
-    backgroundColor: '#7f1d1d',
-    boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)',
+    color: '#000000'
   }}
-  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#991b1b'}
-  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7f1d1d'}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)';
+  }}
 >
   <ChevronRight size={16} className="sm:w-5 sm:h-5" />
 </button>
@@ -1950,6 +2000,81 @@ style={{
           )}
         </div>
 
+{/* ПОПУЛЯРНЫЕ РАБОТЫ */}
+<div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0">
+  <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-6 sm:mb-8">
+    Популярные работы
+  </h2>
+  
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+    {popularWorks.map((work, index) => (
+      <div
+        key={work.id}
+        className="relative rounded-xl p-6 border-2 transition hover:scale-105"
+        style={{
+          background: 'linear-gradient(135deg, rgba(127, 29, 29, 0.4) 0%, rgba(74, 14, 14, 0.6) 100%)',
+          borderColor: '#7f1d1d',
+          boxShadow: '0 0 20px rgba(127, 29, 29, 0.6), 0 0 40px rgba(127, 29, 29, 0.3)'
+        }}
+      >
+        {isAdmin && (
+          <button
+            onClick={() => {
+              setEditingPopularIndex(index);
+              setEditPopularForm(work);
+              setShowPopularEditModal(true);
+            }}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition"
+            style={{
+              background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+              boxShadow: '0 0 10px rgba(220, 38, 38, 0.8)'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        )}
+
+        {work.title ? (
+          <>
+            <h3 className="text-white font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words">
+              {work.title}
+            </h3>
+            
+            <div className="flex justify-center items-center gap-6">
+              <div className="flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span className="text-yellow-400 font-bold text-lg">
+                  {work.rating || '—'}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                <span className="text-blue-400 font-bold text-lg">
+                  {work.views || '—'}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-400 text-sm">
+              Скоро здесь появится работа
+            </p>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
 
 {/* НОВОСТИ */}
 <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">

@@ -150,62 +150,21 @@ const loadAllData = async () => {
   setLoading(false);
 };
 
-  const incrementViewCount = async () => {
-    if (hasIncrementedView.current) return;
-    hasIncrementedView.current = true;
-
-    try {
-      const { error } = await supabase.rpc('increment_work_view', {
-        p_work_id: workId
-      });
-
-      if (error) {
-        console.error('Ошибка увеличения счётчика:', error);
-      } else {
-        const { data } = await supabase
-          .from('work_views')
-          .select('view_count')
-          .eq('work_id', workId)
-          .single();
-        
-        if (data) {
-          setViewCount(data.view_count);
-        }
-      }
-    } catch (err) {
-      console.error('Ошибка:', err);
-    }
+ const incrementViewCount = async () => {
+    // Отключено: просмотры меняются только вручную в Supabase
+    return;
   };
 
-  const submitRating = async (rating) => {
+const submitRating = async (rating) => {
     if (!currentUser) {
       alert('Войдите, чтобы оставить оценку');
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('work_ratings')
-        .upsert({
-          work_id: workId,
-          user_id: currentUser.id,
-          rating: rating,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'work_id,user_id'
-        });
-
-      if (error) {
-        console.error('Ошибка сохранения оценки:', error);
-        alert('Ошибка сохранения оценки');
-      } else {
-        setUserRating(rating);
-        setShowRatingModal(false);
-        loadAllData();
-      }
-    } catch (err) {
-      console.error('Ошибка:', err);
-    }
+    // Отключено: оценки меняются только вручную в Supabase
+    alert('Спасибо за оценку! ❤️');
+    setUserRating(rating);
+    setShowRatingModal(false);
   };
 
   const scrollCharacterCarousel = (direction) => {
