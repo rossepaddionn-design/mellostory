@@ -197,7 +197,7 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-black text-white">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600 mb-4"></div>
           <p className="text-lg sm:text-xl text-gray-400">{t.loading}</p>
@@ -223,9 +223,12 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
   const nextChapter = getNextChapter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen text-white" style={{ backgroundColor: '#D3D3D3' }}>
       {/* HEADER - АДАПТИВНЫЙ */}
-      <header className="bg-gray-950 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40">
+<header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
+  backgroundColor: '#000000',
+  borderColor: '#7f1d1d'
+}}>
         <div className="max-w-4xl mx-auto">
           {/* НАВИГАЦИЯ */}
           <div className="flex justify-between items-center mb-2 sm:mb-4">
@@ -242,10 +245,23 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
 
               {/* Список глав - мобильная кнопка */}
-              <button
-                onClick={() => setShowChapterList(true)}
-                className="bg-red-600 hover:bg-red-700 px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm"
-              >
+<button
+  onClick={() => setShowChapterList(true)}
+  className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
+  style={{
+    backgroundColor: '#7f1d1d',
+    boxShadow: '0 0 10px rgba(127, 29, 29, 0.6)',
+    border: '1px solid #7f1d1d'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = '#991b1b';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = '#7f1d1d';
+    e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.6)';
+  }}
+>
                 <Menu size={16} className="sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{t.chapters}</span>
               </button>
@@ -255,51 +271,123 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
       </header>
 
       {/* МОДАЛЬНОЕ ОКНО СПИСКА ГЛАВ */}
-      {showChapterList && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col border-2 border-red-600">
-            <div className="flex justify-between items-center p-4 border-b border-gray-700">
-              <h2 className="text-lg sm:text-xl font-bold text-red-600">{t.chapters} ({allChapters.length})</h2>
-              <button onClick={() => setShowChapterList(false)} className="text-gray-400 hover:text-white">
-                <X size={24} />
+{showChapterList && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0, 0, 0, 0.95)'
+  }}>
+    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      backgroundColor: '#1a1a1a',
+      border: '2px solid #7f1d1d',
+      boxShadow: '0 0 40px rgba(127, 29, 29, 0.6), 0 0 80px rgba(127, 29, 29, 0.3)'
+    }}>
+      <div className="flex justify-between items-center p-5 sm:p-6" style={{
+        borderBottom: '2px solid #7f1d1d',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)'
+      }}>
+<h2 className="text-xl sm:text-2xl font-bold" style={{
+  color: '#b91c1c',
+  textShadow: '0 0 20px rgba(185, 28, 28, 0.9), 0 0 40px rgba(185, 28, 28, 0.5)'
+}}>
+  Содержание
+</h2>
+        <button 
+          onClick={() => setShowChapterList(false)} 
+          className="transition rounded-full p-2"
+          style={{
+            color: '#7f1d1d',
+            backgroundColor: 'rgba(127, 29, 29, 0.1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(127, 29, 29, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(127, 29, 29, 0.1)';
+          }}
+        >
+          <X size={24} />
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{
+        backgroundColor: '#0a0a0a'
+      }}>
+        <div className="space-y-2">
+          {allChapters.map((ch) => {
+            const isActive = String(ch.id) === String(chapterId);
+            return (
+              <button
+                key={ch.id}
+                onClick={() => handleChapterSelect(ch.id)}
+                className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
+                style={{
+                  background: isActive 
+                    ? 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%)'
+                    : '#1a1a1a',
+                  border: `2px solid ${isActive ? '#b91c1c' : '#333'}`,
+                  boxShadow: isActive 
+                    ? '0 0 20px rgba(127, 29, 29, 0.7), 0 4px 12px rgba(0, 0, 0, 0.5)' 
+                    : '0 2px 6px rgba(0, 0, 0, 0.3)',
+                  transform: isActive ? 'scale(1.02)' : 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = '#2a2a2a';
+                    e.currentTarget.style.borderColor = '#7f1d1d';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(127, 29, 29, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                    e.currentTarget.style.borderColor = '#333';
+                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+                  }
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
+                    color: isActive ? '#ffffff' : '#7f1d1d',
+                    textShadow: isActive ? '0 0 10px rgba(255, 255, 255, 0.4)' : 'none',
+                    minWidth: '30px'
+                  }}>
+                    {ch.chapter_number}.
+                  </span>
+                  <span className="text-sm sm:text-base break-words flex-1" style={{
+                    color: isActive ? '#ffffff' : '#d1d5db',
+                    fontWeight: isActive ? '600' : '400'
+                  }}>
+                    {ch.title}
+                  </span>
+                </div>
               </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-2">
-                {allChapters.map((ch) => (
-                  <button
-                    key={ch.id}
-                    onClick={() => handleChapterSelect(ch.id)}
-                    className={`w-full text-left p-3 rounded-lg transition ${
-                      String(ch.id) === String(chapterId)
-                        ? 'bg-red-600 text-white'
-                        : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-                    }`}
-                  >
-                    <span className="text-sm sm:text-base break-words">
-                      {ch.chapter_number}. {ch.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
         {/* ЗАГОЛОВОК ГЛАВЫ */}
         <div className="mb-6 sm:mb-8">
-          {work && (
-            <p className="text-gray-400 mb-2 text-sm sm:text-base break-words">{work.title}</p>
-          )}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 mb-2 break-words">
+{work && (
+  <p className="mb-2 text-sm sm:text-base break-words font-semibold" style={{
+    color: '#000000'
+  }}>{work.title}</p>
+)}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words" style={{
+  color: '#7f1d1d',
+  textShadow: '0 0 10px rgba(127, 29, 29, 0.8)'
+}}>
             {chapter.chapter_number}. {chapter.title}
           </h1>
         </div>
 
 {/* ТЕКСТ ГЛАВЫ */}
-        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
+        <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
+  borderColor: '#7f1d1d',
+  boxShadow: '0 0 20px rgba(127, 29, 29, 0.6), 0 0 40px rgba(127, 29, 29, 0.4), inset 0 0 20px rgba(127, 29, 29, 0.1)'
+}}>
 <style dangerouslySetInnerHTML={{
   __html: `
     .chapter-text-content {
@@ -411,8 +499,14 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
 
         {/* ИЗОБРАЖЕНИЯ */}
         {chapter.images && chapter.images.length > 0 && (
-          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
-            <h3 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">{t.images}</h3>
+<div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
+  borderColor: '#7f1d1d',
+  boxShadow: '0 0 20px rgba(127, 29, 29, 0.6)'
+}}>
+  <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
+    color: '#7f1d1d',
+    textShadow: '0 0 10px rgba(127, 29, 29, 0.8)'
+  }}>{t.images}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {chapter.images.map((img, i) => (
                 <div key={i} className="rounded-lg overflow-hidden border-2 border-gray-700">
@@ -425,36 +519,62 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
 
         {/* ПРИМЕЧАНИЕ АВТОРА */}
         {chapter.author_note && (
-          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-6 sm:mb-8">
-            <h3 className="text-base sm:text-lg font-bold text-red-500 mb-2">{t.authorNote}</h3>
+<div className="bg-black rounded-lg p-4 sm:p-6 mb-6 sm:mb-8" style={{
+  borderLeft: '4px solid #7f1d1d',
+  boxShadow: '-5px 0 15px rgba(127, 29, 29, 0.4)'
+}}>
+  <h3 className="text-base sm:text-lg font-bold mb-2" style={{
+    color: '#7f1d1d'
+  }}>{t.authorNote}</h3>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{chapter.author_note}</p>
           </div>
         )}
 
         {/* АУДИО */}
-        {chapter.audio_url && (
-          <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 md:p-8 border-2 border-red-900 mb-6 sm:mb-8">
-            <h3 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">{t.audio}</h3>
-            <div className="space-y-3">
-              {JSON.parse(chapter.audio_url).map((audio, i) => (
-                <div key={i} className="bg-gray-800 rounded-lg p-3 border border-gray-700">
-                  <p className="text-xs sm:text-sm text-gray-300 mb-2 break-words">{audio.name}</p>
-                  <audio controls className="w-full" src={audio.url || audio.data}>
-                    Ваш браузер не поддерживает аудио.
-                  </audio>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+{chapter.audio_url && (
+  <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
+    borderColor: '#b91c1c',
+    boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
+  }}>
+    <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
+      color: '#b91c1c',
+      textShadow: '0 0 15px rgba(185, 28, 28, 0.9)'
+    }}>{t.audio}</h3>
+    <div className="space-y-3">
+      {JSON.parse(chapter.audio_url).map((audio, i) => (
+        <div key={i} className="rounded-lg p-3 border-2" style={{
+          backgroundColor: '#0a0a0a',
+          borderColor: '#b91c1c',
+          boxShadow: '0 0 15px rgba(185, 28, 28, 0.5)'
+        }}>
+          <p className="text-xs sm:text-sm text-gray-300 mb-2 break-words">{audio.name}</p>
+          <audio controls className="w-full" src={audio.url || audio.data}>
+            Ваш браузер не поддерживает аудио.
+          </audio>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
         {/* НАВИГАЦИЯ МЕЖДУ ГЛАВАМИ */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-3 sm:gap-4">
           {prevChapter ? (
-            <button 
-              onClick={handlePrevClick}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
-            >
+<button 
+  onClick={handlePrevClick}
+  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+  style={{
+    backgroundColor: '#1a1a1a',
+    border: '2px solid #7f1d1d',
+    boxShadow: '0 0 10px rgba(127, 29, 29, 0.4)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.7)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.4)';
+  }}
+>
               <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">{t.previousChapter}</span>
               <span className="sm:hidden">Пред.</span>
@@ -463,15 +583,28 @@ const [chapterRes, workRes, chaptersRes] = await Promise.all([
             <div className="hidden sm:block"></div>
           )}
           
-          <span className="text-gray-400 text-xs sm:text-sm order-first sm:order-none">
-            Глава {chapter.chapter_number} из {allChapters.length}
-          </span>
+<span className="text-xs sm:text-sm order-first sm:order-none font-semibold" style={{
+  color: '#000000'
+}}>
+  Глава {chapter.chapter_number} из {allChapters.length}
+</span>
 
           {nextChapter ? (
-            <button 
-              onClick={handleNextClick}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
-            >
+<button 
+  onClick={handlePrevClick}
+  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+  style={{
+    backgroundColor: '#1a1a1a',
+    border: '2px solid #7f1d1d',
+    boxShadow: '0 0 10px rgba(127, 29, 29, 0.4)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.7)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.4)';
+  }}
+>
               <span className="hidden sm:inline">{t.nextChapter}</span>
               <span className="sm:hidden">След.</span>
               <ChevronRight size={18} className="sm:w-5 sm:h-5" />
