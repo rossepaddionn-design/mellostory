@@ -9,7 +9,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [language, setLanguage] = useState('ru');
   const [titleColor, setTitleColor] = useState('#ef4444');
-  const [activeCategory, setActiveCategory] = useState('completed');
+  const [activeCategory, setActiveCategory] = useState('minific');
   const [expandedWork, setExpandedWork] = useState(null);
   
   const [works, setWorks] = useState([]);
@@ -123,9 +123,29 @@ const checkUser = async () => {
 };
 
 const loadWorks = async () => {
-  setLoading(true);
+  // Проверяем кэш в sessionStorage
+  const cacheKey = 'homepage_works';
+  const cached = sessionStorage.getItem(cacheKey);
   
-const { data, error } = await supabase
+  if (cached) {
+    try {
+      const worksData = JSON.parse(cached);
+      setWorks(worksData);
+      setCompletedWorks(worksData.filter(w => w.status === 'Завершён'));
+      setOngoingWorks(worksData.filter(w => w.status === 'В процессе'));
+      setMinificWorks(worksData.filter(w => w.category === 'minific'));
+      setLongficWorks(worksData.filter(w => w.category === 'longfic'));
+      setNovelWorks(worksData.filter(w => w.category === 'novel'));
+      setLoading(false);
+      return; // Выходим из функции, данные уже загружены
+    } catch (e) {
+      console.error('Ошибка чтения кэша:', e);
+    }
+  }
+
+  // Если кэша нет - загружаем из базы
+  setLoading(true);
+  const { data, error } = await supabase
     .from('works')
     .select('id, title, cover_url, direction, rating, status, category, fandom, pairing, description, created_at')
     .eq('is_draft', false)
@@ -136,6 +156,10 @@ const { data, error } = await supabase
     console.error('Ошибка загрузки работ:', error);
   } else {
     const worksData = data || [];
+    
+    // Сохраняем в кэш
+    sessionStorage.setItem(cacheKey, JSON.stringify(worksData));
+    
     setWorks(worksData);
     setCompletedWorks(worksData.filter(w => w.status === 'Завершён'));
     setOngoingWorks(worksData.filter(w => w.status === 'В процессе'));
@@ -145,7 +169,6 @@ const { data, error } = await supabase
   }
   setLoading(false);
 };
-
 const loadSiteUpdates = async () => {
     try {
       const { data, error } = await supabase
@@ -1579,9 +1602,16 @@ onClick={async () => {
           <div className="px-3 sm:px-6 py-2 sm:py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 sm:gap-4">
-                <div className="bg-red-600 rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm border-2 border-white shadow-lg flex-shrink-0">
-                  18+
-                </div>
+   <div 
+  className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
+  style={{
+    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+    boxShadow: '0 0 15px rgba(220, 38, 38, 0.8), 0 0 30px rgba(127, 29, 29, 0.6), inset 0 0 10px rgba(220, 38, 38, 0.5)',
+    border: '2px solid rgba(220, 38, 38, 0.8)'
+  }}
+>
+  18+
+</div>
 
                 <select
                   value={language}
@@ -1595,21 +1625,45 @@ onClick={async () => {
 
               <div className="flex-shrink-0">
                 {!user ? (
-                  <button
-                    onClick={() => setShowAuthModal(true)}
-                    className="bg-red-600 hover:bg-red-700 px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                  >
-                    <User size={14} className="sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">{t.login}</span>
-                  </button>
+ <button
+  onClick={() => setShowAuthModal(true)}
+  className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+  style={{
+    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+    boxShadow: '0 0 15px rgba(220, 38, 38, 0.7), 0 0 25px rgba(127, 29, 29, 0.5)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.9), 0 0 35px rgba(153, 27, 27, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(220, 38, 38, 0.7), 0 0 25px rgba(127, 29, 29, 0.5)';
+  }}
+>
+  <User size={14} className="sm:w-5 sm:h-5" />
+  <span className="hidden sm:inline">{t.login}</span>
+</button>
                 ) : (
-                  <button
-                    onClick={() => isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true)}
-                    className="bg-red-600 hover:bg-red-700 px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                  >
-                    <Menu size={14} className="sm:w-5 sm:h-5" />
-                    <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">{isAdmin ? 'Админ' : userProfile?.nickname}</span>
-                  </button>
+<button
+  onClick={() => isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true)}
+  className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+  style={{
+    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+    boxShadow: '0 0 15px rgba(220, 38, 38, 0.7), 0 0 25px rgba(127, 29, 29, 0.5)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.9), 0 0 35px rgba(153, 27, 27, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(220, 38, 38, 0.7), 0 0 25px rgba(127, 29, 29, 0.5)';
+  }}
+>
+  <Menu size={14} className="sm:w-5 sm:h-5" />
+  <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">{isAdmin ? 'Админ' : userProfile?.nickname}</span>
+</button>
                 )}
               </div>
             </div>
@@ -1637,13 +1691,11 @@ onClick={async () => {
 <div className="relative z-10 px-4 sm:px-8 py-4">
   <div className="max-w-7xl mx-auto">
     <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
-      {[
-        { key: 'completed', label: t.completed },
-        { key: 'ongoing', label: t.ongoing },
-        { key: 'minific', label: t.minific },
-        { key: 'longfic', label: t.longfic },
-        { key: 'novel', label: t.novels }
-      ].map((item) => (
+{[
+  { key: 'minific', label: t.minific },
+  { key: 'longfic', label: t.longfic },
+  { key: 'novel', label: t.novels }
+].map((item) => (
         <button
           key={item.key}
           onClick={() => {
@@ -1680,25 +1732,37 @@ onClick={async () => {
               <div className="relative">
                 {displayWorks.length > 1 && (
                   <>
-                    <button
-                      onClick={() => {
-                        setCurrentSlide((currentSlide - 1 + displayWorks.length) % displayWorks.length);
-                        setExpandedWork(null);
-                      }}
-                      className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-4 transition hover:scale-110 shadow-2xl"
-                    >
-                      <ChevronLeft size={24} className="sm:w-8 sm:h-8" />
-                    </button>
+<button
+  onClick={() => {
+    setCurrentSlide((currentSlide - 1 + displayWorks.length) % displayWorks.length);
+    setExpandedWork(null);
+  }}
+  className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
+  style={{
+    backgroundColor: '#7f1d1d',
+    boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#991b1b'}
+  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7f1d1d'}
+>
+  <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
+</button>
 
-                    <button
-                      onClick={() => {
-                        setCurrentSlide((currentSlide + 1) % displayWorks.length);
-                        setExpandedWork(null);
-                      }}
-                      className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-4 transition hover:scale-110 shadow-2xl"
-                    >
-                      <ChevronRight size={24} className="sm:w-8 sm:h-8" />
-                    </button>
+<button
+  onClick={() => {
+    setCurrentSlide((currentSlide + 1) % displayWorks.length);
+    setExpandedWork(null);
+  }}
+  className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
+  style={{
+    backgroundColor: '#7f1d1d',
+    boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#991b1b'}
+  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7f1d1d'}
+>
+  <ChevronRight size={16} className="sm:w-5 sm:h-5" />
+</button>
                   </>
                 )}
 
@@ -1719,21 +1783,36 @@ onClick={async () => {
                         }`}
                       >
                         {isExpanded && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setExpandedWork(null);
-                            }}
-className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 rounded-full p-2 sm:p-3 transition z-[10000] shadow-2xl"
-                          >
-                            <X size={24} className="sm:w-8 sm:h-8" />
-                          </button>
+<button 
+  onClick={(e) => {
+    e.stopPropagation();
+    setExpandedWork(null);
+  }}
+  className="fixed top-4 sm:top-8 right-4 sm:right-8 rounded-full p-2 sm:p-3 transition z-[10000]"
+  style={{
+    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+    boxShadow: '0 0 20px rgba(220, 38, 38, 0.9), 0 0 35px rgba(127, 29, 29, 0.7)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)';
+    e.currentTarget.style.boxShadow = '0 0 25px rgba(239, 68, 68, 1), 0 0 45px rgba(153, 27, 27, 0.8)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(220, 38, 38, 0.9), 0 0 35px rgba(127, 29, 29, 0.7)';
+  }}
+>
+  <X size={24} className="sm:w-8 sm:h-8" />
+</button>
                         )}
                         
                         <div 
-                          className={`bg-gray-900 rounded-2xl overflow-hidden border-4 hover:border-red-500 transition-all duration-300 shadow-2xl hover:shadow-red-600/50 ${!isExpanded && 'cursor-pointer'}`}
-                          style={{ 
-                            borderColor: isCenter ? titleColor : '#7f1d1d',
+className={`bg-gray-900 rounded-2xl overflow-hidden transition-all duration-300 ${!isExpanded && 'cursor-pointer'}`}
+style={{ 
+  border: '6px solid #7f1d1d',
+  boxShadow: isCenter 
+    ? '0 0 30px 8px rgba(220, 38, 38, 0.9), 0 0 60px 15px rgba(127, 29, 29, 0.6), 0 0 90px 25px rgba(127, 29, 29, 0.3), inset 0 0 30px rgba(220, 38, 38, 0.4)' 
+    : '0 0 15px 4px rgba(127, 29, 29, 0.5), 0 0 30px 8px rgba(127, 29, 29, 0.3)',
                             maxWidth: isExpanded ? '1000px' : 'auto',
                             width: '100%'
                           }}
@@ -1792,13 +1871,25 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
         </div>
       </div>
       
-      <Link 
-        href={`/work/${work.id}`}
-        className="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {t.startReading}
-      </Link>
+<Link 
+  href={`/work/${work.id}`}
+  className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+    boxShadow: '0 0 15px rgba(220, 38, 38, 0.8), 0 0 25px rgba(127, 29, 29, 0.6)'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.9), 0 0 35px rgba(153, 27, 27, 0.7)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(220, 38, 38, 0.8), 0 0 25px rgba(127, 29, 29, 0.6)';
+  }}
+>
+  {t.startReading}
+</Link>
     </div>
   </div>
                           ) : (
@@ -1862,77 +1953,92 @@ className="fixed top-4 sm:top-8 right-4 sm:right-8 bg-red-600 hover:bg-red-700 r
 
 {/* НОВОСТИ */}
 <div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
-  <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
-    {isAdmin && (
-      <button
-        onClick={() => {
-          setEditingSection('news');
-          setEditText(newsText);
-          setShowEditModal(true);
-        }}
-        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
-        title="Редактировать новости"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    )}
-    <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
-      <p>{newsText}</p>
-    </div>
+ <div className="bg-black rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
+  {isAdmin && (
+    <button
+      onClick={() => {
+        setEditingSection('news');
+        setEditText(newsText);
+        setShowEditModal(true);
+      }}
+      className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
+      title="Редактировать новости"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  )}
+  <div className="text-white text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+    <p>{newsText}</p>
   </div>
+</div>
 </div>
 
 {/* ABOUT SECTION */}
 <div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
-  <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
-    {isAdmin && (
-      <button
-        onClick={() => {
-          setEditingSection('about');
-          setEditText(aboutText);
-          setShowEditModal(true);
-        }}
-        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
-        title="Редактировать информацию"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    )}
-    <div className="text-gray-300 text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
-      <p>{aboutText}</p>
-    </div>
+ <div className="bg-black rounded-2xl p-6 sm:p-10 border-2 relative" style={{ borderColor: titleColor }}>
+  {isAdmin && (
+    <button
+      onClick={() => {
+        setEditingSection('about');
+        setEditText(aboutText);
+        setShowEditModal(true);
+      }}
+      className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
+      title="Редактировать информацию"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  )}
+  <div className="text-white text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+    <p>{aboutText}</p>
   </div>
+</div>
 </div>
 
     {/* DISCLAIMERS */}
         <div className="max-w-3xl mx-auto mt-8 sm:mt-12 space-y-3 sm:space-y-4 relative z-0">
-          <div className="bg-red-900 bg-opacity-30 border-2 sm:border-4 border-red-600 rounded-xl sm:rounded-2xl p-4 sm:p-8">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-red-500 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
-                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                <path d="M12 9v4"/>
-                <path d="M12 17h.01"/>
-              </svg>
-              <span className="text-base sm:text-2xl md:text-3xl">{t.disclaimer18}</span>
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-200 leading-relaxed text-justify">{t.disclaimerText}</p>
-          </div>
-          <div className="bg-gray-900 border-2 sm:border-4 border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-8">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M14.83 14.83a4 4 0 1 1 0-5.66"/>
-              </svg>
-              <span className="text-base sm:text-2xl md:text-3xl">{t.copyrightTitle}</span>
-</h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-justify">{t.copyrightText}</p>
-          </div>
+<div 
+  className="border-2 sm:border-4 rounded-xl sm:rounded-2xl p-4 sm:p-8"
+  style={{
+    background: 'linear-gradient(135deg, rgba(127, 29, 29, 0.4) 0%, rgba(74, 14, 14, 0.6) 100%)',
+    borderColor: '#7f1d1d'
+  }}
+>
+  <h3 
+    className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3"
+    style={{
+      background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      textShadow: '0 0 30px rgba(220, 38, 38, 0.8), 0 0 50px rgba(127, 29, 29, 0.6)',
+      filter: 'drop-shadow(0 0 20px rgba(220, 38, 38, 0.7))'
+    }}
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" className="sm:w-8 sm:h-8">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+      <path d="M12 9v4"/>
+      <path d="M12 17h.01"/>
+    </svg>
+    <span className="text-base sm:text-2xl md:text-3xl">{t.disclaimer18}</span>
+  </h3>
+  <p className="text-xs sm:text-sm md:text-base text-white leading-relaxed">{t.disclaimerText}</p>
+</div>
+<div className="bg-black border-2 sm:border-4 border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-8">
+  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-8 sm:h-8">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M14.83 14.83a4 4 0 1 1 0-5.66"/>
+    </svg>
+    <span className="text-base sm:text-2xl md:text-3xl">{t.copyrightTitle}</span>
+  </h3>
+  <p className="text-xs sm:text-sm md:text-base text-white leading-relaxed">{t.copyrightText}</p>
+</div>
         </div>
       </main>
 

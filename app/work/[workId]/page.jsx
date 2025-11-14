@@ -51,76 +51,104 @@ export default function WorkPage() {
     }
   }, [workId]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    
+const loadAllData = async () => {
+  const cacheKey = `work_${workId}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  
+  if (cached) {
     try {
-      const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
-        supabase
-          .from('works')
-          .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
-          .eq('id', workId)
-          .eq('is_draft', false)
-          .single(),
-        supabase
-          .from('chapters')
-          .select('id, chapter_number, title, created_at')
-          .eq('work_id', workId)
-          .eq('is_published', true)
-          .order('chapter_number', { ascending: true }),
-        supabase
-          .from('work_views')
-          .select('view_count')
-          .eq('work_id', workId)
-          .single(),
-        supabase
-          .from('work_statistics')
-          .select('average_rating, total_rating_count')
-          .eq('id', workId)
-          .single(),
-        currentUser ? supabase
-          .from('work_ratings')
-          .select('rating')
-          .eq('work_id', workId)
-          .eq('user_id', currentUser.id)
-          .single() : Promise.resolve({ data: null, error: null })
-      ]);
+      const data = JSON.parse(cached);
+      setWork(data.work);
+      setChapters(data.chapters);
+      setViewCount(data.viewCount);
+      setAverageRating(data.averageRating);
+      setTotalRatings(data.totalRatings);
+      setLoading(false);
+      return;
+    } catch (e) {
+      console.error('Ошибка чтения кэша:', e);
+    }
+  }
 
-      if (workRes.error) {
-        console.error('Ошибка загрузки работы:', workRes.error);
-      } else {
-        setWork(workRes.data);
-      }
+  setLoading(true);
+  
+  try {
+    const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
+      supabase
+        .from('works')
+        .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
+        .eq('id', workId)
+        .eq('is_draft', false)
+        .single(),
+      supabase
+        .from('chapters')
+        .select('id, chapter_number, title, created_at')
+        .eq('work_id', workId)
+        .eq('is_published', true)
+        .order('chapter_number', { ascending: true }),
+      supabase
+        .from('work_views')
+        .select('view_count')
+        .eq('work_id', workId)
+        .single(),
+      supabase
+        .from('work_statistics')
+        .select('average_rating, total_rating_count')
+        .eq('id', workId)
+        .single(),
+      currentUser ? supabase
+        .from('work_ratings')
+        .select('rating')
+        .eq('work_id', workId)
+        .eq('user_id', currentUser.id)
+        .single() : Promise.resolve({ data: null, error: null })
+    ]);
 
-      if (chaptersRes.error) {
-        console.error('Ошибка загрузки глав:', chaptersRes.error);
-      } else {
-        setChapters(chaptersRes.data || []);
-      }
-
-      if (viewsRes.data) {
-        setViewCount(viewsRes.data.view_count);
-      }
-
-      if (statsRes.data) {
-        setAverageRating(statsRes.data.average_rating || 0);
-        setTotalRatings(statsRes.data.total_rating_count || 0);
-      } else {
-        setAverageRating(0);
-        setTotalRatings(0);
-      }
-
-      if (userRatingRes.data) {
-        setUserRating(userRatingRes.data.rating);
-      } else {
-        setUserRating(null);
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки данных:', err);
+    if (workRes.error) {
+      console.error('Ошибка загрузки работы:', workRes.error);
+    } else {
+      setWork(workRes.data);
     }
 
-    setLoading(false);
-  };
+    if (chaptersRes.error) {
+      console.error('Ошибка загрузки глав:', chaptersRes.error);
+    } else {
+      setChapters(chaptersRes.data || []);
+    }
+
+    if (viewsRes.data) {
+      setViewCount(viewsRes.data.view_count);
+    }
+
+    if (statsRes.data) {
+      setAverageRating(statsRes.data.average_rating || 0);
+      setTotalRatings(statsRes.data.total_rating_count || 0);
+    } else {
+      setAverageRating(0);
+      setTotalRatings(0);
+    }
+
+    if (userRatingRes.data) {
+      setUserRating(userRatingRes.data.rating);
+    } else {
+      setUserRating(null);
+    }
+
+    // ✅ Сохраняем в кэш ВНУТРИ блока try, где переменные доступны
+    sessionStorage.setItem(cacheKey, JSON.stringify({
+      work: workRes.data,
+      chapters: chaptersRes.data,
+      viewCount: viewsRes.data?.view_count || 0,
+      averageRating: statsRes.data?.average_rating || 0,
+      totalRatings: statsRes.data?.total_rating_count || 0
+    }));
+
+  } catch (err) {
+    console.error('Ошибка загрузки данных:', err);
+  }
+  
+  setLoading(false);
+};
 
   const incrementViewCount = async () => {
     if (hasIncrementedView.current) return;
