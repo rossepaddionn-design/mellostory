@@ -14,7 +14,7 @@ export default function WorkPage() {
   const [loading, setLoading] = useState(true);
   const [showSpoilers, setShowSpoilers] = useState(false);
   const [viewCount, setViewCount] = useState(0);
-    const [averageRating, setAverageRating] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
   const [totalRatings, setTotalRatings] = useState(0);
   const [userRating, setUserRating] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -38,8 +38,7 @@ export default function WorkPage() {
     views: 'Просмотров'
   };
 
-useEffect(() => {
-    // Проверка авторизации
+  useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUser(user);
@@ -52,80 +51,76 @@ useEffect(() => {
     }
   }, [workId]);
 
-const loadAllData = async () => {
-  setLoading(true);
-  
-  try {
-    const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
-      supabase
-        .from('works')
-        .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
-        .eq('id', workId)
-        .eq('is_draft', false)
-        .single(),
-      supabase
-        .from('chapters')
-        .select('id, chapter_number, title, created_at')
-        .eq('work_id', workId)
-        .eq('is_published', true)
-        .order('chapter_number', { ascending: true }),
-      supabase
-        .from('work_views')
-        .select('view_count')
-        .eq('work_id', workId)
-        .single(),
-      // ИЗМЕНЕНО: используем work_statistics вместо work_ratings
-      supabase
-        .from('work_statistics')
-        .select('average_rating, total_rating_count')
-        .eq('id', workId)
-        .single(),
-      // Отдельно получаем оценку текущего пользователя
-      currentUser ? supabase
-        .from('work_ratings')
-        .select('rating')
-        .eq('work_id', workId)
-        .eq('user_id', currentUser.id)
-        .single() : Promise.resolve({ data: null, error: null })
-    ]);
+  const loadAllData = async () => {
+    setLoading(true);
+    
+    try {
+      const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
+        supabase
+          .from('works')
+          .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
+          .eq('id', workId)
+          .eq('is_draft', false)
+          .single(),
+        supabase
+          .from('chapters')
+          .select('id, chapter_number, title, created_at')
+          .eq('work_id', workId)
+          .eq('is_published', true)
+          .order('chapter_number', { ascending: true }),
+        supabase
+          .from('work_views')
+          .select('view_count')
+          .eq('work_id', workId)
+          .single(),
+        supabase
+          .from('work_statistics')
+          .select('average_rating, total_rating_count')
+          .eq('id', workId)
+          .single(),
+        currentUser ? supabase
+          .from('work_ratings')
+          .select('rating')
+          .eq('work_id', workId)
+          .eq('user_id', currentUser.id)
+          .single() : Promise.resolve({ data: null, error: null })
+      ]);
 
-    if (workRes.error) {
-      console.error('Ошибка загрузки работы:', workRes.error);
-    } else {
-      setWork(workRes.data);
+      if (workRes.error) {
+        console.error('Ошибка загрузки работы:', workRes.error);
+      } else {
+        setWork(workRes.data);
+      }
+
+      if (chaptersRes.error) {
+        console.error('Ошибка загрузки глав:', chaptersRes.error);
+      } else {
+        setChapters(chaptersRes.data || []);
+      }
+
+      if (viewsRes.data) {
+        setViewCount(viewsRes.data.view_count);
+      }
+
+      if (statsRes.data) {
+        setAverageRating(statsRes.data.average_rating || 0);
+        setTotalRatings(statsRes.data.total_rating_count || 0);
+      } else {
+        setAverageRating(0);
+        setTotalRatings(0);
+      }
+
+      if (userRatingRes.data) {
+        setUserRating(userRatingRes.data.rating);
+      } else {
+        setUserRating(null);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки данных:', err);
     }
 
-    if (chaptersRes.error) {
-      console.error('Ошибка загрузки глав:', chaptersRes.error);
-    } else {
-      setChapters(chaptersRes.data || []);
-    }
-
-    if (viewsRes.data) {
-      setViewCount(viewsRes.data.view_count);
-    }
-
-    // ИЗМЕНЕНО: используем данные из work_statistics
-    if (statsRes.data) {
-      setAverageRating(statsRes.data.average_rating || 0);
-      setTotalRatings(statsRes.data.total_rating_count || 0);
-    } else {
-      setAverageRating(0);
-      setTotalRatings(0);
-    }
-
-    // Оценка текущего пользователя
-    if (userRatingRes.data) {
-      setUserRating(userRatingRes.data.rating);
-    } else {
-      setUserRating(null);
-    }
-  } catch (err) {
-    console.error('Ошибка загрузки данных:', err);
-  }
-
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   const incrementViewCount = async () => {
     if (hasIncrementedView.current) return;
@@ -178,7 +173,6 @@ const loadAllData = async () => {
       } else {
         setUserRating(rating);
         setShowRatingModal(false);
-        // Перезагружаем оценки
         loadAllData();
       }
     } catch (err) {
@@ -199,7 +193,7 @@ const loadAllData = async () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
+      <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600 mb-4"></div>
           <p className="text-lg sm:text-xl text-gray-400">{t.loading}</p>
@@ -210,7 +204,7 @@ const loadAllData = async () => {
 
   if (!work) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center px-4">
+      <div className="min-h-screen text-white flex items-center justify-center px-4" style={{ backgroundColor: '#000000' }}>
         <div className="text-center">
           <p className="text-xl sm:text-2xl text-gray-400 mb-4">{t.notFound}</p>
           <Link href="/" className="text-red-600 hover:text-red-500 transition text-sm sm:text-base">
@@ -228,9 +222,12 @@ const loadAllData = async () => {
     (typeof work.character_images === 'string' && work.character_images ? work.character_images.split(',').map(s => s.trim()) : []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 text-white">
-      {/* HEADER - АДАПТИВНЫЙ */}
-      <header className="bg-gray-950 border-b border-red-900 py-3 sm:py-4 px-4 sm:px-8">
+    <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
+      {/* HEADER */}
+      <header className="border-b py-3 sm:py-4 px-4 sm:px-8" style={{
+        backgroundColor: '#000000',
+        borderColor: '#7f1d1d'
+      }}>
         <div className="max-w-6xl mx-auto">
           <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-red-500 transition text-sm sm:text-base">
             <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
@@ -240,11 +237,14 @@ const loadAllData = async () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        {/* ОБЛОЖКА + ОПИСАНИЕ - АДАПТИВНАЯ СЕТКА */}
+        {/* ОБЛОЖКА + ОПИСАНИЕ */}
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr] gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* ОБЛОЖКА */}
           <div>
-            <div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-red-900 shadow-2xl md:sticky md:top-8 max-w-sm mx-auto md:max-w-none">
+            <div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 shadow-2xl md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
+              borderColor: '#7f1d1d',
+              boxShadow: '0 0 30px rgba(127, 29, 29, 0.7), 0 0 60px rgba(127, 29, 29, 0.4)'
+            }}>
               {work.cover_url ? (
                 <img src={work.cover_url} alt={work.title} className="w-full aspect-[2/3] object-cover" loading="lazy" />
               ) : (
@@ -255,10 +255,14 @@ const loadAllData = async () => {
             </div>
           </div>
 
-{/* ОПИСАНИЕ И ИНФО */}
+          {/* ОПИСАНИЕ И ИНФО */}
           <div>
             {/* НАЗВАНИЕ */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red-600 mb-3 sm:mb-4 break-words" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words" style={{ 
+              fontFamily: "'Playfair Display', Georgia, serif",
+              color: '#7f1d1d',
+              textShadow: '0 0 20px rgba(127, 29, 29, 0.8)'
+            }}>
               {work.title}
             </h1>
 
@@ -282,9 +286,9 @@ const loadAllData = async () => {
 
             {/* БЕЙДЖИ + СЧЁТЧИК */}
             <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
-              <span className="bg-gray-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">{work.direction}</span>
+              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.direction}</span>
               <span className="bg-red-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">{work.rating}</span>
-              <span className="bg-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">{work.status}</span>
+              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.status}</span>
               {work.category && (
                 <span className="bg-purple-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   {{
@@ -298,18 +302,33 @@ const loadAllData = async () => {
               )}
               
               {/* СЧЁТЧИК ПРОЧТЕНИЙ */}
-              <div className="bg-gray-800 bg-opacity-60 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border border-gray-700">
-                <BookOpen size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-                <span className="text-gray-300">Прочтений: {viewCount.toLocaleString()}</span>
+              <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border" style={{
+                backgroundColor: '#D3D3D3',
+                borderColor: '#000000',
+                color: '#000000'
+              }}>
+                <BookOpen size={14} className="sm:w-4 sm:h-4" />
+                <span>Прочтений: {viewCount.toLocaleString()}</span>
               </div>
               
               {/* ОЦЕНКА */}
               <button
                 onClick={() => setShowRatingModal(true)}
-                className="bg-yellow-900 bg-opacity-40 hover:bg-opacity-60 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border border-yellow-700 hover:border-yellow-500 transition"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border transition"
+                style={{
+                  backgroundColor: '#D3D3D3',
+                  borderColor: '#000000',
+                  color: '#000000'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#c0c0c0';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D3D3D3';
+                }}
               >
-                <Star size={14} className="sm:w-4 sm:h-4 text-yellow-400" fill={userRating ? 'currentColor' : 'none'} />
-                <span className="text-yellow-300">
+                <Star size={14} className="sm:w-4 sm:h-4" fill={userRating ? 'currentColor' : 'none'} />
+                <span>
                   Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}
                 </span>
               </button>
@@ -336,13 +355,23 @@ const loadAllData = async () => {
               <div className="mb-4 sm:mb-6">
                 <button
                   onClick={() => setShowSpoilers(!showSpoilers)}
-                  className="w-full bg-yellow-900 bg-opacity-20 border border-yellow-700 rounded px-3 py-2 flex items-center justify-between hover:bg-opacity-30 transition text-left"
+                  className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left" style={{
+                    backgroundColor: '#D3D3D3',
+                    border: '2px solid #000000',
+                    color: '#000000'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#c0c0c0';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#D3D3D3';
+                  }}
                 >
-                  <span className="text-yellow-400 text-xs sm:text-sm font-medium flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-medium flex items-center gap-2">
                     <AlertTriangle size={14} className="sm:w-4 sm:h-4" />
                     {t.spoilerTags}
                   </span>
-                  {showSpoilers ? <ChevronUp size={16} className="sm:w-5 sm:h-5 text-yellow-400" /> : <ChevronDown size={16} className="sm:w-5 sm:h-5 text-yellow-400" />}
+                  {showSpoilers ? <ChevronUp size={16} className="sm:w-5 sm:h-5" /> : <ChevronDown size={16} className="sm:w-5 sm:h-5" />}
                 </button>
                 
                 {showSpoilers && (
@@ -354,20 +383,31 @@ const loadAllData = async () => {
             )}
 
             {/* ОПИСАНИЕ */}
-            <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-2 border-red-900 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-2 sm:mb-3">{t.description}</h2>
+            <div className="bg-black rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
+              borderColor: '#b91c1c',
+              boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
+            }}>
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3" style={{
+                color: '#b91c1c',
+                textShadow: '0 0 15px rgba(185, 28, 28, 0.9)'
+              }}>{t.description}</h2>
               <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '14px' }}>{work.description}</p>
             </div>
 
             {/* ПРИМЕЧАНИЕ АВТОРА */}
             {work.author_note && (
-              <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 border-l-4 border-red-600 mb-4 sm:mb-6">
-                <h2 className="text-base sm:text-lg font-bold text-red-500 mb-2">{t.authorNote}</h2>
+              <div className="bg-black rounded-lg p-4 sm:p-6 mb-4 sm:mb-6" style={{
+                borderLeft: '4px solid #7f1d1d',
+                boxShadow: '-5px 0 15px rgba(127, 29, 29, 0.4)'
+              }}>
+                <h2 className="text-base sm:text-lg font-bold mb-2" style={{
+                  color: '#7f1d1d'
+                }}>{t.authorNote}</h2>
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '14px' }}>{work.author_note}</p>
               </div>
             )}
 
-            {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ - АДАПТИВНАЯ КАРУСЕЛЬ */}
+            {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
             {characterImagesArray.length > 0 && (
               <div className="mb-4 sm:mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
@@ -384,14 +424,17 @@ const loadAllData = async () => {
                     {characterImagesArray.map((img, index) => (
                       <div 
                         key={index} 
-                        className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 border-gray-700 hover:border-red-600 transition shadow-lg snap-start"
+                        className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+                        style={{
+                          borderColor: '#7f1d1d',
+                          boxShadow: '0 0 15px rgba(127, 29, 29, 0.6)'
+                        }}
                       >
                         <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
                       </div>
                     ))}
                   </div>
 
-                  {/* КНОПКИ КАРУСЕЛИ - ТОЛЬКО НА ДЕСКТОПЕ */}
                   {characterImagesArray.length > 1 && (
                     <>
                       <button
@@ -416,18 +459,20 @@ const loadAllData = async () => {
 
         {/* СОДЕРЖАНИЕ */}
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-red-600 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{ 
+            fontFamily: "'Playfair Display', Georgia, serif",
+            color: '#D3D3D3'
+          }}>
             <BookOpen size={24} className="sm:w-8 sm:h-8" />
             {t.contents}
           </h2>
         </div>
 
         {/* ГЛАВЫ */}
-        <div className="bg-gray-800 bg-opacity-90 rounded-lg p-4 sm:p-6 lg:p-8 border-2 border-red-900">
-          <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4 sm:mb-6">
-            {t.chapters} ({chapters.length})
-          </h3>
-
+        <div className="bg-black rounded-lg p-4 sm:p-6 lg:p-8 border-2" style={{
+          borderColor: '#b91c1c',
+          boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
+        }}>
           {chapters.length === 0 ? (
             <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">{t.noChapters}</p>
           ) : (
@@ -436,7 +481,21 @@ const loadAllData = async () => {
                 <Link
                   key={chapter.id}
                   href={`/work/${workId}/chapter/${chapter.id}`}
-                  className="block bg-gray-750 hover:bg-gray-700 rounded-lg p-3 sm:p-5 border-2 border-gray-600 hover:border-red-600 transition-all duration-300 group"
+                  className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    borderColor: '#333'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2a2a2a';
+                    e.currentTarget.style.borderColor = '#7f1d1d';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                    e.currentTarget.style.borderColor = '#333';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   <div className="flex justify-between items-start gap-2 sm:gap-4">
                     <div className="flex-1 min-w-0">
@@ -449,7 +508,7 @@ const loadAllData = async () => {
                           {new Date(chapter.created_at).toLocaleDateString('ru-RU', { 
                             day: '2-digit', 
                             month: '2-digit',
-                            year: window.innerWidth < 640 ? '2-digit' : 'numeric'
+                            year: typeof window !== 'undefined' && window.innerWidth < 640 ? '2-digit' : 'numeric'
                           })}
                         </span>
                       </div>
@@ -464,57 +523,58 @@ const loadAllData = async () => {
           )}
         </div>
       </main>
+
       {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
-        {showRatingModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-            <div className="bg-gray-900 rounded-xl p-6 sm:p-8 max-w-md w-full border-2 border-red-900 relative">
-              <button
-                onClick={() => setShowRatingModal(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
-              >
-                <X size={24} />
-              </button>
-              
-              <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4">
-                Оцените работу
-              </h3>
-              
-              {!currentUser ? (
-                <p className="text-gray-400 text-center py-4">
-                  Войдите, чтобы оставить оценку
+      {showRatingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+          <div className="bg-gray-900 rounded-xl p-6 sm:p-8 max-w-md w-full border-2 border-red-900 relative">
+            <button
+              onClick={() => setShowRatingModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+            >
+              <X size={24} />
+            </button>
+            
+            <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4">
+              Оцените работу
+            </h3>
+            
+            {!currentUser ? (
+              <p className="text-gray-400 text-center py-4">
+                Войдите, чтобы оставить оценку
+              </p>
+            ) : (
+              <>
+                <p className="text-gray-300 mb-6 text-sm sm:text-base">
+                  {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
                 </p>
-              ) : (
-                <>
-                  <p className="text-gray-300 mb-6 text-sm sm:text-base">
-                    {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+                
+                <div className="grid grid-cols-5 gap-2 sm:gap-3">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => submitRating(num)}
+                      className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
+                        userRating === num
+                          ? 'bg-yellow-600 text-white'
+                          : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                
+                {totalRatings > 0 && (
+                  <p className="text-gray-500 text-center mt-4 text-xs sm:text-sm">
+                    Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
                   </p>
-                  
-                  <div className="grid grid-cols-5 gap-2 sm:gap-3">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                      <button
-                        key={num}
-                        onClick={() => submitRating(num)}
-                        className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
-                          userRating === num
-                            ? 'bg-yellow-600 text-white'
-                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-                        }`}
-                      >
-                        {num}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {totalRatings > 0 && (
-                    <p className="text-gray-500 text-center mt-4 text-xs sm:text-sm">
-                      Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
+                )}
+              </>
+            )}
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }
