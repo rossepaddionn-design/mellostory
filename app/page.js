@@ -194,16 +194,6 @@ const loadSiteUpdates = async () => {
 
 const loadSettings = async () => {
   try {
-    // ЗАГРУЗКА ПОПУЛЯРНЫХ РАБОТ
-    const cachedPopular = localStorage.getItem('popularWorks');
-    if (cachedPopular) {
-      try {
-        setPopularWorks(JSON.parse(cachedPopular));
-      } catch (e) {
-        console.error('Ошибка парсинга popularWorks:', e);
-      }
-    }
-
     const cachedColor = localStorage.getItem('titleColor');
     if (cachedColor) {
       setTitleColor(cachedColor);
@@ -211,18 +201,30 @@ const loadSettings = async () => {
 
     const { data, error } = await supabase
       .from('site_settings')
-      .select('title_color, news_text, about_text')
+      .select('title_color, news_text, about_text, popular_works')
       .eq('id', 1)
       .maybeSingle();
     
-if (data && !error) {
-  if (data.title_color && data.title_color.trim() !== '') {
-    setTitleColor(data.title_color);
-    localStorage.setItem('titleColor', data.title_color);
-  }
-  if (data.news_text) setNewsText(data.news_text);
-  if (data.about_text) setAboutText(data.about_text);
-}
+    if (data && !error) {
+      if (data.title_color && data.title_color.trim() !== '') {
+        setTitleColor(data.title_color);
+        localStorage.setItem('titleColor', data.title_color);
+      }
+      if (data.news_text) setNewsText(data.news_text);
+      if (data.about_text) setAboutText(data.about_text);
+      
+      // ЗАГРУЗКА ПОПУЛЯРНЫХ РАБОТ ИЗ SUPABASE (КАК НОВОСТИ)
+      if (data.popular_works) {
+        try {
+          const parsed = typeof data.popular_works === 'string' 
+            ? JSON.parse(data.popular_works) 
+            : data.popular_works;
+          setPopularWorks(parsed);
+        } catch (e) {
+          console.error('Ошибка парсинга popular_works:', e);
+        }
+      }
+    }
   } catch (err) {
     console.error('Ошибка загрузки настроек:', err);
   }
@@ -633,13 +635,20 @@ if (data && !error) {
   }
 };
 
-const savePopularWork = (index) => {
+const savePopularWork = async (index) => {
   try {
     const updatedWorks = [...popularWorks];
     updatedWorks[index] = { ...editPopularForm, id: index + 1 };
 
-    // Сохраняем в localStorage
-    localStorage.setItem('popularWorks', JSON.stringify(updatedWorks));
+    // Сохраняем в Supabase (КАК НОВОСТИ)
+    const { error } = await supabase
+      .from('site_settings')
+      .upsert({ 
+        id: 1, 
+        popular_works: updatedWorks 
+      }, { onConflict: 'id' });
+
+    if (error) throw error;
     
     setPopularWorks(updatedWorks);
     setShowPopularEditModal(false);
@@ -1856,18 +1865,15 @@ onClick={async () => {
 </button>
                         )}
                         
-                        <div 
-className={`bg-gray-900 rounded-2xl overflow-hidden transition-all duration-300 ${!isExpanded && 'cursor-pointer'}`}
-style={{ 
-  border: '6px solid #7f1d1d',
-  boxShadow: isCenter 
-    ? '0 0 30px 8px rgba(220, 38, 38, 0.9), 0 0 60px 15px rgba(127, 29, 29, 0.6), 0 0 90px 25px rgba(127, 29, 29, 0.3), inset 0 0 30px rgba(220, 38, 38, 0.4)' 
-    : '0 0 15px 4px rgba(127, 29, 29, 0.5), 0 0 30px 8px rgba(127, 29, 29, 0.3)',
-                            maxWidth: isExpanded ? '1000px' : 'auto',
-                            width: '100%'
-                          }}
-                          onClick={() => !isExpanded && setExpandedWork(work.id)}
-                        >
+<div 
+  className={`bg-gray-900 rounded-2xl overflow-hidden transition-all duration-300 ${!isExpanded && 'cursor-pointer'}`}
+  style={{ 
+    border: '6px solid #7f1d1d',
+    maxWidth: isExpanded ? '1000px' : 'auto',
+    width: '100%'
+  }}
+  onClick={() => !isExpanded && setExpandedWork(work.id)}
+>
 {isExpanded ? (
   <div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
     <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
