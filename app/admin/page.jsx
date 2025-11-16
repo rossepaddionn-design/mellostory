@@ -28,6 +28,7 @@ const [workForm, setWorkForm] = useState({
     category: 'minific',
     rating: 'NC-21',
     status: 'В процессе',
+    total_pages: 0,
     fandom: '',
     pairing: '',
     description: '',
@@ -125,6 +126,7 @@ const workData = {
   category: workForm.category,
   rating: workForm.rating,
   status: workForm.status,
+  total_pages: parseInt(workForm.total_pages) || 0,  // ← ДОБАВИЛИ!
   fandom: workForm.fandom ? workForm.fandom.trim() : null,
   pairing: workForm.pairing ? workForm.pairing.trim() : null,
   description: workForm.description.trim(),
@@ -543,12 +545,13 @@ const insertTooltip = () => {
 <button onClick={async () => { 
   const workToEdit = work;
   
-  setWorkForm({
+setWorkForm({
     title: workToEdit.title,
     direction: workToEdit.direction,
     category: workToEdit.category || 'minific',
     rating: workToEdit.rating,
     status: workToEdit.status,
+    total_pages: workToEdit.total_pages || 0,  // ← ДОБАВИЛИ!
     fandom: workToEdit.fandom || '',
     pairing: workToEdit.pairing || '',
     description: workToEdit.description || '',
@@ -659,6 +662,19 @@ const insertTooltip = () => {
                             <option>В процессе</option><option>Завершён</option><option>Заморожен</option>
                           </select>
                         </div>
+                      </div>
+
+                      {/* КОЛИЧЕСТВО СТРАНИЦ */}
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1 sm:mb-2">Количество страниц:</label>
+                        <input 
+                          type="number" 
+                          value={workForm.total_pages} 
+                          onChange={(e) => setWorkForm({...workForm, total_pages: e.target.value})} 
+                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" 
+                          placeholder="Например: 156" 
+                          min="0"
+                        />
                       </div>
 
                       <input value={workForm.fandom} onChange={(e) => setWorkForm({...workForm, fandom: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Фандом" />
