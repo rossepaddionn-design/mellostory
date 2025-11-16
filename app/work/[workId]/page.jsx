@@ -74,12 +74,12 @@ const loadAllData = async () => {
   
   try {
     const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
-      supabase
-        .from('works')
-        .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note')
-        .eq('id', workId)
-        .eq('is_draft', false)
-        .single(),
+supabase
+  .from('works')
+  .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note, total_pages')
+  .eq('id', workId)
+  .eq('is_draft', false)
+  .single(),
       supabase
         .from('chapters')
         .select('id, chapter_number, title, created_at')
@@ -252,8 +252,7 @@ const submitRating = async (rating) => {
             }}>
               {work.title}
             </h1>
-
-            {/* ФАНДОМ И ПЕЙРИНГ */}
+{/* ФАНДОМ И ПЕЙРИНГ */}
             {(work.fandom || work.pairing) && (
               <div className="mb-4 sm:mb-5 space-y-2">
                 {work.fandom && (
@@ -271,11 +270,16 @@ const submitRating = async (rating) => {
               </div>
             )}
 
-            {/* БЕЙДЖИ + СЧЁТЧИК */}
+            {/* БЕЙДЖИ */}
             <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
               <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.direction}</span>
               <span className="bg-red-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">{work.rating}</span>
               <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.status}</span>
+              {work.total_pages > 0 && (
+                <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>
+                  Страниц: {work.total_pages.toLocaleString()}
+                </span>
+              )}
               {work.category && (
                 <span className="bg-purple-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   {{
@@ -287,38 +291,6 @@ const submitRating = async (rating) => {
                   }[work.category] || work.category}
                 </span>
               )}
-              
-              {/* СЧЁТЧИК ПРОЧТЕНИЙ */}
-              <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border" style={{
-                backgroundColor: '#D3D3D3',
-                borderColor: '#000000',
-                color: '#000000'
-              }}>
-                <BookOpen size={14} className="sm:w-4 sm:h-4" />
-                <span>Прочтений: {viewCount.toLocaleString()}</span>
-              </div>
-              
-              {/* ОЦЕНКА */}
-              <button
-                onClick={() => setShowRatingModal(true)}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border transition"
-                style={{
-                  backgroundColor: '#D3D3D3',
-                  borderColor: '#000000',
-                  color: '#000000'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#c0c0c0';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#D3D3D3';
-                }}
-              >
-                <Star size={14} className="sm:w-4 sm:h-4" fill={userRating ? 'currentColor' : 'none'} />
-                <span>
-                  Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}
-                </span>
-              </button>
             </div>
 
             {/* ЖАНРЫ */}
@@ -369,6 +341,56 @@ const submitRating = async (rating) => {
               </div>
             )}
 
+            {/* ПРОЧТЕНИЯ И ОЦЕНКА */}
+            <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
+              {/* СЧЁТЧИК ПРОЧТЕНИЙ - БЕЗ НЕОНА */}
+              <div 
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
+                style={{
+                  backgroundColor: '#1a1a1a',
+                  border: '1px solid #333',
+                  color: '#FFFFFF'
+                }}
+              >
+                <BookOpen size={14} className="sm:w-4 sm:h-4" />
+                <span>Прочтений: {viewCount.toLocaleString()}</span>
+              </div>
+              
+              {/* ОЦЕНКА - СИРЕНЕВЫЙ НЕОН С ПЕРЕЛИВАНИЕМ */}
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes shimmer-purple {
+                  0% { box-shadow: 0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4); }
+                  50% { box-shadow: 0 0 15px rgba(147, 51, 234, 0.9), 0 0 30px rgba(147, 51, 234, 0.6); }
+                  100% { box-shadow: 0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4); }
+                }
+              `}} />
+              <button
+                onClick={() => setShowRatingModal(true)}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
+                style={{
+                  background: 'rgba(147, 51, 234, 0.2)',
+                  borderColor: '#9333ea',
+                  color: '#FFFFFF',
+                  boxShadow: '0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4)',
+                  backdropFilter: 'blur(10px)',
+                  animation: 'shimmer-purple 2s ease-in-out infinite'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 51, 234, 0.9), 0 0 30px rgba(147, 51, 234, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4)';
+                }}
+              >
+                <Star size={14} className="sm:w-4 sm:h-4" fill={userRating ? 'currentColor' : 'none'} />
+                <span>
+                  Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}
+                </span>
+              </button>
+            </div>
+
             {/* ОПИСАНИЕ */}
             <div className="bg-black rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
               borderColor: '#b91c1c',
@@ -394,53 +416,77 @@ const submitRating = async (rating) => {
               </div>
             )}
 
-            {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
-            {characterImagesArray.length > 0 && (
-              <div className="mb-4 sm:mb-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
-                  <ImageIcon size={18} className="sm:w-5 sm:h-5" />
-                  {t.characterImages}
-                </h3>
-                
-                <div className="relative">
-                  <div 
-                    ref={carouselRef}
-                    className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-800"
-                    style={{ scrollbarWidth: 'thin' }}
-                  >
-                    {characterImagesArray.map((img, index) => (
-                      <div 
-                        key={index} 
-                        className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
-                        style={{
-                          borderColor: '#7f1d1d',
-                          boxShadow: '0 0 15px rgba(127, 29, 29, 0.6)'
-                        }}
-                      >
-                        <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                      </div>
-                    ))}
-                  </div>
+{/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
+{characterImagesArray.length > 0 && (
+  <div className="mb-4 sm:mb-6">
+    <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
+      <ImageIcon size={18} className="sm:w-5 sm:h-5" />
+      {t.characterImages}
+    </h3>
+    
+    <div className="relative">
+      <div 
+        ref={carouselRef}
+        className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-800 px-8 sm:px-10"
+        style={{ scrollbarWidth: 'thin' }}
+      >
+        {characterImagesArray.map((img, index) => (
+          <div 
+            key={index} 
+            className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+            style={{
+              borderColor: '#7f1d1d',
+              boxShadow: '0 0 15px rgba(127, 29, 29, 0.6)'
+            }}
+          >
+            <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+          </div>
+        ))}
+      </div>
 
-                  {characterImagesArray.length > 1 && (
-                    <>
-                      <button
-                        onClick={() => scrollCharacterCarousel('left')}
-                        className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 p-2 rounded-full transition z-10 shadow-lg"
-                      >
-                        <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
-                      </button>
-                      <button
-                        onClick={() => scrollCharacterCarousel('right')}
-                        className="hidden sm:block absolute right-0 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 p-2 rounded-full transition z-10 shadow-lg"
-                      >
-                        <ChevronRight size={18} className="sm:w-5 sm:h-5" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
+      {characterImagesArray.length > 1 && (
+        <>
+          <button
+            onClick={() => scrollCharacterCarousel('left')}
+            className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: '#7f1d1d',
+              boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#991b1b';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(127, 29, 29, 1), 0 0 40px rgba(127, 29, 29, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#7f1d1d';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)';
+            }}
+          >
+            <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+          </button>
+          <button
+            onClick={() => scrollCharacterCarousel('right')}
+            className="hidden sm:block absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: '#7f1d1d',
+              boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#991b1b';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(127, 29, 29, 1), 0 0 40px rgba(127, 29, 29, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#7f1d1d';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)';
+            }}
+          >
+            <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+)}
           </div>
         </div>
 
@@ -511,28 +557,36 @@ const submitRating = async (rating) => {
         </div>
       </main>
 
-      {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
+{/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
       {showRatingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-          <div className="bg-gray-900 rounded-xl p-6 sm:p-8 max-w-md w-full border-2 border-red-900 relative">
+          <div className="rounded-xl p-6 sm:p-8 max-w-md w-full border-2 relative" style={{
+            background: 'rgba(147, 51, 234, 0.15)',
+            borderColor: '#9333ea',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+          }}>
             <button
               onClick={() => setShowRatingModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+              className="absolute top-4 right-4 text-purple-300 hover:text-purple-100 transition"
             >
               <X size={24} />
             </button>
             
-            <h3 className="text-xl sm:text-2xl font-bold text-red-500 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
+              color: '#c084fc',
+              textShadow: '0 0 15px rgba(192, 132, 252, 0.8)'
+            }}>
               Оцените работу
             </h3>
             
             {!currentUser ? (
-              <p className="text-gray-400 text-center py-4">
+              <p className="text-center py-4" style={{ color: '#e9d5ff' }}>
                 Войдите, чтобы оставить оценку
               </p>
             ) : (
               <>
-                <p className="text-gray-300 mb-6 text-sm sm:text-base">
+                <p className="mb-6 text-sm sm:text-base" style={{ color: '#e9d5ff' }}>
                   {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
                 </p>
                 
@@ -543,9 +597,28 @@ const submitRating = async (rating) => {
                       onClick={() => submitRating(num)}
                       className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
                         userRating === num
-                          ? 'bg-yellow-600 text-white'
-                          : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                          ? 'bg-purple-600 text-white'
+                          : 'text-purple-200 hover:text-white'
                       }`}
+                      style={userRating === num ? {
+                        background: 'rgba(147, 51, 234, 0.8)',
+                        boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
+                      } : {
+                        background: 'rgba(147, 51, 234, 0.2)',
+                        border: '1px solid rgba(147, 51, 234, 0.4)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (userRating !== num) {
+                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
+                          e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (userRating !== num) {
+                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }
+                      }}
                     >
                       {num}
                     </button>
@@ -553,7 +626,7 @@ const submitRating = async (rating) => {
                 </div>
                 
                 {totalRatings > 0 && (
-                  <p className="text-gray-500 text-center mt-4 text-xs sm:text-sm">
+                  <p className="text-center mt-4 text-xs sm:text-sm" style={{ color: '#d8b4fe' }}>
                     Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
                   </p>
                 )}
