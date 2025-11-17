@@ -226,7 +226,7 @@ export default function ChapterPage() {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-purple-600 mb-4"></div>
           <p className="text-lg sm:text-xl text-gray-400">{t.loading}</p>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function ChapterPage() {
       <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-xl sm:text-2xl text-gray-400 mb-4">{t.notFound}</p>
-          <Link href={`/work/${workId}`} className="text-red-600 hover:text-red-500 transition text-sm sm:text-base">
+          <Link href={`/work/${workId}`} className="text-purple-600 hover:text-purple-500 transition text-sm sm:text-base">
             {t.backToWork}
           </Link>
         </div>
@@ -250,18 +250,18 @@ export default function ChapterPage() {
   const nextChapter = getNextChapter();
 
   return (
-    <div className="min-h-screen text-white" style={{ backgroundColor: '#D3D3D3' }}>
+    <div className="min-h-screen text-white" style={{ backgroundColor: '#a392b0' }}>
       <header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
         backgroundColor: '#000000',
-        borderColor: '#7f1d1d'
+        borderColor: '#7626b5'
       }}>
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-2 sm:mb-4">
             <div className="flex gap-2 sm:gap-4 items-center flex-1 min-w-0">
-              <Link href="/" className="text-gray-400 hover:text-red-500 transition text-xs sm:text-sm whitespace-nowrap">
+              <Link href="/" className="text-gray-400 hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap">
                 {t.backToMain}
               </Link>
-              <Link href={`/work/${workId}`} className="text-red-600 hover:text-red-500 transition text-xs sm:text-sm whitespace-nowrap hidden sm:inline">
+              <Link href={`/work/${workId}`} className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap hidden sm:inline" style={{ color: '#7626b5' }}>
                 ← {t.backToWork}
               </Link>
             </div>
@@ -271,17 +271,17 @@ export default function ChapterPage() {
                 onClick={() => setShowChapterList(true)}
                 className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
                 style={{
-                  backgroundColor: '#7f1d1d',
-                  boxShadow: '0 0 10px rgba(127, 29, 29, 0.6)',
-                  border: '1px solid #7f1d1d'
+                  backgroundColor: '#7626b5',
+                  boxShadow: '0 0 10px rgba(118, 38, 181, 0.6)',
+                  border: '1px solid #7626b5'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#991b1b';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8)';
+                  e.currentTarget.style.backgroundColor = '#8b3fd1';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#7f1d1d';
-                  e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.6)';
+                  e.currentTarget.style.backgroundColor = '#7626b5';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(118, 38, 181, 0.6)';
                 }}
               >
                 <Menu size={16} className="sm:w-4 sm:h-4" />
@@ -293,17 +293,17 @@ export default function ChapterPage() {
                   onClick={() => setShowPlaylist(true)}
                   className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
                   style={{
-                    backgroundColor: '#7f1d1d',
-                    boxShadow: '0 0 10px rgba(127, 29, 29, 0.6)',
-                    border: '1px solid #7f1d1d'
+                    backgroundColor: '#7626b5',
+                    boxShadow: '0 0 10px rgba(118, 38, 181, 0.6)',
+                    border: '1px solid #7626b5'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#991b1b';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8)';
+                    e.currentTarget.style.backgroundColor = '#8b3fd1';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#7f1d1d';
-                    e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.6)';
+                    e.currentTarget.style.backgroundColor = '#7626b5';
+                    e.currentTarget.style.boxShadow = '0 0 10px rgba(118, 38, 181, 0.6)';
                   }}
                 >
                   <Music size={16} className="sm:w-4 sm:h-4" />
@@ -317,43 +317,50 @@ export default function ChapterPage() {
 
       {showChapterList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.95)'
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(10px)'
         }}>
           <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-            backgroundColor: '#1a1a1a',
-            border: '2px solid #7f1d1d',
-            boxShadow: '0 0 40px rgba(127, 29, 29, 0.6), 0 0 80px rgba(127, 29, 29, 0.3)'
+            background: 'rgba(147, 51, 234, 0.15)',
+            border: '2px solid #9333ea',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
           }}>
-            <div className="flex justify-between items-center p-5 sm:p-6" style={{
-              borderBottom: '2px solid #7f1d1d',
-              background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)'
+            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+              borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
             }}>
               <h2 className="text-xl sm:text-2xl font-bold" style={{
-                color: '#b91c1c',
-                textShadow: '0 0 20px rgba(185, 28, 28, 0.9), 0 0 40px rgba(185, 28, 28, 0.5)'
+                color: '#ffffff'
               }}>
                 Содержание
               </h2>
               <button 
                 onClick={() => setShowChapterList(false)} 
-                className="transition rounded-full p-2"
+                className="transition rounded-full p-2 absolute right-4"
                 style={{
-                  color: '#7f1d1d',
-                  backgroundColor: 'rgba(127, 29, 29, 0.1)'
+                  color: '#ffffff',
+                  backgroundColor: 'rgba(147, 51, 234, 0.3)',
+                  border: '2px solid rgba(255, 255, 255, 0.5)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(127, 29, 29, 0.3)';
+                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.5)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(127, 29, 29, 0.1)';
+                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
                 }}
               >
                 <X size={24} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{
-              backgroundColor: '#0a0a0a'
-            }}>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes pulse-chapter {
+                  0%, 100% { box-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
+                  50% { box-shadow: 0 0 20px rgba(192, 132, 252, 0.7); }
+                }
+              `}} />
               <div className="space-y-2">
                 {allChapters.map((ch) => {
                   const isActive = String(ch.id) === String(chapterId);
@@ -364,39 +371,33 @@ export default function ChapterPage() {
                       className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
                       style={{
                         background: isActive 
-                          ? 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%)'
-                          : '#1a1a1a',
-                        border: `2px solid ${isActive ? '#b91c1c' : '#333'}`,
-                        boxShadow: isActive 
-                          ? '0 0 20px rgba(127, 29, 29, 0.7), 0 4px 12px rgba(0, 0, 0, 0.5)' 
-                          : '0 2px 6px rgba(0, 0, 0, 0.3)',
-                        transform: isActive ? 'scale(1.02)' : 'scale(1)'
+                          ? 'rgba(192, 132, 252, 0.2)' 
+                          : 'rgba(147, 51, 234, 0.1)',
+                        border: `2px solid ${isActive ? '#c084fc' : 'rgba(147, 51, 234, 0.3)'}`,
+                        animation: isActive ? 'pulse-chapter 2s ease-in-out infinite' : 'none'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = '#2a2a2a';
-                          e.currentTarget.style.borderColor = '#7f1d1d';
-                          e.currentTarget.style.boxShadow = '0 0 12px rgba(127, 29, 29, 0.4)';
+                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                          e.currentTarget.style.borderColor = '#9333ea';
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = '#1a1a1a';
-                          e.currentTarget.style.borderColor = '#333';
-                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)';
+                          e.currentTarget.style.borderColor = 'rgba(147, 51, 234, 0.3)';
                         }
                       }}
                     >
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
-                          color: isActive ? '#ffffff' : '#7f1d1d',
-                          textShadow: isActive ? '0 0 10px rgba(255, 255, 255, 0.4)' : 'none',
+                          color: '#c084fc',
                           minWidth: '30px'
                         }}>
                           {ch.chapter_number}.
                         </span>
                         <span className="text-sm sm:text-base break-words flex-1" style={{
-                          color: isActive ? '#ffffff' : '#d1d5db',
+                          color: '#c084fc',
                           fontWeight: isActive ? '600' : '400'
                         }}>
                           {ch.title}
@@ -411,7 +412,7 @@ export default function ChapterPage() {
         </div>
       )}
 
-{chapter?.audio_url && (
+      {chapter?.audio_url && (
         <div style={{ display: 'none' }}>
           {JSON.parse(chapter.audio_url).map((audio, i) => (
             <audio 
@@ -524,16 +525,16 @@ export default function ChapterPage() {
             }}>{work.title}</p>
           )}
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words" style={{
-            color: '#7f1d1d',
-            textShadow: '0 0 10px rgba(127, 29, 29, 0.8)'
+            color: '#7626b5',
+            textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
           }}>
             {chapter.chapter_number}. {chapter.title}
           </h1>
         </div>
 
         <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
-          borderColor: '#7f1d1d',
-          boxShadow: '0 0 20px rgba(127, 29, 29, 0.6), 0 0 40px rgba(127, 29, 29, 0.4), inset 0 0 20px rgba(127, 29, 29, 0.1)'
+          borderColor: '#9333ea',
+          boxShadow: '0 0 20px rgba(147, 51, 234, 0.6), 0 0 40px rgba(147, 51, 234, 0.4)'
         }}>
           <style dangerouslySetInnerHTML={{
             __html: `
@@ -646,12 +647,12 @@ export default function ChapterPage() {
 
         {chapter.images && chapter.images.length > 0 && (
           <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
-            borderColor: '#7f1d1d',
-            boxShadow: '0 0 20px rgba(127, 29, 29, 0.6)'
+            borderColor: '#9333ea',
+            boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
           }}>
             <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
-              color: '#7f1d1d',
-              textShadow: '0 0 10px rgba(127, 29, 29, 0.8)'
+              color: '#7626b5',
+              textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
             }}>{t.images}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {chapter.images.map((img, i) => (
@@ -665,11 +666,11 @@ export default function ChapterPage() {
 
         {chapter.author_note && (
           <div className="bg-black rounded-lg p-4 sm:p-6 mb-6 sm:mb-8" style={{
-            borderLeft: '4px solid #7f1d1d',
-            boxShadow: '-5px 0 15px rgba(127, 29, 29, 0.4)'
+            borderLeft: '4px solid #7626b5',
+            boxShadow: '-5px 0 15px rgba(118, 38, 181, 0.4)'
           }}>
             <h3 className="text-base sm:text-lg font-bold mb-2" style={{
-              color: '#7f1d1d'
+              color: '#7626b5'
             }}>{t.authorNote}</h3>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{chapter.author_note}</p>
           </div>
@@ -681,15 +682,18 @@ export default function ChapterPage() {
               onClick={handlePrevClick}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
               style={{
-                backgroundColor: '#1a1a1a',
-                border: '2px solid #7f1d1d',
-                boxShadow: '0 0 10px rgba(127, 29, 29, 0.4)'
+                background: 'rgba(147, 51, 234, 0.2)',
+                border: '2px solid #9333ea',
+                boxShadow: '0 0 10px rgba(147, 51, 234, 0.4)',
+                backdropFilter: 'blur(10px)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.7)';
+                e.currentTarget.style.background = 'rgba(192, 132, 252, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 51, 234, 0.7)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.4)';
+                e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.4)';
               }}
             >
               <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
@@ -711,15 +715,18 @@ export default function ChapterPage() {
               onClick={handleNextClick}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
               style={{
-                backgroundColor: '#1a1a1a',
-                border: '2px solid #7f1d1d',
-                boxShadow: '0 0 10px rgba(127, 29, 29, 0.4)'
+                background: 'rgba(147, 51, 234, 0.2)',
+                border: '2px solid #9333ea',
+                boxShadow: '0 0 10px rgba(147, 51, 234, 0.4)',
+                backdropFilter: 'blur(10px)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.7)';
+                e.currentTarget.style.background = 'rgba(192, 132, 252, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 51, 234, 0.7)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.4)';
+                e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.4)';
               }}
             >
               <span className="hidden sm:inline">{t.nextChapter}</span>

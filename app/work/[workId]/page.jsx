@@ -134,7 +134,6 @@ supabase
       setUserRating(null);
     }
 
-    // ✅ Сохраняем в кэш ВНУТРИ блока try, где переменные доступны
     sessionStorage.setItem(cacheKey, JSON.stringify({
       work: workRes.data,
       chapters: chaptersRes.data,
@@ -151,7 +150,6 @@ supabase
 };
 
  const incrementViewCount = async () => {
-    // Отключено: просмотры меняются только вручную в Supabase
     return;
   };
 
@@ -161,7 +159,6 @@ const submitRating = async (rating) => {
       return;
     }
 
-    // Отключено: оценки меняются только вручную в Supabase
     alert('Спасибо за оценку! ❤️');
     setUserRating(rating);
     setShowRatingModal(false);
@@ -213,10 +210,10 @@ const submitRating = async (rating) => {
       {/* HEADER */}
       <header className="border-b py-3 sm:py-4 px-4 sm:px-8" style={{
         backgroundColor: '#000000',
-        borderColor: '#7f1d1d'
+        borderColor: '#9333ea'
       }}>
         <div className="max-w-6xl mx-auto">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-red-500 transition text-sm sm:text-base">
+          <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-purple-500 transition text-sm sm:text-base">
             <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
             {t.backToMain}
           </Link>
@@ -228,10 +225,10 @@ const submitRating = async (rating) => {
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr] gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* ОБЛОЖКА */}
           <div>
-            <div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 shadow-2xl md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
-              borderColor: '#7f1d1d',
-              boxShadow: '0 0 30px rgba(127, 29, 29, 0.7), 0 0 60px rgba(127, 29, 29, 0.4)'
-            }}>
+<div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 shadow-2xl md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
+  borderColor: '#9333ea',
+  boxShadow: '0 0 30px rgba(147, 51, 234, 0.7), 0 0 60px rgba(147, 51, 234, 0.4)'
+}}>
               {work.cover_url ? (
                 <img src={work.cover_url} alt={work.title} className="w-full aspect-[2/3] object-cover" loading="lazy" />
               ) : (
@@ -247,12 +244,13 @@ const submitRating = async (rating) => {
             {/* НАЗВАНИЕ */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words" style={{ 
               fontFamily: "'Playfair Display', Georgia, serif",
-              color: '#7f1d1d',
-              textShadow: '0 0 20px rgba(127, 29, 29, 0.8)'
+              color: '#9333ea',
+              textShadow: '0 0 20px rgba(147, 51, 234, 0.8)'
             }}>
               {work.title}
             </h1>
-{/* ФАНДОМ И ПЕЙРИНГ */}
+
+            {/* ФАНДОМ И ПЕЙРИНГ */}
             {(work.fandom || work.pairing) && (
               <div className="mb-4 sm:mb-5 space-y-2">
                 {work.fandom && (
@@ -312,18 +310,29 @@ const submitRating = async (rating) => {
             {/* СПОЙЛЕРНЫЕ МЕТКИ */}
             {spoilerTagsArray.length > 0 && (
               <div className="mb-4 sm:mb-6">
+                <style dangerouslySetInnerHTML={{__html: `
+                  @keyframes shimmer-white {
+                    0% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
+                    50% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3); }
+                    100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
+                  }
+                `}} />
                 <button
                   onClick={() => setShowSpoilers(!showSpoilers)}
-                  className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left" style={{
-                    backgroundColor: '#D3D3D3',
-                    border: '2px solid #000000',
-                    color: '#000000'
+                  className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left border-2" style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: '#ffffff',
+                    color: '#ffffff',
+                    boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)',
+                    animation: 'shimmer-white 2s ease-in-out infinite'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#c0c0c0';
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#D3D3D3';
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.boxShadow = '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)';
                   }}
                 >
                   <span className="text-xs sm:text-sm font-medium flex items-center gap-2">
@@ -334,7 +343,10 @@ const submitRating = async (rating) => {
                 </button>
                 
                 {showSpoilers && (
-                  <div className="mt-2 px-3 py-2 text-gray-300 text-xs sm:text-sm bg-gray-900 bg-opacity-50 rounded break-words">
+                  <div className="mt-2 px-3 py-2 text-gray-300 text-xs sm:text-sm rounded break-words" style={{
+                    backgroundColor: '#000000',
+                    border: '1px solid #333'
+                  }}>
                     {spoilerTagsArray.join(', ')}
                   </div>
                 )}
@@ -343,7 +355,7 @@ const submitRating = async (rating) => {
 
             {/* ПРОЧТЕНИЯ И ОЦЕНКА */}
             <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
-              {/* СЧЁТЧИК ПРОЧТЕНИЙ - БЕЗ НЕОНА */}
+              {/* СЧЁТЧИК ПРОЧТЕНИЙ */}
               <div 
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                 style={{
@@ -356,7 +368,7 @@ const submitRating = async (rating) => {
                 <span>Прочтений: {viewCount.toLocaleString()}</span>
               </div>
               
-              {/* ОЦЕНКА - СИРЕНЕВЫЙ НЕОН С ПЕРЕЛИВАНИЕМ */}
+              {/* ОЦЕНКА */}
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes shimmer-purple {
                   0% { box-shadow: 0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4); }
@@ -393,12 +405,10 @@ const submitRating = async (rating) => {
 
             {/* ОПИСАНИЕ */}
             <div className="bg-black rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
-              borderColor: '#b91c1c',
-              boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
+              borderColor: '#9333ea'
             }}>
               <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3" style={{
-                color: '#b91c1c',
-                textShadow: '0 0 15px rgba(185, 28, 28, 0.9)'
+                color: '#9333ea'
               }}>{t.description}</h2>
               <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '14px' }}>{work.description}</p>
             </div>
@@ -406,87 +416,86 @@ const submitRating = async (rating) => {
             {/* ПРИМЕЧАНИЕ АВТОРА */}
             {work.author_note && (
               <div className="bg-black rounded-lg p-4 sm:p-6 mb-4 sm:mb-6" style={{
-                borderLeft: '4px solid #7f1d1d',
-                boxShadow: '-5px 0 15px rgba(127, 29, 29, 0.4)'
+                borderLeft: '4px solid #9333ea'
               }}>
                 <h2 className="text-base sm:text-lg font-bold mb-2" style={{
-                  color: '#7f1d1d'
+                  color: '#9333ea'
                 }}>{t.authorNote}</h2>
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{ fontSize: '14px' }}>{work.author_note}</p>
               </div>
             )}
 
-{/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
-{characterImagesArray.length > 0 && (
-  <div className="mb-4 sm:mb-6">
-    <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
-      <ImageIcon size={18} className="sm:w-5 sm:h-5" />
-      {t.characterImages}
-    </h3>
-    
-    <div className="relative">
-      <div 
-        ref={carouselRef}
-        className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-800 px-8 sm:px-10"
-        style={{ scrollbarWidth: 'thin' }}
-      >
-        {characterImagesArray.map((img, index) => (
-          <div 
-            key={index} 
-            className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
-            style={{
-              borderColor: '#7f1d1d',
-              boxShadow: '0 0 15px rgba(127, 29, 29, 0.6)'
-            }}
-          >
-            <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
-          </div>
-        ))}
-      </div>
+            {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
+            {characterImagesArray.length > 0 && (
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
+                  <ImageIcon size={18} className="sm:w-5 sm:h-5" />
+                  {t.characterImages}
+                </h3>
+                
+                <div className="relative">
+                  <div 
+                    ref={carouselRef}
+                    className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-8 sm:px-10"
+                    style={{ scrollbarWidth: 'thin' }}
+                  >
+                    {characterImagesArray.map((img, index) => (
+                      <div 
+                        key={index} 
+                        className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+                        style={{
+                          borderColor: '#7626b5',
+                          boxShadow: '0 0 10px rgba(118, 38, 181, 0.5)'
+                        }}
+                      >
+                        <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                    ))}
+                  </div>
 
-      {characterImagesArray.length > 1 && (
-        <>
-          <button
-            onClick={() => scrollCharacterCarousel('left')}
-            className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-            style={{
-              backgroundColor: '#7f1d1d',
-              boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#991b1b';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(127, 29, 29, 1), 0 0 40px rgba(127, 29, 29, 0.6)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#7f1d1d';
-              e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)';
-            }}
-          >
-            <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
-          </button>
-          <button
-            onClick={() => scrollCharacterCarousel('right')}
-            className="hidden sm:block absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-            style={{
-              backgroundColor: '#7f1d1d',
-              boxShadow: '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#991b1b';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(127, 29, 29, 1), 0 0 40px rgba(127, 29, 29, 0.6)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#7f1d1d';
-              e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8), 0 0 30px rgba(127, 29, 29, 0.4)';
-            }}
-          >
-            <ChevronRight size={18} className="sm:w-5 sm:h-5" />
-          </button>
-        </>
-      )}
-    </div>
-  </div>
-)}
+                  {characterImagesArray.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => scrollCharacterCarousel('left')}
+                        className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+                        style={{
+                          backgroundColor: '#7626b5',
+                          boxShadow: '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#8b34d9';
+                          e.currentTarget.style.boxShadow = '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#7626b5';
+                          e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)';
+                        }}
+                      >
+                        <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+                      </button>
+                      <button
+                        onClick={() => scrollCharacterCarousel('right')}
+                        className="hidden sm:block absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+                        style={{
+                          backgroundColor: '#7626b5',
+                          boxShadow: '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#8b34d9';
+                          e.currentTarget.style.boxShadow = '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#7626b5';
+                          e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)';
+                        }}
+                      >
+                        <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -502,37 +511,45 @@ const submitRating = async (rating) => {
         </div>
 
         {/* ГЛАВЫ */}
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes shimmer-chapter {
+            0% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(118, 38, 181, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
+          }
+        `}} />
         <div className="bg-black rounded-lg p-4 sm:p-6 lg:p-8 border-2" style={{
-          borderColor: '#b91c1c',
-          boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
+          borderColor: '#9333ea',
+          boxShadow: '0 0 25px rgba(147, 51, 234, 0.8), 0 0 50px rgba(147, 51, 234, 0.5)'
         }}>
           {chapters.length === 0 ? (
             <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">{t.noChapters}</p>
           ) : (
             <div className="space-y-2 sm:space-y-3">
               {chapters.map((chapter) => (
-                <Link
-                  key={chapter.id}
-                  href={`/work/${workId}/chapter/${chapter.id}`}
-                  className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
-                  style={{
-                    backgroundColor: '#1a1a1a',
-                    borderColor: '#333'
-                  }}
+<Link
+  key={chapter.id}
+  href={`/work/${workId}/chapter/${chapter.id}`}
+  className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
+  style={{
+    backgroundColor: 'transparent',
+    borderColor: '#333'
+  }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#2a2a2a';
-                    e.currentTarget.style.borderColor = '#7f1d1d';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.5)';
+                    e.currentTarget.style.borderColor = '#7626b5';
+                    e.currentTarget.style.animation = 'shimmer-chapter 2s ease-in-out infinite';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+  e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.borderColor = '#333';
+                    e.currentTarget.style.animation = 'none';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
                   <div className="flex justify-between items-start gap-2 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-red-500 transition mb-1 sm:mb-2 break-words">
+                      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-purple-400 transition mb-1 sm:mb-2 break-words">
                         {chapter.chapter_number}. {chapter.title}
                       </h3>
                       <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm text-gray-400">
@@ -546,7 +563,7 @@ const submitRating = async (rating) => {
                         </span>
                       </div>
                     </div>
-                    <div className="text-red-600 group-hover:text-red-500 transition flex-shrink-0">
+                    <div className="text-purple-600 group-hover:text-purple-400 transition flex-shrink-0">
                       <ChevronLeft size={20} className="sm:w-6 sm:h-6 rotate-180" />
                     </div>
                   </div>
@@ -557,7 +574,7 @@ const submitRating = async (rating) => {
         </div>
       </main>
 
-{/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
+      {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
       {showRatingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
           <div className="rounded-xl p-6 sm:p-8 max-w-md w-full border-2 relative" style={{
