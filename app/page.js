@@ -1288,6 +1288,488 @@ style={{
 </div>
       </main>
 
+{/* AUTH MODAL */}
+{showAuthModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="rounded-lg w-full max-w-md p-4 sm:p-8 border-2" style={{
+      background: 'rgba(103, 50, 123, 0.3)',
+      backdropFilter: 'blur(10px)',
+      borderColor: '#9370db'
+    }}>
+      <div className="flex justify-center items-center mb-4 sm:mb-6 relative">
+        <h2 className="text-xl sm:text-2xl font-bold">
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes authShimmer {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .auth-shimmer {
+              background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: authShimmer 3s linear infinite;
+            }
+          `}} />
+          <span className="auth-shimmer">
+            {authMode === 'login' ? t.login : t.register}
+          </span>
+        </h2>
+        <button onClick={() => {
+          setShowAuthModal(false);
+          setAgreedToPrivacy(false);
+        }} className="text-gray-400 hover:text-white absolute right-0">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-3 sm:space-y-4">
+        {authMode === 'register' && (
+          <div>
+            <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.nickname}</label>
+            <input
+              type="text"
+              placeholder={t.nickname}
+              value={authForm.nickname}
+              onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
+              className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+              style={{
+                background: 'rgba(0, 0, 0, 0.4)',
+                borderColor: '#67327b'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+            />
+          </div>
+        )}
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.email}</label>
+          <input
+            type="email"
+            placeholder={t.email}
+            value={authForm.email}
+            onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+            style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#67327b'
+            }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.password}</label>
+          <input
+            type="password"
+            placeholder={t.password}
+            value={authForm.password}
+            onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+            style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#67327b'
+            }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+          />
+        </div>
+
+        {authMode === 'register' && (
+          <div className="space-y-3">
+            <div className="flex items-start gap-2 p-3 rounded-lg border" style={{
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderColor: '#67327b'
+            }}>
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                checked={agreedToPrivacy}
+                onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                className="mt-1 w-4 h-4 cursor-pointer flex-shrink-0"
+                style={{ accentColor: '#9370db' }}
+              />
+              <label htmlFor="privacy-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                Я согласен с{' '}
+                <Link href="/privacy" className="hover:text-white underline" style={{ color: '#9370db' }} target="_blank">
+                  Политикой конфиденциальности
+                </Link>
+              </label>
+            </div>
+
+            <div className="flex items-start gap-2 p-3 rounded-lg border" style={{
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderColor: '#67327b'
+            }}>
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                checked={agreedToPrivacy}
+                onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                className="mt-1 w-4 h-4 cursor-pointer flex-shrink-0"
+                style={{ accentColor: '#9370db' }}
+              />
+              <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                Я согласен с{' '}
+                <Link href="/terms" className="hover:text-white underline" style={{ color: '#9370db' }} target="_blank">
+                  Пользовательским соглашением
+                </Link>
+              </label>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={authMode === 'login' ? handleLogin : handleRegister}
+          className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(180, 141, 196, 0.8)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #9370db 0%, #67327b 100%)';
+            e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 112, 219, 0.6)';
+          }}
+        >
+          {authMode === 'login' ? t.login : t.register}
+        </button>
+
+        <button
+          onClick={() => {
+            setAuthMode(authMode === 'login' ? 'register' : 'login');
+            setAgreedToPrivacy(false);
+          }}
+          className="w-full text-gray-400 hover:text-white text-xs sm:text-sm"
+        >
+          {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* DELETE ACCOUNT MODAL */}
+{showDeleteAccountModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-6 border-2 border-orange-600">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
+          <AlertTriangle size={24} />
+          Удаление аккаунта
+        </h2>
+        <button onClick={() => {
+          setShowDeleteAccountModal(false);
+          setDeleteReason('');
+          setDeletePassword('');
+        }} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="bg-red-900 bg-opacity-30 border-2 border-red-600 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+        <p className="text-xs sm:text-sm text-red-300">
+          ⚠️ Это действие необратимо! Все ваши данные будут удалены навсегда.
+        </p>
+      </div>
+
+      <div className="space-y-3 sm:space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">
+            Причина удаления <span className="text-gray-500">(необязательно)</span>
+          </label>
+          <textarea
+            value={deleteReason}
+            onChange={(e) => setDeleteReason(e.target.value)}
+            rows={3}
+            placeholder="Расскажите, почему вы решили удалить аккаунт..."
+            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600 text-white resize-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">
+            Введите пароль для подтверждения <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            placeholder="Ваш пароль"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600"
+          />
+        </div>
+
+        <button
+          onClick={handleDeleteAccount}
+          className="w-full bg-orange-600 hover:bg-orange-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+        >
+          <Trash2 size={18} className="sm:w-5 sm:h-5" />
+          Удалить аккаунт навсегда
+        </button>
+
+        <button
+          onClick={() => {
+            setShowDeleteAccountModal(false);
+            setDeleteReason('');
+            setDeletePassword('');
+          }}
+          className="w-full bg-gray-700 hover:bg-gray-600 py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
+        >
+          Отмена
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* UPDATES MODAL */}
+{showUpdatesModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col border-2 border-red-600">
+      <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700">
+        <h2 className="text-xl sm:text-2xl font-bold text-red-600 flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          Обновления сайта
+        </h2>
+        <button onClick={() => setShowUpdatesModal(false)} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {siteUpdates.length === 0 ? (
+          <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+            <p className="text-gray-500">Пока нет обновлений</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {siteUpdates.map((update) => (
+              <div 
+                key={update.id}
+                className={`bg-gray-800 rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
+                  update.type === 'new_work' ? 'border-red-600' : 'border-gray-700'
+                }`}
+                onClick={async () => {
+                  await supabase.from('site_updates').delete().eq('id', update.id);
+                  loadSiteUpdates();
+                  window.location.href = `/work/${update.work_id}`;
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    {update.type === 'new_work' ? (
+                      <>
+                        <span className="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded mb-2">
+                          НОВАЯ РАБОТА
+                        </span>
+                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
+                          {update.work_title}
+                        </h3>
+                        <p className="text-gray-400 text-sm">
+                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
+                          {update.work_title}
+                        </h3>
+                        <p className="text-gray-300 text-sm mb-1">
+                          {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'long'
+                          })}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* READER MESSAGES MODAL */}
+{showReaderMessagesModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-4xl h-[95vh] sm:h-[85vh] flex flex-col border-2 border-red-600">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
+        <h2 className="text-lg sm:text-2xl font-bold text-red-600 flex items-center gap-2">
+          <Mail size={20} className="sm:w-7 sm:h-7" />
+          Мои сообщения
+        </h2>
+        <button 
+          onClick={() => {
+            setShowReaderMessagesModal(false);
+            setSelectedReaderMessage(null);
+            setNewMessageText('');
+            setReplyMessageText('');
+          }} 
+          className="text-gray-400 hover:text-white self-end sm:self-auto z-50"
+        >
+          <X size={20} className="sm:w-6 sm:h-6" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+        <div className="bg-gray-800 rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2 border-gray-700">
+          <h3 className="text-sm sm:text-lg font-semibold text-red-500 mb-2 sm:mb-3 flex items-center gap-2">
+            <Send size={16} className="sm:w-5 sm:h-5" />
+            Написать новое сообщение автору
+          </h3>
+          <textarea
+            value={newMessageText}
+            onChange={(e) => setNewMessageText(e.target.value)}
+            rows={3}
+            placeholder="Введите ваше сообщение..."
+            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white"
+          />
+          <button
+            onClick={sendNewMessage}
+            className="w-full bg-red-600 hover:bg-red-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+          >
+            <Send size={16} className="sm:w-5 sm:h-5" />
+            Отправить сообщение
+          </button>
+        </div>
+
+        <div className="space-y-3 sm:space-y-4">
+          <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
+            <MailOpen size={18} className="sm:w-6 sm:h-6" />
+            История переписки
+          </h3>
+
+          {readerMessages.length === 0 ? (
+            <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+              <Mail size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+              <p className="text-sm sm:text-base text-gray-500">У вас пока нет сообщений</p>
+            </div>
+          ) : (
+            readerMessages.map((msg) => (
+              <div 
+                key={msg.id} 
+                className={`bg-gray-800 rounded-lg p-3 sm:p-5 border-2 transition ${
+                  msg.admin_reply && !msg.is_read 
+                    ? 'border-red-600 shadow-lg shadow-red-600/20' 
+                    : 'border-gray-700'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-2 sm:mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <span className="font-semibold text-white text-sm sm:text-base">Вы</span>
+                    <span className="text-gray-500 text-xs">
+                      {new Date(msg.created_at).toLocaleString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                    {msg.admin_reply && !msg.is_read && (
+                      <span className="bg-red-600 text-xs px-2 py-1 rounded font-bold animate-pulse">
+                        НОВЫЙ ОТВЕТ
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedReaderMessage(
+                      selectedReaderMessage?.id === msg.id ? null : msg
+                    )}
+                    className="text-gray-400 hover:text-red-500 text-xs sm:text-sm flex items-center gap-1"
+                  >
+                    {selectedReaderMessage?.id === msg.id ? 'Свернуть' : 'Развернуть'}
+                  </button>
+                </div>
+
+                <div className="bg-gray-900 rounded-lg p-3 sm:p-4 mb-2 sm:mb-3">
+                  <p className="text-xs text-gray-500 mb-2">Ваше сообщение:</p>
+                  <p className="text-xs sm:text-sm text-gray-300 whitespace-pre-wrap break-words">
+                    {selectedReaderMessage?.id === msg.id 
+                      ? msg.message 
+                      : msg.message.length > 100 
+                        ? msg.message.slice(0, 100) + '...' 
+                        : msg.message
+                    }
+                  </p>
+                </div>
+
+                {msg.admin_reply && (
+                  <div className="bg-red-900 bg-opacity-20 border-2 border-red-600 rounded-lg p-3 sm:p-4 mb-2 sm:mb-3">
+                    <p className="text-xs text-red-400 mb-2 font-semibold flex items-center gap-1">
+                      <Mail size={12} className="sm:w-4 sm:h-4" />
+                      Ответ автора:
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-200 whitespace-pre-wrap break-words">
+                      {selectedReaderMessage?.id === msg.id 
+                        ? msg.admin_reply 
+                        : msg.admin_reply.length > 100 
+                          ? msg.admin_reply.slice(0, 100) + '...' 
+                          : msg.admin_reply
+                      }
+                    </p>
+                  </div>
+                )}
+
+                {selectedReaderMessage?.id === msg.id && msg.admin_reply && (
+                  <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-700">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2">
+                      Ответить автору:
+                    </h4>
+                    <textarea
+                      value={replyMessageText}
+                      onChange={(e) => setReplyMessageText(e.target.value)}
+                      rows={3}
+                      placeholder="Напишите ваш ответ..."
+                      className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white"
+                    />
+                    <button
+                      onClick={() => sendReaderReply(msg.id)}
+                      className="bg-red-600 hover:bg-red-700 px-3 sm:px-4 py-2 rounded text-xs sm:text-sm flex items-center gap-2"
+                    >
+                      <Send size={12} className="sm:w-4 sm:h-4" />
+                      Отправить ответ
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
 {/* READER PANEL */}
 {showReaderPanel && userProfile && (
   <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-gray-900 border-l-2 border-red-600 z-40 overflow-y-auto shadow-2xl">
