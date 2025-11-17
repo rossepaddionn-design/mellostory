@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getCachedChapterText, prefetchNextChapter } from '@/lib/chapterCache';
 import { useParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X, Music } from 'lucide-react';
 
 export default function ChapterPage() {
   const params = useParams();
@@ -19,6 +19,8 @@ export default function ChapterPage() {
   const [loading, setLoading] = useState(true);
   const [fontSize, setFontSize] = useState(14);
   const [showChapterList, setShowChapterList] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
   const t = {
     backToWork: 'К описанию работы',
@@ -34,7 +36,6 @@ export default function ChapterPage() {
     chapters: 'Главы'
   };
 
-  // Загрузка данных при смене главы
   useEffect(() => {
     if (chapterId && workId) {
       loadAllData();
@@ -42,7 +43,6 @@ export default function ChapterPage() {
     }
   }, [chapterId, workId]);
 
-  // PREFETCH следующей главы
   useEffect(() => {
     if (chapter && allChapters.length > 0) {
       const nextCh = getNextChapter();
@@ -52,7 +52,6 @@ export default function ChapterPage() {
     }
   }, [chapter, allChapters]);
 
-  // ОБРАБОТЧИК КЛИКОВ ПО ПОЯСНЕНИЯМ
   useEffect(() => {
     if (!chapter) return;
 
@@ -116,7 +115,6 @@ export default function ChapterPage() {
     };
   }, [chapter]);
 
-  // Функция prefetch следующей главы
   const prefetchNextChapterData = async (nextChapterId) => {
     try {
       const { data } = await supabase
@@ -133,7 +131,6 @@ export default function ChapterPage() {
     }
   };
 
-  // Загрузка всех данных
   const loadAllData = async () => {
     setLoading(true);
 
@@ -290,6 +287,29 @@ export default function ChapterPage() {
                 <Menu size={16} className="sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{t.chapters}</span>
               </button>
+
+              {chapter?.audio_url && (
+                <button
+                  onClick={() => setShowPlaylist(true)}
+                  className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
+                  style={{
+                    backgroundColor: '#7f1d1d',
+                    boxShadow: '0 0 10px rgba(127, 29, 29, 0.6)',
+                    border: '1px solid #7f1d1d'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#991b1b';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(127, 29, 29, 0.8)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#7f1d1d';
+                    e.currentTarget.style.boxShadow = '0 0 10px rgba(127, 29, 29, 0.6)';
+                  }}
+                >
+                  <Music size={16} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Плейлист</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -383,6 +403,111 @@ export default function ChapterPage() {
                         </span>
                       </div>
                     </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+{chapter?.audio_url && (
+        <div style={{ display: 'none' }}>
+          {JSON.parse(chapter.audio_url).map((audio, i) => (
+            <audio 
+              key={i}
+              id={`audio-track-${i}`}
+              src={audio.url || audio.data}
+              onPlay={() => setCurrentTrack(i)}
+              onPause={() => setCurrentTrack(null)}
+              onEnded={() => setCurrentTrack(null)}
+            />
+          ))}
+        </div>
+      )}
+
+      {showPlaylist && chapter?.audio_url && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+            background: 'rgba(147, 51, 234, 0.15)',
+            border: '2px solid #9333ea',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+          }}>
+            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+              borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+            }}>
+              <h2 className="text-xl sm:text-2xl font-bold" style={{
+                color: '#ffffff'
+              }}>
+                Плейлист
+              </h2>
+              <button 
+                onClick={() => setShowPlaylist(false)} 
+                className="transition rounded-full p-2 absolute right-4"
+                style={{
+                  color: '#ffffff',
+                  backgroundColor: 'rgba(147, 51, 234, 0.3)',
+                  border: '2px solid rgba(255, 255, 255, 0.5)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.5)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes pulse-track {
+                  0%, 100% { box-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
+                  50% { box-shadow: 0 0 20px rgba(192, 132, 252, 0.7); }
+                }
+              `}} />
+              <div className="space-y-3">
+                {JSON.parse(chapter.audio_url).map((audio, i) => {
+                  const isPlaying = currentTrack === i;
+                  const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
+                  
+                  return (
+                    <div 
+                      key={i} 
+                      className="rounded-lg p-4 border-2 transition-all cursor-pointer"
+                      style={{
+                        background: isPlaying 
+                          ? 'rgba(192, 132, 252, 0.2)' 
+                          : 'rgba(147, 51, 234, 0.1)',
+                        borderColor: isPlaying ? '#c084fc' : 'rgba(147, 51, 234, 0.3)',
+                        animation: isPlaying ? 'pulse-track 2s ease-in-out infinite' : 'none'
+                      }}
+                      onClick={() => {
+                        if (audioElement) {
+                          if (audioElement.paused) {
+                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
+                            audioElement.play();
+                          } else {
+                            audioElement.pause();
+                          }
+                        }
+                      }}
+                    >
+                      <p className="text-sm font-semibold flex items-center justify-between" style={{
+                        color: '#c084fc'
+                      }}>
+                        <span className="break-words flex-1">{audio.name}</span>
+                        <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#e9d5ff' }}>
+                          {isPlaying ? '▶ Играет' : '⏸ Кликните'}
+                        </span>
+                      </p>
+                    </div>
                   );
                 })}
               </div>
@@ -547,32 +672,6 @@ export default function ChapterPage() {
               color: '#7f1d1d'
             }}>{t.authorNote}</h3>
             <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{chapter.author_note}</p>
-          </div>
-        )}
-
-        {chapter.audio_url && (
-          <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
-            borderColor: '#b91c1c',
-            boxShadow: '0 0 25px rgba(185, 28, 28, 0.8), 0 0 50px rgba(185, 28, 28, 0.5)'
-          }}>
-            <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
-              color: '#b91c1c',
-              textShadow: '0 0 15px rgba(185, 28, 28, 0.9)'
-            }}>{t.audio}</h3>
-            <div className="space-y-3">
-              {JSON.parse(chapter.audio_url).map((audio, i) => (
-                <div key={i} className="rounded-lg p-3 border-2" style={{
-                  backgroundColor: '#0a0a0a',
-                  borderColor: '#b91c1c',
-                  boxShadow: '0 0 15px rgba(185, 28, 28, 0.5)'
-                }}>
-                  <p className="text-xs sm:text-sm text-gray-300 mb-2 break-words">{audio.name}</p>
-                  <audio controls className="w-full" src={audio.url || audio.data}>
-                    Ваш браузер не поддерживает аудио.
-                  </audio>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
