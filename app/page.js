@@ -1288,6 +1288,130 @@ style={{
 </div>
       </main>
 
+{/* READER PANEL */}
+{showReaderPanel && userProfile && (
+  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-gray-900 border-l-2 border-red-600 z-40 overflow-y-auto shadow-2xl">
+    <div className="sticky top-0 bg-gray-900 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center">
+      <h2 className="text-lg sm:text-xl font-bold text-red-600">{userProfile.nickname}</h2>
+      <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white">
+        <X size={20} className="sm:w-6 sm:h-6" />
+      </button>
+    </div>
+
+    <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
+      <button
+        onClick={() => {
+          setShowUpdatesModal(true);
+          loadSiteUpdates();
+        }}
+        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
+        style={{
+          background: siteUpdates.length > 0
+            ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+            : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        Обновления
+        {siteUpdates.length > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
+            {siteUpdates.length}
+          </span>
+        )}
+      </button>
+
+      <button
+        onClick={() => setShowReaderMessagesModal(true)}
+        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
+        style={{
+          background: readerMessages.some(m => m.admin_reply && !m.is_read)
+            ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+            : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <MessageSquare size={18} className="sm:w-5 sm:h-5" />
+        Мои сообщения
+        {readerMessages.some(m => m.admin_reply && !m.is_read) && (
+          <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
+            {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
+          </span>
+        )}
+      </button>
+
+      <button
+        onClick={() => setShowDeleteAccountModal(true)}
+        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+        style={{
+          background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <Trash2 size={18} className="sm:w-5 sm:h-5" />
+        Удалить аккаунт
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+        style={{
+          background: 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <LogOut size={18} className="sm:w-5 sm:h-5" />
+        {t.logout}
+      </button>
+    </div>
+  </div>
+)}
+
+{/* ADMIN PANEL */}
+{showAdminPanel && isAdmin && (
+  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-gray-900 border-l-2 border-red-600 z-40 overflow-y-auto shadow-2xl">
+    <div className="sticky top-0 bg-gray-900 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center">
+      <h2 className="text-lg sm:text-xl font-bold text-red-600">Админ-панель</h2>
+      <button onClick={() => setShowAdminPanel(false)} className="text-gray-400 hover:text-white">
+        <X size={20} className="sm:w-6 sm:h-6" />
+      </button>
+    </div>
+
+    <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+      <button
+        onClick={() => {
+          setShowManagementModal(true);
+          loadManagementData();
+        }}
+        className="w-full bg-red-600 hover:bg-red-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        <Settings size={18} className="sm:w-5 sm:h-5" />
+        Управление
+      </button>
+
+      <button
+        onClick={() => window.location.href = '/admin'}
+        className="w-full bg-blue-600 hover:bg-blue-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        <FileText size={18} className="sm:w-5 sm:h-5" />
+        Мои работы
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className="w-full bg-gray-700 hover:bg-gray-600 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        <LogOut size={18} className="sm:w-5 sm:h-5" />
+        {t.logout}
+      </button>
+    </div>
+  </div>
+)}
+
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
         <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
