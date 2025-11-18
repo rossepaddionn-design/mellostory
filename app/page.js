@@ -876,10 +876,10 @@ style={{
       {/* MAIN CONTENT */}
       <main className="pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen">
         <div className="max-w-7xl mx-auto relative z-10">
-          {loading ? (
-            <div className="text-center py-12 sm:py-20">
-              <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600"></div>
-            </div>
+{loading ? (
+  <div className="text-center py-12 sm:py-20">
+    <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2" style={{ borderColor: '#8b3cc8' }}></div>
+  </div>
           ) : displayWorks.length === 0 ? (
             <div className="text-center py-12 sm:py-20">
               <p className="text-gray-400 text-lg sm:text-xl">{t.noWorks}</p>
@@ -1108,10 +1108,10 @@ style={{
                         setExpandedWork(null);
                       }}
                       className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300`}
-                      style={{
-                        backgroundColor: idx === currentSlide ? titleColor : '#4b5563',
-                        transform: idx === currentSlide ? 'scale(1.5)' : 'scale(1)'
-                      }}
+ style={{
+  backgroundColor: idx === currentSlide ? '#ce0dbe' : '#ffffff',
+  transform: idx === currentSlide ? 'scale(1.5)' : 'scale(1)'
+}}
                     />
                   ))}
                 </div>
@@ -1488,7 +1488,13 @@ style={{
             onChange={(e) => setDeleteReason(e.target.value)}
             rows={3}
             placeholder="Расскажите, почему вы решили удалить аккаунт..."
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600 text-white resize-none"
+           className="w-full border rounded px-3 py-2 text-sm sm:text-base focus:outline-none text-white resize-none"
+style={{ 
+  background: '#000000',
+  borderColor: '#8b3cc8'
+}}
+onFocus={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
+onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
           />
         </div>
 
@@ -1501,14 +1507,20 @@ style={{
             value={deletePassword}
             onChange={(e) => setDeletePassword(e.target.value)}
             placeholder="Ваш пароль"
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:border-orange-600"
+           className="w-full border rounded px-3 py-2 text-sm sm:text-base focus:outline-none text-white"
+style={{ 
+  background: '#000000',
+  borderColor: '#8b3cc8'
+}}
+onFocus={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
+onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
           />
         </div>
 
 <button
   onClick={handleDeleteAccount}
   className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-  style={{ background: '#c596d9', color: '#000000' }}
+  style={{ background: '#8b3cc8', color: '#ffffff' }}
 >
           <Trash2 size={18} className="sm:w-5 sm:h-5" />
           Удалить аккаунт навсегда
@@ -1521,7 +1533,7 @@ style={{
     setDeletePassword('');
   }}
   className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
-  style={{ background: '#9edbdb', color: '#000000' }}
+  style={{ background: '#8b3cc8', color: '#ffffff' }}
 >
   Отмена
 </button>
@@ -1553,9 +1565,12 @@ style={{
             {siteUpdates.map((update) => (
               <div 
                 key={update.id}
-                className={`rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
-                  update.type === 'new_work' ? 'border-red-600' : 'transparent'
-                }`}
+className="rounded-lg p-4 border-2 transition cursor-pointer bg-black"
+style={{
+  borderColor: update.type === 'new_work' ? '#8b3cc8' : '#333'
+}}
+onMouseEnter={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
+onMouseLeave={(e) => e.currentTarget.style.borderColor = update.type === 'new_work' ? '#8b3cc8' : '#333'}
                 onClick={async () => {
                   await supabase.from('site_updates').delete().eq('id', update.id);
                   loadSiteUpdates();
@@ -1617,7 +1632,7 @@ style={{
 {/* READER MESSAGES MODAL */}
 {showReaderMessagesModal && (
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
-<div className="bg-black rounded-lg w-full max-w-4xl h-[95vh] sm:h-[85vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
+<div className="bg-black rounded-lg w-full max-w-4xl h-[90vh] sm:h-[85vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
     <h2 className="text-lg sm:text-2xl font-bold text-center">
       <span className="shimmer-btn-text">📧 Мои сообщения</span>
@@ -1636,11 +1651,11 @@ style={{
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-        <div className="rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2" style={{ 
-  background: 'rgba(245, 236, 248, 0.1)',
-  borderColor: '#f5ecf8'
+<div className="rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2" style={{ 
+  background: '#000000',
+  borderColor: '#8b3cc8'
 }}>
-          <h3 className="text-sm sm:text-lg font-semibold text-red-500 mb-2 sm:mb-3 flex items-center gap-2">
+          <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2" style={{ color: '#8b3cc8' }}>
             <Send size={16} className="sm:w-5 sm:h-5" />
             Написать новое сообщение автору
           </h3>
@@ -1649,12 +1664,18 @@ style={{
             onChange={(e) => setNewMessageText(e.target.value)}
             rows={3}
             placeholder="Введите ваше сообщение..."
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white"
+           className="w-full border rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none text-white"
+style={{ 
+  background: '#000000',
+  borderColor: '#8b3cc8'
+}}
+onFocus={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
+onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
           />
 <button
   onClick={sendNewMessage}
   className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-  style={{ background: '#c596d9', color: '#000000' }}
+  style={{ background: '#8b3cc8', color: '#ffffff' }}
 >
             <Send size={16} className="sm:w-5 sm:h-5" />
             Отправить сообщение
@@ -1846,7 +1867,7 @@ style={{
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
 }}
 >
-<Trash2 size={18} className="sm:w-5 sm:h-5" style={{ color: '#ef01cb' }} />
+<Trash2 size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
 <span className="shimmer-btn-text">Удалить аккаунт</span>
       </button>
 
