@@ -1328,37 +1328,37 @@ style={{
         {authMode === 'register' && (
           <div>
             <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.nickname}</label>
-            <input
-              type="text"
-              placeholder={t.nickname}
-              value={authForm.nickname}
-              onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
-              className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-style={{ 
-  background: 'rgba(0, 0, 0, 0.3)',
-  borderColor: update.type === 'new_work' ? '#bc7ed3' : '#bc7ed3'
-}}
-              onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
-            />
+<input
+  type="text"
+  placeholder={t.nickname}
+  value={authForm.nickname}
+  onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
+  className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+  style={{ 
+    background: 'rgba(0, 0, 0, 0.3)',
+    borderColor: '#67327b'
+  }}
+  onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+  onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+/>
           </div>
         )}
 
         <div>
           <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.email}</label>
-          <input
-            type="email"
-            placeholder={t.email}
-            value={authForm.email}
-            onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-style={{ 
-  background: 'rgba(0, 0, 0, 0.3)',
-  borderColor: update.type === 'new_work' ? '#bc7ed3' : '#bc7ed3'
-}}
-            onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
-            onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
-          />
+<input
+  type="email"
+  placeholder={t.email}
+  value={authForm.email}
+  onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+  className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+  style={{ 
+    background: 'rgba(0, 0, 0, 0.3)',
+    borderColor: '#67327b'
+  }}
+  onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+  onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+/>
         </div>
 
         <div>
