@@ -1334,10 +1334,10 @@ style={{
               value={authForm.nickname}
               onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
               className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                borderColor: '#67327b'
-              }}
+style={{ 
+  background: 'rgba(0, 0, 0, 0.3)',
+  borderColor: update.type === 'new_work' ? '#bc7ed3' : '#bc7ed3'
+}}
               onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
               onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
             />
@@ -1352,10 +1352,10 @@ style={{
             value={authForm.email}
             onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
             className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-            style={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#67327b'
-            }}
+style={{ 
+  background: 'rgba(0, 0, 0, 0.3)',
+  borderColor: update.type === 'new_work' ? '#bc7ed3' : '#bc7ed3'
+}}
             onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
             onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
           />
@@ -1458,12 +1458,11 @@ style={{
 {/* DELETE ACCOUNT MODAL */}
 {showDeleteAccountModal && (
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="bg-gray-900 rounded-lg w-full max-w-md p-4 sm:p-6 border-2 border-orange-600">
-      <div className="flex justify-between items-center mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
-          <AlertTriangle size={24} />
-          Удаление аккаунта
-        </h2>
+<div className="bg-black rounded-lg w-full max-w-md p-4 sm:p-6 border-2" style={{ borderColor: '#a837d7' }}>
+  <div className="flex justify-between items-center mb-4 sm:mb-6">
+    <h2 className="text-xl sm:text-2xl font-bold text-center">
+      <span className="shimmer-btn-text">⚠️ Удаление аккаунта</span>
+    </h2>
         <button onClick={() => {
           setShowDeleteAccountModal(false);
           setDeleteReason('');
@@ -1473,8 +1472,8 @@ style={{
         </button>
       </div>
 
-      <div className="bg-red-900 bg-opacity-30 border-2 border-red-600 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-        <p className="text-xs sm:text-sm text-red-300">
+<div className="rounded-lg p-3 sm:p-4 mb-4 sm:mb-6" style={{ background: '#c596d9' }}>
+  <p className="text-xs sm:text-sm" style={{ color: '#000000' }}>
           ⚠️ Это действие необратимо! Все ваши данные будут удалены навсегда.
         </p>
       </div>
@@ -1506,24 +1505,26 @@ style={{
           />
         </div>
 
-        <button
-          onClick={handleDeleteAccount}
-          className="w-full bg-orange-600 hover:bg-orange-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-        >
+<button
+  onClick={handleDeleteAccount}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+  style={{ background: '#c596d9', color: '#000000' }}
+>
           <Trash2 size={18} className="sm:w-5 sm:h-5" />
           Удалить аккаунт навсегда
         </button>
 
-        <button
-          onClick={() => {
-            setShowDeleteAccountModal(false);
-            setDeleteReason('');
-            setDeletePassword('');
-          }}
-          className="w-full bg-gray-700 hover:bg-gray-600 py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
-        >
-          Отмена
-        </button>
+<button
+  onClick={() => {
+    setShowDeleteAccountModal(false);
+    setDeleteReason('');
+    setDeletePassword('');
+  }}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
+  style={{ background: '#9edbdb', color: '#000000' }}
+>
+  Отмена
+</button>
       </div>
     </div>
   </div>
@@ -1532,16 +1533,11 @@ style={{
 {/* UPDATES MODAL */}
 {showUpdatesModal && (
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="bg-gray-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col border-2 border-red-600">
-      <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700">
-        <h2 className="text-xl sm:text-2xl font-bold text-red-600 flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
-          Обновления сайта
-        </h2>
+<div className="bg-black rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
+  <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700">
+    <h2 className="text-xl sm:text-2xl font-bold flex items-center justify-center gap-2 w-full">
+      <span className="shimmer-btn-text">📚 Обновления сайта</span>
+    </h2>
         <button onClick={() => setShowUpdatesModal(false)} className="text-gray-400 hover:text-white">
           <X size={24} />
         </button>
@@ -1557,8 +1553,8 @@ style={{
             {siteUpdates.map((update) => (
               <div 
                 key={update.id}
-                className={`bg-gray-800 rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
-                  update.type === 'new_work' ? 'border-red-600' : 'border-gray-700'
+                className={`rounded-lg p-4 border-2 transition hover:border-red-500 cursor-pointer ${
+                  update.type === 'new_work' ? 'border-red-600' : 'transparent'
                 }`}
                 onClick={async () => {
                   await supabase.from('site_updates').delete().eq('id', update.id);
@@ -1621,12 +1617,11 @@ style={{
 {/* READER MESSAGES MODAL */}
 {showReaderMessagesModal && (
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
-    <div className="bg-gray-900 rounded-lg w-full max-w-4xl h-[95vh] sm:h-[85vh] flex flex-col border-2 border-red-600">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
-        <h2 className="text-lg sm:text-2xl font-bold text-red-600 flex items-center gap-2">
-          <Mail size={20} className="sm:w-7 sm:h-7" />
-          Мои сообщения
-        </h2>
+<div className="bg-black rounded-lg w-full max-w-4xl h-[95vh] sm:h-[85vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
+    <h2 className="text-lg sm:text-2xl font-bold text-center">
+      <span className="shimmer-btn-text">📧 Мои сообщения</span>
+    </h2>
         <button 
           onClick={() => {
             setShowReaderMessagesModal(false);
@@ -1641,7 +1636,10 @@ style={{
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2 border-gray-700">
+        <div className="rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2" style={{ 
+  background: 'rgba(245, 236, 248, 0.1)',
+  borderColor: '#f5ecf8'
+}}>
           <h3 className="text-sm sm:text-lg font-semibold text-red-500 mb-2 sm:mb-3 flex items-center gap-2">
             <Send size={16} className="sm:w-5 sm:h-5" />
             Написать новое сообщение автору
@@ -1653,10 +1651,11 @@ style={{
             placeholder="Введите ваше сообщение..."
             className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white"
           />
-          <button
-            onClick={sendNewMessage}
-            className="w-full bg-red-600 hover:bg-red-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-          >
+<button
+  onClick={sendNewMessage}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+  style={{ background: '#c596d9', color: '#000000' }}
+>
             <Send size={16} className="sm:w-5 sm:h-5" />
             Отправить сообщение
           </button>
@@ -1677,7 +1676,7 @@ style={{
             readerMessages.map((msg) => (
               <div 
                 key={msg.id} 
-                className={`bg-gray-800 rounded-lg p-3 sm:p-5 border-2 transition ${
+                className={`rounded-lg p-3 sm:p-5 border-2 transition ${
                   msg.admin_reply && !msg.is_read 
                     ? 'border-red-600 shadow-lg shadow-red-600/20' 
                     : 'border-gray-700'
@@ -1772,10 +1771,13 @@ style={{
 
 {/* READER PANEL */}
 {showReaderPanel && userProfile && (
-  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-gray-900 border-l-2 border-red-600 z-40 overflow-y-auto shadow-2xl">
-    <div className="sticky top-0 bg-gray-900 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center">
-      <h2 className="text-lg sm:text-xl font-bold text-red-600">{userProfile.nickname}</h2>
-      <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white">
+  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-black border-l-2 z-40 overflow-y-auto shadow-2xl" style={{ borderColor: '#b3e7ef' }}>
+<div className="sticky top-0 bg-black p-3 sm:p-4 border-b border-gray-700 flex justify-center items-center relative">
+  <h2 className="text-lg sm:text-xl font-bold" style={{ 
+    color: '#b3e7ef',
+    textShadow: '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.4)'
+  }}>{userProfile.nickname}</h2>
+      <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4">
         <X size={20} className="sm:w-6 sm:h-6" />
       </button>
     </div>
@@ -1787,19 +1789,31 @@ style={{
           loadSiteUpdates();
         }}
         className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
-        style={{
-          background: siteUpdates.length > 0
-            ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
-            : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-        }}
+style={{
+  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+}}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
-        Обновления
+<style dangerouslySetInnerHTML={{__html: `
+  @keyframes shimmer-btn {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+.shimmer-btn-text {
+  background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer-btn 3s linear infinite;
+  }
+`}} />
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3e7ef" strokeWidth="2" className="sm:w-5 sm:h-5">
+  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+  <path d="M2 17l10 5 10-5"/>
+  <path d="M2 12l10 5 10-5"/>
+</svg>
+<span className="shimmer-btn-text">Обновления</span>
         {siteUpdates.length > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
             {siteUpdates.length}
@@ -1810,15 +1824,13 @@ style={{
       <button
         onClick={() => setShowReaderMessagesModal(true)}
         className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
-        style={{
-          background: readerMessages.some(m => m.admin_reply && !m.is_read)
-            ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
-            : 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-        }}
-      >
-        <MessageSquare size={18} className="sm:w-5 sm:h-5" />
-        Мои сообщения
+style={{
+  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+}}
+>
+<MessageSquare size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+<span className="shimmer-btn-text">Мои сообщения</span>
         {readerMessages.some(m => m.admin_reply && !m.is_read) && (
           <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
             {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
@@ -1829,26 +1841,26 @@ style={{
       <button
         onClick={() => setShowDeleteAccountModal(true)}
         className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-        style={{
-          background: 'linear-gradient(135deg, #6b7280 0%, #374151 100%)',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-        }}
-      >
-        <Trash2 size={18} className="sm:w-5 sm:h-5" />
-        Удалить аккаунт
+style={{
+  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+}}
+>
+<Trash2 size={18} className="sm:w-5 sm:h-5" style={{ color: '#ef01cb' }} />
+<span className="shimmer-btn-text">Удалить аккаунт</span>
       </button>
 
-      <button
-        onClick={handleLogout}
-        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-        style={{
-          background: 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-        }}
-      >
-        <LogOut size={18} className="sm:w-5 sm:h-5" />
-        {t.logout}
-      </button>
+<button
+  onClick={handleLogout}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+  style={{
+    background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+  }}
+>
+  <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+  <span className="shimmer-btn-text">Выход</span>
+</button>
     </div>
   </div>
 )}
