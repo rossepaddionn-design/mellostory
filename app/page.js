@@ -1927,6 +1927,327 @@ style={{
   </div>
 )}
 
+{/* ADMIN MANAGEMENT MODAL */}
+{showManagementModal && isAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-6xl h-[95vh] sm:h-[90vh] flex flex-col border-2 border-red-600">
+      <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700">
+        <h2 className="text-lg sm:text-2xl font-bold text-red-600">Управление сайтом</h2>
+        <button onClick={() => setShowManagementModal(false)} className="text-gray-400 hover:text-white">
+          <X size={20} className="sm:w-6 sm:h-6" />
+        </button>
+      </div>
+
+      <div className="flex border-b border-gray-700">
+        <button
+          onClick={() => setManagementTab('comments')}
+          className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+            managementTab === 'comments' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+          }`}
+        >
+          Комментарии
+        </button>
+        <button
+          onClick={() => setManagementTab('messages')}
+          className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+            managementTab === 'messages' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+          }`}
+        >
+          Сообщения
+        </button>
+        <button
+          onClick={() => setManagementTab('users')}
+          className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition text-xs sm:text-base ${
+            managementTab === 'users' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+          }`}
+        >
+          Пользователи
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+        {managementTab === 'comments' && (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+              Последние комментарии ({comments.length})
+            </h3>
+            {comments.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">Комментариев пока нет</p>
+            ) : (
+              comments.map((comment) => (
+                <div key={comment.id} className="bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="text-white font-semibold text-sm sm:text-base">{comment.nickname}</p>
+                      <p className="text-gray-400 text-xs">
+                        {comment.works?.title} - Глава {comment.chapters?.chapter_number}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        {new Date(comment.created_at).toLocaleString('ru-RU')}
+                      </p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Удалить комментарий?')) return;
+                        const { error } = await supabase.from('comments').delete().eq('id', comment.id);
+                        if (error) {
+                          alert('Ошибка: ' + error.message);
+                        } else {
+                          loadManagementData();
+                        }
+                      }}
+                      className="text-red-500 hover:text-red-400"
+                    >
+                      <Trash2 size={16} className="sm:w-5 sm:h-5" />
+                    </button>
+                  </div>
+                  <p className="text-gray-300 text-xs sm:text-sm mt-2 whitespace-pre-wrap break-words">
+                    {comment.text}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementTab === 'messages' && (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+              Сообщения от читателей ({messages.length})
+            </h3>
+            {messages.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">Сообщений пока нет</p>
+            ) : (
+              messages.map((msg) => (
+                <div 
+                  key={msg.id} 
+                  className={`bg-gray-800 rounded-lg p-3 sm:p-4 border-2 ${
+                    msg.is_read ? 'border-gray-700' : 'border-yellow-600'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="text-white font-semibold text-sm sm:text-base">
+                        {msg.from_nickname} ({msg.from_email})
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        {new Date(msg.created_at).toLocaleString('ru-RU')}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => deleteMessage(msg.id)}
+                      className="text-red-500 hover:text-red-400"
+                    >
+                      <Trash2 size={16} className="sm:w-5 sm:h-5" />
+                    </button>
+                  </div>
+                  <div className="bg-gray-900 rounded p-2 sm:p-3 mb-2">
+                    <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words">
+                      {msg.message}
+                    </p>
+                  </div>
+                  {msg.admin_reply ? (
+                    <div className="bg-red-900 bg-opacity-20 rounded p-2 sm:p-3 border border-red-600">
+                      <p className="text-xs text-red-400 mb-1">Ваш ответ:</p>
+                      <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words">
+                        {msg.admin_reply}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-2">
+                      {selectedMessage?.id === msg.id ? (
+                        <div>
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            rows={3}
+                            placeholder="Напишите ответ..."
+                            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 text-xs sm:text-sm focus:outline-none focus:border-red-600 text-white"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => replyToMessage(msg.id)}
+                              className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs sm:text-sm"
+                            >
+                              Отправить
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedMessage(null);
+                                setReplyText('');
+                              }}
+                              className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs sm:text-sm"
+                            >
+                              Отмена
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setSelectedMessage(msg)}
+                          className="text-red-500 hover:text-red-400 text-xs sm:text-sm flex items-center gap-1"
+                        >
+                          <Reply size={14} className="sm:w-4 sm:h-4" />
+                          Ответить
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementTab === 'users' && (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-xl font-semibold text-gray-300 mb-3 sm:mb-4">
+              Пользователи ({allUsers.length})
+            </h3>
+            {allUsers.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">Пользователей пока нет</p>
+            ) : (
+              allUsers.map((u) => (
+                <div 
+                  key={u.id} 
+                  className={`bg-gray-800 rounded-lg p-3 sm:p-4 border-2 ${
+                    u.is_banned ? 'border-red-600' : 'border-gray-700'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-white font-semibold text-sm sm:text-base">{u.nickname}</p>
+                      <p className="text-gray-400 text-xs">{u.email}</p>
+                      <p className="text-gray-500 text-xs">
+                        Регистрация: {new Date(u.created_at).toLocaleDateString('ru-RU')}
+                      </p>
+                      {u.is_banned && (
+                        <span className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded mt-1">
+                          ЗАБЛОКИРОВАН
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => toggleUserBan(u.user_id, u.is_banned)}
+                      className={`px-3 py-1 rounded text-xs sm:text-sm font-bold ${
+                        u.is_banned 
+                          ? 'bg-green-600 hover:bg-green-700' 
+                          : 'bg-red-600 hover:bg-red-700'
+                      }`}
+                    >
+                      {u.is_banned ? 'Разблокировать' : 'Заблокировать'}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* EDIT TEXT MODAL */}
+{showEditModal && isAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="bg-gray-900 rounded-lg w-full max-w-2xl p-4 sm:p-6 border-2 border-red-600">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-red-600">
+          {editingSection === 'news' ? 'Редактировать новости' : 'Редактировать информацию'}
+        </h2>
+        <button onClick={() => {
+          setShowEditModal(false);
+          setEditingSection(null);
+          setEditText('');
+        }} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <textarea
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+        rows={10}
+        className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 mb-4 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white resize-none"
+        placeholder="Введите текст..."
+      />
+
+      <button
+        onClick={saveText}
+        className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg font-bold transition"
+      >
+        Сохранить
+      </button>
+    </div>
+  </div>
+)}
+
+{/* POPULAR WORK EDIT MODAL */}
+{showPopularEditModal && isAdmin && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="bg-gray-900 rounded-lg w-full max-w-md p-6 border-2 border-red-600">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-red-600">
+          Редактировать работу #{editingPopularIndex + 1}
+        </h2>
+        <button 
+          onClick={() => {
+            setShowPopularEditModal(false);
+            setEditingPopularIndex(null);
+            setEditPopularForm({ title: '', rating: '', views: '' });
+          }} 
+          className="text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Название работы</label>
+          <input
+            type="text"
+            value={editPopularForm.title}
+            onChange={(e) => setEditPopularForm({...editPopularForm, title: e.target.value})}
+            placeholder="Введите название"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Оценка</label>
+          <input
+            type="text"
+            value={editPopularForm.rating}
+            onChange={(e) => setEditPopularForm({...editPopularForm, rating: e.target.value})}
+            placeholder="Например: 9.5"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Прочтения</label>
+          <input
+            type="text"
+            value={editPopularForm.views}
+            onChange={(e) => setEditPopularForm({...editPopularForm, views: e.target.value})}
+            placeholder="Например: 15.2K"
+            className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+          />
+        </div>
+
+        <button
+          onClick={() => savePopularWork(editingPopularIndex)}
+          className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg font-bold transition"
+        >
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       {/* FOOTER */}
       <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
         <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
