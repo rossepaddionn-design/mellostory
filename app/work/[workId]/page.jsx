@@ -179,7 +179,7 @@ const submitRating = async (rating) => {
     return (
       <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-red-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-purple-400 mb-4"></div>
           <p className="text-lg sm:text-xl text-gray-400">{t.loading}</p>
         </div>
       </div>
