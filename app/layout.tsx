@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MelloStory",
   description: "MelloStory novel archive",
-  icons: {
-    icon: '/favicon.jpg',
-  },
+icons: {
+  icon: '/favicon.ico',
+},
 };
 
 export default function RootLayout({
