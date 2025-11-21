@@ -225,17 +225,40 @@ const submitRating = async (rating) => {
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr] gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* ОБЛОЖКА */}
           <div>
-<div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 shadow-2xl md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
-  borderColor: '#9333ea',
-  boxShadow: '0 0 30px rgba(147, 51, 234, 0.7), 0 0 60px rgba(147, 51, 234, 0.4)'
+<div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
+  borderColor: '#9333ea'
 }}>
-              {work.cover_url ? (
-                <img src={work.cover_url} alt={work.title} className="w-full aspect-[2/3] object-cover" loading="lazy" />
-              ) : (
-                <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center">
-                  <p className="text-gray-500 text-sm sm:text-base">Нет обложки</p>
-                </div>
-              )}
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes pulse {
+                  0%, 100% { 
+                    transform: scale(1);
+                    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.3);
+                  }
+                  50% { 
+                    transform: scale(1.03);
+                    box-shadow: 0 0 40px rgba(147, 51, 234, 0.8), 0 0 80px rgba(147, 51, 234, 0.5);
+                  }
+                }
+                
+                .pulse-cover-container {
+                  animation: pulse 3s ease-in-out infinite;
+                }
+              `}} />
+              
+              <div className="pulse-cover-container shadow-2xl">
+                {work.cover_url ? (
+                  <img 
+                    src={work.cover_url} 
+                    alt={work.title} 
+                    className="w-full aspect-[2/3] object-cover" 
+                    loading="lazy" 
+                  />
+                ) : (
+                  <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center">
+                    <p className="text-gray-500 text-sm sm:text-base">Нет обложки</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
