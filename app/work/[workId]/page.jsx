@@ -265,13 +265,25 @@ const submitRating = async (rating) => {
           {/* ОПИСАНИЕ И ИНФО */}
           <div>
             {/* НАЗВАНИЕ */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words" style={{ 
-              fontFamily: "'Playfair Display', Georgia, serif",
-              color: '#9333ea',
-              textShadow: '0 0 20px rgba(147, 51, 234, 0.8)'
-            }}>
-              {work.title}
-            </h1>
+<style dangerouslySetInnerHTML={{__html: `
+  @keyframes workPageShimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .work-page-shimmer {
+    background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: workPageShimmer 3s linear infinite;
+  }
+`}} />
+<h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words work-page-shimmer" style={{ 
+  fontFamily: "'Playfair Display', Georgia, serif"
+}}>
+  {work.title}
+</h1>
 
             {/* ФАНДОМ И ПЕЙРИНГ */}
             {(work.fandom || work.pairing) && (

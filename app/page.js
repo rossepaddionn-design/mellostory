@@ -808,8 +808,8 @@ return (
       0% { background-position: -200% center; }
       100% { background-position: 200% center; }
     }
-    .mello-shimmer {
-      background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
+.mello-shimmer {
+  background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;

@@ -519,17 +519,33 @@ export default function ChapterPage() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
         <div className="mb-6 sm:mb-8">
-          {work && (
-            <p className="mb-2 text-sm sm:text-base break-words font-semibold" style={{
-              color: '#000000'
-            }}>{work.title}</p>
-          )}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words" style={{
-            color: '#7626b5',
-            textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
-          }}>
-            {chapter.chapter_number}. {chapter.title}
-          </h1>
+{work && (
+  <>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes workTitleShimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+      }
+      .work-title-shimmer {
+        background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: workTitleShimmer 3s linear infinite;
+      }
+    `}} />
+    <p className="mb-4 text-xl sm:text-2xl md:text-3xl break-words font-bold text-center work-title-shimmer">
+      {work.title}
+    </p>
+  </>
+)}
+<h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 break-words" style={{
+  color: '#7626b5',
+  textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
+}}>
+  {chapter.chapter_number}. {chapter.title}
+</h1>
         </div>
 
         <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
