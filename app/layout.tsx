@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "MelloStory",
   description: "MelloStory novel archive",
   icons: {
-    icon: '/favicon-icon.ico',
+    icon: '/mello-icon.ico',
   },
 };
 
