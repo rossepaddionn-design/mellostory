@@ -115,13 +115,7 @@ export default function Home() {
       } else if (session.user.email === ADMIN_EMAIL) {
         setIsAdmin(true);
       }
-    } else {
-      const adminSession = localStorage.getItem('admin_session');
-      if (adminSession === 'true') {
-        setIsAdmin(true);
-        setUser({ email: ADMIN_EMAIL, id: 'admin' });
-      }
-    }
+}
   };
 
   const loadWorks = async () => {
@@ -336,14 +330,7 @@ export default function Home() {
       return;
     }
 
-    if (authForm.email === ADMIN_EMAIL && authForm.password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      setUser({ email: ADMIN_EMAIL, id: 'admin' });
-      localStorage.setItem('admin_session', 'true');
-      setShowAuthModal(false);
-      setAuthForm({ nickname: '', email: '', password: '' });
-      return;
-    }
+// Админ тоже входит через Supabase Auth
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: authForm.email,
