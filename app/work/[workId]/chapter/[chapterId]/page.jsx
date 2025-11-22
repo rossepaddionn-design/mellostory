@@ -157,15 +157,15 @@ useEffect(() => {
           .eq('id', chapterId)
           .eq('is_published', true)
           .single(),
-        supabase
-          .from('works')
-          .select('title, id')
-          .eq('id', workId)
-          .single(),
-        supabase
-          .from('chapters')
-          .select('id, chapter_number, title, text_blob_url')
-          .eq('work_id', workId)
+supabase
+  .from('works')
+  .select('title, id, total_pages')
+  .eq('id', workId)
+  .single(),
+supabase
+  .from('chapters')
+  .select('id, chapter_number, title, text_blob_url, pages')
+  .eq('work_id', workId)
           .eq('is_published', true)
           .order('chapter_number', { ascending: true })
       ]);
@@ -266,18 +266,34 @@ useEffect(() => {
 
 return (
   <div className="min-h-screen text-white" style={{ backgroundColor: '#a392b0' }}>
-    {/* PROGRESS BAR */}
-    <div className="fixed top-0 left-0 right-0 z-50 h-1 sm:h-1.5" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}>
-      <div 
-        className="h-full transition-all duration-150 ease-out"
-        style={{ 
-          width: `${readProgress}%`,
-          background: 'linear-gradient(90deg, #9370db 0%, #c084fc 50%, #9370db 100%)',
-          boxShadow: '0 0 8px rgba(147, 112, 219, 0.6), 0 0 15px rgba(192, 132, 252, 0.4)',
-          borderRadius: '0 2px 2px 0'
-        }}
-      />
-    </div>
+ {/* PROGRESS BAR */}
+<div className="fixed top-0 left-0 right-0 z-50 h-1 sm:h-1.5" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}>
+  <div 
+    className="h-full transition-all duration-150 ease-out"
+    style={{ 
+      width: `${readProgress}%`,
+      background: 'linear-gradient(90deg, #9370db 0%, #c084fc 50%, #9370db 100%)',
+      boxShadow: '0 0 8px rgba(147, 112, 219, 0.6), 0 0 15px rgba(192, 132, 252, 0.4)',
+      borderRadius: '0 2px 2px 0'
+    }}
+  />
+</div>
+
+{/* PAGE COUNTER IN HEADER */}
+{chapter?.pages > 0 && (
+  <div className="fixed top-1.5 sm:top-2 left-1/2 transform -translate-x-1/2 z-50">
+    <span 
+      className="text-xs px-2 py-0.5 rounded-full"
+      style={{
+        color: 'rgba(255, 255, 255, 0.8)',
+        textShadow: '0 0 6px rgba(255, 255, 255, 0.4)',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)'
+      }}
+    >
+      {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
+    </span>
+  </div>
+)}
     
     <header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
         backgroundColor: '#000000',

@@ -42,14 +42,15 @@ const [workForm, setWorkForm] = useState({
 
   const [chapters, setChapters] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState(null);
-  const [chapterForm, setChapterForm] = useState({
-    title: '',
-    content: '',
-    author_note: '',
-    chapter_number: '',
-    images: [],
-    audio_files: []
-  });
+const [chapterForm, setChapterForm] = useState({
+  title: '',
+  content: '',
+  author_note: '',
+  chapter_number: '',
+  pages: 0,
+  images: [],
+  audio_files: []
+});
 
   const ADMIN_PASSWORD = 'mellostory2025';
 
@@ -216,9 +217,10 @@ const chapterData = {
   work_id: selectedWork.id,
   title: chapterForm.title.trim(),
   text_blob_url: textBlobUrl,
-  content: null,  // Текст теперь в Blob
+  content: null,
   author_note: chapterForm.author_note.trim(),
   chapter_number: chapterForm.chapter_number,
+  pages: parseInt(chapterForm.pages) || 0,
   images: chapterForm.images,
   audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
   is_published: isPublished
@@ -283,16 +285,17 @@ await loadChapters(selectedWork.id);
     }
   };
 
-  const createNewChapter = () => {
-    setSelectedChapter(null);
-    setChapterForm({
-      title: '',
-      content: '',
-      author_note: '',
-      chapter_number: '',
-      images: [],
-      audio_files: []
-    });
+const createNewChapter = () => {
+  setSelectedChapter(null);
+  setChapterForm({
+    title: '',
+    content: '',
+    author_note: '',
+    chapter_number: '',
+    pages: 0,
+    images: [],
+    audio_files: []
+  });
     if (editorRef.current) {
       editorRef.current.innerHTML = '';
     }
@@ -879,6 +882,19 @@ suppressContentEditableWarning={true}
               )}
             </div>
 
+{/* СТРАНИЦЫ ГЛАВЫ */}
+<div className="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+  <label className="block text-xs sm:text-sm text-gray-400 mb-2">Количество страниц в этой главе</label>
+  <input 
+    type="number" 
+    value={chapterForm.pages} 
+    onChange={(e) => setChapterForm({...chapterForm, pages: e.target.value})} 
+    className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500" 
+    placeholder="Например: 12" 
+    min="0"
+  />
+</div>
+
             <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('chapterImages')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
                 <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Изображения в тексте ({chapterForm.images.length}/5)</h3>
@@ -987,14 +1003,15 @@ suppressContentEditableWarning={true}
     }
   }
   
-  const newForm = {
-    title: chapter.title,
-    content: chapterContent,  // ← ТЕПЕРЬ БЕРЁМ ИЗ BLOB!
-    author_note: chapter.author_note || '',
-    chapter_number: chapter.chapter_number,
-    images: chapter.images || [],
-    audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
-  };
+const newForm = {
+  title: chapter.title,
+  content: chapterContent,
+  author_note: chapter.author_note || '',
+  chapter_number: chapter.chapter_number,
+  pages: chapter.pages || 0,
+  images: chapter.images || [],
+  audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
+};
   setChapterForm(newForm);
   if (editorRef.current) {
     editorRef.current.innerHTML = chapterContent;
