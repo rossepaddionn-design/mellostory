@@ -2248,19 +2248,27 @@ style={{
   </div>
 )}
 
-      {/* FOOTER */}
-      <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
-        <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
-        <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
-          <Link href="/privacy" className="text-sm text-gray-400 hover:text-red-500 transition underline">
-            Политика конфиденциальности
-          </Link>
-          <span className="text-gray-600">•</span>
-          <Link href="/terms" className="text-sm text-gray-400 hover:text-red-500 transition underline">
-            Пользовательское соглашение
-          </Link>
-        </div>
-      </footer>
+{/* FOOTER */}
+<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
+  <p className="text-base sm:text-lg mb-2">MelloStory © 2025</p>
+  <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap px-4">
+    <Link href="/privacy" className="text-sm text-gray-400 hover:text-purple-400 transition underline">
+      Политика конфиденциальности
+    </Link>
+    <span className="text-gray-600">•</span>
+    <Link href="/terms" className="text-sm text-gray-400 hover:text-purple-400 transition underline">
+      Пользовательское соглашение
+    </Link>
+    <span className="text-gray-600">•</span>
+    <Link href="/mission" className="text-sm text-gray-400 hover:text-purple-400 transition underline">
+      Миссия сайта
+    </Link>
+    <span className="text-gray-600">•</span>
+    <Link href="/news" className="text-sm text-gray-400 hover:text-purple-400 transition underline">
+      Новости сайта
+    </Link>
+  </div>
+</footer>
     </div>
     </>
   );

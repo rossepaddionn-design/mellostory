@@ -1,36 +1,53 @@
 'use client';
+import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <div 
-        className="fixed inset-0 -z-10"
-        style={{
-          backgroundImage: 'url(/images/main-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#000'
-        }}
-      />
-<div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <a 
+      <style jsx global>{`
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .shimmer-title {
+          background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmer 3s linear infinite;
+        }
+        .section-title {
+          color: #b48dc4;
+          text-shadow: 0 0 15px rgba(180, 141, 196, 0.6);
+        }
+      `}</style>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        <Link 
           href="/"
-          className="inline-flex items-center gap-2 text-red-500 hover:text-red-400 mb-6 sm:mb-8 transition"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 sm:mb-8 transition"
         >
           <ChevronLeft size={20} />
           Вернуться на главную
-        </a>
+        </Link>
 
-        <div className="bg-gray-900 bg-opacity-95 rounded-2xl p-6 sm:p-10 border-2 border-red-600">
-          <h1 className="text-3xl sm:text-4xl font-bold text-red-500 mb-6 sm:mb-8">
+        <div 
+          className="rounded-2xl p-6 sm:p-10 border-2"
+          style={{ 
+            backgroundColor: '#000000',
+            borderColor: '#9370db',
+            boxShadow: '0 0 30px rgba(147, 112, 219, 0.3)'
+          }}
+        >
+          <h1 className="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 shimmer-title">
             Пользовательское соглашение
           </h1>
 
           <div className="space-y-6 text-gray-300 text-sm sm:text-base leading-relaxed">
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">1. Общие положения</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">1. Общие положения</h2>
               <p>
                 Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует порядок использования веб-сайта <strong>MelloStory</strong> (далее — «Сайт») и определяет права и обязанности пользователей.
               </p>
@@ -49,7 +66,7 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">2. Возрастное ограничение (18+)</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">2. Возрастное ограничение (18+)</h2>
               <p>
                 Сайт содержит контент для взрослых (18+), включая сцены насилия, откровенные сексуальные описания и другие материалы, не предназначенные для несовершеннолетних.
               </p>
@@ -69,12 +86,12 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">3. Характер контента и художественный вымысел</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">3. Характер контента и художественный вымысел</h2>
               <p>
                 <strong>Все материалы, размещённые на Сайте, являются художественным вымыслом и не преследуют целей пропаганды.</strong>
               </p>
               
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.1. Художественная литература</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.1. Художественная литература</h3>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
                 <li>Все произведения на Сайте являются <strong>художественным вымыслом</strong> и созданы исключительно в развлекательных и творческих целях.</li>
                 <li>Сайт <strong>не пропагандирует</strong> насилие, противоправное поведение, употребление наркотиков, алкоголя или какие-либо иные действия, запрещённые законодательством РФ или Германии.</li>
@@ -82,14 +99,14 @@ export default function TermsOfService() {
                 <li>Сайт не содержит инструкций, руководств или материалов, направленных на совершение противоправных действий.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.2. Возраст персонажей</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.2. Возраст персонажей</h3>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
                 <li><strong>Все персонажи, участвующие в сексуальных, романтических или откровенных сценах, являются совершеннолетними (18+).</strong></li>
                 <li>Произведения не содержат описаний сексуального характера с участием несовершеннолетних лиц.</li>
                 <li>В случаях, когда персонажи изначально являются несовершеннолетними в исходном произведении (канон), в текстах на данном Сайте они изображаются взрослыми (возраст 18+).</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.3. Тематика произведений</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.3. Тематика произведений</h3>
               <p>
                 Произведения на Сайте могут содержать описания:
               </p>
@@ -102,7 +119,7 @@ export default function TermsOfService() {
                 <strong>Важно:</strong> Все вышеперечисленные элементы представлены исключительно как часть художественного вымысла и не являются призывом к действию, идеологией или формой пропаганды.
               </p>
 
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.4. Отсутствие пропаганды</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.4. Отсутствие пропаганды</h3>
               <p>
                 Сайт <strong>не осуществляет пропаганду</strong> следующего:
               </p>
@@ -119,31 +136,29 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">3. Права и обязанности пользователей</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">4. Права и обязанности пользователей</h2>
               
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.1. Пользователь имеет право:</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">4.1. Пользователь имеет право:</h3>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>Читать литературные произведения, размещённые на Сайте.</li>
-                <li>Оставлять комментарии к главам произведений.</li>
                 <li>Оценивать работы (ставить оценки от 1 до 10).</li>
                 <li>Отправлять сообщения администрации Сайта.</li>
                 <li>Удалить свою учётную запись в любой момент.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">3.2. Пользователь обязуется:</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">4.2. Пользователь обязуется:</h3>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>Не использовать Сайт в незаконных целях.</li>
-                <li>Не публиковать оскорбительные, дискриминационные, угрожающие или иные противоправные комментарии.</li>
                 <li>Не размещать спам, рекламу, ссылки на сторонние ресурсы без разрешения администрации.</li>
                 <li>Не пытаться получить несанкционированный доступ к данным других пользователей или системам Сайта.</li>
                 <li>Не использовать автоматизированные средства (боты, скрипты) для взаимодействия с Сайтом без разрешения.</li>
                 <li>Соблюдать нормы этики и уважительно относиться к другим пользователям и администрации.</li>
-                <li>Не нарушать авторские права, изложенные в разделе 6 настоящего Соглашения.</li>
+                <li>Не нарушать авторские права, изложенные в разделе 7 настоящего Соглашения.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">4. Запрещённые действия</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">5. Запрещённые действия</h2>
               <p>Пользователю строго запрещается:</p>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
                 <li>Публиковать контент, содержащий детскую порнографию, экстремизм, терроризм, пропаганду насилия, разжигание национальной, расовой или религиозной розни.</li>
@@ -159,27 +174,25 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">5. Права администрации</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">6. Права администрации</h2>
               <p>Администрация Сайта оставляет за собой право:</p>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Модерировать и удалять комментарии, нарушающие настоящее Соглашение.</li>
                 <li>Заблокировать или удалить учётную запись пользователя при нарушении правил без предварительного уведомления.</li>
                 <li>Изменять функциональность, дизайн и структуру Сайта без предварительного уведомления.</li>
                 <li>Приостановить работу Сайта для проведения технических работ, обновлений или по иным причинам.</li>
                 <li>Изменять настоящее Соглашение. Новая версия вступает в силу с момента публикации на Сайте.</li>
-                <li>Передавать данные пользователей компетентным органам при получении официального запроса в соответствии с законодательством.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">6. Интеллектуальная собственность и авторские права</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">7. Интеллектуальная собственность и авторские права</h2>
               
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">6.1. Правообладание</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.1. Правообладание</h3>
               <p>
                 Все литературные произведения, тексты, обложки, изображения персонажей, графический контент, аудиоматериалы и иные материалы, размещённые на Сайте, являются объектами авторского права и принадлежат исключительно администрации Сайта <strong>MelloStory</strong>.
               </p>
               
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">6.2. Строго запрещается без письменного согласия правообладателя:</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.2. Строго запрещается без письменного согласия правообладателя:</h3>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
                 <li><strong>Копирование и воспроизведение:</strong> Копировать тексты, обложки, изображения или иной контент Сайта полностью или частично.</li>
                 <li><strong>Публикация в социальных сетях:</strong> Размещать произведения, обложки, иллюстрации или цитаты из произведений в социальных сетях (включая, но не ограничиваясь: ВКонтакте, Telegram, Instagram, TikTok, YouTube, Twitter/X, Facebook).</li>
@@ -189,15 +202,15 @@ export default function TermsOfService() {
                 <li><strong>Создание производных работ:</strong> Создавать адаптации, переработки, ремиксы или иные производные произведения на основе контента Сайта.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">6.3. Получение разрешения</h3>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.3. Получение разрешения</h3>
               <p>
-                Для получения письменного разрешения на использование любого контента Сайта необходимо направить официальный запрос на электронный адрес: <a href="mailto:mellostory@protonmail.com" className="text-red-500 hover:text-red-400 underline">mellostory@protonmail.com</a>
+                Для получения письменного разрешения на использование любого контента Сайта необходимо направить официальный запрос на электронный адрес: <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>
               </p>
               <p className="mt-2">
                 В запросе необходимо указать:
               </p>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Ваши контактные данные (имя, email, телефон)</li>
+                <li>Ваши контактные данные (имя и email)</li>
                 <li>Название произведения или конкретного контента</li>
                 <li>Цель и способ использования (социальная сеть, видео, статья и т.д.)</li>
                 <li>Планируемые сроки использования</li>
@@ -206,30 +219,27 @@ export default function TermsOfService() {
                 Администрация рассматривает запросы в течение 14 рабочих дней. Отсутствие ответа <strong>не является</strong> разрешением на использование.
               </p>
 
-<h3 className="text-lg font-semibold text-red-300 mt-4 mb-2">6.4. Юридическая ответственность за нарушение авторских прав</h3>
-<p>
-  Несанкционированное использование контента Сайта является нарушением авторских прав и влечёт ответственность в соответствии с:
-</p>
-<ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-  <li><strong>Гражданским кодексом РФ</strong> (статьи 1252-1253) — защита исключительных прав и взыскание компенсации</li>
-  <li><strong>Законодательством Германии</strong> (Urheberrechtsgesetz) — возмещение убытков и запретительные меры</li>
-  <li><strong>Международными соглашениями</strong> — Бернская конвенция об охране литературных и художественных произведений</li>
-</ul>
-<p className="mt-2">
-  Администрация оставляет за собой право обращаться в суд для защиты авторских прав и взыскания причинённого ущерба.
-</p>
+              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.4. Юридическая ответственность за нарушение авторских прав</h3>
+              <p>
+                Несанкционированное использование контента Сайта является нарушением авторских прав и влечёт ответственность в соответствии с:
+              </p>
+              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
+                <li><strong>Гражданским кодексом РФ</strong> (статьи 1252-1253) — защита исключительных прав и взыскание компенсации</li>
+                <li><strong>Законодательством Германии</strong> (Urheberrechtsgesetz) — возмещение убытков и запретительные меры</li>
+                <li><strong>Международными соглашениями</strong> — Бернская конвенция об охране литературных и художественных произведений</li>
+              </ul>
+              <p className="mt-2">
+                Администрация оставляет за собой право обращаться в суд для защиты авторских прав и взыскания причинённого ущерба.
+              </p>
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">7. Ограничение ответственности</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">8. Ограничение ответственности</h2>
               <p>
                 Администрация Сайта не несёт ответственности за:
               </p>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Содержание комментариев, оставленных пользователями. Каждый пользователь несёт личную ответственность за свои высказывания в соответствии с законодательством РФ и Германии.</li>
-                <li>Технические сбои, потерю данных, временную недоступность Сайта по причинам, не зависящим от администрации.</li>
-                <li>Действия третьих лиц (взлом аккаунтов, DDoS-атаки, распространение вредоносного ПО и т.д.).</li>
-                <li>Материальный, моральный или иной ущерб, причинённый использованием или невозможностью использования Сайта.</li>
+                <li>Моральный или иной ущерб, причинённый использованием или невозможностью использования Сайта.</li>
                 <li>Точность, актуальность и полноту информации, размещённой пользователями.</li>
               </ul>
               <p className="mt-2">
@@ -238,13 +248,13 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">8. Блокировка пользователей</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">9. Блокировка пользователей</h2>
               <p>
                 Учётная запись пользователя может быть заблокирована без предварительного предупреждения в следующих случаях:
               </p>
               <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Нарушение правил, указанных в разделе 4 (Запрещённые действия).</li>
-                <li>Нарушение авторских прав (раздел 6).</li>
+                <li>Нарушение правил, указанных в разделе 5 (Запрещённые действия).</li>
+                <li>Нарушение авторских прав (раздел 7).</li>
                 <li>Систематические оскорбления других пользователей или администрации.</li>
                 <li>Попытки взлома, DDoS-атак или иного вредоносного воздействия на Сайт.</li>
                 <li>Использование нескольких аккаунтов для обхода блокировки (мультиаккаунтинг).</li>
@@ -252,12 +262,12 @@ export default function TermsOfService() {
                 <li>Предоставление заведомо ложных данных при регистрации.</li>
               </ul>
               <p className="mt-2">
-                Заблокированный пользователь может обратиться к администрации для уточнения причин блокировки по адресу <a href="mailto:mellostory@protonmail.com" className="text-red-500 hover:text-red-400 underline">mellostory@protonmail.com</a>, однако восстановление доступа не гарантируется и остаётся на усмотрение администрации.
+                Заблокированный пользователь может обратиться к администрации для уточнения причин блокировки по адресу <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>, однако восстановление доступа не гарантируется и остаётся на усмотрение администрации.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">9. Применимое право и разрешение споров</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">10. Применимое право и разрешение споров</h2>
               <p>
                 Настоящее Соглашение регулируется и толкуется в соответствии с законодательством Федеративной Республики Германия.
               </p>
@@ -270,7 +280,7 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">10. Изменения в Соглашении</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">11. Изменения в Соглашении</h2>
               <p>
                 Администрация оставляет за собой право вносить изменения в настоящее Соглашение в любое время. Новая версия вступает в силу с момента её публикации на Сайте.
               </p>
@@ -283,12 +293,12 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-3">11. Контактная информация</h2>
+              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">12. Контактная информация</h2>
               <p>
                 По всем вопросам, связанным с использованием Сайта, авторскими правами, блокировкой учётных записей или получением разрешений на использование контента, вы можете связаться с администрацией:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> <a href="mailto:mellostory@protonmail.com" className="text-red-500 hover:text-red-400 underline">mellostory@protonmail.com</a>
+                <strong>Email:</strong> <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>
               </p>
               <p className="mt-2">
                 Ответы на запросы предоставляются в течение 14 рабочих дней.
