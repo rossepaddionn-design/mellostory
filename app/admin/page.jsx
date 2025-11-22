@@ -267,14 +267,15 @@ if (isPublished && !selectedChapter) {
 
 await loadChapters(selectedWork.id);
       setSelectedChapter(null);
-      setChapterForm({
-        title: '',
-        content: '',
-        author_note: '',
-        chapter_number: '',
-        images: [],
-        audio_files: []
-      });
+setChapterForm({
+  title: '',
+  content: '',
+  author_note: '',
+  chapter_number: '',
+  pages: 0,
+  images: [],
+  audio_files: []
+});
       if (editorRef.current) {
         editorRef.current.innerHTML = '';
       }
