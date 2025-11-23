@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronDown, ChevronUp, BookOpen, Clock, AlertTriangle, Image as ImageIcon, ChevronRight, Star, X } from 'lucide-react';
+import GenreTag from '@/lib/components/work/GenrePopup';
 
 export default function WorkPage() {
   const params = useParams();
@@ -327,66 +328,97 @@ const submitRating = async (rating) => {
             </div>
 
             {/* ЖАНРЫ */}
-            {work.genres && work.genres.length > 0 && (
-              <div className="mb-3 sm:mb-4">
-                <span className="text-gray-400 text-xs sm:text-sm">{t.genres}: </span>
-                <span className="text-gray-200 text-xs sm:text-sm break-words">{Array.isArray(work.genres) ? work.genres.join(', ') : work.genres}</span>
-              </div>
-            )}
+{work.genres && (Array.isArray(work.genres) ? work.genres.length > 0 : work.genres.trim().length > 0) && (
+  <div className="mb-3 sm:mb-4">
+    <span className="text-gray-400 text-xs sm:text-sm">{t.genres}: </span>
+    <span className="text-xs sm:text-sm">
+      {(Array.isArray(work.genres) ? work.genres : work.genres.split(',')).map((genre, i, arr) => {
+        const trimmedGenre = genre.trim();
+        if (!trimmedGenre) return null;
+        return (
+          <span key={i}>
+            <GenreTag name={trimmedGenre} />
+            {i < arr.length - 1 && ', '}
+          </span>
+        );
+      })}
+    </span>
+  </div>
+)}
 
             {/* ТЕГИ */}
-            {work.tags && work.tags.length > 0 && (
-              <div className="mb-3 sm:mb-4">
-                <span className="text-gray-400 text-xs sm:text-sm">{t.tags}: </span>
-                <span className="text-gray-200 text-xs sm:text-sm break-words">{Array.isArray(work.tags) ? work.tags.join(', ') : work.tags}</span>
-              </div>
-            )}
+{work.tags && (Array.isArray(work.tags) ? work.tags.length > 0 : work.tags.trim().length > 0) && (
+  <div className="mb-3 sm:mb-4">
+    <span className="text-gray-400 text-xs sm:text-sm">{t.tags}: </span>
+    <span className="text-xs sm:text-sm">
+      {(Array.isArray(work.tags) ? work.tags : work.tags.split(',')).map((tag, i, arr) => {
+        const trimmedTag = tag.trim();
+        if (!trimmedTag) return null;
+        return (
+          <span key={i}>
+            <GenreTag name={trimmedTag} />
+            {i < arr.length - 1 && ', '}
+          </span>
+        );
+      })}
+    </span>
+  </div>
+)}
 
-            {/* СПОЙЛЕРНЫЕ МЕТКИ */}
-            {spoilerTagsArray.length > 0 && (
-              <div className="mb-4 sm:mb-6">
-                <style dangerouslySetInnerHTML={{__html: `
-                  @keyframes shimmer-white {
-                    0% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
-                    50% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3); }
-                    100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
-                  }
-                `}} />
-                <button
-                  onClick={() => setShowSpoilers(!showSpoilers)}
-                  className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left border-2" style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderColor: '#ffffff',
-                    color: '#ffffff',
-                    boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)',
-                    animation: 'shimmer-white 2s ease-in-out infinite'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                    e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.boxShadow = '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)';
-                  }}
-                >
-                  <span className="text-xs sm:text-sm font-medium flex items-center gap-2">
-                    <AlertTriangle size={14} className="sm:w-4 sm:h-4" />
-                    {t.spoilerTags}
-                  </span>
-                  {showSpoilers ? <ChevronUp size={16} className="sm:w-5 sm:h-5" /> : <ChevronDown size={16} className="sm:w-5 sm:h-5" />}
-                </button>
-                
-                {showSpoilers && (
-                  <div className="mt-2 px-3 py-2 text-gray-300 text-xs sm:text-sm rounded break-words" style={{
-                    backgroundColor: '#000000',
-                    border: '1px solid #333'
-                  }}>
-                    {spoilerTagsArray.join(', ')}
-                  </div>
-                )}
-              </div>
-            )}
+{/* СПОЙЛЕРНЫЕ МЕТКИ */}
+{spoilerTagsArray.length > 0 && (
+  <div className="mb-4 sm:mb-6">
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes shimmer-white {
+        0% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
+        50% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3); }
+        100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
+      }
+    `}} />
+    <button
+      onClick={() => setShowSpoilers(!showSpoilers)}
+      className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left border-2" style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: '#ffffff',
+        color: '#ffffff',
+        boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)',
+        animation: 'shimmer-white 2s ease-in-out infinite'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        e.currentTarget.style.boxShadow = '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)';
+      }}
+    >
+      <span className="text-xs sm:text-sm font-medium flex items-center gap-2">
+        <AlertTriangle size={14} className="sm:w-4 sm:h-4" />
+        {t.spoilerTags}
+      </span>
+      {showSpoilers ? <ChevronUp size={16} className="sm:w-5 sm:h-5" /> : <ChevronDown size={16} className="sm:w-5 sm:h-5" />}
+    </button>
+    
+ {showSpoilers && (
+  <div className="mt-2 px-3 py-2 text-xs sm:text-sm rounded" style={{
+    backgroundColor: '#000000',
+    border: '1px solid #333'
+  }}>
+    {spoilerTagsArray.map((spoiler, i, arr) => {
+      const trimmedSpoiler = spoiler.trim();
+      if (!trimmedSpoiler) return null;
+      return (
+        <span key={i}>
+          <GenreTag name={trimmedSpoiler} />
+          {i < arr.length - 1 && ', '}
+        </span>
+      );
+    })}
+  </div>
+)}
+  </div>
+)}
 
             {/* ПРОЧТЕНИЯ И ОЦЕНКА */}
             <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">

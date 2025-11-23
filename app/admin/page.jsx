@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { uploadChapterText, deleteChapterText } from '@/lib/blobStorage';
 import { Save, Upload, Trash2, Plus, Bold, Italic, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, Music, HelpCircle, X, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import GenreAutocomplete from '@/lib/components/admin/GenreAutocomplete';
 
 export default function AdminPanel() {
   const [password, setPassword] = useState('');
@@ -132,9 +133,9 @@ const workData = {
   pairing: workForm.pairing ? workForm.pairing.trim() : null,
   description: workForm.description.trim(),
   author_note: workForm.author_note.trim(),
-  genres: workForm.genres ? workForm.genres.split(',').map(s => s.trim()).filter(s => s) : [],
-  tags: workForm.tags ? workForm.tags.split(',').map(s => s.trim()).filter(s => s) : [],
-  spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.split(',').map(s => s.trim()).filter(s => s) : [],
+  genres: workForm.genres ? workForm.genres.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
+  tags: workForm.tags ? workForm.tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
+  spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
   character_images: workForm.character_images || [],
   cover_url: workForm.cover_image,
   is_draft: isDraft
@@ -683,9 +684,23 @@ setWorkForm({
 
                       <input value={workForm.fandom} onChange={(e) => setWorkForm({...workForm, fandom: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Фандом" />
                       <input value={workForm.pairing} onChange={(e) => setWorkForm({...workForm, pairing: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Пейринг" />
-                      <input value={workForm.genres} onChange={(e) => setWorkForm({...workForm, genres: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Жанры (через запятую)" />
-                      <input value={workForm.tags} onChange={(e) => setWorkForm({...workForm, tags: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Теги (через запятую)" />
-                      <input value={workForm.spoiler_tags} onChange={(e) => setWorkForm({...workForm, spoiler_tags: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Спойлеры (через запятую)" />
+<GenreAutocomplete 
+  value={workForm.genres} 
+  onChange={(val) => setWorkForm({...workForm, genres: val})} 
+  placeholder="Жанры (начните вводить...)" 
+/>
+
+<GenreAutocomplete 
+  value={workForm.tags} 
+  onChange={(val) => setWorkForm({...workForm, tags: val})} 
+  placeholder="Теги (начните вводить...)" 
+/>
+
+<GenreAutocomplete 
+  value={workForm.spoiler_tags} 
+  onChange={(val) => setWorkForm({...workForm, spoiler_tags: val})} 
+  placeholder="Спойлеры (начните вводить...)" 
+/>
                       <textarea value={workForm.description} onChange={(e) => setWorkForm({...workForm, description: e.target.value})} rows={4} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Описание" />
                       <textarea value={workForm.author_note} onChange={(e) => setWorkForm({...workForm, author_note: e.target.value})} rows={2} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Примечание автора" />
                     </div>
