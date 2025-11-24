@@ -385,7 +385,7 @@ const createNewChapter = () => {
 
   const handleImageUpload = (e, target) => {
     const files = Array.from(e.target.files || []);
-    const maxImages = target === 'work' ? 20 : 5;
+    const maxImages = target === 'work' ? 20 : 10;
 
     if (files.length > maxImages) {
       alert(`Максимум ${maxImages} изображений!`);
@@ -403,7 +403,7 @@ const createNewChapter = () => {
         } else if (target === 'chapter') {
           setChapterForm(prev => ({
             ...prev,
-            images: [...prev.images, event.target.result].slice(0, 5)
+            images: [...prev.images, event.target.result].slice(0, 10)
           }));
         }
       };
@@ -913,7 +913,7 @@ suppressContentEditableWarning={true}
 
             <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('chapterImages')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Изображения в тексте ({chapterForm.images.length}/5)</h3>
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Изображения в тексте ({chapterForm.images.length}/10)</h3>
                 {sectionsExpanded.chapterImages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
               
