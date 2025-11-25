@@ -1,11 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getCachedChapterText, prefetchNextChapter } from '@/lib/chapterCache';
 import { useParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Menu, X, Music } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X, Music, Image as ImageIcon } from 'lucide-react';
 
 export default function ChapterPage() {
   const params = useParams();
@@ -22,6 +22,19 @@ export default function ChapterPage() {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
 const [readProgress, setReadProgress] = useState(0);
+
+const carouselRef = useRef(null);
+
+const scrollCharacterCarousel = (direction) => {
+  if (!carouselRef.current) return;
+  
+  const scrollAmount = 200;
+  if (direction === 'left') {
+    carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  } else {
+    carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+};
 
   const t = {
     backToWork: 'К описанию работы',
@@ -706,36 +719,72 @@ return (
         </div>
 
 {chapter.images && chapter.images.length > 0 && (
-  <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
-    borderColor: '#9333ea',
-    boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
-  }}>
-    <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
-      color: '#7626b5',
-      textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
-    }}>{t.images}</h3>
+  <div className="mb-4 sm:mb-6">
+    <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
+      <ImageIcon size={18} className="sm:w-5 sm:h-5" />
+      {t.images}
+    </h3>
     
     <div className="relative">
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-      }}>
-        {chapter.images.map((img, i) => (
-          <div key={i} className="flex-shrink-0 w-[280px] sm:w-[320px] snap-center">
-            <div className="rounded-lg overflow-hidden border-2 border-purple-500 shadow-lg" style={{
-              boxShadow: '0 0 15px rgba(147, 51, 234, 0.5)'
-            }}>
-              <img src={img} alt={`Image ${i + 1}`} className="w-full h-[420px] sm:h-[480px] object-cover" loading="lazy" />
-            </div>
+      <div 
+        ref={carouselRef}
+        className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-8 sm:px-10"
+        style={{ scrollbarWidth: 'thin' }}
+      >
+        {chapter.images.map((img, index) => (
+          <div 
+            key={index} 
+            className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+            style={{
+              borderColor: '#7626b5',
+              boxShadow: '0 0 10px rgba(118, 38, 181, 0.5)'
+            }}
+          >
+            <img src={img} alt={`Image ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
           </div>
         ))}
       </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
+
+      {chapter.images.length > 1 && (
+        <>
+<button
+  onClick={() => scrollCharacterCarousel('left')}
+  className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: '#7626b5',
+              boxShadow: '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#8b34d9';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#7626b5';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)';
+            }}
+          >
+            <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+          </button>
+     <button
+  onClick={() => scrollCharacterCarousel('right')}
+  className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: '#7626b5',
+              boxShadow: '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#8b34d9';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#7626b5';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)';
+            }}
+          >
+            <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+          </button>
+        </>
+      )}
     </div>
   </div>
 )}
