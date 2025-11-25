@@ -181,23 +181,24 @@ if (!isDraft && !selectedWork.id) {
     }
   };
 
- const saveChapter = async (isPublished) => {
+const saveChapter = async (isPublished) => {
     if (!selectedWork || selectedWork.isNew || !selectedWork.id) {
       alert('Сначала сохраните работу!');
       return;
     }
 
-if (!chapterForm.title.trim()) {
-  alert('Заполните название главы!');
-  return;
-}
+    if (!chapterForm.title.trim()) {
+      alert('Заполните название главы!');
+      return;
+    }
 
-// Проверяем текст из редактора напрямую
-const editorContent = editorRef.current?.innerHTML || '';
-if (!editorContent.trim()) {
-  alert('Заполните текст главы!');
-  return;
-}
+    // КРИТИЧНО: берём текст из редактора В МОМЕНТ СОХРАНЕНИЯ
+    const currentEditorContent = editorRef.current?.innerHTML || '';
+    
+    if (!currentEditorContent.trim()) {
+      alert('Заполните текст главы!');
+      return;
+    }
 
     if (!chapterForm.chapter_number || chapterForm.chapter_number.toString().trim() === '') {
       alert('Укажите номер главы!');
@@ -206,28 +207,28 @@ if (!editorContent.trim()) {
 
     setLoading(true);
 
-// 1. Загружаем текст в Blob (editorContent уже объявлен выше)
-const textBlobUrl = await uploadChapterText(
-  selectedWork.id, 
-  chapterForm.chapter_number, 
-  editorContent  // ← Используем уже существующую переменную
-);
-
-// 3. Создаём данные главы
-const chapterData = {
-  work_id: selectedWork.id,
-  title: chapterForm.title.trim(),
-  text_blob_url: textBlobUrl,
-  content: null,
-  author_note: chapterForm.author_note.trim(),
-  chapter_number: chapterForm.chapter_number,
-  pages: parseInt(chapterForm.pages) || 0,
-  images: chapterForm.images,
-  audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
-  is_published: isPublished
-};
-
     try {
+      // 1. Загружаем текст в Blob (используем текст из редактора)
+      const textBlobUrl = await uploadChapterText(
+        selectedWork.id, 
+        chapterForm.chapter_number, 
+        currentEditorContent  // ← Используем актуальный текст из редактора
+      );
+
+      // 2. Создаём данные главы
+      const chapterData = {
+        work_id: selectedWork.id,
+        title: chapterForm.title.trim(),
+        text_blob_url: textBlobUrl,
+        content: null,
+        author_note: chapterForm.author_note.trim(),
+        chapter_number: chapterForm.chapter_number,
+        pages: parseInt(chapterForm.pages) || 0,
+        images: chapterForm.images,
+        audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
+        is_published: isPublished
+      };
+
       let result;
       if (selectedChapter) {
         result = await supabase
@@ -243,16 +244,17 @@ const chapterData = {
       }
 
       if (result.error) throw result.error;
+
       // Добавляем обновление о новой главе
-if (isPublished && !selectedChapter) {
-  await supabase.from('site_updates').insert({
-    work_id: selectedWork.id,
-    work_title: workForm.title,
-    chapter_number: chapterData.chapter_number,
-    chapter_title: chapterData.title,
-    type: 'new_chapter'
-  });
-}
+      if (isPublished && !selectedChapter) {
+        await supabase.from('site_updates').insert({
+          work_id: selectedWork.id,
+          work_title: workForm.title,
+          chapter_number: chapterData.chapter_number,
+          chapter_title: chapterData.title,
+          type: 'new_chapter'
+        });
+      }
 
       if (isPublished && selectedWork.is_draft) {
         await supabase
@@ -266,17 +268,18 @@ if (isPublished && !selectedChapter) {
         alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
       }
 
-await loadChapters(selectedWork.id);
+      await loadChapters(selectedWork.id);
       setSelectedChapter(null);
-setChapterForm({
-  title: '',
-  content: '',
-  author_note: '',
-  chapter_number: '',
-  pages: 0,
-  images: [],
-  audio_files: []
-});
+      setChapterForm({
+        title: '',
+        content: '',
+        author_note: '',
+        chapter_number: '',
+        pages: 0,
+        images: [],
+        audio_files: []
+      });
+      
       if (editorRef.current) {
         editorRef.current.innerHTML = '';
       }
