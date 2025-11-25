@@ -705,24 +705,40 @@ return (
           />
         </div>
 
-        {chapter.images && chapter.images.length > 0 && (
-          <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
-            borderColor: '#9333ea',
-            boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
-          }}>
-            <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
-              color: '#7626b5',
-              textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
-            }}>{t.images}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {chapter.images.map((img, i) => (
-                <div key={i} className="rounded-lg overflow-hidden border-2 border-gray-700">
-                  <img src={img} alt={`Image ${i + 1}`} className="w-full h-auto" loading="lazy" />
-                </div>
-              ))}
+{chapter.images && chapter.images.length > 0 && (
+  <div className="bg-black rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
+    borderColor: '#9333ea',
+    boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
+  }}>
+    <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
+      color: '#7626b5',
+      textShadow: '0 0 10px rgba(118, 38, 181, 0.8)'
+    }}>{t.images}</h3>
+    
+    <div className="relative">
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}>
+        {chapter.images.map((img, i) => (
+          <div key={i} className="flex-shrink-0 w-[280px] sm:w-[320px] snap-center">
+            <div className="rounded-lg overflow-hidden border-2 border-purple-500 shadow-lg" style={{
+              boxShadow: '0 0 15px rgba(147, 51, 234, 0.5)'
+            }}>
+              <img src={img} alt={`Image ${i + 1}`} className="w-full h-[420px] sm:h-[480px] object-cover" loading="lazy" />
             </div>
           </div>
-        )}
+        ))}
+      </div>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}} />
+    </div>
+  </div>
+)}
 
         {chapter.author_note && (
           <div className="bg-black rounded-lg p-4 sm:p-6 mb-6 sm:mb-8" style={{
