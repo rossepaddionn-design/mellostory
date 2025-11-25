@@ -65,13 +65,6 @@ const [chapterForm, setChapterForm] = useState({
     }
   }, [isAuth]);
 
-  // СИНХРОНИЗАЦИЯ РЕДАКТОРА С СОДЕРЖИМЫМ ГЛАВЫ
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = chapterForm.content || '';
-    }
-  }, [selectedChapter?.id]);
-
   const loadWorks = async () => {
     try {
       setLoading(true);
@@ -192,27 +185,23 @@ const saveChapter = async (isPublished) => {
       return;
     }
 
-    // КРИТИЧНО: берём текст из редактора В МОМЕНТ СОХРАНЕНИЯ
-    const currentEditorContent = editorRef.current?.innerHTML || '';
-    
-    if (!currentEditorContent.trim()) {
-      alert('Заполните текст главы!');
-      return;
-    }
+// КРИТИЧНО: берём текст ПРЯМО из редактора прямо сейчас
+const currentEditorContent = editorRef.current?.innerHTML?.trim() || '';
+console.log('💾 Сохраняем текст:', currentEditorContent.substring(0, 100));
 
-    if (!chapterForm.chapter_number || chapterForm.chapter_number.toString().trim() === '') {
-      alert('Укажите номер главы!');
-      return;
-    }
+if (!currentEditorContent) {
+  alert('Заполните текст главы!');
+  return;
+}
 
     setLoading(true);
 
     try {
-      // 1. Загружаем текст в Blob (используем текст из редактора)
+      // 1. Загружаем текст в Blob
       const textBlobUrl = await uploadChapterText(
         selectedWork.id, 
         chapterForm.chapter_number, 
-        currentEditorContent  // ← Используем актуальный текст из редактора
+        currentEditorContent
       );
 
       // 2. Создаём данные главы
@@ -268,21 +257,12 @@ const saveChapter = async (isPublished) => {
         alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
       }
 
+      // ОБНОВЛЯЕМ список глав и оставляем текущую главу открытой
       await loadChapters(selectedWork.id);
-      setSelectedChapter(null);
-      setChapterForm({
-        title: '',
-        content: '',
-        author_note: '',
-        chapter_number: '',
-        pages: 0,
-        images: [],
-        audio_files: []
-      });
       
-      if (editorRef.current) {
-        editorRef.current.innerHTML = '';
-      }
+      // ВАЖНО: НЕ очищаем форму и редактор - оставляем отредактированную главу
+      // Пользователь сам выберет другую главу или нажмёт "Новая глава"
+      
     } catch (err) {
       alert('Ошибка: ' + err.message);
     } finally {
@@ -830,50 +810,38 @@ setWorkForm({
 </button>
                   </div>
 
-                  <div 
-                    ref={editorRef}
-                    contentEditable
-onPaste={(e) => {
-  e.preventDefault();
-  
-  // Получаем ТОЛЬКО текст без форматирования
-  const text = e.clipboardData.getData('text/plain');
-  
-  // Разбиваем на строки
-  const lines = text.split('\n');
-  
-  // Создаём HTML с <br> между строками
-  const cleanHTML = lines.join('<br>');
-  
-  // Вставляем через execCommand
-  document.execCommand('insertHTML', false, cleanHTML);
-  
-  // Обновляем состояние
-  if (editorRef.current) {
-    setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
-  }
-}}
-onKeyDown={(e) => {
-  if (e.key === 'Enter') {
+ <div 
+  ref={editorRef}
+  contentEditable
+  onInput={(e) => {
+    // КРИТИЧНО: Обновляем форму при КАЖДОМ изменении в редакторе
+    const currentContent = e.currentTarget.innerHTML;
+    setChapterForm(prev => ({...prev, content: currentContent}));
+    console.log('✍️ Изменили текст:', currentContent.substring(0, 100));
+  }}
+  onPaste={(e) => {
     e.preventDefault();
-    document.execCommand('insertHTML', false, '<br><br>');
-  }
-}}
-onBlur={() => {
-  if (editorRef.current) {
-    setChapterForm({...chapterForm, content: editorRef.current.innerHTML});
-  }
-}}
-className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-white mb-4 overflow-auto"
-style={{ 
-  fontSize: '16px',
-  lineHeight: '1.8',
-  whiteSpace: 'pre-wrap',
-  wordWrap: 'break-word',
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  textAlign: 'left'
-}}
-suppressContentEditableWarning={true}
+    const text = e.clipboardData.getData('text/plain');
+    const lines = text.split('\n');
+    const cleanHTML = lines.join('<br>');
+    document.execCommand('insertHTML', false, cleanHTML);
+  }}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.execCommand('insertHTML', false, '<br><br>');
+    }
+  }}
+  className="min-h-[300px] sm:min-h-[400px] w-full bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 focus:border-red-600 focus:outline-none text-white mb-4 overflow-auto"
+  style={{ 
+    fontSize: '16px',
+    lineHeight: '1.8',
+    whiteSpace: 'pre-wrap',
+    wordWrap: 'break-word',
+    fontFamily: 'Georgia, "Times New Roman", serif',
+    textAlign: 'left'
+  }}
+  suppressContentEditableWarning={true}
 />
 
                   <div className="mb-4">
@@ -1009,8 +977,6 @@ suppressContentEditableWarning={true}
                             </div>
                             <div className="flex gap-2 w-full sm:w-auto">
 <button onClick={async () => {
-  setSelectedChapter(chapter);
-  
   // ЗАГРУЖАЕМ ТЕКСТ ИЗ BLOB ЕСЛИ ЕСТЬ
   let chapterContent = chapter.content || '';
   if (chapter.text_blob_url) {
@@ -1022,24 +988,40 @@ suppressContentEditableWarning={true}
     }
   }
   
-const newForm = {
-  title: chapter.title,
-  content: chapterContent,
-  author_note: chapter.author_note || '',
-  chapter_number: chapter.chapter_number,
-  pages: chapter.pages || 0,
-  images: chapter.images || [],
-  audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
-};
-  setChapterForm(newForm);
-  if (editorRef.current) {
-    editorRef.current.innerHTML = chapterContent;
+  if (chapter.text_blob_url) {
+  try {
+    const response = await fetch(chapter.text_blob_url);
+    chapterContent = await response.text();
+    console.log('📥 Загрузили из Blob:', chapterContent.substring(0, 100));
+  } catch (error) {
+    console.error('Ошибка загрузки текста:', error);
   }
+}
+  // СНАЧАЛА устанавливаем форму с загруженным текстом
+  setChapterForm({
+    title: chapter.title,
+    content: chapterContent,  // ← Сохраняем текст в форму!
+    author_note: chapter.author_note || '',
+    chapter_number: chapter.chapter_number,
+    pages: chapter.pages || 0,
+    images: chapter.images || [],
+    audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
+  });
+  
+  // ПОТОМ устанавливаем selectedChapter
+  setSelectedChapter(chapter);
+  
+  // И ТОЛЬКО ПОСЛЕ этого заполняем редактор
+if (editorRef.current) {
+  editorRef.current.innerHTML = chapterContent;
+  console.log('✏️ Вставили в редактор:', editorRef.current.innerHTML.substring(0, 100));
+}
+  
   setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition">
-                                Редактировать
-                              </button>
+  Редактировать
+</button>
                               <button onClick={() => deleteChapter(chapter.id)} className="bg-red-900 hover:bg-red-800 p-2 rounded-lg transition">
                                 <Trash2 size={16} className="sm:w-5 sm:h-5" />
                               </button>
