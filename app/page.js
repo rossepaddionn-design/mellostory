@@ -1573,7 +1573,7 @@ style={{
 onMouseEnter={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 onMouseLeave={(e) => e.currentTarget.style.borderColor = update.type === 'new_work' ? '#8b3cc8' : '#333'}
                 onClick={async () => {
-                  await supabase.from('site_updates').delete().eq('id', update.id);
+
                   loadSiteUpdates();
                   window.location.href = `/work/${update.work_id}`;
                 }}
