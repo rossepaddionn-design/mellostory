@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ!
-import { getCachedChapterText, prefetchNextChapter } from '@/lib/chapterCache';
+import { supabaseChapters } from '@/lib/supabase-chapters';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Menu, X, Music, Image as ImageIcon } from 'lucide-react';
 
@@ -22,20 +21,20 @@ export default function ChapterPage() {
   const [showChapterList, setShowChapterList] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
-const [readProgress, setReadProgress] = useState(0);
+  const [readProgress, setReadProgress] = useState(0);
 
-const carouselRef = useRef(null);
+  const carouselRef = useRef(null);
 
-const scrollCharacterCarousel = (direction) => {
-  if (!carouselRef.current) return;
-  
-  const scrollAmount = 200;
-  if (direction === 'left') {
-    carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-  } else {
-    carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-  }
-};
+  const scrollCharacterCarousel = (direction) => {
+    if (!carouselRef.current) return;
+    
+    const scrollAmount = 200;
+    if (direction === 'left') {
+      carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const t = {
     backToWork: 'К описанию работы',
@@ -58,28 +57,19 @@ const scrollCharacterCarousel = (direction) => {
     }
   }, [chapterId, workId]);
 
-useEffect(() => {
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    setReadProgress(Math.min(progress, 100));
-  };
-
-  window.addEventListener('scroll', handleScroll);
-  handleScroll();
-  
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
-
   useEffect(() => {
-    if (chapter && allChapters.length > 0) {
-      const nextCh = getNextChapter();
-      if (nextCh) {
-        prefetchNextChapterData(nextCh.id);
-      }
-    }
-  }, [chapter, allChapters]);
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setReadProgress(Math.min(progress, 100));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (!chapter) return;
@@ -144,87 +134,71 @@ useEffect(() => {
     };
   }, [chapter]);
 
-  const prefetchNextChapterData = async (nextChapterId) => {
+  const loadAllData = async () => {
+    setLoading(true);
+
     try {
-      const { data } = await supabase
-        .from('chapters')
-        .select('text_blob_url')
-        .eq('id', nextChapterId)
-        .single();
-      
-      if (data?.text_blob_url) {
-        prefetchNextChapter(data.text_blob_url);
+      const [chapterRes, workRes, chaptersRes] = await Promise.all([
+        supabase
+          .from('chapters')
+          .select('*')
+          .eq('id', chapterId)
+          .eq('is_published', true)
+          .single(),
+        supabase
+          .from('works')
+          .select('title, id, total_pages')
+          .eq('id', workId)
+          .single(),
+        supabase
+          .from('chapters')
+          .select('id, chapter_number, title, pages')
+          .eq('work_id', workId)
+          .eq('is_published', true)
+          .order('chapter_number', { ascending: true })
+      ]);
+
+      if (workRes.data) setWork(workRes.data);
+      if (chaptersRes.data) setAllChapters(chaptersRes.data);
+
+      if (chapterRes.data) {
+        const chapterData = chapterRes.data;
+        
+        setChapter({
+          ...chapterData,
+          content: '<p class="text-gray-500 text-center py-8">Загрузка текста...</p>'
+        });
+        setLoading(false);
+
+        // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2
+        try {
+          const { data: textData, error: textError } = await supabaseChapters
+            .from('chapter_texts')
+            .select('text_content')
+            .eq('chapter_id', chapterId)
+            .single();
+          
+          if (textError) throw textError;
+          
+          setChapter({
+            ...chapterData,
+            content: textData.text_content || '<p class="text-gray-500">Текст главы пуст</p>'
+          });
+        } catch (error) {
+          console.error('Ошибка загрузки текста:', error);
+          setChapter({
+            ...chapterData,
+            content: '<p class="text-red-500">Ошибка загрузки текста главы</p>'
+          });
+        }
+      } else {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Prefetch error:', error);
+    } catch (err) {
+      console.error('Ошибка загрузки данных:', err);
+      setLoading(false);
     }
   };
-
- const loadAllData = async () => {
-  setLoading(true);
-
-  try {
-    const [chapterRes, workRes, chaptersRes] = await Promise.all([
-      supabase
-        .from('chapters')
-        .select('*')
-        .eq('id', chapterId)
-        .eq('is_published', true)
-        .single(),
-      supabase
-        .from('works')
-        .select('title, id, total_pages')
-        .eq('id', workId)
-        .single(),
-      supabase
-        .from('chapters')
-        .select('id, chapter_number, title, pages')
-        .eq('work_id', workId)
-        .eq('is_published', true)
-        .order('chapter_number', { ascending: true })
-    ]);
-
-    if (workRes.data) setWork(workRes.data);
-    if (chaptersRes.data) setAllChapters(chaptersRes.data);
-
-    if (chapterRes.data) {
-      const chapterData = chapterRes.data;
-      
-      setChapter({
-        ...chapterData,
-        content: '<p class="text-gray-500 text-center py-8">Загрузка текста...</p>'
-      });
-      setLoading(false);
-
-      // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2
-      try {
-        const { data: textData, error: textError } = await supabaseChapters
-          .from('chapter_texts')
-          .select('text_content')
-          .eq('chapter_id', chapterId)
-          .single();
-        
-        if (textError) throw textError;
-        
-        setChapter({
-          ...chapterData,
-          content: textData.text_content || '<p class="text-gray-500">Текст главы пуст</p>'
-        });
-      } catch (error) {
-        console.error('Ошибка загрузки текста:', error);
-        setChapter({
-          ...chapterData,
-          content: '<p class="text-red-500">Ошибка загрузки текста главы</p>'
-        });
-      }
-    } else {
-      setLoading(false);
-    }
-  } catch (err) {
-    console.error('Ошибка загрузки данных:', err);
-    setLoading(false);
-  }
-};
 
   const getPreviousChapter = () => {
     if (!allChapters || allChapters.length === 0) return null;
