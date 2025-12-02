@@ -54,101 +54,60 @@ export default function WorkPage() {
   }, [workId]);
 
 const loadAllData = async () => {
-  const cacheKey = `work_${workId}`;
-  const cached = sessionStorage.getItem(cacheKey);
-  
-  if (cached) {
-    try {
-      const data = JSON.parse(cached);
-      setWork(data.work);
-      setChapters(data.chapters);
-      setViewCount(data.viewCount);
-      setAverageRating(data.averageRating);
-      setTotalRatings(data.totalRatings);
-      setLoading(false);
-      return;
-    } catch (e) {
-      console.error('Ошибка чтения кэша:', e);
-    }
-  }
-
   setLoading(true);
-  
+
   try {
-    const [workRes, chaptersRes, viewsRes, statsRes, userRatingRes] = await Promise.all([
-supabase
-  .from('works')
-  .select('id, title, description, cover_url, direction, rating, status, category, fandom, pairing, genres, tags, spoiler_tags, character_images, author_note, total_pages')
-  .eq('id', workId)
-  .eq('is_draft', false)
-  .single(),
-supabase
-  .from('chapters')
-  .select('id, chapter_number, title, created_at, pages')
-        .eq('work_id', workId)
-        .eq('is_published', true)
-        .order('chapter_number', { ascending: true }),
-      supabase
-        .from('work_views')
-        .select('view_count')
-        .eq('work_id', workId)
-        .single(),
-      supabase
-        .from('work_statistics')
-        .select('average_rating, total_rating_count')
-        .eq('id', workId)
-        .single(),
-      currentUser ? supabase
-        .from('work_ratings')
-        .select('rating')
-        .eq('work_id', workId)
-        .eq('user_id', currentUser.id)
-        .single() : Promise.resolve({ data: null, error: null })
-    ]);
+    // 1. Загружаем данные работы
+    const { data: workData, error: workError } = await supabase
+      .from('works')
+      .select('*')
+      .eq('id', workId)
+      .eq('is_draft', false)
+      .single();
 
-    if (workRes.error) {
-      console.error('Ошибка загрузки работы:', workRes.error);
-    } else {
-      setWork(workRes.data);
+    if (workError) throw workError;
+
+if (workData) {
+      setWork(workData);
+      
+      // ЧИТАЕМ РЕЙТИНГ ИЗ РАБОТЫ
+      if (workData.manual_rating_count > 0) {
+        const avg = workData.manual_rating_sum / workData.manual_rating_count;
+        setAverageRating(avg);
+        setTotalRatings(workData.manual_rating_count);
+      }
     }
 
-    if (chaptersRes.error) {
-      console.error('Ошибка загрузки глав:', chaptersRes.error);
-    } else {
-      setChapters(chaptersRes.data || []);
+    // 2. Загружаем главы
+    const { data: chaptersData, error: chaptersError } = await supabase
+      .from('chapters')
+      .select('id, chapter_number, title, created_at, pages')
+      .eq('work_id', workId)
+      .eq('is_published', true)
+      .order('chapter_number', { ascending: true });
+
+    if (chaptersError) throw chaptersError;
+
+    if (chaptersData) {
+      setChapters(chaptersData);
     }
 
-    if (viewsRes.data) {
-      setViewCount(viewsRes.data.view_count);
+    // ЗАГРУЖАЕМ ПРОСМОТРЫ
+    const { data: viewsData } = await supabase
+      .from('work_views')
+      .select('view_count')
+      .eq('work_id', workId)
+      .single();
+
+    if (viewsData) {
+      setViewCount(viewsData.view_count || 0);
     }
 
-    if (statsRes.data) {
-      setAverageRating(statsRes.data.average_rating || 0);
-      setTotalRatings(statsRes.data.total_rating_count || 0);
-    } else {
-      setAverageRating(0);
-      setTotalRatings(0);
-    }
-
-    if (userRatingRes.data) {
-      setUserRating(userRatingRes.data.rating);
-    } else {
-      setUserRating(null);
-    }
-
-    sessionStorage.setItem(cacheKey, JSON.stringify({
-      work: workRes.data,
-      chapters: chaptersRes.data,
-      viewCount: viewsRes.data?.view_count || 0,
-      averageRating: statsRes.data?.average_rating || 0,
-      totalRatings: statsRes.data?.total_rating_count || 0
-    }));
-
+    setLoading(false);
   } catch (err) {
     console.error('Ошибка загрузки данных:', err);
+    setLoading(false);
   }
-  
-  setLoading(false);
 };
 
  const incrementViewCount = async () => {
