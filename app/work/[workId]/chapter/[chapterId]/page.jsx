@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ!
 import { getCachedChapterText, prefetchNextChapter } from '@/lib/chapterCache';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Menu, X, Music, Image as ImageIcon } from 'lucide-react';
@@ -159,65 +160,71 @@ useEffect(() => {
     }
   };
 
-  const loadAllData = async () => {
-    setLoading(true);
+ const loadAllData = async () => {
+  setLoading(true);
 
-    try {
-      const [chapterRes, workRes, chaptersRes] = await Promise.all([
-        supabase
-          .from('chapters')
-          .select('*')
-          .eq('id', chapterId)
-          .eq('is_published', true)
-          .single(),
-supabase
-  .from('works')
-  .select('title, id, total_pages')
-  .eq('id', workId)
-  .single(),
-supabase
-  .from('chapters')
-  .select('id, chapter_number, title, text_blob_url, pages')
-  .eq('work_id', workId)
-          .eq('is_published', true)
-          .order('chapter_number', { ascending: true })
-      ]);
+  try {
+    const [chapterRes, workRes, chaptersRes] = await Promise.all([
+      supabase
+        .from('chapters')
+        .select('*')
+        .eq('id', chapterId)
+        .eq('is_published', true)
+        .single(),
+      supabase
+        .from('works')
+        .select('title, id, total_pages')
+        .eq('id', workId)
+        .single(),
+      supabase
+        .from('chapters')
+        .select('id, chapter_number, title, pages')
+        .eq('work_id', workId)
+        .eq('is_published', true)
+        .order('chapter_number', { ascending: true })
+    ]);
 
-      if (workRes.data) setWork(workRes.data);
-      if (chaptersRes.data) setAllChapters(chaptersRes.data);
+    if (workRes.data) setWork(workRes.data);
+    if (chaptersRes.data) setAllChapters(chaptersRes.data);
 
-      if (chapterRes.data) {
-        const chapterData = chapterRes.data;
+    if (chapterRes.data) {
+      const chapterData = chapterRes.data;
+      
+      setChapter({
+        ...chapterData,
+        content: '<p class="text-gray-500 text-center py-8">Загрузка текста...</p>'
+      });
+      setLoading(false);
+
+      // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2
+      try {
+        const { data: textData, error: textError } = await supabaseChapters
+          .from('chapter_texts')
+          .select('text_content')
+          .eq('chapter_id', chapterId)
+          .single();
+        
+        if (textError) throw textError;
         
         setChapter({
           ...chapterData,
-          content: '<p class="text-gray-500 text-center py-8">Загрузка текста...</p>'
+          content: textData.text_content || '<p class="text-gray-500">Текст главы пуст</p>'
         });
-        setLoading(false);
-
-        if (chapterData.text_blob_url) {
-          try {
-            const textContent = await getCachedChapterText(chapterData.text_blob_url);
-            setChapter({
-              ...chapterData,
-              content: textContent
-            });
-          } catch (error) {
-            console.error('Ошибка загрузки текста:', error);
-            setChapter({
-              ...chapterData,
-              content: '<p class="text-red-500">Ошибка загрузки текста главы</p>'
-            });
-          }
-        }
-      } else {
-        setLoading(false);
+      } catch (error) {
+        console.error('Ошибка загрузки текста:', error);
+        setChapter({
+          ...chapterData,
+          content: '<p class="text-red-500">Ошибка загрузки текста главы</p>'
+        });
       }
-    } catch (err) {
-      console.error('Ошибка загрузки данных:', err);
+    } else {
       setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error('Ошибка загрузки данных:', err);
+    setLoading(false);
+  }
+};
 
   const getPreviousChapter = () => {
     if (!allChapters || allChapters.length === 0) return null;

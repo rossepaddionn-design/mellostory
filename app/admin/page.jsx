@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
+import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ ЭТУ СТРОКУ!
 import { uploadChapterText, deleteChapterText } from '@/lib/blobStorage';
 import { Save, Upload, Trash2, Plus, Bold, Italic, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, Music, HelpCircle, X, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 import GenreAutocomplete from '@/lib/components/admin/GenreAutocomplete';
@@ -107,7 +108,7 @@ const [chapterForm, setChapterForm] = useState({
     }
   };
 
-  const saveWork = async (isDraft) => {
+const saveWork = async (isDraft) => {
     if (!workForm.title.trim()) {
       alert('Введите название работы!');
       return;
@@ -121,7 +122,7 @@ const workData = {
   category: workForm.category,
   rating: workForm.rating,
   status: workForm.status,
-  total_pages: parseInt(workForm.total_pages) || 0,  // ← ДОБАВИЛИ!
+  total_pages: parseInt(workForm.total_pages) || 0,
   fandom: workForm.fandom ? workForm.fandom.trim() : null,
   pairing: workForm.pairing ? workForm.pairing.trim() : null,
   description: workForm.description.trim(),
@@ -134,7 +135,7 @@ const workData = {
   is_draft: isDraft
 };
 
-console.log('📤 Отправляю данные:', workData); // ← ДОБАВЬ ЭТУ СТРОКУ
+console.log('📤 Отправляю данные:', workData);
 
     try {
       let result;
@@ -175,100 +176,113 @@ if (!isDraft && !selectedWork.id) {
   };
 
 const saveChapter = async (isPublished) => {
-    if (!selectedWork || selectedWork.isNew || !selectedWork.id) {
-      alert('Сначала сохраните работу!');
-      return;
+  if (!selectedWork || selectedWork.isNew || !selectedWork.id) {
+    alert('Сначала сохраните работу!');
+    return;
+  }
+
+  if (!chapterForm.title.trim()) {
+    alert('Заполните название главы!');
+    return;
+  }
+
+  // КРИТИЧНО: берём текст ПРЯМО из редактора
+  const currentEditorContent = editorRef.current?.innerHTML?.trim() || '';
+  console.log('💾 Сохраняем текст:', currentEditorContent.substring(0, 100));
+
+  if (!currentEditorContent) {
+    alert('Заполните текст главы!');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // 1. Создаём данные главы (БЕЗ text_blob_url!)
+    const chapterData = {
+      work_id: selectedWork.id,
+      title: chapterForm.title.trim(),
+      author_note: chapterForm.author_note.trim(),
+      chapter_number: chapterForm.chapter_number,
+      pages: parseInt(chapterForm.pages) || 0,
+      images: chapterForm.images,
+      audio_url: chapterForm.audio_files.length > 0 
+        ? JSON.stringify(chapterForm.audio_files) 
+        : null,
+      is_published: isPublished
+    };
+
+    // 2. Сохраняем метаданные в Supabase #1 (старая база)
+    let result;
+    if (selectedChapter) {
+      // Обновление существующей главы
+      result = await supabase
+        .from('chapters')
+        .update(chapterData)
+        .eq('id', selectedChapter.id)
+        .select();
+    } else {
+      // Создание новой главы
+      result = await supabase
+        .from('chapters')
+        .insert([chapterData])
+        .select();
     }
 
-    if (!chapterForm.title.trim()) {
-      alert('Заполните название главы!');
-      return;
-    }
+    if (result.error) throw result.error;
 
-// КРИТИЧНО: берём текст ПРЯМО из редактора прямо сейчас
-const currentEditorContent = editorRef.current?.innerHTML?.trim() || '';
-console.log('💾 Сохраняем текст:', currentEditorContent.substring(0, 100));
+    const savedChapter = result.data[0];
+    console.log('✅ Метаданные сохранены в Supabase #1:', savedChapter.id);
 
-if (!currentEditorContent) {
-  alert('Заполните текст главы!');
-  return;
-}
-
-    setLoading(true);
-
-    try {
-      // 1. Загружаем текст в Blob
-      const textBlobUrl = await uploadChapterText(
-        selectedWork.id, 
-        chapterForm.chapter_number, 
-        currentEditorContent
-      );
-
-      // 2. Создаём данные главы
-      const chapterData = {
+    // 3. Сохраняем ТЕКСТ в Supabase #2 (новая база)
+    const { error: textError } = await supabaseChapters
+      .from('chapter_texts')
+      .upsert({
+        chapter_id: savedChapter.id,
         work_id: selectedWork.id,
-        title: chapterForm.title.trim(),
-        text_blob_url: textBlobUrl,
-        content: null,
-        author_note: chapterForm.author_note.trim(),
-        chapter_number: chapterForm.chapter_number,
-        pages: parseInt(chapterForm.pages) || 0,
-        images: chapterForm.images,
-        audio_url: chapterForm.audio_files.length > 0 ? JSON.stringify(chapterForm.audio_files) : null,
-        is_published: isPublished
-      };
+        text_content: currentEditorContent,
+        updated_at: new Date().toISOString()
+      }, { 
+        onConflict: 'chapter_id' 
+      });
 
-      let result;
-      if (selectedChapter) {
-        result = await supabase
-          .from('chapters')
-          .update(chapterData)
-          .eq('id', selectedChapter.id)
-          .select();
-      } else {
-        result = await supabase
-          .from('chapters')
-          .insert([chapterData])
-          .select();
-      }
+    if (textError) throw textError;
+    console.log('✅ Текст сохранён в Supabase #2');
 
-      if (result.error) throw result.error;
-
-      // Добавляем обновление о новой главе
-      if (isPublished && !selectedChapter) {
-        await supabase.from('site_updates').insert({
-          work_id: selectedWork.id,
-          work_title: workForm.title,
-          chapter_number: chapterData.chapter_number,
-          chapter_title: chapterData.title,
-          type: 'new_chapter'
-        });
-      }
-
-      if (isPublished && selectedWork.is_draft) {
-        await supabase
-          .from('works')
-          .update({ is_draft: false })
-          .eq('id', selectedWork.id);
-        
-        alert('Глава опубликована! Работа тоже опубликована.');
-        await loadWorks();
-      } else {
-        alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
-      }
-
-      // ОБНОВЛЯЕМ список глав и оставляем текущую главу открытой
-      await loadChapters(selectedWork.id);
-      
-      // ВАЖНО: НЕ очищаем форму и редактор - оставляем отредактированную главу
-      // Пользователь сам выберет другую главу или нажмёт "Новая глава"
-      
-    } catch (err) {
-      alert('Ошибка: ' + err.message);
-    } finally {
-      setLoading(false);
+    // 4. Добавляем обновление о новой главе
+    if (isPublished && !selectedChapter) {
+      await supabase.from('site_updates').insert({
+        work_id: selectedWork.id,
+        work_title: workForm.title,
+        chapter_number: chapterData.chapter_number,
+        chapter_title: chapterData.title,
+        type: 'new_chapter'
+      });
     }
-  };
+
+    // 5. Публикуем работу, если она была черновиком
+    if (isPublished && selectedWork.is_draft) {
+      await supabase
+        .from('works')
+        .update({ is_draft: false })
+        .eq('id', selectedWork.id);
+      
+      alert('Глава опубликована! Работа тоже опубликована.');
+      await loadWorks();
+    } else {
+      alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
+    }
+
+    // ОБНОВЛЯЕМ список глав
+    await loadChapters(selectedWork.id);
+    
+  } catch (err) {
+    console.error('❌ Ошибка сохранения:', err);
+    alert('Ошибка: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
 const createNewChapter = () => {
   setSelectedChapter(null);
@@ -490,6 +504,30 @@ const insertTooltip = () => {
             <button onClick={() => { setActiveTab('works'); setSelectedWork(null); }} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg transition text-sm sm:text-base ${activeTab === 'works' ? 'bg-red-600' : 'bg-gray-800 hover:bg-gray-700'}`}>
               Работы
             </button>
+            <button 
+  onClick={async () => {
+    if (!confirm('Начать миграцию текстов в Supabase #2?')) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/migrate-to-supabase', { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ Готово!\nМигрировано: ${result.migrated}/${result.total} глав`);
+      } else {
+        alert('❌ Ошибка: ' + result.error);
+      }
+    } catch (err) {
+      alert('❌ Ошибка миграции: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }} 
+  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition text-sm sm:text-base"
+>
+  🔄 Миграция
+</button>
             <button onClick={() => setIsAuth(false)} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition text-sm sm:text-base">
               Выход
             </button>
@@ -977,30 +1015,28 @@ setWorkForm({
                             </div>
                             <div className="flex gap-2 w-full sm:w-auto">
 <button onClick={async () => {
-  // ЗАГРУЖАЕМ ТЕКСТ ИЗ BLOB ЕСЛИ ЕСТЬ
-  let chapterContent = chapter.content || '';
-  if (chapter.text_blob_url) {
-    try {
-      const response = await fetch(chapter.text_blob_url);
-      chapterContent = await response.text();
-    } catch (error) {
-      console.error('Ошибка загрузки текста:', error);
-    }
+  // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2!
+  let chapterContent = '';
+  
+  try {
+    const { data: textData, error } = await supabaseChapters
+      .from('chapter_texts')
+      .select('text_content')
+      .eq('chapter_id', chapter.id)
+      .single();
+    
+    if (error) throw error;
+    chapterContent = textData.text_content || '';
+    console.log('📥 Загрузили из Supabase #2:', chapterContent.substring(0, 100));
+  } catch (error) {
+    console.error('❌ Ошибка загрузки текста:', error);
+    alert('Ошибка загрузки текста главы');
   }
   
-  if (chapter.text_blob_url) {
-  try {
-    const response = await fetch(chapter.text_blob_url);
-    chapterContent = await response.text();
-    console.log('📥 Загрузили из Blob:', chapterContent.substring(0, 100));
-  } catch (error) {
-    console.error('Ошибка загрузки текста:', error);
-  }
-}
-  // СНАЧАЛА устанавливаем форму с загруженным текстом
+  // Устанавливаем форму
   setChapterForm({
     title: chapter.title,
-    content: chapterContent,  // ← Сохраняем текст в форму!
+    content: chapterContent,
     author_note: chapter.author_note || '',
     chapter_number: chapter.chapter_number,
     pages: chapter.pages || 0,
@@ -1008,14 +1044,13 @@ setWorkForm({
     audio_files: chapter.audio_url ? JSON.parse(chapter.audio_url) : []
   });
   
-  // ПОТОМ устанавливаем selectedChapter
   setSelectedChapter(chapter);
   
-  // И ТОЛЬКО ПОСЛЕ этого заполняем редактор
-if (editorRef.current) {
-  editorRef.current.innerHTML = chapterContent;
-  console.log('✏️ Вставили в редактор:', editorRef.current.innerHTML.substring(0, 100));
-}
+  // Заполняем редактор
+  if (editorRef.current) {
+    editorRef.current.innerHTML = chapterContent;
+    console.log('✏️ Вставили в редактор:', editorRef.current.innerHTML.substring(0, 100));
+  }
   
   setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
   window.scrollTo({ top: 0, behavior: 'smooth' });

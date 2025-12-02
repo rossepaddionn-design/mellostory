@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ!
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronDown, ChevronUp, BookOpen, Clock, AlertTriangle, Image as ImageIcon, ChevronRight, Star, X } from 'lucide-react';
 import GenreTag from '@/lib/components/work/GenrePopup';
@@ -81,9 +82,9 @@ supabase
   .eq('id', workId)
   .eq('is_draft', false)
   .single(),
-      supabase
-        .from('chapters')
-        .select('id, chapter_number, title, created_at')
+supabase
+  .from('chapters')
+  .select('id, chapter_number, title, created_at, pages')
         .eq('work_id', workId)
         .eq('is_published', true)
         .order('chapter_number', { ascending: true }),
