@@ -212,8 +212,7 @@ const submitRating = async (rating) => {
     src={work.cover_url} 
     alt={work.title} 
     className="w-full aspect-[2/3] object-cover" 
-    loading="eager"  // ← ИЗМЕНЕНО: загружается сразу!
-    fetchpriority="high"  // ← ДОБАВЛЕНО: высокий приоритет!
+    loading="lazy"
   />
                 ) : (
                   <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center">
