@@ -97,7 +97,7 @@ if (workData) {
       .from('work_views')
       .select('view_count')
       .eq('work_id', workId)
-      .single();
+      .single(); 
 
     if (viewsData) {
       setViewCount(viewsData.view_count || 0);
