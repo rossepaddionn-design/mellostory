@@ -92,37 +92,42 @@ export default function Home() {
     loadSiteUpdates();
   }, []);
 
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+ const checkUser = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session) {
+    setUser(session.user);
     
-    if (session) {
-      setUser(session.user);
-      
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-      
-      if (profile) {
-        if (profile.is_banned) {
-          alert('Ваш аккаунт заблокирован!');
-          await supabase.auth.signOut();
-          return;
-        }
-        setUserProfile(profile);
-        setIsAdmin(false);
-      } else if (session.user.email === ADMIN_EMAIL) {
-        setIsAdmin(true);
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('is_deleted', false)  // ← ВАЖНО: только неудалённые профили
+      .single();
+    
+    if (profile) {
+      if (profile.is_banned) {
+        alert('Ваш аккаунт заблокирован!');
+        await supabase.auth.signOut();
+        return;
       }
+      setUserProfile(profile);
+      setIsAdmin(false);
+    } else if (session.user.email === ADMIN_EMAIL) {
+      setIsAdmin(true);
     } else {
-      const adminSession = localStorage.getItem('admin_session');
-      if (adminSession === 'true') {
-        setIsAdmin(true);
-        setUser({ email: ADMIN_EMAIL, id: 'admin' });
-      }
+      // Профиль удалён - выходим
+      await supabase.auth.signOut();
+      alert('Этот аккаунт был удалён.');
     }
-  };
+  } else {
+    const adminSession = localStorage.getItem('admin_session');
+    if (adminSession === 'true') {
+      setIsAdmin(true);
+      setUser({ email: ADMIN_EMAIL, id: 'admin' });
+    }
+  }
+};
 
   const loadWorks = async () => {
     const cacheKey = 'homepage_works';
@@ -394,52 +399,63 @@ const handleLogin = async () => {
     setShowAdminPanel(false);
   };
 
-  const handleDeleteAccount = async () => {
-    if (!deletePassword.trim()) {
-      alert('Введите пароль для подтверждения!');
-      return;
-    }
+const handleDeleteAccount = async () => {
+  if (!deletePassword.trim()) {
+    alert('Введите пароль для подтверждения!');
+    return;
+  }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: userProfile.email,
-      password: deletePassword
+  // Проверяем пароль
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: userProfile.email,
+    password: deletePassword
+  });
+
+  if (signInError) {
+    alert('Неверный пароль!');
+    return;
+  }
+
+  if (!confirm('Вы уверены? Это действие необратимо!')) {
+    return;
+  }
+
+  try {
+    // 1. Помечаем профиль как удалённый (НЕ удаляем!)
+    const { error: updateError } = await supabase
+      .from('reader_profiles')
+      .update({ is_deleted: true })
+      .eq('user_id', user.id);
+
+    if (updateError) throw updateError;
+
+    // 2. Сохраняем причину удаления
+    await supabase.from('deletion_reasons').insert({
+      user_id: user.id,
+      nickname: userProfile.nickname,
+      reason: deleteReason.trim() || 'Причина не указана',
+      deleted_at: new Date().toISOString()
     });
 
-    if (signInError) {
-      alert('Неверный пароль!');
-      return;
-    }
+    // 3. Удаляем комментарии и сообщения (по желанию)
+    await supabase.from('comments').delete().eq('user_id', user.id);
+    await supabase.from('messages').delete().eq('from_user_id', user.id);
 
-    if (!confirm('Вы уверены? Это действие необратимо!')) {
-      return;
-    }
-
-    try {
-      if (deleteReason.trim()) {
-        await supabase.from('deletion_reasons').insert({
-          user_id: user.id,
-          nickname: userProfile.nickname,
-          reason: deleteReason.trim(),
-          deleted_at: new Date().toISOString()
-        });
-      }
-
-      await supabase.from('reader_profiles').delete().eq('user_id', user.id);
-      await supabase.from('comments').delete().eq('user_id', user.id);
-      await supabase.from('messages').delete().eq('from_user_id', user.id);
-      await supabase.auth.signOut();
-      
-      alert('Ваш аккаунт успешно удалён.');
-      setShowDeleteAccountModal(false);
-      setDeleteReason('');
-      setDeletePassword('');
-      setUser(null);
-      setUserProfile(null);
-      setShowReaderPanel(false);
-    } catch (err) {
-      alert('Ошибка удаления: ' + err.message);
-    }
-  };
+    // 4. Выходим из системы
+    await supabase.auth.signOut();
+    
+    alert('Ваш аккаунт успешно удалён.');
+    setShowDeleteAccountModal(false);
+    setDeleteReason('');
+    setDeletePassword('');
+    setUser(null);
+    setUserProfile(null);
+    setShowReaderPanel(false);
+  } catch (err) {
+    console.error('Ошибка удаления:', err);
+    alert('Ошибка при удалении аккаунта: ' + err.message);
+  }
+};
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {

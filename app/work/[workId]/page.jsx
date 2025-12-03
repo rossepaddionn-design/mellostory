@@ -207,13 +207,14 @@ const submitRating = async (rating) => {
               `}} />
               
               <div className="pulse-cover-container shadow-2xl">
-                {work.cover_url ? (
-                  <img 
-                    src={work.cover_url} 
-                    alt={work.title} 
-                    className="w-full aspect-[2/3] object-cover" 
-                    loading="lazy" 
-                  />
+{work.cover_url ? (
+  <img 
+    src={work.cover_url} 
+    alt={work.title} 
+    className="w-full aspect-[2/3] object-cover" 
+    loading="eager"  // ← ИЗМЕНЕНО: загружается сразу!
+    fetchpriority="high"  // ← ДОБАВЛЕНО: высокий приоритет!
+  />
                 ) : (
                   <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center">
                     <p className="text-gray-500 text-sm sm:text-base">Нет обложки</p>
