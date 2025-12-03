@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle, Reply } from 'lucide-react';
 
@@ -991,15 +990,13 @@ style={{
                           {isExpanded ? (
                             <div className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 bg-black max-h-[85vh] overflow-y-auto rounded-2xl">
                               <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-                                {work.cover_url ? (
-                                  <Image 
-                                    src={work.cover_url} 
-                                    alt={work.title} 
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, 400px"
-                                    priority
-                                  />
+{work.cover_url ? (
+  <img 
+    src={work.cover_url} 
+    alt={work.title} 
+    className="w-full h-full object-cover" 
+    loading="lazy" 
+  />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
                                     Нет обложки
@@ -1066,15 +1063,13 @@ style={{
                           ) : (
                             <>
                               <div className="aspect-[2/3] bg-gray-800 relative">
-                                {work.cover_url ? (
-                                  <Image 
-                                    src={work.cover_url} 
-                                    alt={work.title} 
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 640px) 100vw, 400px"
-                                    priority={idx === currentSlide}
-                                  />
+{work.cover_url ? (
+  <img 
+    src={work.cover_url} 
+    alt={work.title}
+    className="w-full h-full object-cover"
+    loading="lazy"
+  />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
                                     Нет обложки
