@@ -9,7 +9,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [language, setLanguage] = useState('ru');
   const [titleColor, setTitleColor] = useState('#ef4444');
-  const [activeCategory, setActiveCategory] = useState('minific');
+const [activeCategory, setActiveCategory] = useState('novel');
   const [expandedWork, setExpandedWork] = useState(null);
   
   const [works, setWorks] = useState([]);
@@ -69,6 +69,7 @@ export default function Home() {
   const [selectedComment, setSelectedComment] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
+  const [showSnow, setShowSnow] = useState(true); // управление снегом
 
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
@@ -92,34 +93,75 @@ export default function Home() {
     loadSiteUpdates();
   }, []);
 
- const checkUser = async () => {
+const checkUser = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
     setUser(session.user);
     
-    const { data: profile } = await supabase
+    // Сначала проверяем - это админ?
+    if (session.user.email === ADMIN_EMAIL) {
+      setIsAdmin(true);
+      return;
+    }
+    
+    // Для обычных пользователей - ищем профиль
+    const { data: profile, error } = await supabase
       .from('reader_profiles')
       .select('*')
       .eq('user_id', session.user.id)
-      .eq('is_deleted', false)  // ← ВАЖНО: только неудалённые профили
       .single();
     
-    if (profile) {
-      if (profile.is_banned) {
-        alert('Ваш аккаунт заблокирован!');
-        await supabase.auth.signOut();
-        return;
-      }
-      setUserProfile(profile);
+    console.log('🔍 DEBUG checkUser:', { 
+      profile, 
+      error, 
+      is_deleted: profile?.is_deleted,
+      user_id: session.user.id 
+    });
+    
+    // Проверяем: ошибка ИЛИ профиль не найден ИЛИ удалён
+    if (error || !profile || profile.is_deleted === true) {
+      console.log('❌ БЛОКИРУЕМ ВХОД:', { error, profile, is_deleted: profile?.is_deleted });
+      
+      // ПОЛНАЯ ОЧИСТКА СЕССИИ
+      await supabase.auth.signOut({ scope: 'global' });
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Очищаем состояние
+      setUser(null);
+      setUserProfile(null);
+      setShowReaderPanel(false);
       setIsAdmin(false);
-    } else if (session.user.email === ADMIN_EMAIL) {
-      setIsAdmin(true);
-    } else {
-      // Профиль удалён - выходим
-      await supabase.auth.signOut();
+      
       alert('Этот аккаунт был удалён.');
+      
+      // ПРИНУДИТЕЛЬНАЯ ПЕРЕЗАГРУЗКА СТРАНИЦЫ
+      window.location.reload();
+      return;
     }
+    
+    // Проверяем бан
+    if (profile.is_banned) {
+      alert('Ваш аккаунт заблокирован!');
+      
+      await supabase.auth.signOut({ scope: 'global' });
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      setUser(null);
+      setUserProfile(null);
+      setShowReaderPanel(false);
+      setIsAdmin(false);
+      
+      window.location.reload();
+      return;
+    }
+    
+    // Всё ОК - устанавливаем профиль
+    setUserProfile(profile);
+    setIsAdmin(false);
+    
   } else {
     const adminSession = localStorage.getItem('admin_session');
     if (adminSession === 'true') {
@@ -698,10 +740,68 @@ const handleDeleteAccount = async () => {
 
   const displayWorks = getCurrentWorks();
 
+// ❄️ ЭФФЕКТ СНЕГА
+useEffect(() => {
+  if (!showSnow) return; // если выключен - не запускаем
+  
+  const createSnowflake = () => {
+    const snowflake = document.createElement('div');
+    snowflake.className = 'snowflake';
+    snowflake.innerHTML = '❄';
+    snowflake.style.left = Math.random() * 100 + '%';
+    snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+    snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+    snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+    
+    document.querySelector('.snow-container')?.appendChild(snowflake);
+    
+    setTimeout(() => {
+      snowflake.remove();
+    }, 5000);
+  };
+  
+  // Адаптивная частота для мобильных
+  const isMobile = window.innerWidth < 768;
+  const interval = setInterval(createSnowflake, isMobile ? 500 : 300);
+  
+  return () => clearInterval(interval);
+}, [showSnow]); // ← ДОБАВИЛИ ЗАВИСИМОСТЬ
+
 return (
     <>
       <link rel="preload" href="/images/main-bg.jpg" as="image" />
       <link rel="preload" href="/images/header-bg.jpg" as="image" />
+      
+      {/* ❄️ СТИЛИ И КОНТЕЙНЕР ДЛЯ СНЕГА */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .snow-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          pointer-events: none;
+          z-index: 9999;
+          overflow: hidden;
+        }
+        
+        .snowflake {
+          position: absolute;
+          top: -20px;
+          color: rgba(255, 255, 255, 0.9);
+          text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+          animation: fall linear forwards;
+          user-select: none;
+        }
+        
+        @keyframes fall {
+          to {
+            transform: translateY(100vh) rotate(360deg);
+          }
+        }
+      `}} />
+      
+      <div className="snow-container"></div>
       
       <div className="min-h-screen text-white overflow-x-hidden relative">
       <div 
@@ -852,11 +952,11 @@ return (
 <div className="relative z-10 px-4 sm:px-8 py-4">
   <div className="max-w-7xl mx-auto">
     <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
-      {[
-        { key: 'minific', label: t.minific },
-        { key: 'longfic', label: t.longfic },
-        { key: 'novel', label: t.novels }
-      ].map((item) => (
+{[
+  { key: 'novel', label: t.novels },      // ← ПЕРВЫМ
+  { key: 'longfic', label: t.longfic },
+  { key: 'minific', label: t.minific }    // ← ПОСЛЕДНИМ
+].map((item) => (
         <button
           key={item.key}
           onClick={() => {
@@ -1899,6 +1999,92 @@ style={{
   <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
   <span className="shimmer-btn-text">Выход</span>
 </button>
+
+      <button
+        onClick={handleLogout}
+        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+        style={{
+          background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+        <span className="shimmer-btn-text">Выход</span>
+      </button>
+      
+      {/* ❄️ КНОПКА УПРАВЛЕНИЯ СНЕГОМ */}
+      <div className="mt-auto pt-6">
+        <p className="text-center text-xs mb-2 text-gray-400">
+          {showSnow ? 'Включить' : 'Отключить'} тему
+        </p>
+        <button
+          onClick={() => setShowSnow(!showSnow)}
+          className="w-full relative rounded-full p-1 transition-all duration-300"
+          style={{
+            background: showSnow 
+              ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
+              : 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+            boxShadow: showSnow
+              ? '0 0 20px rgba(147, 112, 219, 0.6), 0 0 40px rgba(147, 112, 219, 0.3)'
+              : '0 0 10px rgba(255, 255, 255, 0.1)',
+            animation: 'pulse-theme 2s ease-in-out infinite',
+            height: '40px'
+          }}
+        >
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes pulse-theme {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.7; }
+            }
+            @keyframes slide-toggle {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(calc(100% - 32px)); }
+            }
+          `}} />
+          
+          {/* Ползунок */}
+          <div 
+            className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
+            style={{
+              width: '32px',
+              height: '32px',
+              background: showSnow
+                ? 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)'
+                : 'linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%)',
+              boxShadow: showSnow
+                ? '0 2px 8px rgba(255, 255, 255, 0.5)'
+                : '0 2px 8px rgba(0, 0, 0, 0.5)',
+              transform: showSnow ? 'translateX(calc(100vw - 100vw + 240px))' : 'translateX(0)',
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>
+              {showSnow ? '❄️' : '☀️'}
+            </span>
+          </div>
+          
+          {/* Текст внутри капсулы */}
+          <div className="flex items-center justify-between px-4 h-full">
+            <span 
+              className="text-xs font-bold transition-opacity duration-300"
+              style={{ 
+                color: showSnow ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.3)',
+                textShadow: showSnow ? '0 0 10px rgba(255, 255, 255, 0.5)' : 'none'
+              }}
+            >
+              ВКЛ
+            </span>
+            <span 
+              className="text-xs font-bold transition-opacity duration-300"
+              style={{ 
+                color: showSnow ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.9)',
+                textShadow: showSnow ? 'none' : '0 0 10px rgba(255, 255, 255, 0.5)'
+              }}
+            >
+              ВЫКЛ
+            </span>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 )}
