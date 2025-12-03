@@ -1,8 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ ЭТУ СТРОКУ!
-import { uploadChapterText, deleteChapterText } from '@/lib/blobStorage';
+import { supabaseChapters } from '@/lib/supabase-chapters';
 import { Save, Upload, Trash2, Plus, Bold, Italic, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, Music, HelpCircle, X, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 import GenreAutocomplete from '@/lib/components/admin/GenreAutocomplete';
 
