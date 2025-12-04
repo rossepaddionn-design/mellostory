@@ -1286,21 +1286,38 @@ style={{
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0">
-  <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-6 sm:mb-8">
-    Популярные работы
-  </h2>
+<h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes hologram {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hologram-text {
+      background: linear-gradient(45deg, #b3e7ef 0%, #ef01cb 25%, #8b3cc8 50%, #b3e7ef 75%, #ef01cb 100%);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: hologram 3s ease infinite;
+      filter: drop-shadow(0 0 20px rgba(179, 231, 239, 0.7));
+    }
+  `}} />
+  <span className="hologram-text">Популярные работы</span>
+</h2>
   
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
     {popularWorks.map((work, index) => (
-      <div
-        key={work.id}
-        className="relative rounded-xl p-6 border-2 transition hover:scale-105"
-        style={{
-          background: 'linear-gradient(135deg, rgba(155, 115, 176, 0.4) 0%, rgba(103, 50, 123, 0.6) 100%)',
-          borderColor: '#9b73b0',
-          boxShadow: '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)'
-        }}
-      >
+<div
+  key={work.id}
+  className="relative rounded-xl p-6 border-2 transition hover:scale-105"
+  style={{
+    background: 'rgba(0, 0, 0, 0.3)',
+    backdropFilter: 'blur(10px)',
+    borderColor: '#9b73b0',
+    boxShadow: '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)'
+  }}
+>
         {isAdmin && (
           <button
             onClick={() => {
@@ -1323,28 +1340,28 @@ style={{
 
         {work.title ? (
           <>
-            <h3 className="text-white font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words">
-              {work.title}
-            </h3>
+<h3 className="font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words hologram-text">
+  {work.title}
+</h3>
             
             <div className="flex justify-center items-center gap-6">
               <div className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" strokeWidth="2">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
-                <span className="text-yellow-400 font-bold text-lg">
-                  {work.rating || '—'}
-                </span>
+<span className="text-white font-bold text-lg">
+  {work.rating || '—'}
+</span>
               </div>
               
               <div className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
-                <span className="text-blue-400 font-bold text-lg">
-                  {work.views || '—'}
-                </span>
+<span className="text-white font-bold text-lg">
+  {work.views || '—'}
+</span>
               </div>
             </div>
           </>
@@ -1956,13 +1973,47 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 
 {/* READER PANEL */}
 {showReaderPanel && userProfile && (
-  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-black border-l-2 z-40 overflow-y-auto shadow-2xl" style={{ borderColor: '#b3e7ef' }}>
-<div className="sticky top-0 bg-black p-3 sm:p-4 border-b border-gray-700 flex justify-center items-center relative">
-  <h2 className="text-lg sm:text-xl font-bold" style={{ 
-    color: '#b3e7ef',
-    textShadow: '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.4)'
-  }}>{userProfile.nickname}</h2>
-      <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4">
+  <div className="fixed top-0 right-0 h-full w-full sm:w-96 border-l-2 z-40 overflow-y-auto shadow-2xl" style={{ 
+    borderColor: '#b3e7ef',
+    background: '#0a0a0a'
+  }}>
+    <div className="sticky top-0 p-3 sm:p-4 border-b border-gray-700 flex justify-center items-center relative overflow-hidden" style={{
+      background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)'
+    }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shineHeader {
+          0% { left: -100%; }
+          100% { left: 200%; }
+        }
+        @keyframes shimmer-btn {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .shimmer-btn-text {
+          background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmer-btn 3s linear infinite;
+        }
+      `}} />
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: '-100%',
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+        animation: 'shineHeader 3s infinite'
+      }}></div>
+      <h2 className="text-lg sm:text-xl font-bold" style={{ 
+        color: '#fff',
+        textShadow: '0 0 30px rgba(179, 231, 239, 1)',
+        position: 'relative',
+        zIndex: 1
+      }}>{userProfile.nickname}</h2>
+      <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4" style={{ zIndex: 2 }}>
         <X size={20} className="sm:w-6 sm:h-6" />
       </button>
     </div>
@@ -1973,32 +2024,29 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
           setShowUpdatesModal(true);
           loadSiteUpdates();
         }}
-        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
-style={{
-  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-}}
+        className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(160, 99, 207, 0.2) 0%, rgba(124, 58, 173, 0.2) 100%)',
+          border: '2px solid #a063cf',
+          borderRadius: '12px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#fff';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#a063cf';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
       >
-<style dangerouslySetInnerHTML={{__html: `
-  @keyframes shimmer-btn {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-.shimmer-btn-text {
-  background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer-btn 3s linear infinite;
-  }
-`}} />
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3e7ef" strokeWidth="2" className="sm:w-5 sm:h-5">
-  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-  <path d="M2 17l10 5 10-5"/>
-  <path d="M2 12l10 5 10-5"/>
-</svg>
-<span className="shimmer-btn-text">Обновления</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b3e7ef" strokeWidth="2" className="sm:w-5 sm:h-5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span className="shimmer-btn-text">Обновления</span>
         {siteUpdates.length > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
             {siteUpdates.length}
@@ -2006,31 +2054,53 @@ style={{
         )}
       </button>
 
-<button
-  onClick={() => {
-    setShowCollectionModal(true);
-    loadUserCollection();
-  }}
-  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-  style={{
-    background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-  }}
->
-  <Heart size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
-  <span className="shimmer-btn-text">Моя коллекция</span>
-</button>
+      <button
+        onClick={() => {
+          setShowCollectionModal(true);
+          loadUserCollection();
+        }}
+        className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(160, 99, 207, 0.2) 0%, rgba(124, 58, 173, 0.2) 100%)',
+          border: '2px solid #a063cf',
+          borderRadius: '12px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#fff';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#a063cf';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
+      >
+        <Heart size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+        <span className="shimmer-btn-text">Моя коллекция</span>
+      </button>
 
       <button
         onClick={() => setShowReaderMessagesModal(true)}
-        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
-style={{
-  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-}}
->
-<MessageSquare size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
-<span className="shimmer-btn-text">Мои сообщения</span>
+        className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(160, 99, 207, 0.2) 0%, rgba(124, 58, 173, 0.2) 100%)',
+          border: '2px solid #a063cf',
+          borderRadius: '12px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#fff';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#a063cf';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
+      >
+        <MessageSquare size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+        <span className="shimmer-btn-text">Мои сообщения</span>
         {readerMessages.some(m => m.admin_reply && !m.is_read) && (
           <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
             {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
@@ -2040,29 +2110,50 @@ style={{
 
       <button
         onClick={() => setShowDeleteAccountModal(true)}
-        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-style={{
-  background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-}}
->
-<Trash2 size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
-<span className="shimmer-btn-text">Удалить аккаунт</span>
+        className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(160, 99, 207, 0.2) 0%, rgba(124, 58, 173, 0.2) 100%)',
+          border: '2px solid #a063cf',
+          borderRadius: '12px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#fff';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#a063cf';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
+      >
+        <Trash2 size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+        <span className="shimmer-btn-text">Удалить аккаунт</span>
       </button>
 
-<button
-  onClick={handleLogout}
-  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-  style={{
-    background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-  }}
->
-  <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
-  <span className="shimmer-btn-text">Выход</span>
-</button>
+      <button
+        onClick={handleLogout}
+        className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(160, 99, 207, 0.2) 0%, rgba(124, 58, 173, 0.2) 100%)',
+          border: '2px solid #a063cf',
+          borderRadius: '12px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#fff';
+          e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#a063cf';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
+      >
+        <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+        <span className="shimmer-btn-text">Выход</span>
+      </button>
 
-      
       {/* ❄️ КНОПКА УПРАВЛЕНИЯ СНЕГОМ */}
       <div className="mt-auto pt-6">
         <p className="text-center text-xs mb-2 text-gray-400">
@@ -2087,13 +2178,8 @@ style={{
               0%, 100% { opacity: 1; }
               50% { opacity: 0.7; }
             }
-            @keyframes slide-toggle {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(calc(100% - 32px)); }
-            }
           `}} />
           
-          {/* Ползунок */}
           <div 
             className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
             style={{
@@ -2113,7 +2199,6 @@ style={{
             </span>
           </div>
           
-          {/* Текст внутри капсулы */}
           <div className="flex items-center justify-between px-4 h-full">
             <span 
               className="text-xs font-bold transition-opacity duration-300"
