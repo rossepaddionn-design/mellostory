@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { supabaseChapters } from '@/lib/supabase-chapters'; // ← ДОБАВЬ!
+import { supabaseUGC } from '@/lib/supabase-ugc';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronDown, ChevronUp, BookOpen, Clock, AlertTriangle, Image as ImageIcon, ChevronRight, Star, X } from 'lucide-react';
 import GenreTag from '@/lib/components/work/GenrePopup';
@@ -24,6 +25,11 @@ export default function WorkPage() {
   const [showAgeVerification, setShowAgeVerification] = useState(false);
   const carouselRef = useRef(null);
   const hasIncrementedView = useRef(false);
+const [showDiscussionModal, setShowDiscussionModal] = useState(false);
+const [discussions, setDiscussions] = useState([]);
+const [newDiscussion, setNewDiscussion] = useState('');
+const [isFavorited, setIsFavorited] = useState(false);
+
 
   const t = {
     backToMain: 'На главную',
@@ -54,12 +60,96 @@ useEffect(() => {
   };
   
   checkUser();
+}, []);
 
+useEffect(() => {
   if (workId) {
     loadAllData();
     incrementViewCount();
+    loadDiscussions();
+    if (currentUser) {
+      checkFavorite();
+    }
   }
-}, [workId]);
+}, [workId, currentUser]);
+
+const loadDiscussions = async () => {
+const { data } = await supabaseUGC
+  .from('work_discussions')
+    .select('*')
+    .eq('work_id', workId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  
+  if (data) setDiscussions(data);
+};
+
+const checkFavorite = async () => {
+  if (!currentUser) return;
+  
+const { data, error } = await supabaseUGC
+  .from('user_favorites')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .eq('work_id', workId)
+    .maybeSingle();
+  
+  if (!error && data) {
+    setIsFavorited(true);
+  }
+};
+
+const toggleFavorite = async () => {
+  if (!currentUser) {
+    alert('Войдите, чтобы добавить в избранное!');
+    return;
+  }
+  
+  if (isFavorited) {
+await supabaseUGC
+  .from('user_favorites')
+  .delete()
+      .eq('user_id', currentUser.id)
+      .eq('work_id', workId);
+    setIsFavorited(false);
+    alert('Удалено из избранного');
+  } else {
+await supabaseUGC
+  .from('user_favorites')
+  .insert({ user_id: currentUser.id, work_id: workId });
+    setIsFavorited(true);
+    alert('Добавлено в избранное! ❤️');
+  }
+};
+
+const sendDiscussion = async () => {
+  if (!currentUser) {
+    alert('Войдите, чтобы оставить комментарий!');
+    return;
+  }
+  
+  if (!newDiscussion.trim()) {
+    alert('Напишите комментарий!');
+    return;
+  }
+  
+const { error } = await supabaseUGC
+  .from('work_discussions')
+  .insert({
+      work_id: workId,
+      user_id: currentUser.id,
+      nickname: currentUser.email.split('@')[0], // или userProfile?.nickname если есть
+      message: newDiscussion.trim()
+    });
+  
+  if (error) {
+    alert('Ошибка отправки: ' + error.message);
+  } else {
+    alert('Комментарий отправлен! 💜');
+    setNewDiscussion('');
+    loadDiscussions();
+  }
+};
 
 const loadAllData = async () => {
   setLoading(true);
@@ -277,7 +367,6 @@ if (showAgeVerification) {
   );
 }
 
-
   return (
     <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
       {/* HEADER */}
@@ -492,9 +581,7 @@ if (showAgeVerification) {
   </div>
 )}
 
-            {/* ПРОЧТЕНИЯ И ОЦЕНКА */}
-            <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
-              {/* СЧЁТЧИК ПРОЧТЕНИЙ */}
+<div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
               <div 
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                 style={{
@@ -507,12 +594,21 @@ if (showAgeVerification) {
                 <span>Прочтений: {viewCount.toLocaleString()}</span>
               </div>
               
-              {/* ОЦЕНКА */}
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes shimmer-purple {
                   0% { box-shadow: 0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4); }
                   50% { box-shadow: 0 0 15px rgba(147, 51, 234, 0.9), 0 0 30px rgba(147, 51, 234, 0.6); }
                   100% { box-shadow: 0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4); }
+                }
+                @keyframes shimmer-cyan {
+                  0% { box-shadow: 0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4); }
+                  50% { box-shadow: 0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6); }
+                  100% { box-shadow: 0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4); }
+                }
+                @keyframes shimmer-pink {
+                  0% { box-shadow: 0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4); }
+                  50% { box-shadow: 0 0 15px rgba(239, 1, 203, 0.9), 0 0 30px rgba(239, 1, 203, 0.6); }
+                  100% { box-shadow: 0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4); }
                 }
               `}} />
               <button
@@ -536,12 +632,61 @@ if (showAgeVerification) {
                 }}
               >
                 <Star size={14} className="sm:w-4 sm:h-4" fill={userRating ? 'currentColor' : 'none'} />
-                <span>
-                  Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}
-                </span>
+                <span>Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}</span>
+              </button>
+
+              <button
+                onClick={toggleFavorite}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
+                style={{
+                  background: 'rgba(239, 1, 203, 0.2)',
+                  borderColor: '#ef01cb',
+                  color: '#FFFFFF',
+                  boxShadow: '0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4)',
+                  backdropFilter: 'blur(10px)',
+                  animation: 'shimmer-pink 2s ease-in-out infinite'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 1, 203, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 1, 203, 0.9), 0 0 30px rgba(239, 1, 203, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 1, 203, 0.2)';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4)';
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" className="sm:w-4 sm:h-4" fill={isFavorited ? '#ef01cb' : 'none'} stroke="#ef01cb" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span>{isFavorited ? 'В избранном' : 'В избранное'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowDiscussionModal(true);
+                  loadDiscussions();
+                }}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
+                style={{
+                  background: '#000000',
+                  borderColor: '#b3e7ef',
+                  color: '#FFFFFF',
+                  boxShadow: '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)',
+                  animation: 'shimmer-cyan 2s ease-in-out infinite'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)';
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" className="sm:w-4 sm:h-4" fill="none" stroke="#b3e7ef" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Обсуждение ({discussions.length})</span>
               </button>
             </div>
-
             {/* ОПИСАНИЕ */}
             <div className="bg-black rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
               borderColor: '#9333ea'
@@ -712,8 +857,7 @@ if (showAgeVerification) {
           )}
         </div>
       </main>
-
-      {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
+{/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
       {showRatingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
           <div className="rounded-xl p-6 sm:p-8 max-w-md w-full border-2 relative" style={{
@@ -788,6 +932,110 @@ if (showAgeVerification) {
                 )}
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* МОДАЛЬНОЕ ОКНО ОБСУЖДЕНИЯ */}
+      {showDiscussionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+          <div className="bg-black rounded-lg w-full max-w-2xl max-h-[85vh] flex flex-col border-2" style={{ borderColor: '#8b3cc8' }}>
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700 flex-shrink-0">
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes shimmerDiscussion {
+                  0% { background-position: -200% center; }
+                  100% { background-position: 200% center; }
+                }
+                .discussion-title {
+                  background: linear-gradient(90deg, #b3e7ef 0%, #8b3cc8 50%, #b3e7ef 100%);
+                  background-size: 200% auto;
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  animation: shimmerDiscussion 3s linear infinite;
+                }
+              `}} />
+              <h2 className="text-xl sm:text-2xl font-bold discussion-title flex items-center gap-2">
+                💬 Обсуждение работы
+              </h2>
+              <button 
+                onClick={() => setShowDiscussionModal(false)} 
+                className="text-gray-400 hover:text-white transition flex-shrink-0"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {discussions.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p>Пока нет комментариев. Будьте первым!</p>
+                </div>
+              ) : (
+                <div className="space-y-3 sm:space-y-4">
+                  {discussions.map((disc) => (
+                    <div 
+                      key={disc.id}
+                      className="rounded-lg p-3 sm:p-4 border transition"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(139, 60, 200, 0.2) 0%, rgba(74, 29, 110, 0.2) 100%)',
+                        borderColor: 'rgba(139, 60, 200, 0.4)'
+                      }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-sm sm:text-base" style={{ color: '#b3e7ef' }}>
+                          {disc.nickname}
+                        </span>
+                        <span className="text-xs px-2 py-1 rounded" style={{ 
+                          background: '#ef4444',
+                          color: 'white'
+                        }}>
+                          Читатель
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2">
+                        {disc.message}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {new Date(disc.created_at).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-gray-700 p-4 sm:p-6 flex-shrink-0">
+              <textarea
+                value={newDiscussion}
+                onChange={(e) => setNewDiscussion(e.target.value)}
+                rows={3}
+                placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
+                disabled={!currentUser}
+                className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
+                style={{
+                  borderColor: '#8b3cc8'
+                }}
+              />
+              <button
+                onClick={sendDiscussion}
+                disabled={!currentUser || !newDiscussion.trim()}
+                className="w-full py-3 rounded-lg font-bold transition"
+                style={{
+                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+                  color: '#fff',
+                  opacity: !currentUser || !newDiscussion.trim() ? 0.5 : 1
+                }}
+              >
+                Отправить
+              </button>
+            </div>
           </div>
         </div>
       )}
