@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle, Reply } from 'lucide-react';
+import { supabaseUGC } from '@/lib/supabase-ugc';
+import { Heart, Bookmark, Image as ImageIcon } from 'lucide-react';
+
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -70,6 +73,11 @@ const [activeCategory, setActiveCategory] = useState('novel');
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [showSnow, setShowSnow] = useState(true); // управление снегом
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
+const [collectionTab, setCollectionTab] = useState('favorites'); // favorites, gallery, bookmarks
+const [userFavorites, setUserFavorites] = useState([]);
+const [userGallery, setUserGallery] = useState([]);
+const [userBookmarks, setUserBookmarks] = useState([]);
 
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
@@ -681,6 +689,45 @@ const handleDeleteAccount = async () => {
       alert('❌ Ошибка: ' + err.message);
     }
   };
+
+const loadUserCollection = async () => {
+  if (!user) return;
+
+  try {
+    // Избранное
+    const { data: favs } = await supabaseUGC
+      .from('user_favorites')
+      .select('work_id')
+      .eq('user_id', user.id);
+    
+    if (favs && favs.length > 0) {
+      const workIds = favs.map(f => f.work_id);
+      const { data: works } = await supabase
+        .from('works')
+        .select('id, title, cover_url, description')
+        .in('id', workIds);
+      setUserFavorites(works || []);
+    }
+
+    // Галерея
+    const { data: images } = await supabaseUGC
+      .from('user_saved_images')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('saved_at', { ascending: false });
+    setUserGallery(images || []);
+
+    // Закладки
+    const { data: bookmarks } = await supabaseUGC
+      .from('user_bookmarks')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    setUserBookmarks(bookmarks || []);
+  } catch (err) {
+    console.error('Ошибка загрузки коллекции:', err);
+  }
+};
 
   const translations = {
     ru: {
@@ -1959,6 +2006,21 @@ style={{
         )}
       </button>
 
+<button
+  onClick={() => {
+    setShowCollectionModal(true);
+    loadUserCollection();
+  }}
+  className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
+  style={{
+    background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+  }}
+>
+  <Heart size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
+  <span className="shimmer-btn-text">Моя коллекция</span>
+</button>
+
       <button
         onClick={() => setShowReaderMessagesModal(true)}
         className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base text-white"
@@ -2000,17 +2062,6 @@ style={{
   <span className="shimmer-btn-text">Выход</span>
 </button>
 
-      <button
-        onClick={handleLogout}
-        className="w-full py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base text-white"
-        style={{
-          background: 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-        }}
-      >
-        <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#b3e7ef' }} />
-        <span className="shimmer-btn-text">Выход</span>
-      </button>
       
       {/* ❄️ КНОПКА УПРАВЛЕНИЯ СНЕГОМ */}
       <div className="mt-auto pt-6">
@@ -2446,6 +2497,179 @@ style={{
         >
           Сохранить
         </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* MODAL: COLLECTION */}
+{showCollectionModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="bg-black rounded-lg w-full max-w-5xl h-[90vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
+      <div className="flex justify-between items-center p-6 border-b border-gray-700">
+        <h2 className="text-2xl font-bold">
+          <span className="shimmer-btn-text">💜 Моя коллекция</span>
+        </h2>
+        <button 
+          onClick={() => setShowCollectionModal(false)} 
+          className="text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      {/* ТАБЫ */}
+      <div className="flex border-b border-gray-700">
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes shimmerTab {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          .tab-shimmer {
+            background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerTab 3s linear infinite;
+          }
+        `}} />
+        
+        {[
+          { key: 'favorites', label: 'Избранные работы', icon: Heart },
+          { key: 'gallery', label: 'Галерея', icon: ImageIcon },
+          { key: 'bookmarks', label: 'Закладки', icon: Bookmark }
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setCollectionTab(key)}
+            className={`flex-1 px-6 py-4 font-semibold transition text-center ${
+              collectionTab === key ? '' : 'bg-gray-800'
+            }`}
+            style={{
+              background: collectionTab === key 
+                ? 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)' 
+                : 'transparent'
+            }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Icon size={20} style={{ color: collectionTab === key ? '#b3e7ef' : '#666' }} />
+              <span className={collectionTab === key ? 'tab-shimmer' : 'text-gray-400'}>
+                {label}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* КОНТЕНТ */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {collectionTab === 'favorites' && (
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+              Избранные работы ({userFavorites.length})
+            </h3>
+            {userFavorites.length === 0 ? (
+              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <Heart size={48} className="mx-auto mb-3 text-gray-600" />
+                <p className="text-gray-500">У вас пока нет избранных работ</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {userFavorites.map((work) => (
+                  <Link
+                    key={work.id}
+                    href={`/work/${work.id}`}
+                    className="rounded-lg overflow-hidden border-2 transition hover:scale-105"
+                    style={{ borderColor: '#9333ea' }}
+                  >
+                    <div className="aspect-[2/3] bg-gray-800 relative">
+                      {work.cover_url && (
+                        <img src={work.cover_url} alt={work.title} className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                    <div className="p-4 bg-gray-900">
+                      <h4 className="text-white font-semibold text-base mb-2">{work.title}</h4>
+                      <p className="text-gray-400 text-xs line-clamp-2">{work.description}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {collectionTab === 'gallery' && (
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+              Галерея ({userGallery.length})
+            </h3>
+            {userGallery.length === 0 ? (
+              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <ImageIcon size={48} className="mx-auto mb-3 text-gray-600" />
+                <p className="text-gray-500">У вас пока нет сохранённых изображений</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {userGallery.map((img) => (
+                  <div key={img.id} className="aspect-square rounded-lg overflow-hidden border-2 border-purple-600 relative group">
+                    <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Удалить изображение?')) return;
+                        await supabaseUGC.from('user_saved_images').delete().eq('id', img.id);
+                        loadUserCollection();
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {collectionTab === 'bookmarks' && (
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+              Закладки ({userBookmarks.length})
+            </h3>
+            {userBookmarks.length === 0 ? (
+              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <Bookmark size={48} className="mx-auto mb-3 text-gray-600" />
+                <p className="text-gray-500">У вас пока нет закладок</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {userBookmarks.map((bookmark) => (
+                  <div key={bookmark.id} className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="text-white font-semibold">{bookmark.work_title}</h4>
+                        <p className="text-gray-400 text-sm">Глава {bookmark.chapter_number}</p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (!confirm('Удалить закладку?')) return;
+                          await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
+                          loadUserCollection();
+                        }}
+                        className="text-red-500 hover:text-red-400"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                    <p className="text-gray-300 text-sm bg-gray-900 p-3 rounded">
+                      "{bookmark.selected_text.slice(0, 150)}{bookmark.selected_text.length > 150 ? '...' : ''}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   </div>
