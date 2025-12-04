@@ -21,6 +21,7 @@ export default function WorkPage() {
   const [userRating, setUserRating] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showAgeVerification, setShowAgeVerification] = useState(false);
   const carouselRef = useRef(null);
   const hasIncrementedView = useRef(false);
 
@@ -40,18 +41,25 @@ export default function WorkPage() {
     views: 'Просмотров'
   };
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+useEffect(() => {
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
       setCurrentUser(user);
-    };
-    checkUser();
-
-    if (workId) {
-      loadAllData();
-      incrementViewCount();
+      setShowAgeVerification(false);
+    } else {
+      setShowAgeVerification(true);
     }
-  }, [workId]);
+  };
+  
+  checkUser();
+
+  if (workId) {
+    loadAllData();
+    incrementViewCount();
+  }
+}, [workId]);
 
 const loadAllData = async () => {
   setLoading(true);
@@ -165,6 +173,110 @@ const submitRating = async (rating) => {
   
   const characterImagesArray = Array.isArray(work.character_images) ? work.character_images : 
     (typeof work.character_images === 'string' && work.character_images ? work.character_images.split(',').map(s => s.trim()) : []);
+
+// Модальное окно проверки возраста
+if (showAgeVerification) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
+      background: 'rgba(0, 0, 0, 0.95)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)'
+    }}>
+      {/* Модальное окно */}
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div 
+          className="rounded-2xl p-8 border-2 relative"
+          style={{
+            background: 'rgba(0, 0, 0, 0.95)',
+            borderColor: '#9333ea',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.4)'
+          }}
+        >
+          {/* Заголовок MelloStory */}
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes shimmerAge {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .age-shimmer-mello {
+              background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: shimmerAge 3s linear infinite;
+            }
+            .age-shimmer-story {
+              color: #8c32d2;
+              text-shadow: 0 0 20px rgba(140, 50, 210, 0.9), 0 0 40px rgba(140, 50, 210, 0.6);
+            }
+          `}} />
+          
+          <h1 className="text-4xl font-bold text-center mb-6" style={{
+            fontFamily: "'Playfair Display', Georgia, serif"
+          }}>
+            <span className="age-shimmer-mello">MELLO</span>
+            <span className="age-shimmer-story">STORY</span>
+          </h1>
+          
+          {/* Текст предупреждения */}
+          <div className="text-center mb-6">
+            <p className="text-white text-lg font-semibold mb-2">
+              Сайт содержит материалы 18+
+            </p>
+            <p className="text-gray-400 text-sm">
+              Для продолжения необходимо войти в аккаунт или зарегистрироваться
+            </p>
+          </div>
+          
+          {/* Кнопки */}
+          <div className="space-y-3 mb-6">
+            <button
+              onClick={() => {
+                window.location.href = '/?login=true';
+              }}
+              className="w-full py-3 rounded-lg font-bold transition text-base"
+              style={{
+                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+                boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+              }}
+            >
+              Войти
+            </button>
+            
+            <button
+              onClick={() => {
+                window.location.href = '/?register=true';
+              }}
+              className="w-full py-3 rounded-lg font-bold transition text-base border-2"
+              style={{
+                background: 'transparent',
+                borderColor: '#9370db',
+                color: '#9370db'
+              }}
+            >
+              Регистрация
+            </button>
+          </div>
+          
+          {/* Логотип внизу */}
+          <div className="flex justify-center opacity-30">
+            <img 
+              src="/logo.png"
+              alt="MelloStory" 
+              className="w-32 h-32"
+              style={{ 
+                filter: 'grayscale(100%) brightness(0.5)',
+                mixBlendMode: 'lighten'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
