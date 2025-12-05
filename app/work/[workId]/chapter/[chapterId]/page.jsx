@@ -24,6 +24,10 @@ export default function ChapterPage() {
   const [readProgress, setReadProgress] = useState(0);
 const [showAgeVerification, setShowAgeVerification] = useState(false);
 const [currentUser, setCurrentUser] = useState(null);
+const [showBookmarkButton, setShowBookmarkButton] = useState(false);
+const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
+const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
+
 
   const carouselRef = useRef(null);
 
@@ -241,10 +245,94 @@ useEffect(() => {
     }
   };
 
-  const handleChapterSelect = (chId) => {
-    router.push(`/work/${workId}/chapter/${chId}`);
-    setShowChapterList(false);
-  };
+ const handleChapterSelect = (chId) => {
+  router.push(`/work/${workId}/chapter/${chId}`);
+  setShowChapterList(false);
+};
+
+const handleTextSelection = () => {
+  setTimeout(() => {
+    const selection = window.getSelection();
+    const text = selection.toString().trim();
+    
+    if (text.length > 0 && text.length <= 500) {
+      const range = selection.getRangeAt(0);
+      const rects = range.getClientRects();
+      const lastRect = rects[rects.length - 1];
+      
+      // Абсолютные координаты
+      let x = lastRect.right + window.scrollX + 10;
+      let y = lastRect.bottom + window.scrollY + 10;
+      
+      // ВАЖНО: Ограничиваем координаты, чтобы кнопка не улетала за пределы
+      const maxX = document.documentElement.scrollWidth - 120; // 120px - ширина кнопки
+      const minX = 60; // минимальный отступ слева
+      
+      x = Math.max(minX, Math.min(x, maxX));
+      
+      setSelectedTextForBookmark(text);
+      setBookmarkPosition({ x, y });
+      setShowBookmarkButton(true);
+    } else {
+      setShowBookmarkButton(false);
+    }
+  }, 100);
+};
+
+
+const saveBookmark = async () => {
+  if (!currentUser || !selectedTextForBookmark) return;
+  
+  try {
+const response = await fetch('/api/ugc', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'add_bookmark',
+    userId: currentUser.id,
+    workId: workId,
+    chapterId: chapter?.id, // ✅ ИСПОЛЬЗУЕМ chapter.id (это UUID)
+    selectedText: selectedTextForBookmark,
+    workTitle: work?.title,
+    chapterNumber: chapter?.chapter_number
+  })
+});
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      setShowBookmarkButton(false);
+      setSelectedTextForBookmark('');
+      window.getSelection().removeAllRanges();
+      
+      const notification = document.createElement('div');
+      notification.textContent = '✅ Закладка сохранена!';
+      notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #3fcaaf 0%, #2a9d8f 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        z-index: 99999;
+        box-shadow: 0 4px 12px rgba(63, 202, 175, 0.5);
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 2000);
+    }
+  } catch (error) {
+    console.error('Ошибка сохранения:', error);
+  }
+};
+
+const closeBookmarkButton = () => {
+  setShowBookmarkButton(false);
+  setSelectedTextForBookmark('');
+  window.getSelection().removeAllRanges();
+};
 
   if (loading) {
     return (
@@ -809,13 +897,50 @@ return (
                   padding: 10px 14px !important;
                 }
               }
+                ::selection {
+  background-color: #3fcaaf !important;
+  color: #000000 !important;
+}
+
+::-moz-selection {
+  background-color: #3fcaaf !important;
+  color: #000000 !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes bookmarkPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(63, 202, 175, 0.6);
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(63, 202, 175, 0.9);
+    transform: translate(-50%, 0) scale(1.05);
+  }
+}
             `
           }} />
           
-          <div 
-            className="chapter-text-content text-gray-300"
-            dangerouslySetInnerHTML={{ __html: chapter.content }}
-          />
+<div 
+  onMouseUp={handleTextSelection}
+  onTouchEnd={handleTextSelection}
+  style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+>
+  <div 
+    className="chapter-text-content text-gray-300"
+    dangerouslySetInnerHTML={{ __html: chapter.content }}
+  />
+</div>
         </div>
 
 {chapter.images && chapter.images.length > 0 && (
@@ -963,6 +1088,59 @@ return (
           )}
         </div>
       </main>
+{/* КНОПКА ЗАКЛАДКИ */}
+{showBookmarkButton && (
+  <>
+    {/* Полупрозрачный фон */}
+    <div 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999998,
+        background: 'rgba(0, 0, 0, 0.3)'
+      }}
+      onClick={closeBookmarkButton}
+    />
+    
+    {/* Кнопка - адаптивная */}
+    <button
+      style={{
+        position: 'absolute',
+        left: `${bookmarkPosition.x}px`,
+        top: `${bookmarkPosition.y}px`,
+        transform: 'translateX(0)',
+        zIndex: 999999,
+        background: 'rgba(0, 0, 0, 0.9)',
+        color: '#3fcaaf',
+        padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
+        borderRadius: '8px',
+        fontSize: window.innerWidth < 640 ? '12px' : '14px',
+        fontWeight: 'bold',
+        border: '2px solid #3fcaaf',
+        boxShadow: '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)',
+        cursor: 'pointer',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        transition: 'all 0.2s ease',
+        whiteSpace: 'nowrap',
+        maxWidth: '150px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }}
+      onClick={saveBookmark}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(0, 0, 0, 1)';
+        e.currentTarget.style.boxShadow = '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)';
+      }}
+    >
+      🔖 {window.innerWidth < 640 ? 'Сохр.' : 'Сохранить'}
+    </button>
+  </>
+)}
     </div>
   );
 }

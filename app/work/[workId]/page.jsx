@@ -141,6 +141,15 @@ const sendDiscussion = async (parentId = null) => {
   }
 
   try {
+    // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ПРОФИЛЯ
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('nickname')
+      .eq('user_id', currentUser.id)
+      .single();
+
+    const nickname = profile?.nickname || currentUser.email?.split('@')[0] || 'Аноним';
+
     const res = await fetch('/api/ugc', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -148,9 +157,9 @@ const sendDiscussion = async (parentId = null) => {
         action: 'add_comment',
         userId: currentUser.id,
         workId: workId,
-        nickname: currentUser.email?.split('@')[0] || 'Аноним',
+        nickname: nickname, // ← Используем реальный никнейм
         message: messageToSend.trim(),
-        parentCommentId: parentId // ← Передаём ID родительского комментария
+        parentCommentId: parentId
       })
     });
 
@@ -172,7 +181,7 @@ const sendDiscussion = async (parentId = null) => {
     console.error('Ошибка:', err);
     alert('Ошибка: ' + err.message);
   }
-}; 
+};
 
 const deleteDiscussion = async (commentId) => {
   if (!currentUser) return;
@@ -1045,7 +1054,7 @@ if (showAgeVerification) {
                             <span 
                               className="text-xs px-2 py-1 rounded" 
                               style={{ 
-                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#ef4444',
+                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#9ddddb',
                                 color: 'white'
                               }}
                             >

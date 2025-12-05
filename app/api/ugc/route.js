@@ -7,7 +7,25 @@ const supabaseUGC = createClient(
 );
 
 export async function POST(request) {
-  const { action, userId, workId, message, nickname, commentId, parentCommentId } = await request.json();
+  // ВАЖНО: читаем body ОДИН РАЗ!
+  const body = await request.json();
+  const { 
+    action, 
+    userId, 
+    workId, 
+    message, 
+    nickname, 
+    commentId, 
+    parentCommentId, 
+    chapterId, 
+    selectedText, 
+    workTitle, 
+    chapterNumber, 
+    bookmarkId, 
+    imageUrl, 
+    imageSource,
+    imageId 
+  } = body;
 
   try {
     if (action === 'add_favorite') {
@@ -47,9 +65,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true, data });
     }
 
-    // 🆕 УДАЛЕНИЕ КОММЕНТАРИЯ
     if (action === 'delete_comment') {
-      // Проверяем, что комментарий принадлежит пользователю
       const { data: comment, error: fetchError } = await supabaseUGC
         .from('work_discussions')
         .select('user_id')
@@ -64,11 +80,66 @@ export async function POST(request) {
         }, { status: 403 });
       }
       
-      // Удаляем комментарий
       const { error } = await supabaseUGC
         .from('work_discussions')
         .delete()
         .eq('id', commentId);
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true });
+    }
+
+    // ========== ЗАКЛАДКИ ==========
+    if (action === 'add_bookmark') {
+      const { data, error } = await supabaseUGC
+        .from('user_bookmarks')
+        .insert({
+          user_id: userId,
+          work_id: workId,
+          chapter_id: chapterId,
+          selected_text: selectedText,
+          work_title: workTitle,
+          chapter_number: chapterNumber
+        })
+        .select();
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true, data });
+    }
+
+    if (action === 'delete_bookmark') {
+      const { error } = await supabaseUGC
+        .from('user_bookmarks')
+        .delete()
+        .eq('id', bookmarkId)
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true });
+    }
+
+    // ========== СОХРАНЕНИЕ КАРТИНОК ==========
+    if (action === 'save_image') {
+      const { data, error } = await supabaseUGC
+        .from('saved_images')
+        .insert({
+          user_id: userId,
+          work_id: workId,
+          image_url: imageUrl,
+          image_source: imageSource
+        })
+        .select();
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true, data });
+    }
+
+    if (action === 'delete_image') {
+      const { error } = await supabaseUGC
+        .from('saved_images')
+        .delete()
+        .eq('id', imageId)
+        .eq('user_id', userId);
       
       if (error) throw error;
       return NextResponse.json({ success: true });
@@ -101,7 +172,6 @@ export async function GET(request) {
     }
 
     if (action === 'get_discussions') {
-      // Загружаем все комментарии (включая ответы)
       const { data, error } = await supabaseUGC
         .from('work_discussions')
         .select('*')
@@ -110,6 +180,30 @@ export async function GET(request) {
       
       if (error) throw error;
       return NextResponse.json({ discussions: data });
+    }
+
+    // ========== ЗАКЛАДКИ ==========
+    if (action === 'get_bookmarks') {
+      const { data, error } = await supabaseUGC
+        .from('user_bookmarks')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return NextResponse.json({ bookmarks: data });
+    }
+
+    // ========== СОХРАНЕННЫЕ КАРТИНКИ ==========
+    if (action === 'get_saved_images') {
+      const { data, error } = await supabaseUGC
+        .from('saved_images')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return NextResponse.json({ images: data });
     }
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
