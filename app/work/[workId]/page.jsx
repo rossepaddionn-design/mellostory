@@ -29,7 +29,8 @@ const [showDiscussionModal, setShowDiscussionModal] = useState(false);
 const [discussions, setDiscussions] = useState([]);
 const [newDiscussion, setNewDiscussion] = useState('');
 const [isFavorited, setIsFavorited] = useState(false);
-
+const [replyingTo, setReplyingTo] = useState(null); // ID комментария, на который отвечаем
+const [replyText, setReplyText] = useState(''); // Текст ответа
 
   const t = {
     backToMain: 'На главную',
@@ -74,28 +75,24 @@ useEffect(() => {
 }, [workId, currentUser]);
 
 const loadDiscussions = async () => {
-const { data } = await supabaseUGC
-  .from('work_discussions')
-    .select('*')
-    .eq('work_id', workId)
-    .order('created_at', { ascending: false })
-    .limit(10);
-  
-  if (data) setDiscussions(data);
+  try {
+    const res = await fetch(`/api/ugc?action=get_discussions&workId=${workId}`);
+    const { discussions } = await res.json();
+    setDiscussions(discussions || []);
+  } catch (err) {
+    console.error('Ошибка загрузки комментариев:', err);
+  }
 };
 
 const checkFavorite = async () => {
   if (!currentUser) return;
   
-const { data, error } = await supabaseUGC
-  .from('user_favorites')
-    .select('id')
-    .eq('user_id', currentUser.id)
-    .eq('work_id', workId)
-    .maybeSingle();
-  
-  if (!error && data) {
-    setIsFavorited(true);
+  try {
+    const res = await fetch(`/api/ugc?action=check_favorite&userId=${currentUser.id}&workId=${workId}`);
+    const { isFavorited } = await res.json();
+    setIsFavorited(isFavorited);
+  } catch (err) {
+    console.error('Ошибка проверки избранного:', err);
   }
 };
 
@@ -104,50 +101,106 @@ const toggleFavorite = async () => {
     alert('Войдите, чтобы добавить в избранное!');
     return;
   }
-  
-  if (isFavorited) {
-await supabaseUGC
-  .from('user_favorites')
-  .delete()
-      .eq('user_id', currentUser.id)
-      .eq('work_id', workId);
-    setIsFavorited(false);
-    alert('Удалено из избранного');
-  } else {
-await supabaseUGC
-  .from('user_favorites')
-  .insert({ user_id: currentUser.id, work_id: workId });
-    setIsFavorited(true);
-    alert('Добавлено в избранное! ❤️');
+
+  try {
+    const res = await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: isFavorited ? 'remove_favorite' : 'add_favorite',
+        userId: currentUser.id,
+        workId: workId
+      })
+    });
+
+    const result = await res.json();
+    
+    if (result.success) {
+      setIsFavorited(!isFavorited);
+      alert(isFavorited ? 'Удалено из избранного' : 'Добавлено в избранное! ❤️');
+    } else {
+      alert('Ошибка: ' + result.error);
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    alert('Ошибка: ' + err.message);
   }
 };
 
-const sendDiscussion = async () => {
+const sendDiscussion = async (parentId = null) => {
   if (!currentUser) {
     alert('Войдите, чтобы оставить комментарий!');
     return;
   }
   
-  if (!newDiscussion.trim()) {
+  const messageToSend = parentId ? replyText : newDiscussion;
+  
+  if (!messageToSend.trim()) {
     alert('Напишите комментарий!');
     return;
   }
-  
-const { error } = await supabaseUGC
-  .from('work_discussions')
-  .insert({
-      work_id: workId,
-      user_id: currentUser.id,
-      nickname: currentUser.email.split('@')[0], // или userProfile?.nickname если есть
-      message: newDiscussion.trim()
+
+  try {
+    const res = await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add_comment',
+        userId: currentUser.id,
+        workId: workId,
+        nickname: currentUser.email?.split('@')[0] || 'Аноним',
+        message: messageToSend.trim(),
+        parentCommentId: parentId // ← Передаём ID родительского комментария
+      })
     });
+
+    const result = await res.json();
+    
+    if (result.success) {
+      alert(parentId ? 'Ответ отправлен! 💜' : 'Комментарий отправлен! 💜');
+      if (parentId) {
+        setReplyText('');
+        setReplyingTo(null);
+      } else {
+        setNewDiscussion('');
+      }
+      loadDiscussions();
+    } else {
+      alert('Ошибка: ' + result.error);
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    alert('Ошибка: ' + err.message);
+  }
+}; 
+
+const deleteDiscussion = async (commentId) => {
+  if (!currentUser) return;
   
-  if (error) {
-    alert('Ошибка отправки: ' + error.message);
-  } else {
-    alert('Комментарий отправлен! 💜');
-    setNewDiscussion('');
-    loadDiscussions();
+  if (!confirm('Удалить комментарий?')) return;
+
+  try {
+    const res = await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'delete_comment',
+        userId: currentUser.id,
+        commentId: commentId
+      })
+    });
+
+    const result = await res.json();
+    
+    if (result.success) {
+      alert('Комментарий удалён');
+      loadDiscussions();
+    } else {
+      alert('Ошибка: ' + result.error);
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    alert('Ошибка: ' + err.message);
   }
 };
 
@@ -954,7 +1007,7 @@ if (showAgeVerification) {
                   background-clip: text;
                   animation: shimmerDiscussion 3s linear infinite;
                 }
-              `}} />
+`}} />
               <h2 className="text-xl sm:text-2xl font-bold discussion-title flex items-center gap-2">
                 💬 Обсуждение работы
               </h2>
@@ -973,38 +1026,160 @@ if (showAgeVerification) {
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
-                  {discussions.map((disc) => (
-                    <div 
-                      key={disc.id}
-                      className="rounded-lg p-3 sm:p-4 border transition"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(139, 60, 200, 0.2) 0%, rgba(74, 29, 110, 0.2) 100%)',
-                        borderColor: 'rgba(139, 60, 200, 0.4)'
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-bold text-sm sm:text-base" style={{ color: '#b3e7ef' }}>
-                          {disc.nickname}
+                  {discussions
+                    .filter(d => !d.parent_comment_id)
+                    .map((disc) => (
+                    <div key={disc.id} className="space-y-2">
+                      <div 
+                        className="rounded-lg p-3 sm:p-4 border transition"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(139, 60, 200, 0.2) 0%, rgba(74, 29, 110, 0.2) 100%)',
+                          borderColor: 'rgba(139, 60, 200, 0.4)'
+                        }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm sm:text-base" style={{ color: '#b3e7ef' }}>
+                              {disc.nickname}
+                            </span>
+                            <span 
+                              className="text-xs px-2 py-1 rounded" 
+                              style={{ 
+                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#ef4444',
+                                color: 'white'
+                              }}
+                            >
+                              {disc.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setReplyingTo(disc.id);
+                                setReplyText('');
+                              }}
+                              className="text-cyan-400 hover:text-cyan-300 transition text-xs"
+                            >
+                              Ответить
+                            </button>
+                            
+                            {currentUser && disc.user_id === currentUser.id && (
+                              <button
+                                onClick={() => deleteDiscussion(disc.id)}
+                                className="text-red-400 hover:text-red-300 transition text-xs"
+                              >
+                                Удалить
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <p className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2">
+                          {disc.message}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {new Date(disc.created_at).toLocaleString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </span>
-                        <span className="text-xs px-2 py-1 rounded" style={{ 
-                          background: '#ef4444',
-                          color: 'white'
-                        }}>
-                          Читатель
-                        </span>
+                        
+                        {replyingTo === disc.id && (
+                          <div className="mt-3 pl-4 border-l-2" style={{ borderColor: '#8b3cc8' }}>
+                            <textarea
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              rows={2}
+                              placeholder="Напишите ответ..."
+                              className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
+                              style={{ borderColor: '#8b3cc8' }}
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => sendDiscussion(disc.id)}
+                                className="px-4 py-2 rounded-lg font-bold text-sm transition"
+                                style={{
+                                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+                                  color: '#fff'
+                                }}
+                              >
+                                Отправить
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setReplyingTo(null);
+                                  setReplyText('');
+                                }}
+                                className="px-4 py-2 rounded-lg font-bold text-sm transition"
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid #8b3cc8',
+                                  color: '#8b3cc8'
+                                }}
+                              >
+                                Отмена
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2">
-                        {disc.message}
-                      </p>
-                      <span className="text-xs text-gray-500">
-                        {new Date(disc.created_at).toLocaleString('ru-RU', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
+                      
+                      {discussions
+                        .filter(reply => reply.parent_comment_id === disc.id)
+                        .map(reply => (
+                          <div 
+                            key={reply.id}
+                            className="ml-6 sm:ml-12 rounded-lg p-3 border transition"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(179, 231, 239, 0.15) 0%, rgba(139, 60, 200, 0.15) 100%)',
+                              borderColor: 'rgba(179, 231, 239, 0.3)'
+                            }}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-xs sm:text-sm" style={{ color: '#b3e7ef' }}>
+                                  {reply.nickname}
+                                </span>
+                                <span 
+                                  className="text-xs px-2 py-0.5 rounded" 
+                                  style={{ 
+                                    background: reply.nickname === 'Мелло' ? '#9333ea' : '#ef4444',
+                                    color: 'white',
+                                    fontSize: '10px'
+                                  }}
+                                >
+                                  {reply.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
+                                </span>
+                              </div>
+                              
+                              {currentUser && reply.user_id === currentUser.id && (
+                                <button
+                                  onClick={() => deleteDiscussion(reply.id)}
+                                  className="text-red-400 hover:text-red-300 transition text-xs"
+                                >
+                                  Удалить
+                                </button>
+                              )}
+                            </div>
+                            
+                            <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words mb-2">
+                              {reply.message}
+                            </p>
+                            <span className="text-xs text-gray-500">
+                              {new Date(reply.created_at).toLocaleString('ru-RU', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                        ))}
                     </div>
                   ))}
                 </div>
@@ -1024,7 +1199,7 @@ if (showAgeVerification) {
                 }}
               />
               <button
-                onClick={sendDiscussion}
+                onClick={() => sendDiscussion()}
                 disabled={!currentUser || !newDiscussion.trim()}
                 className="w-full py-3 rounded-lg font-bold transition"
                 style={{

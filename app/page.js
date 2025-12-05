@@ -1802,12 +1802,12 @@ onMouseLeave={(e) => e.currentTarget.style.borderColor = update.type === 'new_wo
 
 {/* READER MESSAGES MODAL */}
 {showReaderMessagesModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-8">
-<div className="bg-black rounded-lg w-full max-w-4xl h-[90vh] sm:h-[85vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 sm:p-6 border-b border-gray-700 gap-2">
-    <h2 className="text-lg sm:text-2xl font-bold text-center">
-      <span className="shimmer-btn-text">📧 Мои сообщения</span>
-    </h2>
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div className="bg-black rounded-lg w-full max-w-4xl my-4 sm:my-8 flex flex-col border-2 max-h-[95vh]" style={{ borderColor: '#a837d7' }}>
+      <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700 gap-2 flex-shrink-0 sticky top-0 bg-black z-10">
+        <h2 className="text-lg sm:text-2xl font-bold">
+          <span className="shimmer-btn-text">📧 Мои сообщения</span>
+        </h2>
         <button 
           onClick={() => {
             setShowReaderMessagesModal(false);
@@ -1815,7 +1815,7 @@ onMouseLeave={(e) => e.currentTarget.style.borderColor = update.type === 'new_wo
             setNewMessageText('');
             setReplyMessageText('');
           }} 
-          className="text-gray-400 hover:text-white self-end sm:self-auto z-50"
+          className="text-gray-400 hover:text-white flex-shrink-0"
         >
           <X size={20} className="sm:w-6 sm:h-6" />
         </button>
@@ -2579,9 +2579,9 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 
 {/* MODAL: COLLECTION */}
 {showCollectionModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-4">
-    <div className="bg-black rounded-lg w-full h-[95vh] sm:h-[90vh] sm:max-w-5xl flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
-      <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700 flex-shrink-0">
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div className="bg-black rounded-lg w-full sm:max-w-5xl my-4 sm:my-8 flex flex-col border-2 max-h-[95vh]" style={{ borderColor: '#a837d7' }}>
+      <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700 flex-shrink-0 sticky top-0 bg-black z-10">
         <h2 className="text-lg sm:text-2xl font-bold">
           <span className="shimmer-btn-text">💜 Моя коллекция</span>
         </h2>
