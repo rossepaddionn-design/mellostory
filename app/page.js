@@ -1286,24 +1286,11 @@ style={{
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0">
-<h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes hologram {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .hologram-text {
-      background: linear-gradient(45deg, #b3e7ef 0%, #ef01cb 25%, #8b3cc8 50%, #b3e7ef 75%, #ef01cb 100%);
-      background-size: 400% 400%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: hologram 3s ease infinite;
-      filter: drop-shadow(0 0 20px rgba(179, 231, 239, 0.7));
-    }
-  `}} />
-  <span className="hologram-text">Популярные работы</span>
+<h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{
+  color: '#b3e7ef',
+  textShadow: '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)'
+}}>
+  Популярные работы
 </h2>
   
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
@@ -1340,7 +1327,10 @@ style={{
 
         {work.title ? (
           <>
-<h3 className="font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words hologram-text">
+<h3 className="font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words" style={{
+  color: '#b3e7ef',
+  textShadow: '0 0 15px rgba(179, 231, 239, 0.6)'
+}}>
   {work.title}
 </h3>
             
@@ -2589,22 +2579,22 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 
 {/* MODAL: COLLECTION */}
 {showCollectionModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="bg-black rounded-lg w-full max-w-5xl h-[90vh] flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
-      <div className="flex justify-between items-center p-6 border-b border-gray-700">
-        <h2 className="text-2xl font-bold">
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="bg-black rounded-lg w-full h-[95vh] sm:h-[90vh] sm:max-w-5xl flex flex-col border-2" style={{ borderColor: '#a837d7' }}>
+      <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-700 flex-shrink-0">
+        <h2 className="text-lg sm:text-2xl font-bold">
           <span className="shimmer-btn-text">💜 Моя коллекция</span>
         </h2>
         <button 
           onClick={() => setShowCollectionModal(false)} 
-          className="text-gray-400 hover:text-white"
+          className="text-gray-400 hover:text-white flex-shrink-0"
         >
-          <X size={24} />
+          <X size={20} className="sm:w-6 sm:h-6" />
         </button>
       </div>
 
       {/* ТАБЫ */}
-      <div className="flex border-b border-gray-700">
+      <div className="flex border-b border-gray-700 overflow-x-auto flex-shrink-0">
         <style dangerouslySetInnerHTML={{__html: `
           @keyframes shimmerTab {
             0% { background-position: -200% center; }
@@ -2621,14 +2611,14 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
         `}} />
         
         {[
-          { key: 'favorites', label: 'Избранные работы', icon: Heart },
+          { key: 'favorites', label: 'Избранное', icon: Heart },
           { key: 'gallery', label: 'Галерея', icon: ImageIcon },
           { key: 'bookmarks', label: 'Закладки', icon: Bookmark }
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setCollectionTab(key)}
-            className={`flex-1 px-6 py-4 font-semibold transition text-center ${
+            className={`flex-1 min-w-[100px] px-3 sm:px-6 py-3 sm:py-4 font-semibold transition text-center whitespace-nowrap ${
               collectionTab === key ? '' : 'bg-gray-800'
             }`}
             style={{
@@ -2638,8 +2628,8 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
             }}
           >
             <div className="flex items-center justify-center gap-2">
-              <Icon size={20} style={{ color: collectionTab === key ? '#b3e7ef' : '#666' }} />
-              <span className={collectionTab === key ? 'tab-shimmer' : 'text-gray-400'}>
+              <Icon size={16} className="sm:w-5 sm:h-5" style={{ color: collectionTab === key ? '#b3e7ef' : '#666' }} />
+              <span className={`text-xs sm:text-base ${collectionTab === key ? 'tab-shimmer' : 'text-gray-400'}`}>
                 {label}
               </span>
             </div>
@@ -2648,33 +2638,34 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
       </div>
 
       {/* КОНТЕНТ */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
         {collectionTab === 'favorites' && (
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
               Избранные работы ({userFavorites.length})
             </h3>
             {userFavorites.length === 0 ? (
-              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-                <Heart size={48} className="mx-auto mb-3 text-gray-600" />
-                <p className="text-gray-500">У вас пока нет избранных работ</p>
+              <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <Heart size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+                <p className="text-sm sm:text-base text-gray-500">У вас пока нет избранных работ</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {userFavorites.map((work) => (
                   <Link
                     key={work.id}
                     href={`/work/${work.id}`}
                     className="rounded-lg overflow-hidden border-2 transition hover:scale-105"
                     style={{ borderColor: '#9333ea' }}
+                    onClick={() => setShowCollectionModal(false)}
                   >
                     <div className="aspect-[2/3] bg-gray-800 relative">
                       {work.cover_url && (
                         <img src={work.cover_url} alt={work.title} className="w-full h-full object-cover" />
                       )}
                     </div>
-                    <div className="p-4 bg-gray-900">
-                      <h4 className="text-white font-semibold text-base mb-2">{work.title}</h4>
+                    <div className="p-2 sm:p-4 bg-gray-900">
+                      <h4 className="text-white font-semibold text-xs sm:text-base mb-1 sm:mb-2 line-clamp-2">{work.title}</h4>
                       <p className="text-gray-400 text-xs line-clamp-2">{work.description}</p>
                     </div>
                   </Link>
@@ -2686,16 +2677,16 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 
         {collectionTab === 'gallery' && (
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
               Галерея ({userGallery.length})
             </h3>
             {userGallery.length === 0 ? (
-              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-                <ImageIcon size={48} className="mx-auto mb-3 text-gray-600" />
-                <p className="text-gray-500">У вас пока нет сохранённых изображений</p>
+              <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <ImageIcon size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+                <p className="text-sm sm:text-base text-gray-500">У вас пока нет сохранённых изображений</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {userGallery.map((img) => (
                   <div key={img.id} className="aspect-square rounded-lg overflow-hidden border-2 border-purple-600 relative group">
                     <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
@@ -2705,9 +2696,9 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                         await supabaseUGC.from('user_saved_images').delete().eq('id', img.id);
                         loadUserCollection();
                       }}
-                      className="absolute top-2 right-2 bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition"
+                      className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-600 rounded-full p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition"
                     >
-                      <X size={16} />
+                      <X size={12} className="sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 ))}
@@ -2718,22 +2709,22 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
 
         {collectionTab === 'bookmarks' && (
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-gray-300">
+            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
               Закладки ({userBookmarks.length})
             </h3>
             {userBookmarks.length === 0 ? (
-              <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-                <Bookmark size={48} className="mx-auto mb-3 text-gray-600" />
-                <p className="text-gray-500">У вас пока нет закладок</p>
+              <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+                <Bookmark size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+                <p className="text-sm sm:text-base text-gray-500">У вас пока нет закладок</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {userBookmarks.map((bookmark) => (
-                  <div key={bookmark.id} className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="text-white font-semibold">{bookmark.work_title}</h4>
-                        <p className="text-gray-400 text-sm">Глава {bookmark.chapter_number}</p>
+                  <div key={bookmark.id} className="bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-gray-700">
+                    <div className="flex justify-between items-start mb-2 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
+                        <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
                       </div>
                       <button
                         onClick={async () => {
@@ -2741,13 +2732,13 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                           await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
                           loadUserCollection();
                         }}
-                        className="text-red-500 hover:text-red-400"
+                        className="text-red-500 hover:text-red-400 flex-shrink-0"
                       >
-                        <X size={18} />
+                        <X size={16} className="sm:w-5 sm:h-5" />
                       </button>
                     </div>
-                    <p className="text-gray-300 text-sm bg-gray-900 p-3 rounded">
-                      "{bookmark.selected_text.slice(0, 150)}{bookmark.selected_text.length > 150 ? '...' : ''}"
+                    <p className="text-gray-300 text-xs sm:text-sm bg-gray-900 p-2 sm:p-3 rounded line-clamp-3">
+                      "{bookmark.selected_text}"
                     </p>
                   </div>
                 ))}
