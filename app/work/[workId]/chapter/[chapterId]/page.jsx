@@ -24,7 +24,7 @@ export default function ChapterPage() {
   const [readProgress, setReadProgress] = useState(0);
 const [showAgeVerification, setShowAgeVerification] = useState(false);
 const [currentUser, setCurrentUser] = useState(null);
-const [showBookmarkButton, setShowBookmarkButton] = useState(false);
+const [showBookmarkButton, setShowBookmarkButton] = useState(true);
 const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
 const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
 
@@ -301,9 +301,8 @@ const handleTextSelection = () => {
     
     if (text.length > 0 && text.length <= 500) {
       setSelectedTextForBookmark(text);
-      setShowBookmarkButton(true); // ✅ Кнопка загорается
     } else {
-      setShowBookmarkButton(false); // ✅ Гаснет если нет выделения
+      setSelectedTextForBookmark('');
     }
   }, 100);
 };
@@ -1118,25 +1117,25 @@ return (
       </main>
 {/* ПЛАВАЮЩАЯ КНОПКА ЗАКЛАДКИ */}
 <button
-  onClick={showBookmarkButton ? saveBookmark : null}
+  onClick={saveBookmark}
   disabled={!showBookmarkButton}
-  style={{
+ style={{
     position: 'fixed',
-    bottom: '30px',
+    bottom: '80px',
     right: '30px',
     zIndex: 999999,
-    background: showBookmarkButton 
+    background: selectedTextForBookmark 
       ? 'linear-gradient(135deg, #3fcaaf 0%, #2a9d8f 100%)' 
       : 'rgba(100, 100, 100, 0.3)',
-    color: showBookmarkButton ? '#000' : '#666',
+    color: selectedTextForBookmark ? '#000' : '#666',
     padding: '16px',
     borderRadius: '50%',
     fontSize: '28px',
-    border: showBookmarkButton ? '3px solid #3fcaaf' : '3px solid #444',
-    boxShadow: showBookmarkButton 
+    border: selectedTextForBookmark ? '3px solid #3fcaaf' : '3px solid #444',
+    boxShadow: selectedTextForBookmark 
       ? '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)' 
       : 'none',
-    cursor: showBookmarkButton ? 'pointer' : 'not-allowed',
+    cursor: 'pointer',
     backdropFilter: 'blur(10px)',
     width: '64px',
     height: '64px',
@@ -1144,11 +1143,11 @@ return (
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'all 0.3s ease',
-    animation: showBookmarkButton ? 'bookmarkPulse 1.5s ease-in-out infinite' : 'none',
-    opacity: showBookmarkButton ? 1 : 0.4
+    animation: selectedTextForBookmark ? 'bookmarkPulse 1.5s ease-in-out infinite' : 'none',
+    opacity: selectedTextForBookmark ? 1 : 0.4
   }}
 >
-  🔖
+  ➲
 </button>
     </div>
   );
