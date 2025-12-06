@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+// UGC база для пользовательского контента
 const supabaseUGC = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_UGC_URL,
   process.env.SUPABASE_UGC_SERVICE_ROLE_KEY
 );
 
+// 🔥 ОСНОВНАЯ база для профилей
+const supabaseMain = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 export async function POST(request) {
-  // ВАЖНО: читаем body ОДИН РАЗ!
   const body = await request.json();
   const { 
     action,
