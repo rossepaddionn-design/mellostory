@@ -299,14 +299,15 @@ const handleTextSelection = () => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
     
+    console.log('📱 Выделенный текст:', text); // ДЛЯ ОТЛАДКИ
+    
     if (text.length > 0 && text.length <= 500) {
       setSelectedTextForBookmark(text);
     } else {
       setSelectedTextForBookmark('');
     }
-  }, 100);
+  }, 500); // ⬅️ УВЕЛИЧИЛ ЗАДЕРЖКУ С 100 ДО 300
 };
-
 
 const saveBookmark = async () => {
   if (!currentUser) {
