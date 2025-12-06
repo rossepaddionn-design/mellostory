@@ -110,7 +110,7 @@ if (chapterId && workId) {
               
               break;
             }
-          }
+          } 
         }
         sessionStorage.removeItem('highlightBookmark');
       }, 1000);
