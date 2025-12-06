@@ -296,7 +296,7 @@ const response = await fetch('/api/ugc', {
     workTitle: work?.title,
     chapterNumber: chapter?.chapter_number
   })
-}); 
+});
     
     const data = await response.json();
     

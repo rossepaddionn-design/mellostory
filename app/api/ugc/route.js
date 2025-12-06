@@ -10,7 +10,7 @@ export async function POST(request) {
   // ВАЖНО: читаем body ОДИН РАЗ!
   const body = await request.json();
   const { 
-    action, 
+    action,
     userId, 
     workId, 
     message, 

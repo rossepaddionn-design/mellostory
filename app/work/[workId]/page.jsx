@@ -1054,7 +1054,7 @@ if (showAgeVerification) {
                             <span 
                               className="text-xs px-2 py-1 rounded" 
                               style={{ 
-                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#9ddddb',
+                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#700a21',
                                 color: 'white'
                               }}
                             >
