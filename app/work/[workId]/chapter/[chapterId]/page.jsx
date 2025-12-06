@@ -134,7 +134,9 @@ if (chapterId && workId) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
     const handleSelectionChange = () => {
       const selection = window.getSelection();
       const text = selection.toString().trim();
@@ -146,9 +148,28 @@ if (chapterId && workId) {
       }
     };
 
-    document.addEventListener('selectionchange', handleSelectionChange);
-    
-    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+    if (isMobile) {
+      // На мобильном используем selectionchange (работает при двойном клике)
+      document.addEventListener('selectionchange', handleSelectionChange);
+      return () => document.removeEventListener('selectionchange', handleSelectionChange);
+    } else {
+      // На ПК используем mouseup для обычного выделения
+      const handleMouseUp = () => {
+        setTimeout(() => {
+          const selection = window.getSelection();
+          const text = selection.toString().trim();
+          
+          if (text.length > 0 && text.length <= 500) {
+            setSelectedTextForBookmark(text);
+          } else {
+            setSelectedTextForBookmark('');
+          }
+        }, 10);
+      };
+      
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => document.removeEventListener('mouseup', handleMouseUp);
+    }
   }, []);
 
   useEffect(() => {
