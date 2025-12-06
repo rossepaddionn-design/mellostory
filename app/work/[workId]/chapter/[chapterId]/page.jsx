@@ -70,9 +70,53 @@ useEffect(() => {
   
   checkAuth();
   
-  if (chapterId && workId) {
+if (chapterId && workId) {
     loadAllData();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // ⬇️ Подсветка текста закладки
+    const bookmarkText = sessionStorage.getItem('highlightBookmark');
+    if (bookmarkText) {
+      setTimeout(() => {
+        const textContent = document.querySelector('.chapter-text-content');
+        if (textContent && textContent.textContent.includes(bookmarkText)) {
+          // Находим текст и подсвечиваем
+          const walker = document.createTreeWalker(textContent, NodeFilter.SHOW_TEXT);
+          let node;
+          while (node = walker.nextNode()) {
+            const index = node.textContent.indexOf(bookmarkText);
+            if (index !== -1) {
+              const range = document.createRange();
+              range.setStart(node, index);
+              range.setEnd(node, index + bookmarkText.length);
+              
+              const rect = range.getBoundingClientRect();
+              window.scrollTo({ 
+                top: rect.top + window.scrollY - 100, 
+                behavior: 'smooth' 
+              });
+              
+              // Подсвечиваем жёлтым на 3 секунды
+              const span = document.createElement('span');
+              span.style.cssText = 'background: yellow; color: black; padding: 2px 4px; border-radius: 3px; transition: all 1s ease;';
+              span.textContent = bookmarkText;
+              
+              const parent = node.parentNode;
+              parent.replaceChild(span, node);
+              
+              setTimeout(() => {
+                span.style.background = 'transparent';
+                span.style.color = 'inherit';
+              }, 3000);
+              
+              break;
+            }
+          }
+        }
+        sessionStorage.removeItem('highlightBookmark');
+      }, 1000);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }, [chapterId, workId]);
 
@@ -250,31 +294,18 @@ useEffect(() => {
   setShowChapterList(false);
 };
 
-const handleTextSelection = (e) => {
+const handleTextSelection = () => {
   setTimeout(() => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
     
     if (text.length > 0 && text.length <= 500) {
-      const range = selection.getRangeAt(0);
-      const rects = range.getClientRects();
-      const lastRect = rects[rects.length - 1];
-      
-      let x = lastRect.right + window.scrollX + 10;
-      let y = lastRect.bottom + window.scrollY + 10;
-      
-      const maxX = document.documentElement.scrollWidth - 60;
-      const minX = 10;
-      
-      x = Math.max(minX, Math.min(x, maxX));
-      
       setSelectedTextForBookmark(text);
-      setBookmarkPosition({ x, y });
-      setShowBookmarkButton(true);
-      
-      // ✅ НЕ УБИРАЕМ ВЫДЕЛЕНИЕ - кнопка останется!
+      setShowBookmarkButton(true); // ✅ Кнопка загорается
+    } else {
+      setShowBookmarkButton(false); // ✅ Гаснет если нет выделения
     }
-  }, 200); // Увеличил задержку для стабильности
+  }, 100);
 };
 
 
@@ -299,32 +330,17 @@ const saveBookmark = async () => {
     const data = await response.json();
     
     if (data.success) {
-      // ✅ Закрываем кнопку и убираем выделение
-      closeBookmarkButton();
+      setShowBookmarkButton(false);
+      setSelectedTextForBookmark('');
+      window.getSelection().removeAllRanges();
       
-      const notification = document.createElement('div');
-      notification.textContent = '✅ Закладка сохранена!';
-      notification.style.cssText = `
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #3fcaaf 0%, #2a9d8f 100%);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: bold;
-        z-index: 99999;
-        box-shadow: 0 4px 12px rgba(63, 202, 175, 0.5);
-      `;
-      document.body.appendChild(notification);
-      setTimeout(() => notification.remove(), 2000);
+      alert('✅ Закладка сохранена!');
     }
   } catch (error) {
-    console.error('Ошибка сохранения:', error);
+    console.error('Ошибка:', error);
+    alert('❌ Ошибка сохранения!');
   }
 };
-
 const closeBookmarkButton = () => {
   setShowBookmarkButton(false);
   setSelectedTextForBookmark('');
@@ -1100,60 +1116,40 @@ return (
           )}
         </div>
       </main>
-{/* КНОПКА ЗАКЛАДКИ - ТОЛЬКО ИКОНКА */}
-{showBookmarkButton && (
-  <>
-    <div 
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 999998,
-        background: 'rgba(0, 0, 0, 0.3)'
-      }}
-      onClick={closeBookmarkButton}
-    />
-    
-    <button
-      style={{
-        position: 'absolute',
-        left: `${bookmarkPosition.x}px`,
-        top: `${bookmarkPosition.y}px`,
-        transform: 'translateX(0)',
-        zIndex: 999999,
-        background: 'rgba(0, 0, 0, 0.9)',
-        color: '#3fcaaf',
-        padding: '12px',
-        borderRadius: '50%',
-        fontSize: '24px',
-        fontWeight: 'bold',
-        border: '2px solid #3fcaaf',
-        boxShadow: '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)',
-        cursor: 'pointer',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        transition: 'all 0.2s ease',
-        width: '48px',
-        height: '48px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-      onClick={saveBookmark}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(0, 0, 0, 1)';
-        e.currentTarget.style.boxShadow = '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)';
-        e.currentTarget.style.transform = 'translateX(0) scale(1.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
-        e.currentTarget.style.boxShadow = '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)';
-        e.currentTarget.style.transform = 'translateX(0) scale(1)';
-      }}
-    >
-      🔖
-    </button>
-  </>
-)}
+{/* ПЛАВАЮЩАЯ КНОПКА ЗАКЛАДКИ */}
+<button
+  onClick={showBookmarkButton ? saveBookmark : null}
+  disabled={!showBookmarkButton}
+  style={{
+    position: 'fixed',
+    bottom: '30px',
+    right: '30px',
+    zIndex: 999999,
+    background: showBookmarkButton 
+      ? 'linear-gradient(135deg, #3fcaaf 0%, #2a9d8f 100%)' 
+      : 'rgba(100, 100, 100, 0.3)',
+    color: showBookmarkButton ? '#000' : '#666',
+    padding: '16px',
+    borderRadius: '50%',
+    fontSize: '28px',
+    border: showBookmarkButton ? '3px solid #3fcaaf' : '3px solid #444',
+    boxShadow: showBookmarkButton 
+      ? '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)' 
+      : 'none',
+    cursor: showBookmarkButton ? 'pointer' : 'not-allowed',
+    backdropFilter: 'blur(10px)',
+    width: '64px',
+    height: '64px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.3s ease',
+    animation: showBookmarkButton ? 'bookmarkPulse 1.5s ease-in-out infinite' : 'none',
+    opacity: showBookmarkButton ? 1 : 0.4
+  }}
+>
+  🔖
+</button>
     </div>
   );
 }

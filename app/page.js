@@ -2724,13 +2724,7 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
             key={bookmark.id}
             className="bg-gray-800 rounded-lg border-2 border-gray-700 hover:border-purple-600 transition overflow-hidden"
           >
-            
-              href={`/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}`}
-              className="block p-3 sm:p-4 cursor-pointer"
-              onClick={(e) => {
-                setShowCollectionModal(false);
-              }}
-            >
+            <div className="p-3 sm:p-4">
               <div className="flex justify-between items-start mb-2 gap-2">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
@@ -2740,34 +2734,48 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                   </p>
                 </div>
                 <button
-                  onClick={async (e) => {
-                    e.preventDefault();
+ onClick={async (e) => {
                     e.stopPropagation();
                     if (!confirm('Удалить закладку?')) return;
                     await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
                     loadUserCollection();
                   }}
-                  className="text-red-500 hover:text-red-400 flex-shrink-0 z-10"
+                  className="text-red-500 hover:text-red-400 flex-shrink-0"
                 >
                   <X size={16} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
-              <div className="bg-gray-900 p-2 sm:p-3 rounded">
+              <div className="bg-gray-900 p-2 sm:p-3 rounded mb-3">
                 <p className="text-gray-300 text-xs sm:text-sm line-clamp-3">
-                  "{bookmark.selected_text}"
+                  &quot;{bookmark.selected_text}&quot;
                 </p>
               </div>
-              <div className="mt-2 flex items-center gap-2 text-purple-400 text-xs">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <button
+                onClick={() => {
+                  sessionStorage.setItem('highlightBookmark', bookmark.selected_text);
+                  setShowCollectionModal(false);
+                  window.location.href = `/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}`;
+                }}
+                className="w-full py-2 px-4 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+                  color: '#fff'
+                }}
+              >
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
-                <span>Нажмите, чтобы перейти</span>
-              </div>
-            </a>
+                Перейти к закладке
+</button>
+            </div>
           </div>
         ))}
       </div>
     )}
+  </div>
+)}
+      </div>
+    </div>
   </div>
 )}
 
@@ -2792,7 +2800,7 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
     </Link>
   </div>
 </footer>
-    </div>
+      </div>
     </>
   );
-} 
+}

@@ -49,46 +49,30 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'add_comment') {
-      const { data, error } = await supabaseUGC
-        .from('work_discussions')
-        .insert({
-          work_id: workId,
-          user_id: userId,
-          nickname: nickname,
-          message: message,
-          parent_comment_id: parentCommentId || null
-        })
-        .select();
-      
-      if (error) throw error;
-      return NextResponse.json({ success: true, data });
-    }
+  if (action === 'add_comment') {
+  // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ПРОФИЛЯ
+  const { data: profile } = await supabaseUGC
+    .from('reader_profiles')
+    .select('nickname')
+    .eq('user_id', userId)
+    .single();
 
-    if (action === 'delete_comment') {
-      const { data: comment, error: fetchError } = await supabaseUGC
-        .from('work_discussions')
-        .select('user_id')
-        .eq('id', commentId)
-        .single();
-      
-      if (fetchError) throw fetchError;
-      
-      if (comment.user_id !== userId) {
-        return NextResponse.json({ 
-          error: 'Вы можете удалять только свои комментарии' 
-        }, { status: 403 });
-      }
-      
-      const { error } = await supabaseUGC
-        .from('work_discussions')
-        .delete()
-        .eq('id', commentId);
-      
-      if (error) throw error;
-      return NextResponse.json({ success: true });
-    }
+  const actualNickname = profile?.nickname || 'Аноним';
 
+  const { data, error } = await supabaseUGC
+    .from('work_discussions')
+    .insert({
+      work_id: workId,
+      user_id: userId,
+      nickname: actualNickname, // ← Используем реальный никнейм
+      message: message,
+      parent_comment_id: parentCommentId || null
+    })
+    .select();
+  
+  if (error) throw error;
+  return NextResponse.json({ success: true, data });
+}
     // ========== ЗАКЛАДКИ ==========
     if (action === 'add_bookmark') {
       const { data, error } = await supabaseUGC
