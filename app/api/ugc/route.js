@@ -7,8 +7,8 @@ const supabaseUGC = createClient(
   process.env.SUPABASE_UGC_SERVICE_ROLE_KEY
 );
 
-// 🔥 ОСНОВНАЯ база для профилей
-const supabaseMain = createClient(
+// Основная база для профилей
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
@@ -55,30 +55,43 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
 
-  if (action === 'add_comment') {
-  // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ПРОФИЛЯ
-  const { data: profile } = await supabaseUGC
-    .from('reader_profiles')
-    .select('nickname')
-    .eq('user_id', userId)
-    .single();
+    if (action === 'add_comment') {
+      // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ОСНОВНОЙ БАЗЫ
+      const { data: profile } = await supabase
+        .from('reader_profiles')
+        .select('nickname')
+        .eq('user_id', userId)
+        .single();
 
-  const actualNickname = profile?.nickname || 'Аноним';
+      const actualNickname = profile?.nickname || 'Аноним';
 
-  const { data, error } = await supabaseUGC
-    .from('work_discussions')
-    .insert({
-      work_id: workId,
-      user_id: userId,
-      nickname: actualNickname, // ← Используем реальный никнейм
-      message: message,
-      parent_comment_id: parentCommentId || null
-    })
-    .select();
-  
-  if (error) throw error;
-  return NextResponse.json({ success: true, data });
-}
+      // Сохраняем комментарий в UGC базу
+      const { data, error } = await supabaseUGC
+        .from('work_discussions')
+        .insert({
+          work_id: workId,
+          user_id: userId,
+          nickname: actualNickname,
+          message: message,
+          parent_comment_id: parentCommentId || null
+        })
+        .select();
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true, data });
+    }
+
+    if (action === 'delete_comment') {
+      const { error } = await supabaseUGC
+        .from('work_discussions')
+        .delete()
+        .eq('id', commentId)
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+      return NextResponse.json({ success: true });
+    }
+
     // ========== ЗАКЛАДКИ ==========
     if (action === 'add_bookmark') {
       const { data, error } = await supabaseUGC

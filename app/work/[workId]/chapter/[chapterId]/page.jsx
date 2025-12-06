@@ -73,7 +73,7 @@ useEffect(() => {
 if (chapterId && workId) {
     loadAllData();
     
-    // ⬇️ Подсветка текста закладки
+// ⬇️ Подсветка текста закладки
     const bookmarkText = sessionStorage.getItem('highlightBookmark');
     if (bookmarkText) {
       setTimeout(() => {
@@ -89,23 +89,27 @@ if (chapterId && workId) {
               range.setStart(node, index);
               range.setEnd(node, index + bookmarkText.length);
               
-              const rect = range.getBoundingClientRect();
-              window.scrollTo({ 
-                top: rect.top + window.scrollY - 100, 
-                behavior: 'smooth' 
-              });
-              
-              // Подсвечиваем жёлтым на 3 секунды
+              // Подсвечиваем текст (работает и на ПК, и на мобильном)
               const span = document.createElement('span');
-              span.style.cssText = 'background: yellow; color: black; padding: 2px 4px; border-radius: 3px; transition: all 1s ease;';
+              span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; font-weight: bold; transition: all 1s ease;';
               span.textContent = bookmarkText;
               
               const parent = node.parentNode;
               parent.replaceChild(span, node);
               
+              // Скролл к элементу (работает и на ПК, и на мобильном)
+              setTimeout(() => {
+                span.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'center' 
+                });
+              }, 100);
+              
+              // Убираем подсветку через 3 секунды
               setTimeout(() => {
                 span.style.background = 'transparent';
                 span.style.color = 'inherit';
+                span.style.fontWeight = 'normal';
               }, 3000);
               
               break;
@@ -635,12 +639,24 @@ return (
             backdropFilter: 'blur(20px)',
             boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
           }}>
-            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+<div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
               borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
             }}>
-              <h2 className="text-xl sm:text-2xl font-bold" style={{
-                color: '#ffffff'
-              }}>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes chapterTitleShimmer {
+                  0% { background-position: -200% center; }
+                  100% { background-position: 200% center; }
+                }
+                .chapter-title-shimmer {
+                  background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
+                  background-size: 200% auto;
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  animation: chapterTitleShimmer 3s linear infinite;
+                }
+              `}} />
+              <h2 className="text-xl sm:text-2xl font-bold chapter-title-shimmer">
                 Содержание
               </h2>
               <button 
@@ -663,13 +679,7 @@ return (
                 <X size={24} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes pulse-chapter {
-                  0%, 100% { box-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
-                  50% { box-shadow: 0 0 20px rgba(192, 132, 252, 0.7); }
-                }
-              `}} />
+<div className="flex-1 overflow-y-auto p-4 sm:p-6">
               <div className="space-y-2">
                 {allChapters.map((ch) => {
                   const isActive = String(ch.id) === String(chapterId);
@@ -679,23 +689,14 @@ return (
                       onClick={() => handleChapterSelect(ch.id)}
                       className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
                       style={{
-                        background: isActive 
-                          ? 'rgba(192, 132, 252, 0.2)' 
-                          : 'rgba(147, 51, 234, 0.1)',
-                        border: `2px solid ${isActive ? '#c084fc' : 'rgba(147, 51, 234, 0.3)'}`,
-                        animation: isActive ? 'pulse-chapter 2s ease-in-out infinite' : 'none'
+                        background: '#000000',
+                        border: `2px solid #3fcaaf`
                       }}
                       onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
-                          e.currentTarget.style.borderColor = '#9333ea';
-                        }
+                        e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
                       }}
                       onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)';
-                          e.currentTarget.style.borderColor = 'rgba(147, 51, 234, 0.3)';
-                        }
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -747,12 +748,24 @@ return (
             backdropFilter: 'blur(20px)',
             boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
           }}>
-            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+<div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
               borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
             }}>
-              <h2 className="text-xl sm:text-2xl font-bold" style={{
-                color: '#ffffff'
-              }}>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes playlistTitleShimmer {
+                  0% { background-position: -200% center; }
+                  100% { background-position: 200% center; }
+                }
+                .playlist-title-shimmer {
+                  background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
+                  background-size: 200% auto;
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  animation: playlistTitleShimmer 3s linear infinite;
+                }
+              `}} />
+              <h2 className="text-xl sm:text-2xl font-bold playlist-title-shimmer">
                 Плейлист
               </h2>
               <button 
@@ -775,11 +788,11 @@ return (
                 <X size={24} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+<div className="flex-1 overflow-y-auto p-4 sm:p-6">
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes pulse-track {
-                  0%, 100% { box-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
-                  50% { box-shadow: 0 0 20px rgba(192, 132, 252, 0.7); }
+                  0%, 100% { box-shadow: 0 0 10px rgba(63, 202, 175, 0.6); }
+                  50% { box-shadow: 0 0 20px rgba(63, 202, 175, 0.9); }
                 }
               `}} />
               <div className="space-y-3">
@@ -792,10 +805,8 @@ return (
                       key={i} 
                       className="rounded-lg p-4 border-2 transition-all cursor-pointer"
                       style={{
-                        background: isPlaying 
-                          ? 'rgba(192, 132, 252, 0.2)' 
-                          : 'rgba(147, 51, 234, 0.1)',
-                        borderColor: isPlaying ? '#c084fc' : 'rgba(147, 51, 234, 0.3)',
+                        background: '#000000',
+                        borderColor: '#3fcaaf',
                         animation: isPlaying ? 'pulse-track 2s ease-in-out infinite' : 'none'
                       }}
                       onClick={() => {
