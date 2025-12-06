@@ -926,6 +926,20 @@ return (
     transform: translate(-50%, 0) scale(1.05);
   }
 }
+  /* Блокируем браузерное контекстное меню на выделении */
+.chapter-text-content {
+  -webkit-touch-callout: none !important;
+}
+
+.chapter-text-content::selection {
+  background-color: #3fcaaf !important;
+  color: #000000 !important;
+}
+
+.chapter-text-content::-moz-selection {
+  background-color: #3fcaaf !important;
+  color: #000000 !important;
+}
             `
           }} />
           

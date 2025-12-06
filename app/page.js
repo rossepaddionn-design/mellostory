@@ -2720,45 +2720,51 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
     ) : (
       <div className="space-y-3 sm:space-y-4">
         {userBookmarks.map((bookmark) => (
-          <Link
+          <div
             key={bookmark.id}
-            href={`/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}#bookmark-${bookmark.id}`}
-            className="block bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-gray-700 hover:border-purple-600 transition cursor-pointer"
-            onClick={() => setShowCollectionModal(false)}
+            className="bg-gray-800 rounded-lg border-2 border-gray-700 hover:border-purple-600 transition overflow-hidden"
           >
-            <div className="flex justify-between items-start mb-2 gap-2">
-              <div className="flex-1 min-w-0">
-                <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
-                <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
-                <p className="text-gray-500 text-xs">
-                  {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+            
+              href={`/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}`}
+              className="block p-3 sm:p-4 cursor-pointer"
+              onClick={(e) => {
+                setShowCollectionModal(false);
+              }}
+            >
+              <div className="flex justify-between items-start mb-2 gap-2">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
+                  <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
+                  <p className="text-gray-500 text-xs">
+                    {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+                  </p>
+                </div>
+                <button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!confirm('Удалить закладку?')) return;
+                    await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
+                    loadUserCollection();
+                  }}
+                  className="text-red-500 hover:text-red-400 flex-shrink-0 z-10"
+                >
+                  <X size={16} className="sm:w-5 sm:h-5" />
+                </button>
+              </div>
+              <div className="bg-gray-900 p-2 sm:p-3 rounded">
+                <p className="text-gray-300 text-xs sm:text-sm line-clamp-3">
+                  "{bookmark.selected_text}"
                 </p>
               </div>
-              <button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (!confirm('Удалить закладку?')) return;
-                  await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
-                  loadUserCollection();
-                }}
-                className="text-red-500 hover:text-red-400 flex-shrink-0"
-              >
-                <X size={16} className="sm:w-5 sm:h-5" />
-              </button>
-            </div>
-            <div className="bg-gray-900 p-2 sm:p-3 rounded">
-              <p className="text-gray-300 text-xs sm:text-sm line-clamp-3">
-                "{bookmark.selected_text}"
-              </p>
-            </div>
-            <div className="mt-2 flex items-center gap-2 text-purple-400 text-xs">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-              <span>Перейти к закладке</span>
-            </div>
-          </Link>
+              <div className="mt-2 flex items-center gap-2 text-purple-400 text-xs">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                <span>Нажмите, чтобы перейти</span>
+              </div>
+            </a>
+          </div>
         ))}
       </div>
     )}
