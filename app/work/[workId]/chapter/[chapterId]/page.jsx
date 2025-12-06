@@ -309,7 +309,15 @@ const handleTextSelection = () => {
 
 
 const saveBookmark = async () => {
-  if (!currentUser || !selectedTextForBookmark) return;
+  if (!currentUser) {
+    alert('❌ Войдите в аккаунт для сохранения закладок!');
+    return;
+  }
+  
+  if (!selectedTextForBookmark) {
+    alert('❌ Выделите текст для сохранения закладки!');
+    return;
+  }
   
   try {
     const response = await fetch('/api/ugc', {
@@ -329,11 +337,11 @@ const saveBookmark = async () => {
     const data = await response.json();
     
     if (data.success) {
-      setShowBookmarkButton(false);
+      alert('✅ Закладка сохранена!');
       setSelectedTextForBookmark('');
       window.getSelection().removeAllRanges();
-      
-      alert('✅ Закладка сохранена!');
+    } else {
+      alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
     }
   } catch (error) {
     console.error('Ошибка:', error);
@@ -568,6 +576,25 @@ return (
                   <span className="hidden sm:inline">Плейлист</span>
                 </button>
               )}
+
+{/* КНОПКА ЗАКЛАДКИ */}
+              <button
+                onClick={saveBookmark}
+                className="p-2 rounded-full flex items-center justify-center text-xl sm:text-2xl transition"
+                style={{
+                  backgroundColor: selectedTextForBookmark ? '#3fcaaf' : 'rgba(118, 38, 181, 0.3)',
+                  boxShadow: selectedTextForBookmark 
+                    ? '0 0 15px rgba(63, 202, 175, 0.8)' 
+                    : 'none',
+                  border: selectedTextForBookmark ? '2px solid #3fcaaf' : '2px solid rgba(118, 38, 181, 0.5)',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  opacity: selectedTextForBookmark ? 1 : 0.5
+                }}
+              >
+                🔖
+              </button>
             </div>
           </div>
         </div>
@@ -1115,40 +1142,6 @@ return (
           )}
         </div>
       </main>
-{/* ПЛАВАЮЩАЯ КНОПКА ЗАКЛАДКИ */}
-<button
-  onClick={saveBookmark}
-  disabled={!showBookmarkButton}
- style={{
-    position: 'fixed',
-    bottom: '80px',
-    right: '30px',
-    zIndex: 999999,
-    background: selectedTextForBookmark 
-      ? 'linear-gradient(135deg, #3fcaaf 0%, #2a9d8f 100%)' 
-      : 'rgba(100, 100, 100, 0.3)',
-    color: selectedTextForBookmark ? '#000' : '#666',
-    padding: '16px',
-    borderRadius: '50%',
-    fontSize: '28px',
-    border: selectedTextForBookmark ? '3px solid #3fcaaf' : '3px solid #444',
-    boxShadow: selectedTextForBookmark 
-      ? '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)' 
-      : 'none',
-    cursor: 'pointer',
-    backdropFilter: 'blur(10px)',
-    width: '64px',
-    height: '64px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.3s ease',
-    animation: selectedTextForBookmark ? 'bookmarkPulse 1.5s ease-in-out infinite' : 'none',
-    opacity: selectedTextForBookmark ? 1 : 0.4
-  }}
->
-  ➲
-</button>
     </div>
   );
 }
