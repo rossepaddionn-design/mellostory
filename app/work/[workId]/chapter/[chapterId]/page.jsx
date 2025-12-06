@@ -135,6 +135,23 @@ if (chapterId && workId) {
   }, []);
 
   useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      
+      if (text.length > 0 && text.length <= 500) {
+        setSelectedTextForBookmark(text);
+      } else {
+        setSelectedTextForBookmark('');
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, []);
+
+  useEffect(() => {
     if (!chapter) return;
 
     const handleExplanationClick = (e) => {
@@ -292,21 +309,6 @@ if (chapterId && workId) {
  const handleChapterSelect = (chId) => {
   router.push(`/work/${workId}/chapter/${chId}`);
   setShowChapterList(false);
-};
-
-const handleTextSelection = () => {
-  setTimeout(() => {
-    const selection = window.getSelection();
-    const text = selection.toString().trim();
-    
-    console.log('📱 Выделенный текст:', text); // ДЛЯ ОТЛАДКИ
-    
-    if (text.length > 0 && text.length <= 500) {
-      setSelectedTextForBookmark(text);
-    } else {
-      setSelectedTextForBookmark('');
-    }
-  }, 500); // ⬅️ УВЕЛИЧИЛ ЗАДЕРЖКУ С 100 ДО 300
 };
 
 const saveBookmark = async () => {
@@ -986,11 +988,7 @@ return (
             `
           }} />
           
-<div 
-  onMouseUp={handleTextSelection}
-  onTouchEnd={handleTextSelection}
-  style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
->
+<div style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
   <div 
     className="chapter-text-content text-gray-300"
     dangerouslySetInnerHTML={{ __html: chapter.content }}
