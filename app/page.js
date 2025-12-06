@@ -2707,47 +2707,61 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
           </div>
         )}
 
-        {collectionTab === 'bookmarks' && (
-          <div>
-            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
-              Закладки ({userBookmarks.length})
-            </h3>
-            {userBookmarks.length === 0 ? (
-              <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-                <Bookmark size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
-                <p className="text-sm sm:text-base text-gray-500">У вас пока нет закладок</p>
-              </div>
-            ) : (
-              <div className="space-y-3 sm:space-y-4">
-                {userBookmarks.map((bookmark) => (
-                  <div key={bookmark.id} className="bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-gray-700">
-                    <div className="flex justify-between items-start mb-2 gap-2">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
-                        <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
-                      </div>
-                      <button
-                        onClick={async () => {
-                          if (!confirm('Удалить закладку?')) return;
-                          await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
-                          loadUserCollection();
-                        }}
-                        className="text-red-500 hover:text-red-400 flex-shrink-0"
-                      >
-                        <X size={16} className="sm:w-5 sm:h-5" />
-                      </button>
-                    </div>
-                    <p className="text-gray-300 text-xs sm:text-sm bg-gray-900 p-2 sm:p-3 rounded line-clamp-3">
-                      "{bookmark.selected_text}"
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+{collectionTab === 'bookmarks' && (
+  <div>
+    <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
+      Закладки ({userBookmarks.length})
+    </h3>
+    {userBookmarks.length === 0 ? (
+      <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
+        <Bookmark size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+        <p className="text-sm sm:text-base text-gray-500">У вас пока нет закладок</p>
       </div>
-    </div>
+    ) : (
+      <div className="space-y-3 sm:space-y-4">
+        {userBookmarks.map((bookmark) => (
+          <Link
+            key={bookmark.id}
+            href={`/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}#bookmark-${bookmark.id}`}
+            className="block bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-gray-700 hover:border-purple-600 transition cursor-pointer"
+            onClick={() => setShowCollectionModal(false)}
+          >
+            <div className="flex justify-between items-start mb-2 gap-2">
+              <div className="flex-1 min-w-0">
+                <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
+                <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
+                <p className="text-gray-500 text-xs">
+                  {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+                </p>
+              </div>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!confirm('Удалить закладку?')) return;
+                  await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
+                  loadUserCollection();
+                }}
+                className="text-red-500 hover:text-red-400 flex-shrink-0"
+              >
+                <X size={16} className="sm:w-5 sm:h-5" />
+              </button>
+            </div>
+            <div className="bg-gray-900 p-2 sm:p-3 rounded">
+              <p className="text-gray-300 text-xs sm:text-sm line-clamp-3">
+                "{bookmark.selected_text}"
+              </p>
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-purple-400 text-xs">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+              <span>Перейти к закладке</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )}
   </div>
 )}
 

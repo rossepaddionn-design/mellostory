@@ -250,7 +250,7 @@ useEffect(() => {
   setShowChapterList(false);
 };
 
-const handleTextSelection = () => {
+const handleTextSelection = (e) => {
   setTimeout(() => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
@@ -260,23 +260,21 @@ const handleTextSelection = () => {
       const rects = range.getClientRects();
       const lastRect = rects[rects.length - 1];
       
-      // Абсолютные координаты
       let x = lastRect.right + window.scrollX + 10;
       let y = lastRect.bottom + window.scrollY + 10;
       
-      // ВАЖНО: Ограничиваем координаты, чтобы кнопка не улетала за пределы
-      const maxX = document.documentElement.scrollWidth - 120; // 120px - ширина кнопки
-      const minX = 60; // минимальный отступ слева
+      const maxX = document.documentElement.scrollWidth - 60;
+      const minX = 10;
       
       x = Math.max(minX, Math.min(x, maxX));
       
       setSelectedTextForBookmark(text);
       setBookmarkPosition({ x, y });
       setShowBookmarkButton(true);
-    } else {
-      setShowBookmarkButton(false);
+      
+      // ✅ НЕ УБИРАЕМ ВЫДЕЛЕНИЕ - кнопка останется!
     }
-  }, 100);
+  }, 200); // Увеличил задержку для стабильности
 };
 
 
@@ -284,26 +282,25 @@ const saveBookmark = async () => {
   if (!currentUser || !selectedTextForBookmark) return;
   
   try {
-const response = await fetch('/api/ugc', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'add_bookmark',
-    userId: currentUser.id,
-    workId: workId,
-    chapterId: chapter?.id, // ✅ ИСПОЛЬЗУЕМ chapter.id (это UUID)
-    selectedText: selectedTextForBookmark,
-    workTitle: work?.title,
-    chapterNumber: chapter?.chapter_number
-  })
-});
+    const response = await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add_bookmark',
+        userId: currentUser.id,
+        workId: workId,
+        chapterId: chapter?.id,
+        selectedText: selectedTextForBookmark,
+        workTitle: work?.title,
+        chapterNumber: chapter?.chapter_number
+      })
+    });
     
     const data = await response.json();
     
     if (data.success) {
-      setShowBookmarkButton(false);
-      setSelectedTextForBookmark('');
-      window.getSelection().removeAllRanges();
+      // ✅ Закрываем кнопку и убираем выделение
+      closeBookmarkButton();
       
       const notification = document.createElement('div');
       notification.textContent = '✅ Закладка сохранена!';
@@ -331,6 +328,7 @@ const response = await fetch('/api/ugc', {
 const closeBookmarkButton = () => {
   setShowBookmarkButton(false);
   setSelectedTextForBookmark('');
+  // ✅ Убираем выделение только при закрытии кнопки
   window.getSelection().removeAllRanges();
 };
 
@@ -1088,10 +1086,9 @@ return (
           )}
         </div>
       </main>
-{/* КНОПКА ЗАКЛАДКИ */}
+{/* КНОПКА ЗАКЛАДКИ - ТОЛЬКО ИКОНКА */}
 {showBookmarkButton && (
   <>
-    {/* Полупрозрачный фон */}
     <div 
       style={{
         position: 'fixed',
@@ -1102,7 +1099,6 @@ return (
       onClick={closeBookmarkButton}
     />
     
-    {/* Кнопка - адаптивная */}
     <button
       style={{
         position: 'absolute',
@@ -1112,9 +1108,9 @@ return (
         zIndex: 999999,
         background: 'rgba(0, 0, 0, 0.9)',
         color: '#3fcaaf',
-        padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
-        borderRadius: '8px',
-        fontSize: window.innerWidth < 640 ? '12px' : '14px',
+        padding: '12px',
+        borderRadius: '50%',
+        fontSize: '24px',
         fontWeight: 'bold',
         border: '2px solid #3fcaaf',
         boxShadow: '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)',
@@ -1122,22 +1118,25 @@ return (
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         transition: 'all 0.2s ease',
-        whiteSpace: 'nowrap',
-        maxWidth: '150px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
+        width: '48px',
+        height: '48px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
       onClick={saveBookmark}
       onMouseEnter={(e) => {
         e.currentTarget.style.background = 'rgba(0, 0, 0, 1)';
         e.currentTarget.style.boxShadow = '0 0 30px rgba(63, 202, 175, 1), 0 0 60px rgba(63, 202, 175, 0.6)';
+        e.currentTarget.style.transform = 'translateX(0) scale(1.1)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(63, 202, 175, 0.8), 0 0 40px rgba(63, 202, 175, 0.4)';
+        e.currentTarget.style.transform = 'translateX(0) scale(1)';
       }}
     >
-      🔖 {window.innerWidth < 640 ? 'Сохр.' : 'Сохранить'}
+      🔖
     </button>
   </>
 )}
