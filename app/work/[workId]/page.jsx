@@ -458,13 +458,13 @@ if (showAgeVerification) {
         {/* ОБЛОЖКА + ОПИСАНИЕ */}
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr] gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* ОБЛОЖКА */}
-<div>
-<div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 md:sticky md:top-8 max-w-[200px] sm:max-w-[250px] md:max-w-[280px] lg:max-w-[320px] mx-auto" style={{
+          <div>
+<div className="rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 md:sticky md:top-8 max-w-sm mx-auto md:max-w-none" style={{
   borderColor: '#9333ea'
 }}>
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes pulse {
-                  0%, 100% { 
+                  0%, 100% {     
                     transform: scale(1);
                     box-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.3);
                   }
