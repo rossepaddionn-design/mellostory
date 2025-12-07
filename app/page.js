@@ -2613,7 +2613,6 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
         {[
           { key: 'favorites', label: 'Избранное', icon: Heart },
           { key: 'gallery', label: 'Галерея', icon: ImageIcon },
-          { key: 'bookmarks', label: 'Закладки', icon: Bookmark }
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -2695,7 +2694,7 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                         if (!confirm('Удалить изображение?')) return;
                         await supabaseUGC.from('user_saved_images').delete().eq('id', img.id);
                         loadUserCollection();
-                      }}
+}}
                       className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-600 rounded-full p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition"
                     >
                       <X size={12} className="sm:w-4 sm:h-4" />
@@ -2706,74 +2705,6 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
             )}
           </div>
         )}
-
-{collectionTab === 'bookmarks' && (
-  <div>
-    <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
-      Закладки ({userBookmarks.length})
-    </h3>
-    {userBookmarks.length === 0 ? (
-      <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-        <Bookmark size={32} className="sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
-        <p className="text-sm sm:text-base text-gray-500">У вас пока нет закладок</p>
-      </div>
-    ) : (
-      <div className="space-y-3 sm:space-y-4">
-        {userBookmarks.map((bookmark) => (
-          <div
-            key={bookmark.id}
-            className="bg-gray-800 rounded-lg border-2 border-gray-700 hover:border-purple-600 transition overflow-hidden"
-          >
-            <div className="p-3 sm:p-4">
-              <div className="flex justify-between items-start mb-2 gap-2">
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-semibold text-sm sm:text-base truncate">{bookmark.work_title}</h4>
-                  <p className="text-gray-400 text-xs sm:text-sm">Глава {bookmark.chapter_number}</p>
-                  <p className="text-gray-500 text-xs">
-                    {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
-                  </p>
-                </div>
-                <button
- onClick={async (e) => {
-                    e.stopPropagation();
-                    if (!confirm('Удалить закладку?')) return;
-                    await supabaseUGC.from('user_bookmarks').delete().eq('id', bookmark.id);
-                    loadUserCollection();
-                  }}
-                  className="text-red-500 hover:text-red-400 flex-shrink-0"
-                >
-                  <X size={16} className="sm:w-5 sm:h-5" />
-                </button>
-              </div>
-              <div className="bg-gray-900 p-2 sm:p-3 rounded mb-3">
-                <p className="text-gray-300 text-xs sm:text-sm line-clamp-3">
-                  &quot;{bookmark.selected_text}&quot;
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  sessionStorage.setItem('highlightBookmark', bookmark.selected_text);
-                  setShowCollectionModal(false);
-                  window.location.href = `/work/${bookmark.work_id}/chapter/${bookmark.chapter_id}`;
-                }}
-                className="w-full py-2 px-4 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-                  color: '#fff'
-                }}
-              >
- <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-                Перейти к закладке
-</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
       </div>
     </div>
   </div>

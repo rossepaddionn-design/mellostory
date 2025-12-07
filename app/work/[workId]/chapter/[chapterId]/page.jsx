@@ -91,8 +91,8 @@ if (chapterId && workId) {
               range.setEnd(node, index + bookmarkText.length);
               
               // Подсвечиваем текст (работает и на ПК, и на мобильном)
-              const span = document.createElement('span');
-              span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; font-weight: bold; transition: all 1s ease;';
+const span = document.createElement('span');
+span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; transition: all 1s ease;';
               span.textContent = bookmarkText;
               
               const parent = node.parentNode;
@@ -107,11 +107,10 @@ if (chapterId && workId) {
               }, 100);
               
               // Убираем подсветку через 3 секунды
-              setTimeout(() => {
-                span.style.background = 'transparent';
-                span.style.color = 'inherit';
-                span.style.fontWeight = 'normal';
-              }, 3000);
+setTimeout(() => {
+  span.style.background = 'transparent';
+  span.style.color = 'inherit';
+}, 3000);
               
               break;
             }
@@ -410,8 +409,8 @@ const jumpToBookmark = (bookmarkText) => {
       while (node = walker.nextNode()) {
         const index = node.textContent.indexOf(bookmarkText);
         if (index !== -1) {
-          const span = document.createElement('span');
-          span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; font-weight: bold; transition: all 1s ease;';
+const span = document.createElement('span');
+span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; transition: all 1s ease;';
           span.textContent = bookmarkText;
           
           const parent = node.parentNode;
@@ -606,7 +605,7 @@ return (
 
 {/* PAGE COUNTER IN HEADER */}
 {chapter?.pages > 0 && (
-  <div className="fixed top-1.5 sm:top-2 left-1/2 transform -translate-x-1/2 z-50">
+  <div className="fixed top-12 sm:top-14 left-1/2 transform -translate-x-1/2 z-40">
     <span 
       className="text-xs px-2 py-0.5 rounded-full"
       style={{
