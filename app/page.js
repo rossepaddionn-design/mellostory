@@ -78,6 +78,16 @@ const [collectionTab, setCollectionTab] = useState('favorites'); // favorites, g
 const [userFavorites, setUserFavorites] = useState([]);
 const [userGallery, setUserGallery] = useState([]);
 const [userBookmarks, setUserBookmarks] = useState([]);
+const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [confirmMessage, setConfirmMessage] = useState('');
+const [confirmAction, setConfirmAction] = useState(null);
+
+const showConfirm = (message, action = null) => {
+  setConfirmMessage(message);
+  setConfirmAction(() => action);
+  setShowConfirmModal(true);
+};
+
 
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
@@ -151,7 +161,7 @@ const checkUser = async () => {
     
     // Проверяем бан
     if (profile.is_banned) {
-      alert('Ваш аккаунт заблокирован!');
+    showConfirm('Ваш аккаунт заблокирован!');
       
       await supabase.auth.signOut({ scope: 'global' });
       localStorage.clear();
@@ -332,12 +342,12 @@ const checkUser = async () => {
 
   const handleRegister = async () => {
     if (!authForm.nickname || !authForm.email || !authForm.password) {
-      alert('Заполните все поля!');
+    showConfirm('Заполните все поля!');
       return;
     }
 
     if (!agreedToPrivacy) {
-      alert('Необходимо согласиться с политикой конфиденциальности!');
+    showConfirm('Необходимо согласиться с политикой конфиденциальности!');
       return;
     }
 
@@ -348,7 +358,7 @@ const checkUser = async () => {
       .single();
     
     if (existingNickname) {
-      alert('Этот никнейм уже занят!');
+    showConfirm('Этот никнейм уже занят!');
       return;
     }
 
@@ -358,7 +368,7 @@ const checkUser = async () => {
     });
 
     if (error) {
-      alert('Ошибка регистрации: ' + error.message);
+    showConfirm('Ошибка регистрации: ' + error.message);
       return;
     }
 
@@ -375,9 +385,9 @@ const checkUser = async () => {
         });
 
       if (profileError) {
-        alert('Ошибка создания профиля: ' + profileError.message);
+      showConfirm('Ошибка создания профиля: ' + profileError.message);
       } else {
-        alert('Регистрация успешна! Проверьте почту для подтверждения.');
+      showConfirm('Регистрация успешна! Проверьте почту для подтверждения.');
         setShowAuthModal(false);
         setAuthForm({ nickname: '', email: '', password: '' });
         setAgreedToPrivacy(false);
@@ -387,7 +397,7 @@ const checkUser = async () => {
 
 const handleLogin = async () => {
   if (!authForm.email || !authForm.password) {
-    alert('Введите email и пароль!');
+  showConfirm('Введите email и пароль!');
     return;
   }
 
@@ -398,7 +408,7 @@ const handleLogin = async () => {
   });
 
   if (error) {
-    alert('Ошибка входа: ' + error.message);
+  showConfirm('Ошибка входа: ' + error.message);
     return;
   }
 
@@ -422,7 +432,7 @@ const handleLogin = async () => {
     
     if (profile) {
       if (profile.is_banned) {
-        alert('Ваш аккаунт заблокирован!');
+      showConfirm('Ваш аккаунт заблокирован!');
         await supabase.auth.signOut();
         return;
       }
@@ -451,7 +461,7 @@ const handleLogin = async () => {
 
 const handleDeleteAccount = async () => {
   if (!deletePassword.trim()) {
-    alert('Введите пароль для подтверждения!');
+  showConfirm('Введите пароль для подтверждения!');
     return;
   }
 
@@ -462,54 +472,51 @@ const handleDeleteAccount = async () => {
   });
 
   if (signInError) {
-    alert('Неверный пароль!');
+  showConfirm('Неверный пароль!');
     return;
   }
+showConfirm('Вы уверены? Это действие необратимо!', async () => {
+    try {
+      // 1. Помечаем профиль как удалённый (НЕ удаляем!)
+      const { error: updateError } = await supabase
+        .from('reader_profiles')
+        .update({ is_deleted: true })
+        .eq('user_id', user.id);
 
-  if (!confirm('Вы уверены? Это действие необратимо!')) {
-    return;
-  }
+      if (updateError) throw updateError;
 
-  try {
-    // 1. Помечаем профиль как удалённый (НЕ удаляем!)
-    const { error: updateError } = await supabase
-      .from('reader_profiles')
-      .update({ is_deleted: true })
-      .eq('user_id', user.id);
+      // 2. Сохраняем причину удаления
+      await supabase.from('deletion_reasons').insert({
+        user_id: user.id,
+        nickname: userProfile.nickname,
+        reason: deleteReason.trim() || 'Причина не указана',
+        deleted_at: new Date().toISOString()
+      });
 
-    if (updateError) throw updateError;
+      // 3. Удаляем комментарии и сообщения (по желанию)
+      await supabase.from('comments').delete().eq('user_id', user.id);
+      await supabase.from('messages').delete().eq('from_user_id', user.id);
 
-    // 2. Сохраняем причину удаления
-    await supabase.from('deletion_reasons').insert({
-      user_id: user.id,
-      nickname: userProfile.nickname,
-      reason: deleteReason.trim() || 'Причина не указана',
-      deleted_at: new Date().toISOString()
-    });
-
-    // 3. Удаляем комментарии и сообщения (по желанию)
-    await supabase.from('comments').delete().eq('user_id', user.id);
-    await supabase.from('messages').delete().eq('from_user_id', user.id);
-
-    // 4. Выходим из системы
-    await supabase.auth.signOut();
-    
-    alert('Ваш аккаунт успешно удалён.');
-    setShowDeleteAccountModal(false);
-    setDeleteReason('');
-    setDeletePassword('');
-    setUser(null);
-    setUserProfile(null);
-    setShowReaderPanel(false);
-  } catch (err) {
-    console.error('Ошибка удаления:', err);
-    alert('Ошибка при удалении аккаунта: ' + err.message);
-  }
+      // 4. Выходим из системы
+      await supabase.auth.signOut();
+      
+      showConfirm('Ваш аккаунт успешно удалён.');
+      setShowDeleteAccountModal(false);
+      setDeleteReason('');
+      setDeletePassword('');
+      setUser(null);
+      setUserProfile(null);
+      setShowReaderPanel(false);
+    } catch (err) {
+      console.error('Ошибка удаления:', err);
+      showConfirm('Ошибка при удалении аккаунта: ' + err.message);
+    }
+  });
 };
 
   const sendNewMessage = async () => {
     if (!newMessageText.trim() || !userProfile) {
-      alert('Напишите сообщение!');
+     showConfirm('Напишите сообщение!');
       return;
     }
 
@@ -525,9 +532,9 @@ const handleDeleteAccount = async () => {
       });
 
     if (error) {
-      alert('Ошибка отправки: ' + error.message);
+     showConfirm('Ошибка отправки: ' + error.message);
     } else {
-      alert('Сообщение отправлено!');
+    showConfirm('Сообщение отправлено!');
       setNewMessageText('');
       loadReaderMessages();
     }
@@ -552,9 +559,9 @@ const handleDeleteAccount = async () => {
       });
 
     if (error) {
-      alert('Ошибка отправки ответа: ' + error.message);
+    showConfirm('Ошибка отправки ответа: ' + error.message);
     } else {
-      alert('Ответ отправлен!');
+     showConfirm('Ответ отправлен!');
       setReplyMessageText('');
       setSelectedReaderMessage(null);
       loadReaderMessages();
@@ -563,7 +570,7 @@ const handleDeleteAccount = async () => {
 
   const sendMessage = async () => {
     if (!messageText.trim() || !userProfile) {
-      alert('Напишите сообщение!');
+     showConfirm('Напишите ответ!');
       return;
     }
 
@@ -578,9 +585,9 @@ const handleDeleteAccount = async () => {
       });
 
     if (error) {
-      alert('Ошибка отправки: ' + error.message);
+    showConfirm('Ошибка отправки ответа: ' + error.message);
     } else {
-      alert('Сообщение отправлено!');
+    showConfirm('Ответ отправлен!');
       setMessageText('');
       setShowMessageModal(false);
     }
@@ -593,16 +600,16 @@ const handleDeleteAccount = async () => {
       .eq('user_id', userId);
 
     if (error) {
-      alert('Ошибка: ' + error.message);
+     showConfirm('Ошибка: ' + error.message);
     } else {
-      alert(currentBanStatus ? 'Пользователь разблокирован!' : 'Пользователь заблокирован!');
+      showConfirm(currentBanStatus ? 'Пользователь разблокирован!' : 'Пользователь заблокирован!');
       loadManagementData();
     }
   };
 
   const replyToMessage = async (messageId) => {
     if (!replyText.trim()) {
-      alert('Напишите ответ!');
+    showConfirm('Напишите ответ!');
       return;
     }
 
@@ -615,29 +622,29 @@ const handleDeleteAccount = async () => {
       .eq('id', messageId);
 
     if (error) {
-      alert('Ошибка: ' + error.message);
+    showConfirm('Ошибка: ' + error.message);
     } else {
-      alert('Ответ отправлен!');
+    showConfirm('Ответ отправлен!');
       setReplyText('');
       setSelectedMessage(null);
       loadManagementData();
     }
   };
 
-  const deleteMessage = async (messageId) => {
-    if (!confirm('Удалить сообщение?')) return;
-
+ const deleteMessage = async (messageId) => {
+  showConfirm('Удалить сообщение?', async () => {
     const { error } = await supabase
       .from('messages')
       .delete()
       .eq('id', messageId);
 
     if (error) {
-      alert('Ошибка: ' + error.message);
+      showConfirm('Ошибка: ' + error.message);
     } else {
       loadManagementData();
     }
-  };
+  });
+};
   
   const saveText = async () => {
     try {
@@ -660,9 +667,9 @@ const handleDeleteAccount = async () => {
       setShowEditModal(false);
       setEditingSection(null);
       setEditText('');
-      alert('✅ Текст сохранён!');
+    showConfirm('✅ Текст сохранён!');
     } catch (err) {
-      alert('❌ Ошибка: ' + err.message);
+    showConfirm('❌ Ошибка: ' + err.message);
     }
   };
 
@@ -684,9 +691,9 @@ const handleDeleteAccount = async () => {
       setShowPopularEditModal(false);
       setEditingPopularIndex(null);
       setEditPopularForm({ title: '', rating: '', views: '' });
-      alert('✅ Популярная работа сохранена!');
+    showConfirm('✅ Популярная работа сохранена!');
     } catch (err) {
-      alert('❌ Ошибка: ' + err.message);
+    showConfirm('❌ Ошибка: ' + err.message);
     }
   };
 
@@ -2316,15 +2323,16 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                       </p>
                     </div>
                     <button
-                      onClick={async () => {
-                        if (!confirm('Удалить комментарий?')) return;
-                        const { error } = await supabase.from('comments').delete().eq('id', comment.id);
-                        if (error) {
-                          alert('Ошибка: ' + error.message);
-                        } else {
-                          loadManagementData();
-                        }
-                      }}
+onClick={async () => {
+  showConfirm('Удалить комментарий?', async () => {
+    const { error } = await supabase.from('comments').delete().eq('id', comment.id);
+    if (error) {
+      showConfirm('Ошибка: ' + error.message);
+    } else {
+      loadManagementData();
+    }
+  });
+}}
                       className="text-red-500 hover:text-red-400"
                     >
                       <Trash2 size={16} className="sm:w-5 sm:h-5" />
@@ -2690,10 +2698,11 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
                   <div key={img.id} className="aspect-square rounded-lg overflow-hidden border-2 border-purple-600 relative group">
                     <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
                     <button
-                      onClick={async () => {
-                        if (!confirm('Удалить изображение?')) return;
-                        await supabaseUGC.from('user_saved_images').delete().eq('id', img.id);
-                        loadUserCollection();
+onClick={() => {
+  showConfirm('Удалить изображение?', async () => {
+    await supabaseUGC.from('user_saved_images').delete().eq('id', img.id);
+    loadUserCollection();
+  });
 }}
                       className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-600 rounded-full p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition"
                     >
@@ -2704,6 +2713,67 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
               </div>
             )}
           </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+{showConfirmModal && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backdropFilter: 'blur(10px)'
+  }}>
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
+        {confirmMessage}
+      </p>
+      
+      <div className="flex gap-3">
+        {confirmAction ? (
+          <>
+            <button
+              onClick={() => {
+                confirmAction();
+                setShowConfirmModal(false);
+              }}
+              className="flex-1 py-3 rounded-lg font-bold transition"
+              style={{
+                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+                boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+              }}
+            >
+              Да
+            </button>
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              className="flex-1 py-3 rounded-lg font-bold transition border-2"
+              style={{
+                background: 'transparent',
+                borderColor: '#9370db',
+                color: '#9370db'
+              }}
+            >
+              Отмена
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setShowConfirmModal(false)}
+            className="w-full py-3 rounded-lg font-bold transition"
+            style={{
+              background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+              boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+            }}
+          >
+            ОК
+          </button>
         )}
       </div>
     </div>
