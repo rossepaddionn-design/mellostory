@@ -29,13 +29,17 @@ const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
 const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
 const [showBookmarksModal, setShowBookmarksModal] = useState(false);
 const [userBookmarks, setUserBookmarks] = useState([]);
+const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [confirmAction, setConfirmAction] = useState(null);
+const [confirmMessage, setConfirmMessage] = useState('');
+
+const carouselRef = useRef(null);
+
 const showConfirm = (message, action) => {
   setConfirmMessage(message);
   setConfirmAction(() => action);
   setShowConfirmModal(true);
 };
-
-  const carouselRef = useRef(null);
 
   const scrollCharacterCarousel = (direction) => {
     if (!carouselRef.current) return;
