@@ -27,7 +27,8 @@ const [currentUser, setCurrentUser] = useState(null);
 const [showBookmarkButton, setShowBookmarkButton] = useState(true);
 const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
 const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
-
+const [showBookmarksModal, setShowBookmarksModal] = useState(false);
+const [userBookmarks, setUserBookmarks] = useState([]);
 
   const carouselRef = useRef(null);
 
@@ -383,6 +384,80 @@ const closeBookmarkButton = () => {
   window.getSelection().removeAllRanges();
 };
 
+const loadChapterBookmarks = async () => {
+  if (!currentUser) return;
+  
+  try {
+    const res = await fetch(`/api/ugc?action=get_bookmarks&userId=${currentUser.id}`);
+    const { bookmarks } = await res.json();
+    
+    // Фильтруем только закладки текущей главы
+    const chapterBookmarks = bookmarks.filter(b => b.chapter_id === chapter?.id);
+    setUserBookmarks(chapterBookmarks);
+  } catch (err) {
+    console.error('Ошибка загрузки закладок:', err);
+  }
+};
+
+const jumpToBookmark = (bookmarkText) => {
+  setShowBookmarksModal(false);
+  
+  setTimeout(() => {
+    const textContent = document.querySelector('.chapter-text-content');
+    if (textContent && textContent.textContent.includes(bookmarkText)) {
+      const walker = document.createTreeWalker(textContent, NodeFilter.SHOW_TEXT);
+      let node;
+      while (node = walker.nextNode()) {
+        const index = node.textContent.indexOf(bookmarkText);
+        if (index !== -1) {
+          const span = document.createElement('span');
+          span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; border-radius: 3px; font-weight: bold; transition: all 1s ease;';
+          span.textContent = bookmarkText;
+          
+          const parent = node.parentNode;
+          parent.replaceChild(span, node);
+          
+          setTimeout(() => {
+            span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+          
+          setTimeout(() => {
+            span.style.background = 'transparent';
+            span.style.color = 'inherit';
+            span.style.fontWeight = 'normal';
+          }, 3000);
+          
+          break;
+        }
+      }
+    }
+  }, 300);
+};
+
+const deleteBookmark = async (bookmarkId) => {
+  if (!confirm('Удалить закладку?')) return;
+  
+  try {
+    const res = await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'delete_bookmark',
+        userId: currentUser.id,
+        bookmarkId: bookmarkId
+      })
+    });
+    
+    const result = await res.json();
+    if (result.success) {
+      alert('Закладка удалена');
+      loadChapterBookmarks();
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+  }
+};
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -580,6 +655,32 @@ return (
               >
                 <Menu size={16} className="sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{t.chapters}</span>
+              </button>
+
+<button
+                onClick={() => {
+                  setShowBookmarksModal(true);
+                  loadChapterBookmarks();
+                }}
+                className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
+                style={{
+                  backgroundColor: '#7626b5',
+                  boxShadow: '0 0 10px rgba(118, 38, 181, 0.6)',
+                  border: '1px solid #7626b5'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#8b3fd1';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#7626b5';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(118, 38, 181, 0.6)';
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span className="hidden sm:inline">Закладки</span>
               </button>
 
               {chapter?.audio_url && (
@@ -832,6 +933,111 @@ return (
                   );
                 })}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* МОДАЛЬНОЕ ОКНО ЗАКЛАДОК */}
+      {showBookmarksModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+            background: 'rgba(147, 51, 234, 0.15)',
+            border: '2px solid #9333ea',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+          }}>
+            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+              borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+            }}>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes bookmarksTitleShimmer {
+                  0% { background-position: -200% center; }
+                  100% { background-position: 200% center; }
+                }
+                .bookmarks-title-shimmer {
+                  background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
+                  background-size: 200% auto;
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  animation: bookmarksTitleShimmer 3s linear infinite;
+                }
+              `}} />
+              <h2 className="text-xl sm:text-2xl font-bold bookmarks-title-shimmer">
+                🔖 Закладки главы
+              </h2>
+              <button 
+                onClick={() => setShowBookmarksModal(false)} 
+                className="transition rounded-full p-2 absolute right-4"
+                style={{
+                  color: '#ffffff',
+                  backgroundColor: 'rgba(147, 51, 234, 0.3)',
+                  border: '2px solid rgba(255, 255, 255, 0.5)'
+                }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {userBookmarks.length === 0 ? (
+                <div className="text-center py-12">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(147, 51, 234, 0.5)" strokeWidth="2" className="mx-auto mb-4">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p className="text-gray-500">В этой главе нет закладок</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {userBookmarks.map((bookmark) => (
+                    <div 
+                      key={bookmark.id}
+                      className="rounded-lg p-4 border-2 transition-all cursor-pointer"
+                      style={{
+                        background: '#000000',
+                        borderColor: '#3fcaaf'
+                      }}
+                      onClick={() => jumpToBookmark(bookmark.selected_text)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#3fcaaf' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#3fcaaf" stroke="#3fcaaf" strokeWidth="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                          </svg>
+                          Закладка
+                        </p>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteBookmark(bookmark.id);
+                          }}
+                          className="text-red-500 hover:text-red-400 transition"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="bg-gray-900 rounded p-3 mb-2">
+                        <p className="text-gray-300 text-sm line-clamp-3">
+                          &quot;{bookmark.selected_text}&quot;
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
