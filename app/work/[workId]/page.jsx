@@ -31,6 +31,16 @@ const [newDiscussion, setNewDiscussion] = useState('');
 const [isFavorited, setIsFavorited] = useState(false);
 const [replyingTo, setReplyingTo] = useState(null); // ID комментария, на который отвечаем
 const [replyText, setReplyText] = useState(''); // Текст ответа
+const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [confirmMessage, setConfirmMessage] = useState('');
+const [confirmAction, setConfirmAction] = useState(null);
+
+const showConfirm = (message, action = null) => {
+  setConfirmMessage(message);
+  setConfirmAction(() => action);
+  setShowConfirmModal(true);
+};
+
 
   const t = {
     backToMain: 'На главную',
@@ -98,7 +108,7 @@ const checkFavorite = async () => {
 
 const toggleFavorite = async () => {
   if (!currentUser) {
-    alert('Войдите, чтобы добавить в избранное!');
+    showConfirm('Войдите, чтобы добавить в избранное!');
     return;
   }
 
@@ -115,28 +125,28 @@ const toggleFavorite = async () => {
 
     const result = await res.json();
     
-    if (result.success) {
-      setIsFavorited(!isFavorited);
-      alert(isFavorited ? 'Удалено из избранного' : 'Добавлено в избранное! ❤️');
-    } else {
-      alert('Ошибка: ' + result.error);
-    }
-  } catch (err) {
-    console.error('Ошибка:', err);
-    alert('Ошибка: ' + err.message);
-  }
+if (result.success) {
+  setIsFavorited(!isFavorited);
+  showConfirm(isFavorited ? 'Удалено из избранного' : 'Добавлено в избранное');
+} else {
+  showConfirm('Ошибка: ' + result.error);
+}
+} catch (err) {
+  console.error('Ошибка:', err);
+  showConfirm('Ошибка: ' + err.message);
+}
 };
 
 const sendDiscussion = async (parentId = null) => {
   if (!currentUser) {
-    alert('Войдите, чтобы оставить комментарий!');
+    showConfirm('Войдите, чтобы оставить комментарий');
     return;
   }
   
   const messageToSend = parentId ? replyText : newDiscussion;
   
   if (!messageToSend.trim()) {
-    alert('Напишите комментарий!');
+    showConfirm('Напишите комментарий');
     return;
   }
 
@@ -165,52 +175,52 @@ const sendDiscussion = async (parentId = null) => {
 
     const result = await res.json();
     
-    if (result.success) {
-      alert(parentId ? 'Ответ отправлен! 💜' : 'Комментарий отправлен! 💜');
-      if (parentId) {
-        setReplyText('');
-        setReplyingTo(null);
-      } else {
-        setNewDiscussion('');
-      }
-      loadDiscussions();
-    } else {
-      alert('Ошибка: ' + result.error);
-    }
-  } catch (err) {
-    console.error('Ошибка:', err);
-    alert('Ошибка: ' + err.message);
+if (result.success) {
+  showConfirm(parentId ? 'Ответ отправлен' : 'Комментарий отправлен');
+  if (parentId) {
+    setReplyText('');
+    setReplyingTo(null);
+  } else {
+    setNewDiscussion('');
   }
+  loadDiscussions();
+} else {
+  showConfirm('Ошибка: ' + result.error);
+}
+} catch (err) {
+  console.error('Ошибка:', err);
+  showConfirm('Ошибка: ' + err.message);
+}
 };
 
 const deleteDiscussion = async (commentId) => {
   if (!currentUser) return;
   
-  if (!confirm('Удалить комментарий?')) return;
+  showConfirm('Удалить комментарий?', async () => {
+    try {
+      const res = await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_comment',
+          userId: currentUser.id,
+          commentId: commentId
+        })
+      });
 
-  try {
-    const res = await fetch('/api/ugc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'delete_comment',
-        userId: currentUser.id,
-        commentId: commentId
-      })
-    });
-
-    const result = await res.json();
-    
-    if (result.success) {
-      alert('Комментарий удалён');
-      loadDiscussions();
-    } else {
-      alert('Ошибка: ' + result.error);
+      const result = await res.json();
+      
+      if (result.success) {
+        showConfirm('Комментарий удалён');
+        loadDiscussions();
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    } catch (err) {
+      console.error('Ошибка:', err);
+      showConfirm('Ошибка: ' + err.message);
     }
-  } catch (err) {
-    console.error('Ошибка:', err);
-    alert('Ошибка: ' + err.message);
-  }
+  });
 };
 
 const loadAllData = async () => {
@@ -276,11 +286,11 @@ if (workData) {
 
 const submitRating = async (rating) => {
     if (!currentUser) {
-      alert('Войдите, чтобы оставить оценку');
+      showConfirm('Войдите, чтобы оставить оценку');
       return;
     }
 
-    alert('Спасибо за оценку! ❤️');
+    showConfirm('Спасибо за оценку');
     setUserRating(rating);
     setShowRatingModal(false);
   };
@@ -1226,3 +1236,64 @@ if (showAgeVerification) {
     </div>
   );
 }
+
+{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+            background: 'rgba(147, 51, 234, 0.15)',
+            borderColor: '#9333ea',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+          }}>
+            <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
+              {confirmMessage}
+            </p>
+            
+            <div className="flex gap-3">
+              {confirmAction ? (
+                <>
+                  <button
+                    onClick={() => {
+                      confirmAction();
+                      setShowConfirmModal(false);
+                    }}
+                    className="flex-1 py-3 rounded-lg font-bold transition"
+                    style={{
+                      background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+                      boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+                    }}
+                  >
+                    Да
+                  </button>
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="flex-1 py-3 rounded-lg font-bold transition border-2"
+                    style={{
+                      background: 'transparent',
+                      borderColor: '#9370db',
+                      color: '#9370db'
+                    }}
+                  >
+                    Отмена
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="w-full py-3 rounded-lg font-bold transition"
+                  style={{
+                    background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+                    boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+                  }}
+                >
+                  ОК
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}

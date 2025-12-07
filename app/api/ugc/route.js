@@ -55,27 +55,18 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'add_comment') {
-      // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ОСНОВНОЙ БАЗЫ
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('nickname')
-        .eq('user_id', userId)
-        .single();
-
-      const actualNickname = profile?.nickname || 'Аноним';
-
-      // Сохраняем комментарий в UGC базу
-      const { data, error } = await supabaseUGC
-        .from('work_discussions')
-        .insert({
-          work_id: workId,
-          user_id: userId,
-          nickname: actualNickname,
-          message: message,
-          parent_comment_id: parentCommentId || null
-        })
-        .select();
+ if (action === 'add_comment') {
+  // Сохраняем комментарий в UGC базу (никнейм уже передан из фронтенда)
+  const { data, error } = await supabaseUGC
+    .from('work_discussions')
+    .insert({
+      work_id: workId,
+      user_id: userId,
+      nickname: nickname, // ← Используем переданный никнейм
+      message: message,
+      parent_comment_id: parentCommentId || null
+    })
+    .select();
       
       if (error) throw error;
       return NextResponse.json({ success: true, data });

@@ -374,15 +374,15 @@ const saveBookmark = async () => {
     const data = await response.json();
     
 if (data.success) {
-  showConfirm('✅ Закладка сохранена!', null);
+  showConfirm('Закладка сохранена!', null);
   setSelectedTextForBookmark('');
   window.getSelection().removeAllRanges();
 } else {
-  showConfirm('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'), null);
+  showConfirm('Ошибка: ' + (data.error || 'Неизвестная ошибка'), null);
 }
 } catch (error) {
   console.error('Ошибка:', error);
-  showConfirm('❌ Ошибка сохранения!', null);
+  showConfirm('Ошибка сохранения!', null);
 }
 };
 const closeBookmarkButton = () => {
@@ -457,12 +457,12 @@ const deleteBookmark = async (bookmarkId) => {
       
       const result = await res.json();
       if (result.success) {
-        showConfirm('✅ Закладка удалена', null);
+        showConfirm('Закладка удалена', null);
         loadChapterBookmarks();
       }
     } catch (err) {
       console.error('Ошибка:', err);
-      showConfirm('❌ Ошибка удаления', null);
+      showConfirm('Ошибка удаления', null);
     }
   });
 };
