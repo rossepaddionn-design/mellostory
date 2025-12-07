@@ -29,6 +29,11 @@ const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
 const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
 const [showBookmarksModal, setShowBookmarksModal] = useState(false);
 const [userBookmarks, setUserBookmarks] = useState([]);
+const showConfirm = (message, action) => {
+  setConfirmMessage(message);
+  setConfirmAction(() => action);
+  setShowConfirmModal(true);
+};
 
   const carouselRef = useRef(null);
 
@@ -338,12 +343,12 @@ setTimeout(() => {
 
 const saveBookmark = async () => {
   if (!currentUser) {
-    alert('❌ Войдите в аккаунт для сохранения закладок!');
+    showConfirm('❌ Войдите в аккаунт для сохранения закладок!', null);
     return;
   }
   
   if (!selectedTextForBookmark) {
-    alert('❌ Выделите текст для сохранения закладки!');
+    showConfirm('❌ Выделите текст для сохранения закладки!', null);
     return;
   }
   
@@ -364,17 +369,17 @@ const saveBookmark = async () => {
     
     const data = await response.json();
     
-    if (data.success) {
-      alert('✅ Закладка сохранена!');
-      setSelectedTextForBookmark('');
-      window.getSelection().removeAllRanges();
-    } else {
-      alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
-    }
-  } catch (error) {
-    console.error('Ошибка:', error);
-    alert('❌ Ошибка сохранения!');
-  }
+if (data.success) {
+  showConfirm('✅ Закладка сохранена!', null);
+  setSelectedTextForBookmark('');
+  window.getSelection().removeAllRanges();
+} else {
+  showConfirm('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'), null);
+}
+} catch (error) {
+  console.error('Ошибка:', error);
+  showConfirm('❌ Ошибка сохранения!', null);
+}
 };
 const closeBookmarkButton = () => {
   setShowBookmarkButton(false);
@@ -434,27 +439,28 @@ span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; bor
 };
 
 const deleteBookmark = async (bookmarkId) => {
-  if (!confirm('Удалить закладку?')) return;
-  
-  try {
-    const res = await fetch('/api/ugc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'delete_bookmark',
-        userId: currentUser.id,
-        bookmarkId: bookmarkId
-      })
-    });
-    
-    const result = await res.json();
-    if (result.success) {
-      alert('Закладка удалена');
-      loadChapterBookmarks();
+  showConfirm('Удалить закладку?', async () => {
+    try {
+      const res = await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_bookmark',
+          userId: currentUser.id,
+          bookmarkId: bookmarkId
+        })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        showConfirm('✅ Закладка удалена', null);
+        loadChapterBookmarks();
+      }
+    } catch (err) {
+      console.error('Ошибка:', err);
+      showConfirm('❌ Ошибка удаления', null);
     }
-  } catch (err) {
-    console.error('Ошибка:', err);
-  }
+  });
 };
 
   if (loading) {
@@ -602,22 +608,6 @@ return (
     }}
   />
 </div>
-
-{/* PAGE COUNTER IN HEADER */}
-{chapter?.pages > 0 && (
-  <div className="fixed top-12 sm:top-14 left-1/2 transform -translate-x-1/2 z-40">
-    <span 
-      className="text-xs px-2 py-0.5 rounded-full"
-      style={{
-        color: 'rgba(255, 255, 255, 0.8)',
-        textShadow: '0 0 6px rgba(255, 255, 255, 0.4)',
-        backgroundColor: 'rgba(0, 0, 0, 0.6)'
-      }}
-    >
-      {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
-    </span>
-  </div>
-)}
     
     <header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
         backgroundColor: '#000000',
@@ -725,6 +715,22 @@ return (
               </button>
             </div>
           </div>
+
+          {/* СЧЕТЧИК СТРАНИЦ - ВНИЗУ HEADER */}
+          {chapter?.pages > 0 && (
+            <div className="flex justify-center pb-1">
+              <span 
+                className="text-xs px-2 py-0.5 rounded-full"
+                style={{
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  textShadow: '0 0 6px rgba(255, 255, 255, 0.4)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)'
+                }}
+              >
+                {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
@@ -1300,6 +1306,67 @@ return (
           </button>
         </>
       )}
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+{showConfirmModal && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backdropFilter: 'blur(10px)'
+  }}>
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
+        {confirmMessage}
+      </p>
+      
+      <div className="flex gap-3">
+        {confirmAction ? (
+          <>
+            <button
+              onClick={() => {
+                confirmAction();
+                setShowConfirmModal(false);
+              }}
+              className="flex-1 py-3 rounded-lg font-bold transition"
+              style={{
+                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+                boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+              }}
+            >
+              Да
+            </button>
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              className="flex-1 py-3 rounded-lg font-bold transition border-2"
+              style={{
+                background: 'transparent',
+                borderColor: '#9370db',
+                color: '#9370db'
+              }}
+            >
+              Отмена
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setShowConfirmModal(false)}
+            className="w-full py-3 rounded-lg font-bold transition"
+            style={{
+              background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+              boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+            }}
+          >
+            ОК
+          </button>
+        )}
+      </div>
     </div>
   </div>
 )}
