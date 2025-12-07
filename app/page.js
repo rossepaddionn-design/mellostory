@@ -865,16 +865,16 @@ return (
         }}
       />
 
-
 {/* HEADER - КИНЕМАТОГРАФИЧНЫЙ СТИЛЬ */}
 <div className="relative overflow-hidden">
   <div 
+
     className="relative w-full"
     style={{
       height: 'clamp(250px, 50vh, 500px)',
       backgroundImage: `url(${HEADER_BG_IMAGE})`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center top',
+      backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat'
     }}
   >
