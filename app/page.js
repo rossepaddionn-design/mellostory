@@ -858,158 +858,158 @@ return (
       <div className="snow-container"></div>
       
       <div className="min-h-screen text-white overflow-x-hidden relative">
-      <div 
-        className="fixed inset-0 -z-10"
-        style={{
-          backgroundImage: 'url(/images/main-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#000'
+<div 
+  className="fixed inset-0 -z-10"
+  style={{
+    backgroundColor: '#000000',
         }}
       />
 
-{/* HEADER */}
-<div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
-  <div className="max-w-7xl mx-auto">
+{/* HEADER - КИНЕМАТОГРАФИЧНЫЙ СТИЛЬ */}
+<div className="relative overflow-hidden">
+  <div 
+    className="relative w-full"
+    style={{
+      height: 'clamp(300px, 40vh, 500px)',
+      backgroundImage: `url(${HEADER_BG_IMAGE})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}
+  >
     <div 
-      className="relative overflow-hidden rounded-lg"
+      className="absolute inset-0"
       style={{
-        padding: '3px',
-        background: 'linear-gradient(135deg, #67327b 0%, #000000 50%, #67327b 100%)'
+        background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0,0,0,0.7) 80%, #000000 100%)'
       }}
-    >
-      <div 
-        className="relative rounded-lg overflow-hidden"
-        style={{
-          backgroundImage: `url(${HEADER_BG_IMAGE})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          minHeight: '90px'
-        }}
-      >
-        <style jsx>{`
-          @media (min-width: 640px) {
-            div[style*="backgroundImage"] {
-              min-height: 35vh !important;
-            }
-          }
-        `}</style>
-        
-        <div className="relative z-10 h-full flex flex-col min-h-[90px] sm:min-h-[35vh]">
-          <div className="px-3 sm:px-6 py-2 sm:py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2 sm:gap-4">
-                <div 
-                  className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
-                  style={{
-                    background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
-                    boxShadow: '0 0 15px rgba(220, 38, 38, 0.8), 0 0 30px rgba(127, 29, 29, 0.6), inset 0 0 10px rgba(220, 38, 38, 0.5)',
-                    border: '2px solid rgba(220, 38, 38, 0.8)'
-                  }}
-                >
-                  18+
-                </div>
-
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-gray-800 border border-gray-700 rounded px-2 sm:px-3 py-1 text-xs sm:text-sm hover:border-red-600 transition"
-                >
-                  <option value="ru">RU</option>
-                  <option value="en">EN</option>
-                </select>
-              </div>
-
-              <div className="flex-shrink-0">
-                {!user ? (
-                  <button
-                    onClick={() => setShowAuthModal(true)}
-                    className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                    style={{
-                      background: 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)',
-                      boxShadow: '0 0 15px rgba(180, 141, 196, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #b48dc4 100%)';
-                      e.currentTarget.style.boxShadow = '0 0 20px rgba(213, 172, 236, 0.9), 0 0 35px rgba(180, 141, 196, 0.6)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)';
-                      e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 141, 196, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)';
-                    }}
-                  >
-                    <User size={14} className="sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">{t.login}</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true)}
-                    className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                    style={{
-                      background: 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)',
-                      boxShadow: '0 0 15px rgba(180, 141, 196, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #b48dc4 100%)';
-                      e.currentTarget.style.boxShadow = '0 0 20px rgba(213, 172, 236, 0.9), 0 0 35px rgba(180, 141, 196, 0.6)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)';
-                      e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 141, 196, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)';
-                    }}
-                  >
-                    <Menu size={14} className="sm:w-5 sm:h-5" />
-                    <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">{isAdmin ? 'Админ' : userProfile?.nickname}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 flex items-center justify-center px-3 sm:px-4 pb-2 sm:pb-4">
-            <div className="text-center">
-<h1 className="text-3xl sm:text-6xl md:text-7xl font-bold tracking-widest leading-tight" style={{
-  fontFamily: "'Playfair Display', Georgia, serif",
-  textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
-}}>
+    />
+    
+    <div 
+      className="absolute inset-0"
+      style={{
+        boxShadow: 'inset 0 0 100px 50px rgba(0,0,0,0.8)'
+      }}
+    />
+    
+    <div className="relative z-10 px-4 sm:px-8 pt-4 sm:pt-6">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="flex items-center gap-2 sm:gap-4">
+ <div 
+  className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
+  style={{
+    background: '#dc0000',
+    border: '2px solid #ff0000',
+    boxShadow: '0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6)',
+    animation: 'pulse18 2s ease-in-out infinite'
+  }}
+>
   <style dangerouslySetInnerHTML={{__html: `
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-.mello-shimmer {
-  background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
+    @keyframes pulse18 {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
+        transform: scale(1.05);
+      }
     }
   `}} />
-<span className="mello-shimmer">MELLO</span>
-<span style={{
-  color: '#8c32d2',
-  textShadow: '0 0 20px rgba(140, 50, 210, 0.9), 0 0 40px rgba(140, 50, 210, 0.6), 0 0 60px rgba(140, 50, 210, 0.4)'
-}}>STORY</span>
-</h1>
-            </div>
-          </div>
+  18+
+</div>
+
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="rounded px-2 sm:px-3 py-1 text-xs sm:text-sm"
+            style={{
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: 'white'
+            }}
+          >
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+          </select>
         </div>
+
+        <div className="flex-shrink-0">
+          {!user ? (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+              style={{
+                background: 'rgba(147, 112, 219, 0.3)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(147, 112, 219, 0.5)'
+              }}
+            >
+              <User size={14} className="sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">{t.login}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true)}
+              className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+              style={{
+                background: 'rgba(147, 112, 219, 0.3)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(147, 112, 219, 0.5)'
+              }}
+            >
+              <Menu size={14} className="sm:w-5 sm:h-5" />
+              <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">
+                {isAdmin ? 'Админ' : userProfile?.nickname}
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div className="absolute bottom-8 left-0 right-0 z-10 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
+          }}
+        >
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes shimmer {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .mello-shimmer {
+              background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: shimmer 3s linear infinite;
+            }
+          `}} />
+          <span className="mello-shimmer">MELLO</span>
+          <span style={{
+            color: '#8c32d2',
+            textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)'
+          }}>STORY</span>
+        </h1>
       </div>
     </div>
   </div>
 </div>
 
 {/* NAVIGATION */}
-<div className="relative z-10 px-4 sm:px-8 py-4">
+<div className="relative z-10 px-4 sm:px-8 py-4" style={{ background: '#000000', marginTop: '-1px' }}>
   <div className="max-w-7xl mx-auto">
     <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
 {[
-  { key: 'novel', label: t.novels },      // ← ПЕРВЫМ
+  { key: 'novel', label: t.novels },
   { key: 'longfic', label: t.longfic },
-  { key: 'minific', label: t.minific }    // ← ПОСЛЕДНИМ
+  { key: 'minific', label: t.minific }
 ].map((item) => (
         <button
           key={item.key}
