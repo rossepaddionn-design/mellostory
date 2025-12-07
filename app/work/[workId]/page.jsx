@@ -1233,11 +1233,8 @@ if (showAgeVerification) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+      {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
           backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -1297,3 +1294,6 @@ if (showAgeVerification) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
