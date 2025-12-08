@@ -34,6 +34,84 @@ const [replyText, setReplyText] = useState(''); // Текст ответа
 const [showConfirmModal, setShowConfirmModal] = useState(false);
 const [confirmMessage, setConfirmMessage] = useState('');
 const [confirmAction, setConfirmAction] = useState(null);
+const [showColorPicker, setShowColorPicker] = useState(false);
+const [showReplyColorPicker, setShowReplyColorPicker] = useState(false);
+const textareaRef = useRef(null);
+const replyTextareaRef = useRef(null);
+
+const colors = ['#a91e30', '#8b1ea9', '#41d8ad', '#dbc78a', '#ec83c7', '#83eca5'];
+
+const applyFormatting = (format, isReply = false) => {
+  const textarea = isReply ? replyTextareaRef.current : textareaRef.current;
+  const text = isReply ? replyText : newDiscussion;
+  const setText = isReply ? setReplyText : setNewDiscussion;
+  
+  if (!textarea) return;
+  
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selectedText = text.substring(start, end);
+  
+  if (!selectedText) {
+    showConfirm('Выделите текст для форматирования');
+    return;
+  }
+  
+  let formattedText = '';
+  
+  switch(format) {
+    case 'bold':
+      formattedText = `<b>${selectedText}</b>`;
+      break;
+    case 'italic':
+      formattedText = `<i>${selectedText}</i>`;
+      break;
+    case 'underline':
+      formattedText = `<u>${selectedText}</u>`;
+      break;
+    case 'spoiler':
+      formattedText = `<spoiler>${selectedText}</spoiler>`;
+      break;
+    default:
+      if (format.startsWith('#')) {
+        formattedText = `<color=${format}>${selectedText}</color>`;
+      }
+  }
+  
+  const newText = text.substring(0, start) + formattedText + text.substring(end);
+  setText(newText);
+  
+  setTimeout(() => {
+    textarea.focus();
+    textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+  }, 0);
+  
+  setShowColorPicker(false);
+  setShowReplyColorPicker(false);
+};
+
+const renderFormattedText = (text) => {
+  if (!text) return text;
+  
+  let result = text;
+  
+  // Обработка жирного текста
+  result = result.replace(/<b>(.*?)<\/b>/g, '<strong>$1</strong>');
+  
+  // Обработка курсива
+  result = result.replace(/<i>(.*?)<\/i>/g, '<em>$1</em>');
+  
+  // Обработка подчеркнутого
+  result = result.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline;">$1</span>');
+  
+  // Обработка цветного текста
+  result = result.replace(/<color=(#[0-9a-fA-F]{6})>(.*?)<\/color>/g, '<span style="color: $1;">$2</span>');
+  
+  // Обработка спойлеров
+  result = result.replace(/<spoiler>(.*?)<\/spoiler>/g, '<span class="spoiler-text" onclick="this.classList.toggle(\'revealed\')">$1</span>');
+  
+  return result;
+};
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
@@ -439,8 +517,40 @@ if (showAgeVerification) {
   );
 }
 
-  return (
-    <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
+return (
+  <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
+    <style dangerouslySetInnerHTML={{ __html: `
+      .spoiler-text {
+        background: linear-gradient(90deg, #9333ea 0%, #ec4899 25%, #06b6d4 50%, #ec4899 75%, #9333ea 100%);
+        background-size: 200% 100%;
+        animation: spoiler-shimmer 2s linear infinite;
+        color: transparent;
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 4px;
+        user-select: none;
+        position: relative;
+        display: inline-block;
+      }
+      
+      @keyframes spoiler-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      .spoiler-text.revealed {
+        background: transparent;
+        color: inherit;
+        animation: none;
+        user-select: text;
+      }
+      
+      .spoiler-text:hover:not(.revealed) {
+        background-size: 300% 100%;
+        animation-duration: 1.5s;
+      }
+    `}} />
+
       {/* HEADER */}
       <header className="border-b py-3 sm:py-4 px-4 sm:px-8" style={{
         backgroundColor: '#000000',
@@ -1094,9 +1204,10 @@ if (showAgeVerification) {
                           </div>
                         </div>
                         
-                        <p className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2">
-                          {disc.message}
-                        </p>
+<div 
+  className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2"
+  dangerouslySetInnerHTML={{ __html: renderFormattedText(disc.message) }}
+/>
                         <span className="text-xs text-gray-500">
                           {new Date(disc.created_at).toLocaleString('ru-RU', {
                             day: '2-digit',
@@ -1107,16 +1218,49 @@ if (showAgeVerification) {
                           })}
                         </span>
                         
-                        {replyingTo === disc.id && (
-                          <div className="mt-3 pl-4 border-l-2" style={{ borderColor: '#8b3cc8' }}>
-                            <textarea
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                              rows={2}
-                              placeholder="Напишите ответ..."
-                              className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
-                              style={{ borderColor: '#8b3cc8' }}
-                            />
+ {replyingTo === disc.id && (
+  <div className="mt-3 pl-4 border-l-2" style={{ borderColor: '#8b3cc8' }}>
+    <div className="space-y-2">
+      {/* Панель инструментов для ответа */}
+      <div className="flex flex-wrap gap-2 p-2 rounded-lg border" style={{
+        background: 'rgba(139, 60, 200, 0.1)',
+        borderColor: '#8b3cc8'
+      }}>
+        <button onClick={() => applyFormatting('bold', true)} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Жирный">
+          <strong>B</strong>
+        </button>
+        <button onClick={() => applyFormatting('italic', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Курсив">
+          <em>I</em>
+        </button>
+        <button onClick={() => applyFormatting('underline', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Подчеркнутый">
+          <u>U</u>
+        </button>
+        <div className="relative">
+          <button onClick={() => setShowReplyColorPicker(!showReplyColorPicker)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Цвет">
+            🎨
+          </button>
+          {showReplyColorPicker && (
+            <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1" style={{ background: '#000', borderColor: '#8b3cc8' }}>
+              {colors.map(color => (
+                <button key={color} onClick={() => applyFormatting(color, true)} className="w-6 h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
+              ))}
+            </div>
+          )}
+        </div>
+        <button onClick={() => applyFormatting('spoiler', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Спойлер">
+          👁️
+        </button>
+      </div>
+
+      <textarea
+        ref={replyTextareaRef}
+        value={replyText}
+        onChange={(e) => setReplyText(e.target.value)}
+        rows={2}
+        placeholder="Напишите ответ..."
+        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
+        style={{ borderColor: '#8b3cc8' }}
+      />
                             <div className="flex gap-2">
                               <button
                                 onClick={() => sendDiscussion(disc.id)}
@@ -1144,6 +1288,7 @@ if (showAgeVerification) {
                               </button>
                             </div>
                           </div>
+                        </div>
                         )}
                       </div>
                       
@@ -1185,9 +1330,10 @@ if (showAgeVerification) {
                               )}
                             </div>
                             
-                            <p className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words mb-2">
-                              {reply.message}
-                            </p>
+<div 
+  className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words mb-2"
+  dangerouslySetInnerHTML={{ __html: renderFormattedText(reply.message) }}
+/>
                             <span className="text-xs text-gray-500">
                               {new Date(reply.created_at).toLocaleString('ru-RU', {
                                 day: '2-digit',
@@ -1205,18 +1351,90 @@ if (showAgeVerification) {
               )}
             </div>
 
-            <div className="border-t border-gray-700 p-4 sm:p-6 flex-shrink-0">
-              <textarea
-                value={newDiscussion}
-                onChange={(e) => setNewDiscussion(e.target.value)}
-                rows={3}
-                placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
-                disabled={!currentUser}
-                className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
-                style={{
-                  borderColor: '#8b3cc8'
-                }}
+<div className="border-t border-gray-700 p-4 sm:p-6 flex-shrink-0">
+  <div className="space-y-3">
+    {/* Панель инструментов */}
+    <div className="flex flex-wrap gap-2 p-2 rounded-lg border" style={{
+      background: 'rgba(139, 60, 200, 0.1)',
+      borderColor: '#8b3cc8'
+    }}>
+      <button
+        onClick={() => applyFormatting('bold')}
+        className="px-3 py-1.5 rounded transition text-sm font-bold"
+        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
+        title="Жирный"
+      >
+        <strong>B</strong>
+      </button>
+      
+      <button
+        onClick={() => applyFormatting('italic')}
+        className="px-3 py-1.5 rounded transition text-sm"
+        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
+        title="Курсив"
+      >
+        <em>I</em>
+      </button>
+      
+      <button
+        onClick={() => applyFormatting('underline')}
+        className="px-3 py-1.5 rounded transition text-sm"
+        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
+        title="Подчеркнутый"
+      >
+        <u>U</u>
+      </button>
+      
+      <div className="relative">
+        <button
+          onClick={() => setShowColorPicker(!showColorPicker)}
+          className="px-3 py-1.5 rounded transition text-sm"
+          style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
+          title="Цвет текста"
+        >
+          🎨
+        </button>
+        
+        {showColorPicker && (
+          <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1"
+            style={{ background: '#000', borderColor: '#8b3cc8' }}
+          >
+            {colors.map(color => (
+              <button
+                key={color}
+                onClick={() => applyFormatting(color)}
+                className="w-8 h-8 rounded border-2 border-white transition hover:scale-110"
+                style={{ background: color }}
+                title={color}
               />
+            ))}
+          </div>
+        )}
+      </div>
+      
+      <button
+        onClick={() => applyFormatting('spoiler')}
+        className="px-3 py-1.5 rounded transition text-sm"
+        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
+        title="Спойлер"
+      >
+        👁️
+      </button>
+    </div>
+
+    <textarea
+      ref={textareaRef}
+      value={newDiscussion}
+      onChange={(e) => setNewDiscussion(e.target.value)}
+      rows={3}
+      placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
+      disabled={!currentUser}
+      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
+      style={{
+        borderColor: '#8b3cc8'
+      }}
+    />
+  </div>
               <button
                 onClick={() => sendDiscussion()}
                 disabled={!currentUser || !newDiscussion.trim()}
