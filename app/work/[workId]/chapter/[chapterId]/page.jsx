@@ -579,18 +579,29 @@ if (showAgeVerification) {
             </button>
           </div>
           
-          {/* Логотип внизу */}
-          <div className="flex justify-center opacity-30">
-            <img 
-              src="/logo.png"
-              alt="MelloStory" 
-              className="w-32 h-32"
-              style={{ 
-                filter: 'grayscale(100%) brightness(0.5)',
-                mixBlendMode: 'lighten'
-              }}
-            />
-          </div>
+{/* Логотип внизу */}
+<div className="flex justify-center">
+  <div style={{
+    width: '128px',
+    height: '128px',
+    borderRadius: '50%',
+    background: '#000000',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden'
+  }}>
+    <img 
+      src="/logo.png"
+      alt="MelloStory" 
+      style={{ 
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+      }}
+    />
+  </div>
+</div>
         </div>
       </div>
     </div>

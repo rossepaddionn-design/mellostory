@@ -499,18 +499,29 @@ if (showAgeVerification) {
             </button>
           </div>
           
-          {/* Логотип внизу */}
-          <div className="flex justify-center opacity-30">
-            <img 
-              src="/logo.png"
-              alt="MelloStory" 
-              className="w-32 h-32"
-              style={{ 
-                filter: 'grayscale(100%) brightness(0.5)',
-                mixBlendMode: 'lighten'
-              }}
-            />
-          </div>
+{/* Логотип внизу */}
+<div className="flex justify-center">
+  <div style={{
+    width: '128px',
+    height: '128px',
+    borderRadius: '50%',
+    background: '#000000',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden'
+  }}>
+    <img 
+      src="/logo.png"
+      alt="MelloStory" 
+      style={{ 
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+      }}
+    />
+  </div>
+</div>
         </div>
       </div>
     </div>
@@ -1252,14 +1263,17 @@ return (
         </button>
       </div>
 
-      <textarea
+<div
         ref={replyTextareaRef}
-        value={replyText}
-        onChange={(e) => setReplyText(e.target.value)}
-        rows={2}
-        placeholder="Напишите ответ..."
-        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
-        style={{ borderColor: '#8b3cc8' }}
+        contentEditable={true}
+        onInput={(e) => setReplyText(e.currentTarget.innerHTML)}
+        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white text-sm mb-2 min-h-[60px] max-h-[150px] overflow-y-auto"
+        style={{ 
+          borderColor: '#8b3cc8',
+          outline: 'none'
+        }}
+        data-placeholder="Напишите ответ..."
+        suppressContentEditableWarning={true}
       />
                             <div className="flex gap-2">
                               <button
@@ -1422,18 +1436,29 @@ return (
       </button>
     </div>
 
-    <textarea
+<div
       ref={textareaRef}
-      value={newDiscussion}
-      onChange={(e) => setNewDiscussion(e.target.value)}
-      rows={3}
-      placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
-      disabled={!currentUser}
-      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
+      contentEditable={!!currentUser}
+      onInput={(e) => setNewDiscussion(e.currentTarget.innerHTML)}
+      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white text-sm sm:text-base mb-3 min-h-[80px] max-h-[200px] overflow-y-auto"
       style={{
-        borderColor: '#8b3cc8'
+        borderColor: '#8b3cc8',
+        outline: 'none'
       }}
+      data-placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
+      suppressContentEditableWarning={true}
     />
+    
+    <style dangerouslySetInnerHTML={{__html: `
+      [contenteditable]:empty:before {
+        content: attr(data-placeholder);
+        color: #6b7280;
+        pointer-events: none;
+      }
+      [contenteditable]:focus {
+        outline: none;
+      }
+    `}} />
   </div>
               <button
                 onClick={() => sendDiscussion()}
