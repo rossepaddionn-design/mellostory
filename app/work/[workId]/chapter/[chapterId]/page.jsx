@@ -551,43 +551,43 @@ if (showAgeVerification) {
           
           {/* Кнопки */}
 <style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPinkPulse {
+  @keyframes neonPurplePulse {
     0%, 100% { 
-      box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
-                  0 0 20px rgba(255, 20, 147, 0.3),
-                  0 0 30px rgba(255, 20, 147, 0.2);
+      box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
+                  0 0 20px rgba(183, 91, 205, 0.3),
+                  0 0 30px rgba(183, 91, 205, 0.2);
     }
     50% { 
-      box-shadow: 0 0 15px rgba(255, 20, 147, 0.6), 
-                  0 0 30px rgba(255, 20, 147, 0.5),
-                  0 0 45px rgba(255, 20, 147, 0.3);
+      box-shadow: 0 0 15px rgba(183, 91, 205, 0.6), 
+                  0 0 30px rgba(183, 91, 205, 0.5),
+                  0 0 45px rgba(183, 91, 205, 0.3);
     }
   }
   
   .pink-neon-button {
     background: rgba(0, 0, 0, 0.7) !important;
-    border: 2px solid rgba(255, 20, 147, 0.5) !important;
-    box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
-                0 0 20px rgba(255, 20, 147, 0.3),
-                0 0 30px rgba(255, 20, 147, 0.2) !important;
-    animation: neonPinkPulse 3s ease-in-out infinite !important;
+    border: 2px solid rgba(183, 91, 205, 0.5) !important;
+    box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
+                0 0 20px rgba(183, 91, 205, 0.3),
+                0 0 30px rgba(183, 91, 205, 0.2) !important;
+    animation: neonPurplePulse 3s ease-in-out infinite !important;
     transition: all 0.3s ease !important;
     color: #ffffff !important;
   }
   
   .pink-neon-button:hover {
-    border-color: rgba(255, 20, 147, 0.9) !important;
-    box-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 
-                0 0 40px rgba(255, 20, 147, 0.6),
-                0 0 60px rgba(255, 20, 147, 0.4) !important;
+    border-color: rgba(183, 91, 205, 0.9) !important;
+    box-shadow: 0 0 20px rgba(183, 91, 205, 0.8), 
+                0 0 40px rgba(183, 91, 205, 0.6),
+                0 0 60px rgba(183, 91, 205, 0.4) !important;
     transform: translateY(-2px) !important;
   }
   
   .pink-neon-button:active {
     transform: translateY(0) !important;
-    box-shadow: 0 0 30px rgba(255, 20, 147, 1), 
-                0 0 50px rgba(255, 20, 147, 0.8),
-                0 0 70px rgba(255, 20, 147, 0.5) !important;
+    box-shadow: 0 0 30px rgba(183, 91, 205, 1), 
+                0 0 50px rgba(183, 91, 205, 0.8),
+                0 0 70px rgba(183, 91, 205, 0.5) !important;
   }
 `}} />
 
