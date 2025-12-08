@@ -550,34 +550,72 @@ if (showAgeVerification) {
           </div>
           
           {/* Кнопки */}
-          <div className="space-y-3 mb-6">
-            <button
-              onClick={() => {
-                window.location.href = '/?login=true';
-              }}
-              className="w-full py-3 rounded-lg font-bold transition text-base"
-              style={{
-                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-                boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
-              }}
-            >
-              Войти
-            </button>
-            
-            <button
-              onClick={() => {
-                window.location.href = '/?register=true';
-              }}
-              className="w-full py-3 rounded-lg font-bold transition text-base border-2"
-              style={{
-                background: 'transparent',
-                borderColor: '#9370db',
-                color: '#9370db'
-              }}
-            >
-              Регистрация
-            </button>
-          </div>
+<style dangerouslySetInnerHTML={{__html: `
+  @keyframes neonPulse {
+    0%, 100% { 
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
+                  0 0 20px rgba(255, 105, 180, 0.5),
+                  0 0 30px rgba(255, 105, 180, 0.3),
+                  inset 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 
+                  0 0 40px rgba(255, 105, 180, 0.8),
+                  0 0 60px rgba(255, 105, 180, 0.5),
+                  inset 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+  }
+  
+  .glass-button {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 
+                0 0 20px rgba(255, 105, 180, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
+    animation: neonPulse 3s ease-in-out infinite !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 
+                0 0 40px rgba(255, 105, 180, 0.6),
+                0 0 60px rgba(255, 105, 180, 0.4),
+                inset 0 0 30px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  .glass-button:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 
+                0 0 50px rgba(255, 105, 180, 0.8),
+                0 0 70px rgba(255, 105, 180, 0.6),
+                inset 0 0 40px rgba(255, 255, 255, 0.2) !important;
+  }
+`}} />
+
+<div className="space-y-3 mb-6">
+  <button
+    onClick={() => {
+      window.location.href = '/?login=true';
+    }}
+    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+  >
+    Войти
+  </button>
+  
+  <button
+    onClick={() => {
+      window.location.href = '/?register=true';
+    }}
+    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+  >
+    Регистрация
+  </button>
+</div>
           
 {/* Логотип внизу */}
 <div className="flex justify-center">
