@@ -113,6 +113,12 @@ const renderFormattedText = (text) => {
   return result;
 };
 
+const showConfirm = (message, action = null) => {
+  setConfirmMessage(message);
+  setConfirmAction(() => action);
+  setShowConfirmModal(true);
+};
+
 
   const t = {
     backToMain: 'На главную',
@@ -556,7 +562,7 @@ if (showAgeVerification) {
 
 return (
   <div className="min-h-screen text-white" style={{ backgroundColor: '#000000' }}>
-    <style dangerouslySetInnerHTML={{ __html: `
+    <style dangerouslySetInnerHTML={{__html: `
       .spoiler-text {
         background: linear-gradient(90deg, #9333ea 0%, #ec4899 25%, #06b6d4 50%, #ec4899 75%, #9333ea 100%);
         background-size: 200% 100%;
@@ -1289,7 +1295,7 @@ return (
         </button>
       </div>
 
-<textarea
+      <textarea
         ref={replyTextareaRef}
         value={replyText}
         onChange={(e) => setReplyText(e.target.value)}
@@ -1459,7 +1465,7 @@ return (
       </button>
     </div>
 
-<textarea
+    <textarea
       ref={textareaRef}
       value={newDiscussion}
       onChange={(e) => setNewDiscussion(e.target.value)}
@@ -1471,17 +1477,6 @@ return (
         borderColor: '#8b3cc8'
       }}
     />
-    
-    <style dangerouslySetInnerHTML={{__html: `
-      [contenteditable]:empty:before {
-        content: attr(data-placeholder);
-        color: #6b7280;
-        pointer-events: none;
-      }
-      [contenteditable]:focus {
-        outline: none;
-      }
-    `}} />
   </div>
               <button
                 onClick={() => sendDiscussion()}
