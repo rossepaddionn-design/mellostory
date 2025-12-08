@@ -113,12 +113,6 @@ const renderFormattedText = (text) => {
   return result;
 };
 
-const showConfirm = (message, action = null) => {
-  setConfirmMessage(message);
-  setConfirmAction(() => action);
-  setShowConfirmModal(true);
-};
-
 
   const t = {
     backToMain: 'На главную',
@@ -471,49 +465,43 @@ if (showAgeVerification) {
           
           {/* Кнопки */}
 <style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPulse {
+  @keyframes neonPinkPulse {
     0%, 100% { 
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
-                  0 0 20px rgba(255, 105, 180, 0.5),
-                  0 0 30px rgba(255, 105, 180, 0.3),
-                  inset 0 0 20px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
+                  0 0 20px rgba(255, 20, 147, 0.3),
+                  0 0 30px rgba(255, 20, 147, 0.2);
     }
     50% { 
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 
-                  0 0 40px rgba(255, 105, 180, 0.8),
-                  0 0 60px rgba(255, 105, 180, 0.5),
-                  inset 0 0 30px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(255, 20, 147, 0.6), 
+                  0 0 30px rgba(255, 20, 147, 0.5),
+                  0 0 45px rgba(255, 20, 147, 0.3);
     }
   }
   
-  .glass-button {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 
-                0 0 20px rgba(255, 105, 180, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
-    animation: neonPulse 3s ease-in-out infinite !important;
+  .pink-neon-button {
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(255, 20, 147, 0.5) !important;
+    box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
+                0 0 20px rgba(255, 20, 147, 0.3),
+                0 0 30px rgba(255, 20, 147, 0.2) !important;
+    animation: neonPinkPulse 3s ease-in-out infinite !important;
     transition: all 0.3s ease !important;
+    color: #ffffff !important;
   }
   
-  .glass-button:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 
-                0 0 40px rgba(255, 105, 180, 0.6),
-                0 0 60px rgba(255, 105, 180, 0.4),
-                inset 0 0 30px rgba(255, 255, 255, 0.1) !important;
+  .pink-neon-button:hover {
+    border-color: rgba(255, 20, 147, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 
+                0 0 40px rgba(255, 20, 147, 0.6),
+                0 0 60px rgba(255, 20, 147, 0.4) !important;
     transform: translateY(-2px) !important;
   }
   
-  .glass-button:active {
+  .pink-neon-button:active {
     transform: translateY(0) !important;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 
-                0 0 50px rgba(255, 105, 180, 0.8),
-                0 0 70px rgba(255, 105, 180, 0.6),
-                inset 0 0 40px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 30px rgba(255, 20, 147, 1), 
+                0 0 50px rgba(255, 20, 147, 0.8),
+                0 0 70px rgba(255, 20, 147, 0.5) !important;
   }
 `}} />
 
@@ -522,7 +510,7 @@ if (showAgeVerification) {
     onClick={() => {
       window.location.href = '/?login=true';
     }}
-    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
     Войти
   </button>
@@ -531,7 +519,7 @@ if (showAgeVerification) {
     onClick={() => {
       window.location.href = '/?register=true';
     }}
-    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
     Регистрация
   </button>
@@ -1301,17 +1289,14 @@ return (
         </button>
       </div>
 
-<div
+<textarea
         ref={replyTextareaRef}
-        contentEditable={true}
-        onInput={(e) => setReplyText(e.currentTarget.innerHTML)}
-        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white text-sm mb-2 min-h-[60px] max-h-[150px] overflow-y-auto"
-        style={{ 
-          borderColor: '#8b3cc8',
-          outline: 'none'
-        }}
-        data-placeholder="Напишите ответ..."
-        suppressContentEditableWarning={true}
+        value={replyText}
+        onChange={(e) => setReplyText(e.target.value)}
+        rows={2}
+        placeholder="Напишите ответ..."
+        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
+        style={{ borderColor: '#8b3cc8' }}
       />
                             <div className="flex gap-2">
                               <button
@@ -1474,17 +1459,17 @@ return (
       </button>
     </div>
 
-<div
+<textarea
       ref={textareaRef}
-      contentEditable={!!currentUser}
-      onInput={(e) => setNewDiscussion(e.currentTarget.innerHTML)}
-      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white text-sm sm:text-base mb-3 min-h-[80px] max-h-[200px] overflow-y-auto"
+      value={newDiscussion}
+      onChange={(e) => setNewDiscussion(e.target.value)}
+      rows={3}
+      placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
+      disabled={!currentUser}
+      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
       style={{
-        borderColor: '#8b3cc8',
-        outline: 'none'
+        borderColor: '#8b3cc8'
       }}
-      data-placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
-      suppressContentEditableWarning={true}
     />
     
     <style dangerouslySetInnerHTML={{__html: `

@@ -551,49 +551,43 @@ if (showAgeVerification) {
           
           {/* Кнопки */}
 <style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPulse {
+  @keyframes neonPinkPulse {
     0%, 100% { 
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
-                  0 0 20px rgba(255, 105, 180, 0.5),
-                  0 0 30px rgba(255, 105, 180, 0.3),
-                  inset 0 0 20px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
+                  0 0 20px rgba(255, 20, 147, 0.3),
+                  0 0 30px rgba(255, 20, 147, 0.2);
     }
     50% { 
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 
-                  0 0 40px rgba(255, 105, 180, 0.8),
-                  0 0 60px rgba(255, 105, 180, 0.5),
-                  inset 0 0 30px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(255, 20, 147, 0.6), 
+                  0 0 30px rgba(255, 20, 147, 0.5),
+                  0 0 45px rgba(255, 20, 147, 0.3);
     }
   }
   
-  .glass-button {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 
-                0 0 20px rgba(255, 105, 180, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
-    animation: neonPulse 3s ease-in-out infinite !important;
+  .pink-neon-button {
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(255, 20, 147, 0.5) !important;
+    box-shadow: 0 0 10px rgba(255, 20, 147, 0.4), 
+                0 0 20px rgba(255, 20, 147, 0.3),
+                0 0 30px rgba(255, 20, 147, 0.2) !important;
+    animation: neonPinkPulse 3s ease-in-out infinite !important;
     transition: all 0.3s ease !important;
+    color: #ffffff !important;
   }
   
-  .glass-button:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 
-                0 0 40px rgba(255, 105, 180, 0.6),
-                0 0 60px rgba(255, 105, 180, 0.4),
-                inset 0 0 30px rgba(255, 255, 255, 0.1) !important;
+  .pink-neon-button:hover {
+    border-color: rgba(255, 20, 147, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 
+                0 0 40px rgba(255, 20, 147, 0.6),
+                0 0 60px rgba(255, 20, 147, 0.4) !important;
     transform: translateY(-2px) !important;
   }
   
-  .glass-button:active {
+  .pink-neon-button:active {
     transform: translateY(0) !important;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 
-                0 0 50px rgba(255, 105, 180, 0.8),
-                0 0 70px rgba(255, 105, 180, 0.6),
-                inset 0 0 40px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 30px rgba(255, 20, 147, 1), 
+                0 0 50px rgba(255, 20, 147, 0.8),
+                0 0 70px rgba(255, 20, 147, 0.5) !important;
   }
 `}} />
 
@@ -602,7 +596,7 @@ if (showAgeVerification) {
     onClick={() => {
       window.location.href = '/?login=true';
     }}
-    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
     Войти
   </button>
@@ -611,7 +605,7 @@ if (showAgeVerification) {
     onClick={() => {
       window.location.href = '/?register=true';
     }}
-    className="glass-button w-full py-3 rounded-lg font-bold text-base text-white"
+    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
     Регистрация
   </button>
