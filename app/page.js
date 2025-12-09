@@ -865,41 +865,29 @@ return (
         }}
       />
 
-{/* HEADER - АДАПТИВНЫЙ БЕЗ РАМКИ */}
-<div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
-  <div className="max-w-7xl mx-auto">
-    <div className="relative rounded-lg overflow-hidden bg-black">
-      {/* КАРТИНКА */}
-      <div className="relative w-full" style={{ minHeight: '200px', maxHeight: '500px' }}>
-        <img 
-          src={HEADER_BG_IMAGE}
-          alt="Header"
-          className="w-full h-full object-cover"
-          style={{
-            objectPosition: 'center 40%'
-          }}
-        />
-        
-        {/* ГРАДИЕНТЫ */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0,0,0,0.7) 80%, #000000 100%)'
-          }}
-        />
-        
-        <div 
-          className="absolute inset-0"
-          style={{
-            boxShadow: 'inset 0 0 100px 50px rgba(0,0,0,0.8)'
-          }}
-        />
-      </div>
-      
-      {/* КОНТЕНТ ПОВЕРХ */}
-      <div className="absolute inset-0 z-10 flex flex-col">
-        <div className="px-3 sm:px-6 py-2 sm:py-4">
-          <div className="flex justify-between items-center">
+{/* HEADER */}
+<div className="relative overflow-hidden">
+  <div className="relative w-full h-[50vh] sm:h-[60vh] max-h-[600px]">
+    {/* КАРТИНКА */}
+    <img 
+      src={HEADER_BG_IMAGE}
+      alt="Header"
+      className="w-full h-full object-cover"
+      style={{ objectPosition: 'center 40%' }}
+    />
+    
+    {/* ЗАТЕМНЕНИЕ */}
+    <div 
+      className="absolute inset-0"
+      style={{
+        background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.8) 80%, #000000 100%)'
+      }}
+    />
+    
+    {/* КОНТЕНТ ПОВЕРХ */}
+    <div className="absolute inset-0 z-10 flex flex-col">
+      <div className="px-3 sm:px-6 py-2 sm:py-4">
+        <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 sm:gap-4">
               <div 
                 className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
@@ -976,41 +964,66 @@ return (
         </div>
 
         <div className="flex-1 flex items-center justify-center px-4 pb-8">
-          <h1 
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
-            }}
-          >
-            <style dangerouslySetInnerHTML={{__html: `
-              @keyframes shimmer {
-                0% { background-position: -200% center; }
-                100% { background-position: 200% center; }
-              }
-              .mello-shimmer {
-                background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
-                background-size: 200% auto;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                animation: shimmer 3s linear infinite;
-              }
-            `}} />
-            <span className="mello-shimmer">MELLO</span>
-            <span style={{
-              color: '#8c32d2',
-              textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)'
-            }}>STORY</span>
-          </h1>
+<h1 
+  className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
+  style={{
+    fontFamily: "'Playfair Display', Georgia, serif",
+    textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
+  }}
+>
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .mello-shimmer {
+      background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+  `}} />
+  <span className="mello-shimmer">MELLO</span>
+  <span style={{
+    color: '#8c32d2',
+    textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)'
+        }}>STORY</span>
+</h1>
         </div>
       </div>
     </div>
   </div>
-</div>
 
+{/* ВОЛНИСТАЯ ЛИНИЯ */}
+<div className="relative" style={{ background: '#000000' }}>
+  <svg viewBox="0 0 1200 200" preserveAspectRatio="none" className="w-full" style={{ height: '200px', display: 'block' }}>
+    <defs>
+      <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style={{ stopColor: '#000000' }} />
+        <stop offset="50%" style={{ stopColor: '#9333ea' }} />
+        <stop offset="100%" style={{ stopColor: '#000000' }} />
+      </linearGradient>
+      <radialGradient id="glowGrad" cx="50%" cy="0%">
+        <stop offset="0%" style={{ stopColor: '#9333ea', stopOpacity: 0.5 }} />
+        <stop offset="100%" style={{ stopColor: 'transparent' }} />
+      </radialGradient>
+    </defs>
+    
+   
+    
+    {/* Линия выгнута ВВЕРХ */}
+    <path 
+      d="M0,60 Q600,0 1200,60" 
+      fill="none" 
+      stroke="url(#lineGrad)" 
+      strokeWidth="2"
+    />
+  </svg>
+</div>
 {/* NAVIGATION */}
-<div className="relative z-10 px-4 sm:px-8 py-4" style={{ background: '#000000', marginTop: '-1px' }}>
+<div className="relative z-10 px-4 sm:px-8 py-4 -mt-24 sm:-mt-20" style={{ background: '#000000' }}>
   <div className="max-w-7xl mx-auto">
     <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
 {[
