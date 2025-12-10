@@ -185,7 +185,7 @@ const saveChapter = async (isPublished) => {
     return;
   }
 
-  // КРИТИЧНО: берём текст ПРЯМО из редактора
+  // Берём текст из редактора
   const currentEditorContent = editorRef.current?.innerHTML?.trim() || '';
   console.log('💾 Сохраняем текст:', currentEditorContent.substring(0, 100));
 
@@ -197,7 +197,7 @@ const saveChapter = async (isPublished) => {
   setLoading(true);
 
   try {
-    // 1. Создаём данные главы (БЕЗ text_blob_url!)
+    // 1. Создаём данные главы (метаданные)
     const chapterData = {
       work_id: selectedWork.id,
       title: chapterForm.title.trim(),
@@ -211,17 +211,15 @@ const saveChapter = async (isPublished) => {
       is_published: isPublished
     };
 
-    // 2. Сохраняем метаданные в Supabase #1 (старая база)
+    // 2. Сохраняем метаданные в основную базу
     let result;
     if (selectedChapter) {
-      // Обновление существующей главы
       result = await supabase
         .from('chapters')
         .update(chapterData)
         .eq('id', selectedChapter.id)
         .select();
     } else {
-      // Создание новой главы
       result = await supabase
         .from('chapters')
         .insert([chapterData])
@@ -231,22 +229,26 @@ const saveChapter = async (isPublished) => {
     if (result.error) throw result.error;
 
     const savedChapter = result.data[0];
-    console.log('✅ Метаданные сохранены в Supabase #1:', savedChapter.id);
+    console.log('✅ Метаданные сохранены:', savedChapter.id);
 
-    // 3. Сохраняем ТЕКСТ в Supabase #2 (новая база)
-    const { error: textError } = await supabaseChapters
-      .from('chapter_texts')
-      .upsert({
-        chapter_id: savedChapter.id,
-        work_id: selectedWork.id,
-        text_content: currentEditorContent,
-        updated_at: new Date().toISOString()
-      }, { 
-        onConflict: 'chapter_id' 
-      });
+    // 3. Сохраняем ТЕКСТ через API (защищённо!)
+    const textResponse = await fetch('/api/chapters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save_chapter',
+        userId: '04c2f90c-cf0e-4dde-9186-8d19b98cad5a', // Ваш ID
+        chapterData: {
+          chapter_id: savedChapter.id,
+          work_id: selectedWork.id,
+          text_content: currentEditorContent
+        }
+      })
+    });
 
-    if (textError) throw textError;
-    console.log('✅ Текст сохранён в Supabase #2');
+    const textResult = await textResponse.json();
+    if (!textResult.success) throw new Error(textResult.error);
+    console.log('✅ Текст сохранён через API');
 
     // 4. Добавляем обновление о новой главе
     if (isPublished && !selectedChapter) {
@@ -272,7 +274,6 @@ const saveChapter = async (isPublished) => {
       alert(isPublished ? 'Глава опубликована!' : 'Черновик сохранён!');
     }
 
-    // ОБНОВЛЯЕМ список глав
     await loadChapters(selectedWork.id);
     
   } catch (err) {
@@ -1014,25 +1015,22 @@ setWorkForm({
                             </div>
                             <div className="flex gap-2 w-full sm:w-auto">
 <button onClick={async () => {
-  // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2!
+  // Загружаем текст через API
   let chapterContent = '';
   
   try {
-    const { data: textData, error } = await supabaseChapters
-      .from('chapter_texts')
-      .select('text_content')
-      .eq('chapter_id', chapter.id)
-      .single();
+    const response = await fetch(`/api/chapters?action=get_chapter_text&chapterId=${chapter.id}&userId=04c2f90c-cf0e-4dde-9186-8d19b98cad5a`);
+    const result = await response.json();
     
-    if (error) throw error;
-    chapterContent = textData.text_content || '';
-    console.log('📥 Загрузили из Supabase #2:', chapterContent.substring(0, 100));
+    if (result.success) {
+      chapterContent = result.text_content || '';
+      console.log('📥 Загрузили через API:', chapterContent.substring(0, 100));
+    }
   } catch (error) {
-    console.error('❌ Ошибка загрузки текста:', error);
+    console.error('❌ Ошибка загрузки:', error);
     alert('Ошибка загрузки текста главы');
   }
   
-  // Устанавливаем форму
   setChapterForm({
     title: chapter.title,
     content: chapterContent,
@@ -1045,10 +1043,8 @@ setWorkForm({
   
   setSelectedChapter(chapter);
   
-  // Заполняем редактор
   if (editorRef.current) {
     editorRef.current.innerHTML = chapterContent;
-    console.log('✏️ Вставили в редактор:', editorRef.current.innerHTML.substring(0, 100));
   }
   
   setSectionsExpanded(prev => ({ ...prev, chapterEditor: true }));
