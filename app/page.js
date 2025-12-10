@@ -976,12 +976,11 @@ return (
       </div>
     </div>
   </div>
-  <div className="flex-1 flex items-center justify-center px-4 pb-8">
+ <div className="flex-1 flex items-center justify-center px-4 pb-8">
     <h1
       className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
       style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
-        textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
+        fontFamily: "'Playfair Display', Georgia, serif"
       }}
     >
       <style
@@ -999,10 +998,14 @@ return (
               background-clip: text;
               animation: shimmer 3s linear infinite;
             }
+            .story-text {
+              color: #cdb0e3;
+              text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);
+            }
           `
         }}
       />
-      <span className="mello-shimmer">MELLO</span> <span style={{ color: '#8c32d2', textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)' }}>STORY</span>
+      <span className="mello-shimmer">MELLO</span> <span className="story-text">STORY</span>
     </h1>
   </div>
 </div>
