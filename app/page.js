@@ -866,171 +866,161 @@ return (
       />
 
 {/* HEADER */}
-<div className="relative overflow-hidden">
-  <div className="relative w-full h-[50vh] sm:h-[60vh] max-h-[600px]">
-    {/* КАРТИНКА */}
-    <img 
-      src={HEADER_BG_IMAGE}
-      alt="Header"
-      className="w-full h-full object-cover"
-      style={{ objectPosition: 'center 40%' }}
-    />
-    
-    {/* ЗАТЕМНЕНИЕ */}
+<div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
+  <div className="max-w-7xl mx-auto">
+    {/* РАМКА С ГРАДИЕНТОМ */}
     <div 
-      className="absolute inset-0"
+      className="relative overflow-hidden rounded-lg"
       style={{
-        background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.8) 80%, #000000 100%)'
+        padding: '3px',
+        background: 'linear-gradient(135deg, #200a2e 0%, #000000 50%, #200a2e 100%)'
       }}
-    />
-    
-    {/* КОНТЕНТ ПОВЕРХ */}
-    <div className="absolute inset-0 z-10 flex flex-col">
-      <div className="px-3 sm:px-6 py-2 sm:py-4">
-        <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div 
-                className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
-                style={{
-                  background: '#dc0000',
-                  border: '2px solid #ff0000',
-                  boxShadow: '0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6)',
-                  animation: 'pulse18 2s ease-in-out infinite'
-                }}
-              >
-                <style dangerouslySetInnerHTML={{__html: `
-                  @keyframes pulse18 {
-                    0%, 100% { 
-                      box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
-                      transform: scale(1);
-                    }
-                    50% { 
-                      box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
-                      transform: scale(1.05);
-                    }
-                  }
-                `}} />
-                18+
-              </div>
-
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="rounded px-2 sm:px-3 py-1 text-xs sm:text-sm"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'white'
-                }}
-              >
-                <option value="ru">RU</option>
-                <option value="en">EN</option>
-              </select>
-            </div>
-
-            <div className="flex-shrink-0">
-              {!user ? (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                  style={{
-                    background: 'rgba(147, 112, 219, 0.3)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(147, 112, 219, 0.5)'
-                  }}
-                >
-                  <User size={14} className="sm:w-5 sm:h-5" />
-                  <span className="hidden sm:inline">{t.login}</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true)}
-                  className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-                  style={{
-                    background: 'rgba(147, 112, 219, 0.3)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(147, 112, 219, 0.5)'
-                  }}
-                >
-                  <Menu size={14} className="sm:w-5 sm:h-5" />
-                  <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">
-                    {isAdmin ? 'Админ' : userProfile?.nickname}
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
+    >
+      {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
+      <div 
+        className="relative rounded-lg overflow-hidden"
+        style={{
+          backgroundImage: `url(${HEADER_BG_IMAGE})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '90px'
+        }}
+      >
+        <style jsx>{`
+          @media (min-width: 640px) {
+            div[style*="backgroundImage"] {
+              min-height: 35vh !important;
+            }
+          }
+        `}</style>
+        
+        <div className="relative z-10 h-full flex flex-col min-h-[90px] sm:min-h-[35vh]">
+          {/* ВЕРХНЯЯ ПАНЕЛЬ */}
+<div className="absolute inset-0 z-10 flex flex-col">
+  <div className="px-3 sm:px-6 py-2 sm:py-4">
+    <div className="flex justify-between items-center">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <div
+          className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
+          style={{
+            background: '#dc0000',
+            border: '2px solid #ff0000',
+            boxShadow: '0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6)',
+            animation: 'pulse18 2s ease-in-out infinite'
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              @keyframes pulse18 {
+                0%, 100% {
+                  box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
+                  transform: scale(1);
+                }
+                50% {
+                  box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
+                  transform: scale(1.05);
+                }
+              }
+            `
+            }}
+          />
+          18+
         </div>
-
-        <div className="flex-1 flex items-center justify-center px-4 pb-8">
-<h1 
-  className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
-  style={{
-    fontFamily: "'Playfair Display', Georgia, serif",
-    textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
-  }}
->
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-    .mello-shimmer {
-      background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-    }
-  `}} />
-  <span className="mello-shimmer">MELLO</span>
-  <span style={{
-    color: '#8c32d2',
-    textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)'
-        }}>STORY</span>
-</h1>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="rounded px-2 sm:px-3 py-1 text-xs sm:text-sm"
+          style={{
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}
+        >
+          <option value="ru">RU</option>
+          <option value="en">EN</option>
+        </select>
+      </div>
+      <div className="flex-shrink-0">
+        {!user ? (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+            style={{
+              background: 'rgba(147, 112, 219, 0.3)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(147, 112, 219, 0.5)'
+            }}
+          >
+            <User size={14} className="sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">{t.login}</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
+            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+            style={{
+              background: 'rgba(147, 112, 219, 0.3)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(147, 112, 219, 0.5)'
+            }}
+          >
+            <Menu size={14} className="sm:w-5 sm:h-5" />
+            <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">
+              {isAdmin ? 'Админ' : userProfile?.nickname}
+            </span>
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+  <div className="flex-1 flex items-center justify-center px-4 pb-8">
+    <h1
+      className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
+      style={{
+        fontFamily: "'Playfair Display', Georgia, serif",
+        textShadow: '0 0 40px rgba(140, 50, 210, 0.8), 0 4px 20px rgba(0,0,0,0.9)'
+      }}
+    >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes shimmer {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .mello-shimmer {
+              background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: shimmer 3s linear infinite;
+            }
+          `
+        }}
+      />
+      <span className="mello-shimmer">MELLO</span> <span style={{ color: '#8c32d2', textShadow: '0 0 30px rgba(140, 50, 210, 1), 0 0 60px rgba(140, 50, 210, 0.6)' }}>STORY</span>
+    </h1>
+  </div>
+</div>
         </div>
       </div>
     </div>
   </div>
-
-{/* ВОЛНИСТАЯ ЛИНИЯ */}
-<div className="relative" style={{ background: '#000000' }}>
-  <svg viewBox="0 0 1200 200" preserveAspectRatio="none" className="w-full" style={{ height: '200px', display: 'block' }}>
-    <defs>
-      <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" style={{ stopColor: '#000000' }} />
-        <stop offset="50%" style={{ stopColor: '#9333ea' }} />
-        <stop offset="100%" style={{ stopColor: '#000000' }} />
-      </linearGradient>
-      <radialGradient id="glowGrad" cx="50%" cy="0%">
-        <stop offset="0%" style={{ stopColor: '#9333ea', stopOpacity: 0.5 }} />
-        <stop offset="100%" style={{ stopColor: 'transparent' }} />
-      </radialGradient>
-    </defs>
-    
-   
-    
-    {/* Линия выгнута ВВЕРХ */}
-    <path 
-      d="M0,60 Q600,0 1200,60" 
-      fill="none" 
-      stroke="url(#lineGrad)" 
-      strokeWidth="2"
-    />
-  </svg>
 </div>
+
 {/* NAVIGATION */}
-<div className="relative z-10 px-4 sm:px-8 py-4 -mt-24 sm:-mt-20" style={{ background: '#000000' }}>
+<div className="relative z-10 px-4 sm:px-8 py-4">
   <div className="max-w-7xl mx-auto">
     <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
-{[
-  { key: 'novel', label: t.novels },
-  { key: 'longfic', label: t.longfic },
-  { key: 'minific', label: t.minific }
-].map((item) => (
+      {[
+       { key: 'novel', label: t.novels },
+        { key: 'longfic', label: t.longfic },
+        { key: 'minific', label: t.minific },
+      ].map((item) => (
         <button
           key={item.key}
           onClick={() => {
@@ -1038,21 +1028,21 @@ return (
             setCurrentSlide(0);
             setExpandedWork(null);
           }}
-          className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2.5 border-2 rounded-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap`}
-style={{
-  borderColor: activeCategory === item.key ? '#ffffff' : '#984bc3',
-  backgroundColor: activeCategory === item.key ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-  color: activeCategory === item.key ? '#ffffff' : '#d1d5db'
-}}
+          className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2.5 border-2 rounded-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap"
+          style={{
+            borderColor: activeCategory === item.key ? '#a87ec4' : '#7430a1',
+            backgroundColor: 'transparent',
+            color: '#ffffff'
+          }}
           onMouseEnter={(e) => {
             if (activeCategory !== item.key) {
-              e.currentTarget.style.borderColor = '#d5acec';
-              e.currentTarget.style.boxShadow = '0 0 10px rgba(213, 172, 236, 0.6)';
+              e.currentTarget.style.borderColor = '#a87ec4';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(168, 126, 196, 0.6)';
             }
           }}
           onMouseLeave={(e) => {
             if (activeCategory !== item.key) {
-              e.currentTarget.style.borderColor = '#984bc3';
+              e.currentTarget.style.borderColor = '#7430a1';
               e.currentTarget.style.boxShadow = 'none';
             }
           }}
@@ -1063,6 +1053,8 @@ style={{
     </nav>
   </div>
 </div>
+
+
 
       {/* MAIN CONTENT */}
       <main className="pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen">
