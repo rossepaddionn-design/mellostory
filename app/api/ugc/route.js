@@ -34,15 +34,20 @@ export async function POST(request) {
   } = body;
 
   try {
-    if (action === 'add_favorite') {
-      const { data, error } = await supabaseUGC
-        .from('user_favorites')
-        .insert({ user_id: userId, work_id: workId })
-        .select();
-      
-      if (error) throw error;
-      return NextResponse.json({ success: true, data });
-    }
+if (action === 'save_image') {
+  const { data, error } = await supabaseUGC
+    .from('saved_images')
+    .insert({
+      user_id: userId,
+      image_url: imageUrl,
+      image_source: imageSource
+      // work_id убираем
+    })
+    .select();
+  
+  if (error) throw error;
+  return NextResponse.json({ success: true, data });
+}
 
     if (action === 'remove_favorite') {
       const { error } = await supabaseUGC
@@ -82,6 +87,18 @@ export async function POST(request) {
       if (error) throw error;
       return NextResponse.json({ success: true });
     }
+
+if (action === 'edit_comment') {
+  const { data, error } = await supabaseUGC
+    .from('work_discussions')
+    .update({ message: message })
+    .eq('id', commentId)
+    .eq('user_id', userId)
+    .select();
+  
+  if (error) throw error;
+  return NextResponse.json({ success: true, data });
+}
 
     // ========== ЗАКЛАДКИ ==========
     if (action === 'add_bookmark') {
@@ -128,16 +145,16 @@ export async function POST(request) {
       return NextResponse.json({ success: true, data });
     }
 
-    if (action === 'delete_image') {
-      const { error } = await supabaseUGC
-        .from('saved_images')
-        .delete()
-        .eq('id', imageId)
-        .eq('user_id', userId);
-      
-      if (error) throw error;
-      return NextResponse.json({ success: true });
-    }
+if (action === 'delete_image') {
+  const { error } = await supabaseUGC
+    .from('saved_images')
+    .delete()
+    .eq('user_id', userId)
+    .eq('image_url', imageUrl); // ← ИЗМЕНЕНО (было imageId)
+  
+  if (error) throw error;
+  return NextResponse.json({ success: true });
+}
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {

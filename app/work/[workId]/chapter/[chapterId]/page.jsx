@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { supabaseChapters } from '@/lib/supabase-chapters';
+import { supabaseUGC } from '@/lib/supabase-ugc';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Menu, X, Music, Image as ImageIcon } from 'lucide-react';
 
@@ -28,6 +29,7 @@ const [showBookmarkButton, setShowBookmarkButton] = useState(true);
 const [bookmarkPosition, setBookmarkPosition] = useState({ x: 0, y: 0 });
 const [selectedTextForBookmark, setSelectedTextForBookmark] = useState('');
 const [showBookmarksModal, setShowBookmarksModal] = useState(false);
+const [savedImages, setSavedImages] = useState([]);
 const [userBookmarks, setUserBookmarks] = useState([]);
 const [showConfirmModal, setShowConfirmModal] = useState(false);
 const [confirmAction, setConfirmAction] = useState(null);
@@ -65,6 +67,87 @@ const showConfirm = (message, action) => {
     nextChapter: 'Следующая',
     chapters: 'Главы'
   };
+
+useEffect(() => {
+  if (currentUser) {
+    loadSavedImages();
+  }
+}, [currentUser]);
+
+const loadSavedImages = async () => {
+  if (!currentUser) return;
+  
+  try {
+    const res = await fetch(`/api/ugc?action=get_saved_images&userId=${currentUser.id}`);
+    const { images } = await res.json();
+    
+    if (images) {
+      setSavedImages(images.map(img => img.image_url));
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки сохранённых изображений:', err);
+  }
+};
+
+const toggleSaveImage = async (imageUrl) => {
+  if (!currentUser) {
+    showConfirm('Войдите, чтобы сохранить изображение');
+    return;
+  }
+
+  const isSaved = savedImages.includes(imageUrl);
+
+  try {
+    if (isSaved) {
+      // Удаление через API
+const res = await fetch('/api/ugc', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'save_image',
+    userId: currentUser.id,
+    // workId убираем
+    imageUrl: imageUrl,
+    imageSource: 'chapter'
+  })
+});
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages(savedImages.filter(img => img !== imageUrl));
+        showConfirm('Удалено из галереи');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    } else {
+      // Сохранение через API
+      const res = await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_image',
+          userId: currentUser.id,
+          workId: workId,
+          imageUrl: imageUrl,
+          imageSource: 'work' // ← УБРАЛИ проверку chapterId, так как на странице work его нет
+        })
+      });
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages([...savedImages, imageUrl]);
+        showConfirm('Сохранено в галерею!');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    showConfirm('Ошибка сохранения: ' + err.message);
+  }
+};
 
 useEffect(() => {
   const checkAuth = async () => {
@@ -1299,16 +1382,40 @@ return (
         className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-8 sm:px-10"
         style={{ scrollbarWidth: 'thin' }}
       >
-        {chapter.images.map((img, index) => (
-          <div 
-            key={index} 
-            className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+{chapter.images.map((img, index) => (
+  <div 
+    key={index} 
+    className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative"
             style={{
               borderColor: '#7626b5',
               boxShadow: '0 0 10px rgba(118, 38, 181, 0.5)'
             }}
           >
             <img src={img} alt={`Image ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+            <button
+  onClick={() => toggleSaveImage(img)}
+  className="absolute bottom-2 left-1/2 transform -translate-x-1/2 p-2 rounded-full transition-all duration-300"
+  style={{
+    background: savedImages.includes(img) 
+      ? 'rgba(239, 1, 203, 0.9)' 
+      : 'rgba(0, 0, 0, 0.7)',
+    backdropFilter: 'blur(10px)',
+    boxShadow: savedImages.includes(img)
+      ? '0 0 15px rgba(239, 1, 203, 0.8), 0 0 30px rgba(239, 1, 203, 0.5)'
+      : '0 0 10px rgba(0, 0, 0, 0.5)'
+  }}
+>
+  <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill={savedImages.includes(img) ? '#ef01cb' : 'none'}
+    stroke={savedImages.includes(img) ? '#ffffff' : '#ef01cb'}
+    strokeWidth="2"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+</button>
           </div>
         ))}
       </div>

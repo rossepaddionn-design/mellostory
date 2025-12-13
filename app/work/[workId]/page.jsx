@@ -25,19 +25,12 @@ export default function WorkPage() {
   const [showAgeVerification, setShowAgeVerification] = useState(false);
   const carouselRef = useRef(null);
   const hasIncrementedView = useRef(false);
-const [showDiscussionModal, setShowDiscussionModal] = useState(false);
-const [discussions, setDiscussions] = useState([]);
-const [newDiscussion, setNewDiscussion] = useState('');
 const [isFavorited, setIsFavorited] = useState(false);
-const [replyingTo, setReplyingTo] = useState(null); // ID комментария, на который отвечаем
-const [replyText, setReplyText] = useState(''); // Текст ответа
 const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [savedImages, setSavedImages] = useState([]);
 const [confirmMessage, setConfirmMessage] = useState('');
 const [confirmAction, setConfirmAction] = useState(null);
-const [showColorPicker, setShowColorPicker] = useState(false);
-const [showReplyColorPicker, setShowReplyColorPicker] = useState(false);
-const textareaRef = useRef(null);
-const replyTextareaRef = useRef(null);
+
 
 const colors = ['#a91e30', '#8b1ea9', '#41d8ad', '#dbc78a', '#ec83c7', '#83eca5'];
 
@@ -152,25 +145,94 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  if (currentUser) {
+    loadSavedImages();
+  }
+}, [currentUser]);
+
+const loadSavedImages = async () => {
+  if (!currentUser) return;
+  
+  try {
+    const res = await fetch(`/api/ugc?action=get_saved_images&userId=${currentUser.id}`);
+    const { images } = await res.json();
+    
+    if (images) {
+      setSavedImages(images.map(img => img.image_url));
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки сохранённых изображений:', err);
+  }
+};
+
+const toggleSaveImage = async (imageUrl) => {
+  if (!currentUser) {
+    showConfirm('Войдите, чтобы сохранить изображение');
+    return;
+  }
+
+  const isSaved = savedImages.includes(imageUrl);
+
+  try {
+    if (isSaved) {
+      // Удаление через API
+      const res = await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_image',
+          userId: currentUser.id,
+          imageUrl: imageUrl
+        })
+      });
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages(savedImages.filter(img => img !== imageUrl));
+        showConfirm('Удалено из галереи');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    } else {
+      // Сохранение через API
+const res = await fetch('/api/ugc', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'save_image',
+    userId: currentUser.id,
+    // workId убираем
+    imageUrl: imageUrl,
+    imageSource: 'work'
+  })
+});
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages([...savedImages, imageUrl]);
+        showConfirm('Сохранено в галерею!');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    showConfirm('Ошибка сохранения: ' + err.message);
+  }
+};
+
+useEffect(() => {
   if (workId) {
     loadAllData();
     incrementViewCount();
-    loadDiscussions();
     if (currentUser) {
       checkFavorite();
     }
   }
 }, [workId, currentUser]);
 
-const loadDiscussions = async () => {
-  try {
-    const res = await fetch(`/api/ugc?action=get_discussions&workId=${workId}`);
-    const { discussions } = await res.json();
-    setDiscussions(discussions || []);
-  } catch (err) {
-    console.error('Ошибка загрузки комментариев:', err);
-  }
-};
 
 const checkFavorite = async () => {
   if (!currentUser) return;
@@ -215,91 +277,6 @@ if (result.success) {
 }
 };
 
-const sendDiscussion = async (parentId = null) => {
-  if (!currentUser) {
-    showConfirm('Войдите, чтобы оставить комментарий');
-    return;
-  }
-  
-  const messageToSend = parentId ? replyText : newDiscussion;
-  
-  if (!messageToSend.trim()) {
-    showConfirm('Напишите комментарий');
-    return;
-  }
-
-  try {
-    // 🔥 ПОЛУЧАЕМ НИКНЕЙМ ИЗ ПРОФИЛЯ
-    const { data: profile } = await supabase
-      .from('reader_profiles')
-      .select('nickname')
-      .eq('user_id', currentUser.id)
-      .single();
-
-    const nickname = profile?.nickname || currentUser.email?.split('@')[0] || 'Аноним';
-
-    const res = await fetch('/api/ugc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'add_comment',
-        userId: currentUser.id,
-        workId: workId,
-        nickname: nickname, // ← Используем реальный никнейм
-        message: messageToSend.trim(),
-        parentCommentId: parentId
-      })
-    });
-
-    const result = await res.json();
-    
-if (result.success) {
-  showConfirm(parentId ? 'Ответ отправлен' : 'Комментарий отправлен');
-  if (parentId) {
-    setReplyText('');
-    setReplyingTo(null);
-  } else {
-    setNewDiscussion('');
-  }
-  loadDiscussions();
-} else {
-  showConfirm('Ошибка: ' + result.error);
-}
-} catch (err) {
-  console.error('Ошибка:', err);
-  showConfirm('Ошибка: ' + err.message);
-}
-};
-
-const deleteDiscussion = async (commentId) => {
-  if (!currentUser) return;
-  
-  showConfirm('Удалить комментарий?', async () => {
-    try {
-      const res = await fetch('/api/ugc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete_comment',
-          userId: currentUser.id,
-          commentId: commentId
-        })
-      });
-
-      const result = await res.json();
-      
-      if (result.success) {
-        showConfirm('Комментарий удалён');
-        loadDiscussions();
-      } else {
-        showConfirm('Ошибка: ' + result.error);
-      }
-    } catch (err) {
-      console.error('Ошибка:', err);
-      showConfirm('Ошибка: ' + err.message);
-    }
-  });
-};
 
 const loadAllData = async () => {
   setLoading(true);
@@ -886,31 +863,28 @@ return (
                 <span>{isFavorited ? 'В избранном' : 'В избранное'}</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setShowDiscussionModal(true);
-                  loadDiscussions();
-                }}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
-                style={{
-                  background: '#000000',
-                  borderColor: '#b3e7ef',
-                  color: '#FFFFFF',
-                  boxShadow: '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)',
-                  animation: 'shimmer-cyan 2s ease-in-out infinite'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)';
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" className="sm:w-4 sm:h-4" fill="none" stroke="#b3e7ef" strokeWidth="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span>Обсуждение ({discussions.length})</span>
-              </button>
+<Link
+  href={`/work/${workId}/discussion`}
+  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
+  style={{
+    background: '#000000',
+    borderColor: '#b3e7ef',
+    color: '#FFFFFF',
+    boxShadow: '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)',
+    animation: 'shimmer-cyan 2s ease-in-out infinite'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)';
+  }}
+>
+  <svg width="14" height="14" viewBox="0 0 24 24" className="sm:w-4 sm:h-4" fill="none" stroke="#b3e7ef" strokeWidth="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <span>Обсуждение</span>
+</Link>
             </div>
             {/* ОПИСАНИЕ */}
             <div className="bg-black rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
@@ -948,16 +922,40 @@ return (
                     className="flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-8 sm:px-10"
                     style={{ scrollbarWidth: 'thin' }}
                   >
-                    {characterImagesArray.map((img, index) => (
-                      <div 
-                        key={index} 
-                        className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start"
+{characterImagesArray.map((img, index) => (
+  <div 
+    key={index} 
+    className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative"
                         style={{
                           borderColor: '#7626b5',
                           boxShadow: '0 0 10px rgba(118, 38, 181, 0.5)'
                         }}
                       >
                         <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                        <button
+  onClick={() => toggleSaveImage(img)}
+  className="absolute bottom-2 left-1/2 transform -translate-x-1/2 p-2 rounded-full transition-all duration-300"
+  style={{
+    background: savedImages.includes(img) 
+      ? 'rgba(239, 1, 203, 0.9)' 
+      : 'rgba(0, 0, 0, 0.7)',
+    backdropFilter: 'blur(10px)',
+    boxShadow: savedImages.includes(img)
+      ? '0 0 15px rgba(239, 1, 203, 0.8), 0 0 30px rgba(239, 1, 203, 0.5)'
+      : '0 0 10px rgba(0, 0, 0, 0.5)'
+  }}
+>
+  <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill={savedImages.includes(img) ? '#ef01cb' : 'none'}
+    stroke={savedImages.includes(img) ? '#ffffff' : '#ef01cb'}
+    strokeWidth="2"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+</button>
                       </div>
                     ))}
                   </div>
@@ -1157,340 +1155,6 @@ return (
                 )}
               </>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* МОДАЛЬНОЕ ОКНО ОБСУЖДЕНИЯ */}
-      {showDiscussionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-          <div className="bg-black rounded-lg w-full max-w-2xl max-h-[85vh] flex flex-col border-2" style={{ borderColor: '#8b3cc8' }}>
-            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-700 flex-shrink-0">
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes shimmerDiscussion {
-                  0% { background-position: -200% center; }
-                  100% { background-position: 200% center; }
-                }
-                .discussion-title {
-                  background: linear-gradient(90deg, #b3e7ef 0%, #8b3cc8 50%, #b3e7ef 100%);
-                  background-size: 200% auto;
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                  background-clip: text;
-                  animation: shimmerDiscussion 3s linear infinite;
-                }
-`}} />
-              <h2 className="text-xl sm:text-2xl font-bold discussion-title flex items-center gap-2">
-                💬 Обсуждение работы
-              </h2>
-              <button 
-                onClick={() => setShowDiscussionModal(false)} 
-                className="text-gray-400 hover:text-white transition flex-shrink-0"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-              {discussions.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <p>Пока нет комментариев. Будьте первым!</p>
-                </div>
-              ) : (
-                <div className="space-y-3 sm:space-y-4">
-                  {discussions
-                    .filter(d => !d.parent_comment_id)
-                    .map((disc) => (
-                    <div key={disc.id} className="space-y-2">
-                      <div 
-                        className="rounded-lg p-3 sm:p-4 border transition"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(139, 60, 200, 0.2) 0%, rgba(74, 29, 110, 0.2) 100%)',
-                          borderColor: 'rgba(139, 60, 200, 0.4)'
-                        }}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm sm:text-base" style={{ color: '#b3e7ef' }}>
-                              {disc.nickname}
-                            </span>
-                            <span 
-                              className="text-xs px-2 py-1 rounded" 
-                              style={{ 
-                                background: disc.nickname === 'Мелло' ? '#9333ea' : '#700a21',
-                                color: 'white'
-                              }}
-                            >
-                              {disc.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
-                            </span>
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setReplyingTo(disc.id);
-                                setReplyText('');
-                              }}
-                              className="text-cyan-400 hover:text-cyan-300 transition text-xs"
-                            >
-                              Ответить
-                            </button>
-                            
-                            {currentUser && disc.user_id === currentUser.id && (
-                              <button
-                                onClick={() => deleteDiscussion(disc.id)}
-                                className="text-red-400 hover:text-red-300 transition text-xs"
-                              >
-                                Удалить
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        
-<div 
-  className="text-gray-300 text-sm sm:text-base whitespace-pre-wrap break-words mb-2"
-  dangerouslySetInnerHTML={{ __html: renderFormattedText(disc.message) }}
-/>
-                        <span className="text-xs text-gray-500">
-                          {new Date(disc.created_at).toLocaleString('ru-RU', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                        
- {replyingTo === disc.id && (
-  <div className="mt-3 pl-4 border-l-2" style={{ borderColor: '#8b3cc8' }}>
-    <div className="space-y-2">
-      {/* Панель инструментов для ответа */}
-      <div className="flex flex-wrap gap-2 p-2 rounded-lg border" style={{
-        background: 'rgba(139, 60, 200, 0.1)',
-        borderColor: '#8b3cc8'
-      }}>
-        <button onClick={() => applyFormatting('bold', true)} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Жирный">
-          <strong>B</strong>
-        </button>
-        <button onClick={() => applyFormatting('italic', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Курсив">
-          <em>I</em>
-        </button>
-        <button onClick={() => applyFormatting('underline', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Подчеркнутый">
-          <u>U</u>
-        </button>
-        <div className="relative">
-          <button onClick={() => setShowReplyColorPicker(!showReplyColorPicker)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Цвет">
-            🎨
-          </button>
-          {showReplyColorPicker && (
-            <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1" style={{ background: '#000', borderColor: '#8b3cc8' }}>
-              {colors.map(color => (
-                <button key={color} onClick={() => applyFormatting(color, true)} className="w-6 h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
-              ))}
-            </div>
-          )}
-        </div>
-        <button onClick={() => applyFormatting('spoiler', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Спойлер">
-          👁️
-        </button>
-      </div>
-
-      <textarea
-        ref={replyTextareaRef}
-        value={replyText}
-        onChange={(e) => setReplyText(e.target.value)}
-        rows={2}
-        placeholder="Напишите ответ..."
-        className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white resize-none text-sm mb-2"
-        style={{ borderColor: '#8b3cc8' }}
-      />
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => sendDiscussion(disc.id)}
-                                className="px-4 py-2 rounded-lg font-bold text-sm transition"
-                                style={{
-                                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-                                  color: '#fff'
-                                }}
-                              >
-                                Отправить
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setReplyingTo(null);
-                                  setReplyText('');
-                                }}
-                                className="px-4 py-2 rounded-lg font-bold text-sm transition"
-                                style={{
-                                  background: 'transparent',
-                                  border: '1px solid #8b3cc8',
-                                  color: '#8b3cc8'
-                                }}
-                              >
-                                Отмена
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        )}
-                      </div>
-                      
-                      {discussions
-                        .filter(reply => reply.parent_comment_id === disc.id)
-                        .map(reply => (
-                          <div 
-                            key={reply.id}
-                            className="ml-6 sm:ml-12 rounded-lg p-3 border transition"
-                            style={{
-                              background: 'linear-gradient(135deg, rgba(179, 231, 239, 0.15) 0%, rgba(139, 60, 200, 0.15) 100%)',
-                              borderColor: 'rgba(179, 231, 239, 0.3)'
-                            }}
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-xs sm:text-sm" style={{ color: '#b3e7ef' }}>
-                                  {reply.nickname}
-                                </span>
-                                <span 
-                                  className="text-xs px-2 py-0.5 rounded" 
-                                  style={{ 
-                                    background: reply.nickname === 'Мелло' ? '#9333ea' : '#ef4444',
-                                    color: 'white',
-                                    fontSize: '10px'
-                                  }}
-                                >
-                                  {reply.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
-                                </span>
-                              </div>
-                              
-                              {currentUser && reply.user_id === currentUser.id && (
-                                <button
-                                  onClick={() => deleteDiscussion(reply.id)}
-                                  className="text-red-400 hover:text-red-300 transition text-xs"
-                                >
-                                  Удалить
-                                </button>
-                              )}
-                            </div>
-                            
-<div 
-  className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words mb-2"
-  dangerouslySetInnerHTML={{ __html: renderFormattedText(reply.message) }}
-/>
-                            <span className="text-xs text-gray-500">
-                              {new Date(reply.created_at).toLocaleString('ru-RU', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-<div className="border-t border-gray-700 p-4 sm:p-6 flex-shrink-0">
-  <div className="space-y-3">
-    {/* Панель инструментов */}
-    <div className="flex flex-wrap gap-2 p-2 rounded-lg border" style={{
-      background: 'rgba(139, 60, 200, 0.1)',
-      borderColor: '#8b3cc8'
-    }}>
-      <button
-        onClick={() => applyFormatting('bold')}
-        className="px-3 py-1.5 rounded transition text-sm font-bold"
-        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
-        title="Жирный"
-      >
-        <strong>B</strong>
-      </button>
-      
-      <button
-        onClick={() => applyFormatting('italic')}
-        className="px-3 py-1.5 rounded transition text-sm"
-        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
-        title="Курсив"
-      >
-        <em>I</em>
-      </button>
-      
-      <button
-        onClick={() => applyFormatting('underline')}
-        className="px-3 py-1.5 rounded transition text-sm"
-        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
-        title="Подчеркнутый"
-      >
-        <u>U</u>
-      </button>
-      
-      <div className="relative">
-        <button
-          onClick={() => setShowColorPicker(!showColorPicker)}
-          className="px-3 py-1.5 rounded transition text-sm"
-          style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
-          title="Цвет текста"
-        >
-          🎨
-        </button>
-        
-        {showColorPicker && (
-          <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1"
-            style={{ background: '#000', borderColor: '#8b3cc8' }}
-          >
-            {colors.map(color => (
-              <button
-                key={color}
-                onClick={() => applyFormatting(color)}
-                className="w-8 h-8 rounded border-2 border-white transition hover:scale-110"
-                style={{ background: color }}
-                title={color}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      
-      <button
-        onClick={() => applyFormatting('spoiler')}
-        className="px-3 py-1.5 rounded transition text-sm"
-        style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }}
-        title="Спойлер"
-      >
-        👁️
-      </button>
-    </div>
-
-    <textarea
-      ref={textareaRef}
-      value={newDiscussion}
-      onChange={(e) => setNewDiscussion(e.target.value)}
-      rows={3}
-      placeholder={currentUser ? "Напишите ваш комментарий..." : "Войдите, чтобы оставить комментарий"}
-      disabled={!currentUser}
-      className="w-full px-3 py-2 rounded-lg border-2 bg-gray-900 text-white resize-none text-sm sm:text-base mb-3"
-      style={{
-        borderColor: '#8b3cc8'
-      }}
-    />
-  </div>
-              <button
-                onClick={() => sendDiscussion()}
-                disabled={!currentUser || !newDiscussion.trim()}
-                className="w-full py-3 rounded-lg font-bold transition"
-                style={{
-                  background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-                  color: '#fff',
-                  opacity: !currentUser || !newDiscussion.trim() ? 0.5 : 1
-                }}
-              >
-                Отправить
-              </button>
-            </div>
           </div>
         </div>
       )}

@@ -716,12 +716,12 @@ const loadUserCollection = async () => {
       setUserFavorites(works || []);
     }
 
-    // Галерея
+    // Галерея - ИЗМЕНЕНО!
     const { data: images } = await supabaseUGC
-      .from('user_saved_images')
+      .from('saved_images') // ← ИЗМЕНЕНО (было user_saved_images)
       .select('*')
       .eq('user_id', user.id)
-      .order('saved_at', { ascending: false });
+      .order('created_at', { ascending: false }) // ← Проверьте, что колонка называется saved_at или created_at
     setUserGallery(images || []);
 
     // Закладки
@@ -977,8 +977,8 @@ return (
     </div>
   </div>
  <div className="flex-1 flex items-center justify-center px-4 pb-8">
-    <h1
-      className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
+<h1
+  className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
       style={{
         fontFamily: "'Playfair Display', Georgia, serif"
       }}
@@ -2206,9 +2206,9 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
               transform: showSnow ? 'translateX(calc(100vw - 100vw + 240px))' : 'translateX(0)',
             }}
           >
-            <span style={{ fontSize: '16px' }}>
-              {showSnow ? '❄️' : '☀️'}
-            </span>
+<span style={{ fontSize: '16px', filter: 'grayscale(100%) brightness(2)', opacity: 0.6 }}>
+  {showSnow ? '❄️' : '☀️'}
+</span>
           </div>
           
           <div className="flex items-center justify-between px-4 h-full">
@@ -2710,7 +2710,7 @@ onClick={async () => {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {userGallery.map((img) => (
-                  <div key={img.id} className="aspect-square rounded-lg overflow-hidden border-2 border-purple-600 relative group">
+                  <div key={img.id} className="aspect-[3/4] rounded-lg overflow-hidden border-2 border-purple-600 relative group">
                     <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
                     <button
 onClick={() => {
