@@ -26,6 +26,7 @@ export default function DiscussionPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmAction, setConfirmAction] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   const showConfirm = (message, action = null) => {
     setConfirmMessage(message);
@@ -259,29 +260,22 @@ export default function DiscussionPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <style dangerouslySetInnerHTML={{__html: `
-        .spoiler-text {
-          background: linear-gradient(90deg, #9333ea 0%, #ec4899 25%, #06b6d4 50%, #ec4899 75%, #9333ea 100%);
-          background-size: 200% 100%;
-          animation: spoiler-shimmer 2s linear infinite;
-          color: transparent;
-          cursor: pointer;
-          padding: 2px 4px;
-          border-radius: 4px;
-          user-select: none;
-          display: inline-block;
-        }
-        
-        @keyframes spoiler-shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        
-        .spoiler-text.revealed {
-          background: transparent;
-          color: inherit;
-          animation: none;
-          user-select: text;
-        }
+.spoiler-text {
+  filter: blur(8px);
+  background: rgba(139, 60, 200, 0.3);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  user-select: none;
+  display: inline-block;
+  transition: filter 0.3s ease;
+}
+
+.spoiler-text.revealed {
+  filter: blur(0);
+  background: transparent;
+  user-select: text;
+}
       `}} />
 
       {/* HEADER */}
@@ -402,28 +396,28 @@ export default function DiscussionPage() {
               .map((disc) => (
                 <div key={disc.id} className="space-y-3">
 <div 
-  className="rounded-lg p-5 border-2 transition"
+  className="rounded-lg p-3 sm:p-5 border-2 transition"
   style={{
     background: '#000000',
     borderColor: '#8b3cc8',
     boxShadow: '0 0 15px rgba(139, 60, 200, 0.6)'
   }}
 >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold" style={{ color: '#b3e7ef' }}>
-                          {disc.nickname}
-                        </span>
-                        <span 
-                          className="text-xs px-2 py-1 rounded" 
-                          style={{ 
-                            background: disc.nickname === 'Мелло' ? '#9333ea' : '#700a21',
-                            color: 'white'
-                          }}
-                        >
-                          {disc.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
-                        </span>
-                      </div>
+  <div className="flex items-center justify-between mb-2 sm:mb-3 flex-wrap gap-2">
+    <div className="flex items-center gap-2">
+      <span className="font-bold text-sm sm:text-base" style={{ color: '#b3e7ef' }}>
+        {disc.nickname}
+      </span>
+      <span 
+        className="text-xs px-2 py-0.5 sm:py-1 rounded" 
+        style={{ 
+          background: disc.nickname === 'Мелло' ? '#9333ea' : '#700a21',
+          color: 'white'
+        }}
+      >
+        {disc.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
+      </span>
+    </div>
                       
 <div className="flex gap-2">
   <button
@@ -431,73 +425,72 @@ export default function DiscussionPage() {
       setReplyingTo(disc.id);
       setReplyText('');
     }}
-    className="px-3 py-1.5 rounded-lg text-sm font-medium transition"
+    className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition"
     style={{
       background: 'rgba(139, 60, 200, 0.2)',
       border: '1px solid #8b3cc8',
-      color: '#b3e7ef',
+      color: '#d9d5dd',
       boxShadow: '0 0 10px rgba(139, 60, 200, 0.3)'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 60, 200, 0.6)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = '0 0 10px rgba(139, 60, 200, 0.3)';
     }}
   >
     Ответить
   </button>
   
   {currentUser && disc.user_id === currentUser.id && (
-    <>
-<button
-  onClick={() => {
-    setEditingComment(disc.id);
-    setEditText(disc.message);
-  }}
-        className="px-3 py-1.5 rounded-lg text-sm font-medium transition"
+    <div className="relative">
+      <button
+        onClick={() => setOpenMenuId(openMenuId === disc.id ? null : disc.id)}
+        className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition"
         style={{
           background: 'rgba(139, 60, 200, 0.2)',
           border: '1px solid #8b3cc8',
-          color: '#dbc78a',
+          color: '#d9d5dd',
           boxShadow: '0 0 10px rgba(139, 60, 200, 0.3)'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 60, 200, 0.6)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 10px rgba(139, 60, 200, 0.3)';
-        }}
       >
-        Редактировать
+        ...
       </button>
       
-      <button
-        onClick={() => deleteDiscussion(disc.id)}
-        className="px-3 py-1.5 rounded-lg text-sm font-medium transition"
-        style={{
-          background: 'rgba(139, 60, 200, 0.2)',
-          border: '1px solid #8b3cc8',
-          color: '#ef4444',
-          boxShadow: '0 0 10px rgba(139, 60, 200, 0.3)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 60, 200, 0.6)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 10px rgba(139, 60, 200, 0.3)';
-        }}
-      >
-        Удалить
-      </button>
-    </>
+      {openMenuId === disc.id && (
+        <div 
+          className="absolute top-full mt-2 right-0 rounded-lg border-2 p-2 z-20 min-w-[140px] sm:min-w-[180px]"
+          style={{
+            background: '#000',
+            borderColor: '#8b3cc8',
+            boxShadow: '0 0 20px rgba(139, 60, 200, 0.6)'
+          }}
+        >
+          <button
+            onClick={() => {
+              setEditingComment(disc.id);
+              setEditText(disc.message);
+              setOpenMenuId(null);
+            }}
+            className="w-full text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded transition hover:bg-gray-800 text-sm"
+            style={{ color: '#d9d5dd' }}
+          >
+            Редактировать
+          </button>
+          <button
+            onClick={() => {
+              setOpenMenuId(null);
+              deleteDiscussion(disc.id);
+            }}
+            className="w-full text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded transition hover:bg-gray-800 text-sm"
+            style={{ color: '#d9d5dd' }}
+          >
+            Удалить
+          </button>
+        </div>
+      )}
+    </div>
   )}
 </div>
-                    </div>
+</div>
                     
                     <div 
-                      className="text-gray-300 whitespace-pre-wrap break-words mb-2"
-                      dangerouslySetInnerHTML={{ __html: renderFormattedText(disc.message) }}
+    className="text-gray-300 whitespace-pre-wrap break-words mb-2 text-sm sm:text-base"
+    dangerouslySetInnerHTML={{ __html: renderFormattedText(disc.message) }}
                     />
                     <span className="text-xs text-gray-500">
                       {new Date(disc.created_at).toLocaleString('ru-RU', {
@@ -509,42 +502,41 @@ export default function DiscussionPage() {
                       })}
                     </span>
                     
-{editingComment === disc.id && (
-<div className="mt-4 p-4 rounded-lg border-2" style={{ 
-  background: 'rgba(0, 0, 0, 0.8)',
-  borderColor: '#b3e7ef'
-}}>
-  <h4 className="text-sm font-semibold mb-3" style={{ color: '#b3e7ef' }}>
-     Редактирование комментария
+ {editingComment === disc.id && (
+  <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg border-2" style={{ 
+    background: 'rgba(0, 0, 0, 0.8)',
+    borderColor: '#8b3cc8'
+  }}>
+    <h4 className="text-xs sm:text-sm font-semibold mb-2 sm:mb-3" style={{ color: '#8b3cc8' }}>
+      Редактирование комментария
     </h4>
     
-    {/* Панель инструментов для редактирования */}
-    <div className="flex flex-wrap gap-2 p-2 rounded-lg border mb-3" style={{
-      background: 'rgba(219, 199, 138, 0.1)',
-      borderColor: '#dbc78a'
+    <div className="flex flex-wrap gap-1 sm:gap-2 p-2 rounded-lg border mb-2 sm:mb-3" style={{
+      background: 'rgba(139, 60, 200, 0.1)',
+      borderColor: '#8b3cc8'
     }}>
-      <button onClick={() => applyFormatting('bold', 'edit')} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #dbc78a' }} title="Жирный">
+      <button onClick={() => applyFormatting('bold', 'edit')} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Жирный">
         <strong>B</strong>
       </button>
-      <button onClick={() => applyFormatting('italic', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #dbc78a' }} title="Курсив">
+      <button onClick={() => applyFormatting('italic', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Курсив">
         <em>I</em>
       </button>
-      <button onClick={() => applyFormatting('underline', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #dbc78a' }} title="Подчеркнутый">
+      <button onClick={() => applyFormatting('underline', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Подчеркнутый">
         <u>U</u>
       </button>
       <div className="relative">
-        <button onClick={() => setShowEditColorPicker(!showEditColorPicker)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #dbc78a' }} title="Цвет">
+        <button onClick={() => setShowEditColorPicker(!showEditColorPicker)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Цвет">
           🎨
         </button>
         {showEditColorPicker && (
-          <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1" style={{ background: '#000', borderColor: '#dbc78a' }}>
+          <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1" style={{ background: '#000', borderColor: '#8b3cc8' }}>
             {colors.map(color => (
-              <button key={color} onClick={() => applyFormatting(color, 'edit')} className="w-6 h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
+              <button key={color} onClick={() => applyFormatting(color, 'edit')} className="w-5 h-5 sm:w-6 sm:h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
             ))}
           </div>
         )}
       </div>
-      <button onClick={() => applyFormatting('spoiler', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #dbc78a' }} title="Спойлер">
+      <button onClick={() => applyFormatting('spoiler', 'edit')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Спойлер">
         👁️
       </button>
     </div>
@@ -554,31 +546,31 @@ export default function DiscussionPage() {
       value={editText}
       onChange={(e) => setEditText(e.target.value)}
       rows={4}
-      className="w-full px-3 py-2 rounded-lg border bg-gray-900 text-white mb-3"
-style={{ 
-  borderColor: '#b3e7ef',
+      className="w-full px-2 sm:px-3 py-2 rounded-lg border bg-gray-900 text-white mb-2 sm:mb-3 text-sm"
+      style={{ 
+        borderColor: '#8b3cc8',
         minHeight: '100px',
         resize: 'vertical'
       }}
     />
     
     <div className="flex gap-2">
-<button
-  onClick={() => editDiscussion()}
-  className="px-4 py-2 rounded-lg font-bold transition"
-  style={{
-    background: 'linear-gradient(135deg, #b3e7ef 0%, #06b6d4 100%)',
-    color: '#000'
-  }}
->
-  Сохранить
-</button>
+      <button
+        onClick={() => editDiscussion()}
+        className="px-3 sm:px-4 py-2 rounded-lg font-bold transition text-sm"
+        style={{
+          background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+          color: '#fff'
+        }}
+      >
+        Сохранить
+      </button>
       <button
         onClick={() => {
           setEditingComment(null);
           setEditText('');
         }}
-        className="px-4 py-2 rounded-lg font-bold transition"
+        className="px-3 sm:px-4 py-2 rounded-lg font-bold transition text-sm"
         style={{
           background: 'transparent',
           border: '1px solid #8b3cc8',
@@ -591,24 +583,23 @@ style={{
   </div>
 )}
 
-{replyingTo === disc.id && (
-  <div className="mt-4 pl-4 border-l-2 p-4 rounded-lg" style={{ 
-    borderColor: '#8b3cc8',
-    background: 'rgba(0, 0, 0, 0.6)'
-  }}>
+                    {replyingTo === disc.id && (
+                      <div className="mt-4 pl-4 border-l-2 p-4 rounded-lg" style={{ 
+                        borderColor: '#8b3cc8',
+                        background: 'rgba(0, 0, 0, 0.6)'
+                      }}>
                         <div className="space-y-3">
-                          {/* Панель инструментов для ответа */}
                           <div className="flex flex-wrap gap-2 p-2 rounded-lg border" style={{
                             background: 'rgba(139, 60, 200, 0.1)',
                             borderColor: '#8b3cc8'
                           }}>
-                            <button onClick={() => applyFormatting('bold', true)} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Жирный">
+                            <button onClick={() => applyFormatting('bold', 'reply')} className="px-2 py-1 rounded transition text-xs font-bold" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Жирный">
                               <strong>B</strong>
                             </button>
-                            <button onClick={() => applyFormatting('italic', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Курсив">
+                            <button onClick={() => applyFormatting('italic', 'reply')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Курсив">
                               <em>I</em>
                             </button>
-                            <button onClick={() => applyFormatting('underline', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Подчеркнутый">
+                            <button onClick={() => applyFormatting('underline', 'reply')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Подчеркнутый">
                               <u>U</u>
                             </button>
                             <div className="relative">
@@ -618,12 +609,12 @@ style={{
                               {showReplyColorPicker && (
                                 <div className="absolute top-full mt-1 left-0 p-2 rounded-lg border z-10 flex gap-1" style={{ background: '#000', borderColor: '#8b3cc8' }}>
                                   {colors.map(color => (
-                                    <button key={color} onClick={() => applyFormatting(color, true)} className="w-6 h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
+                                    <button key={color} onClick={() => applyFormatting(color, 'reply')} className="w-6 h-6 rounded border-2 border-white transition hover:scale-110" style={{ background: color }} />
                                   ))}
                                 </div>
                               )}
                             </div>
-                            <button onClick={() => applyFormatting('spoiler', true)} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Спойлер">
+                            <button onClick={() => applyFormatting('spoiler', 'reply')} className="px-2 py-1 rounded transition text-xs" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #8b3cc8' }} title="Спойлер">
                               👁️
                             </button>
                           </div>
@@ -655,7 +646,7 @@ style={{
                             <button
                               onClick={() => {
                                 setReplyingTo(null);
-                                setReplyText('');
+ setReplyText('');
                               }}
                               className="px-4 py-2 rounded-lg font-bold transition"
                               style={{
@@ -672,134 +663,132 @@ style={{
                     )}
                   </div>
 
-{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
-{showConfirmModal && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(139, 60, 200, 0.15)',
-      borderColor: '#8b3cc8',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(139, 60, 200, 0.6)'
-    }}>
-      <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
-        {confirmMessage}
-      </p>
-      
-      <div className="flex gap-3">
-        {confirmAction ? (
-          <>
-            <button
-              onClick={() => {
-                confirmAction();
-                setShowConfirmModal(false);
-              }}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-                boxShadow: '0 0 15px rgba(139, 60, 200, 0.6)'
-              }}
-            >
-              Да
-            </button>
-            <button
-              onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition border-2"
-              style={{
-                background: 'transparent',
-                borderColor: '#8b3cc8',
-                color: '#8b3cc8'
-              }}
-            >
-              Отмена
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setShowConfirmModal(false)}
-            className="w-full py-3 rounded-lg font-bold transition"
-            style={{
-              background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-              boxShadow: '0 0 15px rgba(139, 60, 200, 0.6)'
-            }}
-          >
-            ОК
-          </button>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-
-{/* ОТВЕТЫ НА КОММЕНТАРИЙ */}
-{discussions
-  .filter(reply => reply.parent_comment_id === disc.id)
-  .map(reply => (
+                  {/* ОТВЕТЫ НА КОММЕНТАРИЙ */}
+                  {discussions
+                    .filter(reply => reply.parent_comment_id === disc.id)
+                    .map(reply => (
 <div 
   key={reply.id}
-  className="ml-12 rounded-lg p-4 border-2 transition"
+  className="ml-4 sm:ml-12 rounded-lg p-3 sm:p-4 border-2 transition"
   style={{
     background: '#000000',
     borderColor: '#ef01cb',
     boxShadow: '0 0 15px rgba(239, 1, 203, 0.6)'
   }}
 >
-      {/* Показываем на чей комментарий отвечают */}
-      <div className="mb-2 pb-2 border-b" style={{ borderColor: 'rgba(139, 60, 200, 0.3)' }}>
-        <span className="text-xs text-gray-400">
-          Ответ на комментарий <span style={{ color: '#b3e7ef' }}>{disc.nickname}</span>
-        </span>
-      </div>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm" style={{ color: '#b3e7ef' }}>
-                              {reply.nickname}
-                            </span>
-                            <span 
-                              className="text-xs px-2 py-0.5 rounded" 
-                              style={{ 
-                                background: reply.nickname === 'Мелло' ? '#9333ea' : '#ef4444',
-                                color: 'white',
-                                fontSize: '10px'
-                              }}
-                            >
-                              {reply.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
-                            </span>
-                          </div>
-                          
-                          {currentUser && reply.user_id === currentUser.id && (
-                            <button
-                              onClick={() => deleteDiscussion(reply.id)}
-                              className="text-red-400 hover:text-red-300 transition text-xs"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          )}
-                        </div>
-                        
-                        <div 
-                          className="text-gray-300 text-sm whitespace-pre-wrap break-words mb-2"
-                          dangerouslySetInnerHTML={{ __html: renderFormattedText(reply.message) }}
-                        />
-                        <span className="text-xs text-gray-500">
-                          {new Date(reply.created_at).toLocaleString('ru-RU', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      </div>
+  <div className="mb-2 pb-2 border-b" style={{ borderColor: 'rgba(139, 60, 200, 0.3)' }}>
+    <span className="text-xs text-gray-400">
+      Ответ на комментарий <span style={{ color: '#b3e7ef' }}>{disc.nickname}</span>
+    </span>
+  </div>
+  <div className="flex items-center justify-between mb-2">
+    <div className="flex items-center gap-2">
+      <span className="font-bold text-xs sm:text-sm" style={{ color: '#b3e7ef' }}>
+        {reply.nickname}
+      </span>
+      <span 
+        className="text-xs px-2 py-0.5 rounded" 
+        style={{ 
+          background: reply.nickname === 'Мелло' ? '#9333ea' : '#700a21',
+          color: 'white',
+          fontSize: '10px'
+        }}
+      >
+        {reply.nickname === 'Мелло' ? 'Автор' : 'Читатель'}
+      </span>
+    </div>
+    
+    {currentUser && reply.user_id === currentUser.id && (
+      <button
+        onClick={() => deleteDiscussion(reply.id)}
+        className="text-red-400 hover:text-red-300 transition text-xs"
+      >
+        <Trash2 size={14} />
+      </button>
+    )}
+  </div>
+  
+  <div 
+    className="text-gray-300 text-xs sm:text-sm whitespace-pre-wrap break-words mb-2"
+    dangerouslySetInnerHTML={{ __html: renderFormattedText(reply.message) }}
+  />
+  <span className="text-xs text-gray-500">
+    {new Date(reply.created_at).toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}
+  </span>
+</div>
                     ))}
                 </div>
               ))
           )}
         </div>
       </main>
+
+      {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+            background: 'rgba(139, 60, 200, 0.15)',
+            borderColor: '#8b3cc8',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(139, 60, 200, 0.6)'
+          }}>
+            <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
+              {confirmMessage}
+            </p>
+            
+            <div className="flex gap-3">
+              {confirmAction ? (
+                <>
+                  <button
+                    onClick={() => {
+                      confirmAction();
+                      setShowConfirmModal(false);
+                    }}
+                    className="flex-1 py-3 rounded-lg font-bold transition"
+                    style={{
+                      background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+                      boxShadow: '0 0 15px rgba(139, 60, 200, 0.6)'
+                    }}
+                  >
+                    Да
+                  </button>
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="flex-1 py-3 rounded-lg font-bold transition border-2"
+                    style={{
+                      background: 'transparent',
+                      borderColor: '#8b3cc8',
+                      color: '#8b3cc8'
+                    }}
+                  >
+                    Отмена
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="w-full py-3 rounded-lg font-bold transition"
+                  style={{
+                    background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
+                    boxShadow: '0 0 15px rgba(139, 60, 200, 0.6)'
+                  }}
+                >
+                  ОК
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

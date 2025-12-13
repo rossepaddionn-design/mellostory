@@ -2167,11 +2167,11 @@ onBlur={(e) => e.currentTarget.style.borderColor = '#8b3cc8'}
       </button>
 
       {/* ❄️ КНОПКА УПРАВЛЕНИЯ СНЕГОМ */}
-      <div className="mt-auto pt-6">
-        <p className="text-center text-xs mb-2 text-gray-400">
-          {showSnow ? 'Включить' : 'Отключить'} тему
-        </p>
-        <button
+ <div className="mt-auto pt-6">
+  <p className="text-center text-xs mb-2 text-gray-400">
+    Winter waltz
+  </p>
+  <button
           onClick={() => setShowSnow(!showSnow)}
           className="w-full relative rounded-full p-1 transition-all duration-300"
           style={{
