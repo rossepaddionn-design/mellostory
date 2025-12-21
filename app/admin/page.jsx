@@ -43,6 +43,7 @@ const [workForm, setWorkForm] = useState({
 
   const [chapters, setChapters] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState(null);
+  const [draggedChapter, setDraggedChapter] = useState(null);
 const [chapterForm, setChapterForm] = useState({
   title: '',
   content: '',
@@ -1008,7 +1009,38 @@ setWorkForm({
                     ) : (
                       <div className="space-y-2">
                         {chapters.map((chapter) => (
-                          <div key={chapter.id} className="bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-red-900 transition">
+                          <div 
+  key={chapter.id} 
+  draggable
+  onDragStart={() => setDraggedChapter(chapter)}
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={async (e) => {
+    e.preventDefault();
+    if (!draggedChapter || draggedChapter.id === chapter.id) return;
+    
+    const oldIndex = chapters.findIndex(c => c.id === draggedChapter.id);
+    const newIndex = chapters.findIndex(c => c.id === chapter.id);
+    
+    const reordered = [...chapters];
+    reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, draggedChapter);
+    
+    try {
+      for (let i = 0; i < reordered.length; i++) {
+        await supabase
+          .from('chapters')
+          .update({ chapter_number: i + 1 })
+          .eq('id', reordered[i].id);
+      }
+      await loadChapters(selectedWork.id);
+      setDraggedChapter(null);
+    } catch (err) {
+      alert('Ошибка: ' + err.message);
+    }
+  }}
+  onDragEnd={() => setDraggedChapter(null)}
+  className={`bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-red-900 transition cursor-move ${draggedChapter?.id === chapter.id ? 'opacity-50' : ''}`}
+>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-sm sm:text-base md:text-lg break-words">{chapter.chapter_number}. {chapter.title}</h4>
                               <p className="text-xs sm:text-sm text-gray-400 mt-1">{chapter.is_published ? '✅ Опубликовано' : '📝 Черновик'}</p>
