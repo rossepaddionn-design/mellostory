@@ -203,7 +203,8 @@ const saveChapter = async (isPublished) => {
       work_id: selectedWork.id,
       title: chapterForm.title.trim(),
       author_note: chapterForm.author_note.trim(),
-      chapter_number: chapterForm.chapter_number,
+     author_note: chapterForm.author_note.trim(),
+  chapter_number: chapterForm.chapter_number.trim(),  // ← ДОБАВИЛИ .trim()
       pages: parseInt(chapterForm.pages) || 0,
       images: chapterForm.images,
       audio_url: chapterForm.audio_files.length > 0 
