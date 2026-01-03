@@ -2314,7 +2314,7 @@ style={{
     borderLeft: '12px solid',
     borderImage: 'linear-gradient(to bottom, #b49a5f 0%, #8b7345 20%, #6b5530 40%, #4a3a1f 60%, #2a1f0f 80%, #000000 100%) 1',
     boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-    backgroundImage: 'url(/textures/histories.jpg)',
+    backgroundImage: 'url(/textures/red-musse.jpg)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat'

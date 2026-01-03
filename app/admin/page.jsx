@@ -384,7 +384,7 @@ const createNewChapter = () => {
 
   const handleImageUpload = (e, target) => {
     const files = Array.from(e.target.files || []);
-    const maxImages = target === 'work' ? 20 : 10;
+    const maxImages = target === 'work' ? 40 : 20;
 
     if (files.length > maxImages) {
       alert(`Максимум ${maxImages} изображений!`);
@@ -397,12 +397,12 @@ const createNewChapter = () => {
         if (target === 'work') {
           setWorkForm(prev => ({
             ...prev,
-            character_images: [...prev.character_images, event.target.result].slice(0, 20)
+            character_images: [...prev.character_images, event.target.result].slice(0, 40)
           }));
         } else if (target === 'chapter') {
           setChapterForm(prev => ({
             ...prev,
-            images: [...prev.images, event.target.result].slice(0, 10)
+            images: [...prev.images, event.target.result].slice(0, 20)
           }));
         }
       };
@@ -426,8 +426,8 @@ const createNewChapter = () => {
 
   const handleAudioUpload = (e) => {
     const files = Array.from(e.target.files || []);
-    if (chapterForm.audio_files.length + files.length > 8) {
-      alert('Максимум 8 аудио!');
+if (chapterForm.audio_files.length + files.length > 25) {
+  alert('Максимум 25 аудио!');
       return;
     }
 
@@ -436,7 +436,7 @@ const createNewChapter = () => {
       reader.onload = (event) => {
         setChapterForm(prev => ({
           ...prev,
-          audio_files: [...prev.audio_files, { name: file.name, data: event.target.result }].slice(0, 8)
+         audio_files: [...prev.audio_files, { name: file.name, data: event.target.result }].slice(0, 25)
         }));
       };
       reader.readAsDataURL(file);
@@ -734,7 +734,7 @@ setWorkForm({
 
             <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('characterImages')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-300">Изображения персонажей ({workForm.character_images.length}/20)</h3>
+               <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-300">Изображения персонажей ({workForm.character_images.length}/40)</h3>
                 {sectionsExpanded.characterImages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
               
@@ -924,7 +924,7 @@ setWorkForm({
 
             <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('chapterImages')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Изображения в тексте ({chapterForm.images.length}/10)</h3>
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Изображения в тексте ({chapterForm.images.length}/20)</h3>
                 {sectionsExpanded.chapterImages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
               
@@ -954,7 +954,7 @@ setWorkForm({
 
             <div className="bg-gray-900 rounded-lg border border-gray-700 mb-4 sm:mb-6">
               <button onClick={() => toggleSection('chapterAudio')} className="w-full flex justify-between items-center p-4 sm:p-6 hover:bg-gray-800 transition">
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Аудиофайлы ({chapterForm.audio_files.length}/8)</h3>
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-300">Аудиофайлы ({chapterForm.audio_files.length}/25)</h3>
                 {sectionsExpanded.chapterAudio ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
               
