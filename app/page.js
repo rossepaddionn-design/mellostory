@@ -725,13 +725,13 @@ return (
     border-radius: 10px;
   }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c2ab75 0%, #918150 100%);
+    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
+    box-shadow: 0 0 10px rgba(80, 79, 78, 0.6);
   }
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%);
-    box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
+    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
+    box-shadow: 0 0 15px rgba(78, 77, 76, 0.8);
   }
   `}
 `}} />
@@ -1031,7 +1031,7 @@ style={{
 {loading ? (
   <div className="text-center py-12 sm:py-20">
     <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2" style={{ 
-      borderColor: isDarkTheme ? '#8b3cc8' : '#cdc2a2' 
+      borderColor: isDarkTheme ? '#8b3cc8' : '#c9c6bb' 
     }}></div>
   </div>
           ) : displayWorks.length === 0 ? (
@@ -1050,7 +1050,7 @@ style={{
   }}
   className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
   style={{
-    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#cdc2a2',
+    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#c9c6bb',
     boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)' : 'none',
     color: '#000000'
   }}
@@ -1065,7 +1065,7 @@ style={{
   }}
   className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
   style={{
-    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#cdc2a2',
+    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#c9c6bb',
     boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)' : 'none',
     color: '#000000'
   }}
@@ -1101,7 +1101,7 @@ style={{
   style={{
     background: isDarkTheme 
       ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-      : '#c2ab75',
+      : '#c9c6bb',
     boxShadow: isDarkTheme 
       ? '0 0 20px rgba(188, 141, 216, 0.9), 0 0 35px rgba(147, 112, 219, 0.7)'
       : 'none'
@@ -1129,7 +1129,7 @@ style={{
     padding: isDarkTheme ? '6px' : '3px',
     background: isDarkTheme 
       ? 'linear-gradient(135deg, #000000 0%, #8c32d2 50%, #000000 100%)'
-      : 'linear-gradient(135deg, #c2beae 0%, #000000 100%)',
+      : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
     maxWidth: isExpanded ? '1000px' : 'auto',
     width: '100%',
     borderRadius: '8px',
@@ -1169,10 +1169,10 @@ background: isDarkTheme
     <div className="flex flex-col justify-between">
       <div>
         <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4" style={{ 
-          color: isDarkTheme ? '#bc8dd8' : '#c2beae',
+          color: isDarkTheme ? '#bc8dd8' : '#c9c6bb',
           textShadow: isDarkTheme ? '0 0 20px rgba(188, 141, 216, 0.8)' : 'none',
           fontStyle: !isDarkTheme ? 'italic' : 'normal',
-          background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+          background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #65635d 100%)' : 'none',
           WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
           WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
           backgroundClip: !isDarkTheme ? 'text' : 'unset'

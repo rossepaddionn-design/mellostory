@@ -409,6 +409,7 @@ style={{
           ) : (
 discussions
   .filter(d => !d.parent_comment_id)
+  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
   .slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
   .map((disc) => (
                 <div key={disc.id} className="space-y-3">
