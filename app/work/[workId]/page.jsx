@@ -37,17 +37,68 @@ const [userProfile, setUserProfile] = useState(null);
 const [showManagementModal, setShowManagementModal] = useState(false);
 const [showUpdatesModal, setShowUpdatesModal] = useState(false);
 const [siteUpdates, setSiteUpdates] = useState([]);
-const [showCollectionModal, setShowCollectionModal] = useState(false);
-const [collectionTab, setCollectionTab] = useState('favorites');
-const [userFavorites, setUserFavorites] = useState([]);
-const [userGallery, setUserGallery] = useState([]);
-const [showReaderMessagesModal, setShowReaderMessagesModal] = useState(false);
-const [readerMessages, setReaderMessages] = useState([]);
-const [selectedReaderMessage, setSelectedReaderMessage] = useState(null);
-const [newMessageText, setNewMessageText] = useState('');
-const [replyMessageText, setReplyMessageText] = useState('');
 
-const colors = ['#a91e30', '#8b1ea9', '#41d8ad', '#dbc78a', '#ec83c7', '#83eca5'];
+const toggleSaveImage = async (imageUrl) => {
+  if (!currentUser) {
+    showConfirm('Войдите, чтобы сохранить изображение');
+    return;
+  }
+
+  const isSaved = savedImages.includes(imageUrl);
+
+  try {
+    if (isSaved) {
+      // Удаление через API
+const res = await fetch('/api/ugc', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'save_image',
+    userId: currentUser.id,
+    // workId убираем
+    imageUrl: imageUrl,
+    imageSource: 'chapter'
+  })
+});
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages(savedImages.filter(img => img !== imageUrl));
+        showConfirm('Удалено из галереи');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    } else {
+      // Сохранение через API
+      const res = await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_image',
+          userId: currentUser.id,
+          workId: workId,
+          imageUrl: imageUrl,
+          imageSource: 'work' // ← УБРАЛИ проверку chapterId, так как на странице work его нет
+        })
+      });
+
+      const result = await res.json();
+      
+      if (result.success) {
+        setSavedImages([...savedImages, imageUrl]);
+        showConfirm('Сохранено в галерею!');
+      } else {
+        showConfirm('Ошибка: ' + result.error);
+      }
+    }
+  } catch (err) {
+    console.error('Ошибка:', err);
+    showConfirm('Ошибка сохранения: ' + err.message);
+  }
+};
+
+const colors = ['#35030e', '#6d1fe0', '#2932d1', '#727439', '#8f8f8f', '#64a081'];
 
 const applyFormatting = (format, isReply = false) => {
   const textarea = isReply ? replyTextareaRef.current : textareaRef.current;
@@ -148,110 +199,6 @@ const loadSiteUpdates = async () => {
   }
 };
 
-const loadUserCollection = async () => {
-  if (!currentUser) return;
-
-  try {
-    // Избранное
-    const { data: favs } = await supabaseUGC
-      .from('user_favorites')
-      .select('work_id')
-      .eq('user_id', currentUser.id);
-    
-    if (favs && favs.length > 0) {
-      const workIds = favs.map(f => f.work_id);
-      const { data: works } = await supabase
-        .from('works')
-        .select('id, title, cover_url, description')
-        .in('id', workIds);
-      setUserFavorites(works || []);
-    }
-
-    // Галерея
-    const { data: images } = await supabaseUGC
-      .from('saved_images')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false });
-    setUserGallery(images || []);
-  } catch (err) {
-    console.error('Ошибка загрузки коллекции:', err);
-  }
-};
-
-const loadReaderMessages = async () => {
-  if (!currentUser) return;
-
-  try {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('from_user_id', currentUser.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Ошибка загрузки сообщений:', error);
-    } else {
-      setReaderMessages(data || []);
-    }
-  } catch (err) {
-    console.error('Ошибка загрузки сообщений:', err);
-  }
-};
-
-const sendNewMessage = async () => {
-  if (!newMessageText.trim() || !userProfile) {
-    showConfirm('Напишите сообщение!');
-    return;
-  }
-
-  const { error } = await supabase
-    .from('messages')
-    .insert({
-      from_user_id: currentUser.id,
-      from_nickname: userProfile.nickname,
-      from_email: userProfile.email,
-      message: newMessageText.trim(),
-      is_read: false,
-      admin_reply: null
-    });
-
-  if (error) {
-    showConfirm('Ошибка отправки: ' + error.message);
-  } else {
-    showConfirm('Сообщение отправлено!');
-    setNewMessageText('');
-    loadReaderMessages();
-  }
-};
-
-const sendReaderReply = async (messageId) => {
-  if (!replyMessageText.trim()) {
-    showConfirm('Напишите ответ!');
-    return;
-  }
-
-  const { error } = await supabase
-    .from('messages')
-    .insert({
-      from_user_id: currentUser.id,
-      from_nickname: userProfile.nickname,
-      from_email: userProfile.email,
-      message: replyMessageText.trim(),
-      is_read: false,
-      admin_reply: null,
-      reply_to_message_id: messageId
-    });
-
-  if (error) {
-    showConfirm('Ошибка отправки ответа: ' + error.message);
-  } else {
-    showConfirm('Ответ отправлен!');
-    setReplyMessageText('');
-    setSelectedReaderMessage(null);
-    loadReaderMessages();
-  }
-};
 
 const handleLogout = async () => {
   await supabase.auth.signOut();
@@ -301,97 +248,6 @@ useEffect(() => {
   
   checkUser();
 }, []);
-
-useEffect(() => {
-  if (currentUser) {
-    loadSavedImages();
-  }
-}, [currentUser]);
-
-useEffect(() => {
-  if (showReaderMessagesModal && currentUser) {
-    loadReaderMessages();
-  }
-}, [showReaderMessagesModal, currentUser]);
-
-useEffect(() => {
-  if (showCollectionModal && currentUser) {
-    loadUserCollection();
-  }
-}, [showCollectionModal, currentUser]);
-
-const loadSavedImages = async () => {
-  if (!currentUser) return;
-  
-  try {
-    const res = await fetch(`/api/ugc?action=get_saved_images&userId=${currentUser.id}`);
-    const { images } = await res.json();
-    
-    if (images) {
-      setSavedImages(images.map(img => img.image_url));
-    }
-  } catch (err) {
-    console.error('Ошибка загрузки сохранённых изображений:', err);
-  }
-};
-
-const toggleSaveImage = async (imageUrl) => {
-  if (!currentUser) {
-    showConfirm('Войдите, чтобы сохранить изображение');
-    return;
-  }
-
-  const isSaved = savedImages.includes(imageUrl);
-
-  try {
-    if (isSaved) {
-      // Удаление через API
-      const res = await fetch('/api/ugc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete_image',
-          userId: currentUser.id,
-          imageUrl: imageUrl
-        })
-      });
-
-      const result = await res.json();
-      
-      if (result.success) {
-        setSavedImages(savedImages.filter(img => img !== imageUrl));
-        showConfirm('Удалено из галереи');
-      } else {
-        showConfirm('Ошибка: ' + result.error);
-      }
-    } else {
-      // Сохранение через API
-const res = await fetch('/api/ugc', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'save_image',
-    userId: currentUser.id,
-    // workId убираем
-    imageUrl: imageUrl,
-    imageSource: 'work'
-  })
-});
-
-      const result = await res.json();
-      
-      if (result.success) {
-        setSavedImages([...savedImages, imageUrl]);
-        showConfirm('Сохранено в галерею!');
-      } else {
-        showConfirm('Ошибка: ' + result.error);
-      }
-    }
-  } catch (err) {
-    console.error('Ошибка:', err);
-    showConfirm('Ошибка сохранения: ' + err.message);
-  }
-};
 
 // Синхронизация настроек с главной страницей
 useEffect(() => {
@@ -723,7 +579,7 @@ if (showAgeVerification) {
 }
 
 return (
-  <div className="min-h-screen text-white" style={{ backgroundColor: isDarkTheme ? '#000000' : '#4e040f' }}>
+  <div className="min-h-screen text-white" style={{ backgroundColor: isDarkTheme ? '#000000' : '#000000' }}>
     <style dangerouslySetInnerHTML={{__html: `
       .spoiler-text {
         background: linear-gradient(90deg, #9333ea 0%, #ec4899 25%, #06b6d4 50%, #ec4899 75%, #9333ea 100%);
@@ -807,12 +663,12 @@ return (
     border-radius: 10px;
   }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c2ab75 0%, #918150 100%);
+    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
   }
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%);
+    background: linear-gradient(135deg, #65635d 0%, #c9c6bb 100%);
     box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
   }
   `}
@@ -863,28 +719,10 @@ return (
   padding: '3px',
   background: isDarkTheme 
     ? '#9333ea' 
-    : 'linear-gradient(135deg, #b6a96d 0%, #000000 100%)',
+    : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
   borderRadius: '24px'
 }}>
-  {/* Анимация ТОЛЬКО для темной темы */}
-  {isDarkTheme && (
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes pulse {
-        0%, 100% {     
-          transform: scale(1);
-          box-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.3);
-        }
-        50% { 
-          transform: scale(1.03);
-          box-shadow: 0 0 40px rgba(147, 51, 234, 0.8), 0 0 80px rgba(147, 51, 234, 0.5);
-        }
-      }
-      
-      .pulse-cover-container {
-        animation: pulse 3s ease-in-out infinite;
-      }
-    `}} />
-  )}
+
   
 <div className={isDarkTheme ? "pulse-cover-container shadow-2xl rounded-xl" : "shadow-2xl rounded-xl"} style={{
   background: '#000000',
@@ -1185,9 +1023,11 @@ return (
             </div>
             {/* ОПИСАНИЕ */}
 <div className="rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
-  background: isDarkTheme ? '#000000' : 'radial-gradient(ellipse at center, rgba(113, 20, 31, 0.8) 0%, rgba(74, 13, 21, 0.95) 100%)',
-  borderColor: isDarkTheme ? '#9333ea' : '#b6a96d',
-  boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none'
+  background: 'transparent',
+  borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
+  boxShadow: isDarkTheme 
+    ? '0 0 15px rgba(147, 112, 219, 0.4)' 
+    : 'none'
 }}>
   <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3" style={{
     fontStyle: !isDarkTheme ? 'italic' : 'normal',
@@ -1202,11 +1042,12 @@ return (
 
             {/* ПРИМЕЧАНИЕ АВТОРА */}
 {work.author_note && (
-  <div className="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6" style={{
-    background: isDarkTheme ? '#000000' : 'radial-gradient(ellipse at center, rgba(113, 20, 31, 0.8) 0%, rgba(74, 13, 21, 0.95) 100%)',
-    borderLeft: isDarkTheme ? '4px solid #9333ea' : 'none',
-    border: !isDarkTheme ? '2px solid #b6a96d' : 'none',
-    boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none'
+  <div className="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 border-2" style={{
+    background: 'transparent',
+    borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
+    boxShadow: isDarkTheme 
+      ? '0 0 15px rgba(147, 112, 219, 0.4)' 
+      : 'none'
   }}>
     <h2 className="text-base sm:text-lg font-bold mb-2" style={{
       fontStyle: !isDarkTheme ? 'italic' : 'normal',
@@ -1239,7 +1080,7 @@ return (
     key={index} 
     className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative cursor-pointer"
     style={{
-      borderColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+      borderColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
       boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(192, 167, 109, 0.5)'
     }}
     onClick={() => setSelectedImage(img)}
@@ -1254,7 +1095,7 @@ return (
   style={{
     background: isDarkTheme 
       ? (savedImages.includes(img) ? 'rgba(239, 1, 203, 0.9)' : 'rgba(0, 0, 0, 0.7)')
-      : '#85002d',
+      : '#40030f',
     backdropFilter: 'blur(10px)',
     boxShadow: savedImages.includes(img)
       ? (isDarkTheme 
@@ -1267,10 +1108,10 @@ return (
     width="20" 
     height="20" 
     viewBox="0 0 24 24" 
-    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#d8c5a2') : 'none'}
+    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#65635d') : 'none'}
     stroke={isDarkTheme 
       ? (savedImages.includes(img) ? '#ffffff' : '#ef01cb')
-      : '#d8c5a2'}
+      : '#c9c6bb'}
     strokeWidth="2"
   >
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1286,19 +1127,19 @@ return (
   onClick={() => scrollCharacterCarousel('left')}
   className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';
@@ -1310,19 +1151,19 @@ return (
   onClick={() => scrollCharacterCarousel('right')}
   className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';
@@ -1363,10 +1204,8 @@ return (
   }
 `}} />
 <div className="rounded-lg p-4 sm:p-6 lg:p-8 border-2" style={{
-  background: isDarkTheme 
-    ? '#000000' 
-    : 'radial-gradient(ellipse at center, rgba(113, 20, 31, 0.8) 0%, rgba(74, 13, 21, 0.95) 100%)',
-  borderColor: isDarkTheme ? '#9333ea' : '#b6a96d',
+  background: 'transparent',
+  borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
   boxShadow: isDarkTheme 
     ? '0 0 25px rgba(147, 51, 234, 0.8), 0 0 50px rgba(147, 51, 234, 0.5)' 
     : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
@@ -1392,7 +1231,7 @@ return (
               e.currentTarget.style.animation = 'shimmer-chapter 2s ease-in-out infinite';
             } else {
               e.currentTarget.style.background = 'rgba(182, 169, 109, 0.2)';
-              e.currentTarget.style.borderColor = '#b6a96d';
+              e.currentTarget.style.borderColor = '#65635d';
               e.currentTarget.style.boxShadow = 'inset 0 0 30px rgba(0, 0, 0, 0.4)';
             }
           }}
@@ -1428,7 +1267,7 @@ return (
               </div>
             </div>
             <div className="flex-shrink-0 transition" style={{
-              color: isDarkTheme ? '#9333ea' : '#b6a96d'
+              color: isDarkTheme ? '#9333ea' : '#65635d'
             }}>
               <ChevronLeft size={20} className="sm:w-6 sm:h-6 rotate-180" />
             </div>
@@ -1518,33 +1357,34 @@ return (
         </div>
       )}
 
-      {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
 {showConfirmModal && (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     backdropFilter: 'blur(10px)'
   }}>
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
+    <div className="rounded-2xl w-full max-w-md p-6" style={{
       background: isDarkTheme 
         ? 'rgba(147, 51, 234, 0.15)' 
-        : 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: isDarkTheme 
         ? '2px solid #9333ea' 
         : '3px solid transparent',
-      borderRadius: '24px',
+      borderRadius: '16px',
       backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
+      position: 'relative',
       backdropFilter: 'blur(20px)',
       boxShadow: isDarkTheme 
         ? '0 0 30px rgba(147, 51, 234, 0.6)' 
-        : '0 0 0 3px #71141f, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
     }}>
       {!isDarkTheme && (
         <div style={{
           position: 'absolute',
           inset: '-3px',
-          borderRadius: '24px',
+          borderRadius: '16px',
           padding: '3px',
-          background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+          background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
           maskComposite: 'exclude',
@@ -1552,14 +1392,13 @@ return (
           zIndex: -1
         }} />
       )}
-      
       <p className="text-center text-base sm:text-lg mb-6 whitespace-pre-wrap" style={{
-        color: isDarkTheme ? '#ffffff' : '#d8c5a2'
+        color: isDarkTheme ? '#ffffff' : '#c9c6bb'
       }}>
         {confirmMessage}
       </p>
       
-      <div className="flex gap-3">
+<div className="flex gap-3">
         {confirmAction ? (
           <>
             <button
@@ -1571,39 +1410,42 @@ return (
               style={{
                 background: isDarkTheme 
                   ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                  : '#d8c5a2',
+                  : '#c9c6bb',
                 color: isDarkTheme ? '#ffffff' : '#000000',
                 boxShadow: isDarkTheme 
                   ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                  : 'none'
+                  : '0 0 15px rgba(216, 197, 162, 0.4)',
+                border: 'none'
               }}
             >
               Да
             </button>
             <button
               onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition border-2"
+              className="flex-1 py-3 rounded-lg font-bold transition"
               style={{
                 background: isDarkTheme ? 'transparent' : 'rgba(216, 197, 162, 0.15)',
-                borderColor: isDarkTheme ? '#9370db' : '#d8c5a2',
-                color: isDarkTheme ? '#9370db' : '#d8c5a2'
+                borderColor: isDarkTheme ? '#9370db' : '#65635d',
+                border: isDarkTheme ? '2px solid #9370db' : '2px solid #c9c6bb',
+                color: isDarkTheme ? '#9370db' : '#c9c6bb'
               }}
             >
               Отмена
             </button>
           </>
-        ) : (
+) : (
           <button
             onClick={() => setShowConfirmModal(false)}
             className="w-full py-3 rounded-lg font-bold transition"
             style={{
               background: isDarkTheme 
                 ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : '#d8c5a2',
+                : '#c9c6bb',
               color: isDarkTheme ? '#ffffff' : '#000000',
               boxShadow: isDarkTheme 
                 ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                : 'none'
+                : '0 0 15px rgba(216, 197, 162, 0.4)',
+              border: 'none'
             }}
           >
             ОК
@@ -1679,13 +1521,9 @@ onClick={() => {
   }}>Обновления</span>
 </button>
 
-<button
-onClick={() => {
-  setShowCollectionModal(true);
-  loadUserCollection();
-  setShowReaderPanel(false);
-}}
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
+<Link
+  href="/collection"
+  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden block"
   style={{
     background: 'rgba(160, 99, 207, 0.4)',
     border: '2px solid #a063cf',
@@ -1708,15 +1546,11 @@ onClick={() => {
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
   }}>Моя коллекция</span>
-</button>
+</Link>
 
-<button
-onClick={() => {
-  setShowReaderMessagesModal(true);
-  loadReaderMessages();
-  setShowReaderPanel(false);
-}}
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden"
+<Link
+  href="/my-messages"
+  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden block"
   style={{
     background: 'rgba(160, 99, 207, 0.4)',
     border: '2px solid #a063cf',
@@ -1739,12 +1573,7 @@ onClick={() => {
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
   }}>Мои сообщения</span>
-  {readerMessages.some(m => m.admin_reply && !m.is_read) && (
-    <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
-      {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
-    </span>
-  )}
-</button>
+</Link>
 
           <button
             onClick={() => {
@@ -1784,53 +1613,74 @@ onClick={() => {
       </div>
     )}
 
-    {/* СВЕТЛАЯ ПАНЕЛЬ */}
+   {/* СВЕТЛАЯ ПАНЕЛЬ */}
     {!isDarkTheme && (
-      <div className="fixed top-0 right-0 h-full w-full sm:w-96 z-[60] overflow-y-auto shadow-2xl" style={{ 
+      <div className="fixed top-0 right-0 h-full w-full sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{ 
         borderLeft: '12px solid',
-        borderImage: 'linear-gradient(to bottom, #b49a5f 0%, #8b7345 20%, #6b5530 40%, #4a3a1f 60%, #2a1f0f 80%, #000000 100%) 1',
+        borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
         boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-        backgroundImage: 'url(/textures/red-musse.jpg)',
+        backgroundImage: 'url(/textures/darkness.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.15) 0%, rgba(144, 120, 60, 0.1) 100%)',
-          borderBottom: '1px solid rgba(158, 144, 76, 0.2)',
-          boxShadow: '0 8px 32px rgba(158, 144, 76, 0.1)'
+background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.25) 0%, rgba(188, 187, 174, 0.15) 100%)',
+borderBottom: '1px solid rgba(188, 187, 174, 0.35)',
+boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
+
         }}>
-          <h2 className="text-lg sm:text-xl font-bold text-center mb-4" style={{ 
-            color: '#e4e1c8',
-            fontFamily: "'RuinedC', Georgia, serif"
-          }}>{userProfile.nickname}</h2>
+
+<h2 className="text-lg sm:text-xl font-bold text-center mb-4" style={{ 
+  color: '#e4e1c8',
+  fontFamily: "'RuinedC', Georgia, serif"
+}}>{userProfile.nickname}</h2>
+
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes champagneBubbles {
+              0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+              50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+            }
+            @keyframes shimmerGold {
+              0% { background-position: -200% center; }
+              100% { background-position: 200% center; }
+            }
+            .champagne-text {
+              background: linear-gradient(90deg, #c9c6bb 0%, #c9c6bb 50%, #bcbbae 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              animation: shimmerGold 3s linear infinite;
+              font-family: 'Playfair Display', Georgia, serif;
+            }
+          `}} />
           
-          <button 
-            onClick={() => setShowReaderPanel(false)}
-            className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
+<button 
+  onClick={() => setShowReaderPanel(false)}
+  className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
             style={{
-              background: 'rgba(158, 144, 76, 0.2)',
+              background: 'rgba(188, 187, 174, 0.35)',
               backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(158, 144, 76, 0.3)'
+              border: '1px solid rgba(188, 187, 174, 0.15)'
             }}
           >
-            <X size={20} color="#9e904c" />
+            <X size={20} color="#c9c6bb" />
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 flex flex-col h-[calc(100vh-120px)]">
 <button
-onClick={() => {
-  setShowUpdatesModal(true);
-  loadSiteUpdates();
-  setShowReaderPanel(false);
-}}
+  onClick={() => {
+    setShowUpdatesModal(true);
+    loadSiteUpdates();
+  }}
   className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
   style={{
-    background: siteUpdates.length > 0 ? '#62091e' : 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-    border: '1px solid rgba(158, 144, 76, 0.3)',
+    background: siteUpdates.length > 0 ? '#35030e' : 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(188, 187, 174, 0.35)',
     backdropFilter: 'blur(10px)',
-    boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -1842,34 +1692,22 @@ onClick={() => {
     <path d="M2 17l10 5 10-5"/>
     <path d="M2 12l10 5 10-5"/>
   </svg>
-<span className="relative z-10" style={{ 
-  background: siteUpdates.length > 0 
-    ? 'none' 
-    : 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
-  backgroundSize: '200% auto',
-  WebkitBackgroundClip: siteUpdates.length > 0 ? 'unset' : 'text',
-  WebkitTextFillColor: siteUpdates.length > 0 ? '#e9e6d8' : 'transparent',
-  backgroundClip: siteUpdates.length > 0 ? 'unset' : 'text',
-  animation: siteUpdates.length > 0 ? 'none' : 'shimmerGoldBtn 3s linear infinite',
-  color: siteUpdates.length > 0 ? '#e9e6d8' : 'transparent',
-  fontStyle: 'italic'
-}}>
-  Обновления
-</span>
+  <span className="relative z-10" style={{ 
+    color: siteUpdates.length > 0 ? '#e9e6d8' : '#62091e',
+    fontStyle: 'italic'
+  }}>
+    Обновления
+  </span>
 </button>
 
-<button
-onClick={() => {
-  setShowCollectionModal(true);
-  loadUserCollection();
-  setShowReaderPanel(false);
-}}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+<Link
+  href="/collection"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
   style={{
-    background: 'linear-gradient(135deg, rgba(149, 138, 86, 0.4), rgba(144, 120, 60, 0.4))',
-    border: '1px solid rgba(158, 144, 76, 0.3)',
-    backdropFilter: 'blur(10px)',
-    boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(188, 187, 174, 0.35)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -1889,20 +1727,16 @@ onClick={() => {
   }}>
     Моя коллекция
   </span>
-</button>
+</Link>
 
-<button
-onClick={() => {
-  setShowReaderMessagesModal(true);
-  loadReaderMessages();
-  setShowReaderPanel(false);
-}}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+<Link
+  href="/my-messages"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
   style={{
-    background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-    border: '1px solid rgba(158, 144, 76, 0.3)',
-    backdropFilter: 'blur(10px)',
-    boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(188, 187, 174, 0.35)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -1922,43 +1756,74 @@ onClick={() => {
   }}>
     Мои сообщения
   </span>
-  {readerMessages.some(m => m.admin_reply && !m.is_read) && (
-    <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse z-20">
-      {readerMessages.filter(m => m.admin_reply && !m.is_read).length}
-    </span>
-  )}
+</Link>
+
+ <button
+  onClick={() => setShowManagementModal(true)}
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+  style={{
+              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+              border: '1px solid rgba(188, 187, 174, 0.35)',
+              backdropFilter: 'blur(1px)',
+              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+  }}
+>
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+  }} />
+  
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes shimmerGoldBtn {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+  `}} />
+  
+  <Settings size={20} color="#62091e" className="relative z-10" />
+  <span className="relative z-10" style={{ 
+    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    backgroundSize: '200% auto',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    animation: 'shimmerGoldBtn 3s linear infinite',
+    fontStyle: 'normal',
+    fontWeight: '600'
+  }}>
+    Настройки
+  </span>
 </button>
 
-          <button
-            onClick={() => {
-  setShowManagementModal(true);
-  setShowReaderPanel(false);
-}}
-            className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3"
-            style={{
-              background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-              border: '1px solid rgba(158, 144, 76, 0.3)',
-              color: '#62091e'
-            }}
-          >
-            <Settings size={20} color="#62091e" />
-            Настройки
-          </button>
-
-          <div className="mt-4">
-            <button
-              onClick={handleLogout}
-              className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3"
-              style={{
-                background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-                border: '1px solid rgba(158, 144, 76, 0.3)',
-                color: '#62091e'
-              }}
-            >
-              <LogOut size={20} color="#62091e" />
-              Выход
-            </button>
-          </div>
+<div className="mt-4">
+  <button
+    onClick={handleLogout}
+    className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+    style={{
+              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+              border: '1px solid rgba(188, 187, 174, 0.35)',
+              backdropFilter: 'blur(1px)',
+              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    }}
+  >
+    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+      background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    }} />
+    
+    <LogOut size={20} color="#62091e" className="relative z-10" />
+    <span className="relative z-10" style={{ 
+      background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+      backgroundSize: '200% auto',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      animation: 'shimmerGoldBtn 3s linear infinite',
+      fontStyle: 'normal',
+      fontWeight: '600'
+    }}>
+      Выход
+    </span>
+  </button>
+</div>
         </div>
       </div>
     )}
@@ -2032,18 +1897,18 @@ onClick={() => {
     backdropFilter: 'blur(10px)'
   }}>
     <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: '3px solid transparent',
       borderRadius: '24px',
       backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #71141f, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
     }}>
       <div style={{
         position: 'absolute',
         inset: '-3px',
         borderRadius: '24px',
         padding: '3px',
-        background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
         WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
         WebkitMaskComposite: 'xor',
         maskComposite: 'exclude',
@@ -2053,25 +1918,25 @@ onClick={() => {
       
       <div className="flex justify-center items-center mb-6 relative">
         <h2 className="text-2xl font-bold" style={{
-          color: '#c2ab75',
+          color: '#c9c6bb',
           fontFamily: "'Playfair Display', Georgia, serif",
           fontStyle: 'italic'
         }}>Настройки</h2>
-        <button onClick={() => setShowManagementModal(false)} className="absolute right-0" style={{ color: '#c2ab75' }}>
+        <button onClick={() => setShowManagementModal(false)} className="absolute right-0" style={{ color: '#c9c6bb' }}>
           <X size={24} />
         </button>
       </div>
 
       <div className="space-y-4">
         <div>
-          <p className="mb-2 text-sm" style={{ color: '#d8c5a2' }}>Интерфейс сайта:</p>
+          <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Интерфейс сайта:</p>
 <button
   onClick={toggleTheme}
   className="w-full relative rounded-full p-1 transition-all duration-300"
   style={{
     background: isDarkTheme 
       ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-      : 'linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%)',
+       : 'linear-gradient(135deg, #c9c6bb%, #65635d 100%)',
     boxShadow: isDarkTheme 
       ? '0 0 20px rgba(147, 112, 219, 0.6)' 
       : '0 0 15px rgba(216, 197, 162, 0.4)',
@@ -2083,7 +1948,7 @@ onClick={() => {
     style={{
       width: '32px',
       height: '32px',
-      background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #939085 100%)',
       boxShadow: '0 2px 8px rgba(255, 255, 255, 0.5)',
       transform: isDarkTheme ? 'translateX(0)' : 'translateX(240px)',
     }}
@@ -2217,18 +2082,18 @@ onClick={() => {
     backdropFilter: 'blur(10px)'
   }}>
     <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: '3px solid transparent',
       borderRadius: '24px',
       backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #71141f, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
     }}>
       <div style={{
         position: 'absolute',
         inset: '-3px',
         borderRadius: '24px',
         padding: '3px',
-        background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
         WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
         WebkitMaskComposite: 'xor',
         maskComposite: 'exclude',
@@ -2238,7 +2103,7 @@ onClick={() => {
       
       <div className="flex justify-center items-center mb-6 relative">
         <h2 className="text-2xl font-bold" style={{
-          color: '#c2ab75',
+          color: '#c9c6bb',
           fontFamily: "'Playfair Display', Georgia, serif",
           fontStyle: 'italic'
         }}>Обновления</h2>
@@ -2253,7 +2118,7 @@ onClick={() => {
             background: 'rgba(0, 0, 0, 0.3)',
             border: '1px solid rgba(180, 154, 95, 0.3)'
           }}>
-            <p style={{ color: '#c2ab75' }}>Пока нет обновлений</p>
+            <p style={{ color: '#c9c6bb' }}>Пока нет обновлений</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -2263,20 +2128,16 @@ onClick={() => {
                 className="rounded-lg p-4 transition cursor-pointer"
                 style={{
                   background: 'rgba(0, 0, 0, 0.3)',
-                  border: update.type === 'new_work' ? '2px solid #c2ab75' : '1px solid rgba(180, 154, 95, 0.3)'
+                  border: update.type === 'new_work' ? '2px solid #c9c6bb' : '1px solid rgba(180, 154, 95, 0.3)'
                 }}
                 onClick={async () => {
                   loadSiteUpdates();
-                  if (update.work_id === workId) {
-  setShowUpdatesModal(false);
-} else {
-  window.location.href = `/work/${update.work_id}`;
-}
+                  window.location.href = `/work/${update.work_id}`;
                 }}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c2ab75" style={{ 
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c9c6bb" style={{ 
                       filter: 'drop-shadow(0 0 5px rgba(194, 171, 117, 0.4))'
                     }}>
                       <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -2288,15 +2149,15 @@ onClick={() => {
                     {update.type === 'new_work' ? (
                       <>
                         <span className="inline-block text-xs font-bold px-2 py-1 rounded mb-2" style={{
-                          background: '#d8c5a2',
+                          background: '#c9c6bb',
                           color: '#000000'
                         }}>
                           НОВАЯ РАБОТА
                         </span>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#d8c5a2' }}>
+                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
                           {update.work_title}
                         </h3>
-                        <p className="text-sm" style={{ color: '#c2ab75', opacity: 0.8 }}>
+                        <p className="text-sm" style={{ color: '#c9c6bb', opacity: 0.8 }}>
                           Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
                             day: 'numeric',
                             month: 'long',
@@ -2306,13 +2167,13 @@ onClick={() => {
                       </>
                     ) : (
                       <>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#d8c5a2' }}>
+                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
                           {update.work_title}
                         </h3>
-                        <p className="text-sm mb-1" style={{ color: '#c2ab75' }}>
+                        <p className="text-sm mb-1" style={{ color: '#c9c6bb' }}>
                           {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
                         </p>
-                        <p className="text-xs" style={{ color: '#c2ab75', opacity: 0.7 }}>
+                        <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
                           Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
                             day: 'numeric',
                             month: 'long'
@@ -2331,789 +2192,6 @@ onClick={() => {
   </div>
 )}
 
-{/* READER MESSAGES MODAL */}
-{showReaderMessagesModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-4xl my-4 sm:my-8 flex flex-col max-h-[95vh] border-2 p-6" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Мои сообщения</h2>
-        <button onClick={() => {
-          setShowReaderMessagesModal(false);
-          setSelectedReaderMessage(null);
-          setNewMessageText('');
-          setReplyMessageText('');
-        }} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-</div>
-
-      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-<div className="rounded-lg p-3 sm:p-6 mb-4 sm:mb-6 border-2" style={{ 
-  background: '#000000',
-  borderColor: '#ef01cb',
-  boxShadow: '0 0 15px rgba(239, 1, 203, 0.6)'
-}}>
-  <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 shimmer-btn-text">
-    Написать новое сообщение автору
-  </h3>
-  <textarea
-    value={newMessageText}
-    onChange={(e) => setNewMessageText(e.target.value)}
-    rows={3}
-    placeholder="Введите ваше сообщение..."
-    className="w-full border rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none text-white"
-    style={{ 
-      background: '#000000',
-      borderColor: '#ef01cb'
-    }}
-    onFocus={(e) => e.currentTarget.style.borderColor = '#ef01cb'}
-    onBlur={(e) => e.currentTarget.style.borderColor = '#ef01cb'}
-  />
-  <button
-    onClick={sendNewMessage}
-    className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
-    style={{ 
-      background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-      boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
-      color: '#ffffff'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = '0 0 25px rgba(147, 112, 219, 0.9)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 112, 219, 0.6)';
-    }}
->
-    Отправить сообщение
-  </button>
-</div>
-
-<div className="space-y-3 sm:space-y-4">
-<h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 shimmer-btn-text">
-  История переписки
-</h3>
-
-{readerMessages.length === 0 ? (
-  <div className="text-center py-8 sm:py-12 rounded-lg border" style={{
-    background: '#000000',
-    borderColor: 'rgba(239, 1, 203, 0.2)'
-  }}>
-    <Mail size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-      color: 'rgba(239, 1, 203, 0.3)'
-    }} />
-    <p className="text-sm sm:text-base text-white">У вас пока нет сообщений</p>
-  </div>
-          ) : (
-            readerMessages.map((msg) => (
-<div 
-  key={msg.id} 
-  className="rounded-lg p-3 sm:p-5 border-2 transition"
-  style={{
-    background: '#000000',
-    borderColor: msg.admin_reply && !msg.is_read ? '#ef01cb' : '#ef01cb',
-    boxShadow: msg.admin_reply && !msg.is_read ? '0 0 20px rgba(239, 1, 203, 0.6)' : '0 0 10px rgba(239, 1, 203, 0.3)'
-  }}
->
-                <div className="flex justify-between items-start mb-2 sm:mb-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span className="font-semibold text-white text-sm sm:text-base">Вы</span>
-                    <span className="text-gray-500 text-xs">
-                      {new Date(msg.created_at).toLocaleString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                    {msg.admin_reply && !msg.is_read && (
-                      <span className="bg-red-600 text-xs px-2 py-1 rounded font-bold animate-pulse">
-                        НОВЫЙ ОТВЕТ
-                      </span>
-                    )}
-                  </div>
-<div className="relative">
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      setSelectedReaderMessage(selectedReaderMessage?.id === msg.id ? null : msg);
-    }}
-    className="text-xs sm:text-sm transition p-1 rounded"
-    style={{ color: '#ef01cb' }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.color = '#ff6bcb';
-      e.currentTarget.style.background = 'rgba(239, 1, 203, 0.1)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.color = '#ef01cb';
-      e.currentTarget.style.background = 'transparent';
-    }}
-  >
-    •••
-  </button>
-  
-  {selectedReaderMessage?.id === msg.id && (
-    <div className="absolute right-0 top-8 rounded-lg border-2 p-2 z-10 min-w-[150px]" style={{
-      background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-      borderColor: '#ef01cb',
-      boxShadow: '0 0 20px rgba(239, 1, 203, 0.6)'
-    }}>
-      <button
-        onClick={() => setSelectedReaderMessage(null)}
-        className="w-full text-left px-3 py-2 rounded text-xs sm:text-sm transition"
-        style={{ color: '#ffffff' }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 1, 203, 0.3)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-      >
-        Свернуть
-      </button>
-      <button
-        onClick={() => {
-          /* функция редактирования */
-        }}
-        className="w-full text-left px-3 py-2 rounded text-xs sm:text-sm transition"
-        style={{ color: '#ffffff' }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 1, 203, 0.3)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-      >
-        Редактировать
-      </button>
-      <button
-        onClick={() => {
-          showConfirm('Удалить сообщение?', async () => {
-            await supabase.from('messages').delete().eq('id', msg.id);
-            loadReaderMessages();
-          });
-        }}
-        className="w-full text-left px-3 py-2 rounded text-xs sm:text-sm transition"
-        style={{ color: '#ffffff' }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 1, 203, 0.3)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-      >
-        Удалить
-      </button>
-    </div>
-  )}
-</div>
-                </div>
-
-<div className="rounded-lg p-3 sm:p-4 mb-2 sm:mb-3 border" style={{
-  background: '#000000',
-  borderColor: '#ef01cb'
-}}>
-  <p className="text-xs mb-2 shimmer-btn-text">Ваше сообщение:</p>
-  <p className="text-xs sm:text-sm text-white whitespace-pre-wrap break-words">
-                    {selectedReaderMessage?.id === msg.id 
-                      ? msg.message 
-                      : msg.message.length > 100 
-                        ? msg.message.slice(0, 100) + '...' 
-                        : msg.message
-                    }
-                  </p>
-                </div>
-
-{msg.admin_reply && (
-  <div className="border-2 rounded-lg p-3 sm:p-4 mb-2 sm:mb-3" style={{
-    background: '#000000',
-    borderColor: '#ef01cb',
-    boxShadow: '0 0 15px rgba(239, 1, 203, 0.4)'
-  }}>
-    <p className="text-xs mb-2 font-semibold shimmer-btn-text">
-      Ответ автора:
-    </p>
-                    <p className="text-xs sm:text-sm text-gray-200 whitespace-pre-wrap break-words">
-                      {selectedReaderMessage?.id === msg.id 
-                        ? msg.admin_reply 
-                        : msg.admin_reply.length > 100 
-                          ? msg.admin_reply.slice(0, 100) + '...' 
-                          : msg.admin_reply
-                      }
-                    </p>
-                  </div>
-                )}
-
-                {selectedReaderMessage?.id === msg.id && msg.admin_reply && (
-                  <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-700">
-                    <h4 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2">
-                      Ответить автору:
-                    </h4>
-                    <textarea
-                      value={replyMessageText}
-                      onChange={(e) => setReplyMessageText(e.target.value)}
-                      rows={3}
-                      placeholder="Напишите ваш ответ..."
-                      className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white"
-                    />
-                    <button
-                      onClick={() => sendReaderReply(msg.id)}
-                      className="bg-red-600 hover:bg-red-700 px-3 sm:px-4 py-2 rounded text-xs sm:text-sm flex items-center gap-2"
-                    >
-                      <Send size={12} className="sm:w-4 sm:h-4" />
-                      Отправить ответ
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-)}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* READER MESSAGES MODAL - СВЕТЛАЯ ТЕМА */}
-{showReaderMessagesModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-4xl my-4 sm:my-8 flex flex-col max-h-[95vh] p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #71141f, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c2ab75',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Мои сообщения</h2>
-        <button onClick={() => {
-          setShowReaderMessagesModal(false);
-          setSelectedReaderMessage(null);
-          setNewMessageText('');
-          setReplyMessageText('');
-        }} className="absolute right-0" style={{ color: '#c2ab75' }}>
-          <X size={24} />
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-        <div className="rounded-lg p-3 sm:p-6 mb-4 sm:mb-6" style={{ 
-          background: 'rgba(0, 0, 0, 0.3)',
-          border: '2px solid #c2ab75'
-        }}>
-          <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3" style={{ color: '#c2ab75' }}>
-            Написать новое сообщение автору
-          </h3>
-          <textarea
-            value={newMessageText}
-            onChange={(e) => setNewMessageText(e.target.value)}
-            rows={3}
-            placeholder="Введите ваше сообщение..."
-            className="w-full rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid #c2ab75',
-              color: '#d8c5a2'
-            }}
-          />
-          <button
-            onClick={sendNewMessage}
-            className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
-            style={{ 
-              background: '#d8c5a2',
-              color: '#000000'
-            }}
-          >
-            Отправить сообщение
-          </button>
-        </div>
-
-        <div className="space-y-3 sm:space-y-4">
-          <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#c2ab75' }}>
-            История переписки
-          </h3>
-
-          {readerMessages.length === 0 ? (
-            <div className="text-center py-8 sm:py-12 rounded-lg" style={{
-              background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(180, 154, 95, 0.3)'
-            }}>
-              <Mail size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-                color: 'rgba(194, 171, 117, 0.5)'
-              }} />
-              <p className="text-sm sm:text-base" style={{ color: '#d8c5a2' }}>У вас пока нет сообщений</p>
-            </div>
-          ) : (
-            readerMessages.map((msg) => (
-              <div 
-                key={msg.id} 
-                className="rounded-lg p-3 sm:p-5 transition"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: msg.admin_reply && !msg.is_read ? '2px solid #c2ab75' : '1px solid rgba(180, 154, 95, 0.3)'
-                }}
-              >
-                <div className="flex justify-between items-start mb-2 sm:mb-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span className="font-semibold text-sm sm:text-base" style={{ color: '#d8c5a2' }}>Вы</span>
-                    <span className="text-xs" style={{ color: '#c2ab75', opacity: 0.7 }}>
-                      {new Date(msg.created_at).toLocaleString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                    {msg.admin_reply && !msg.is_read && (
-                      <span className="text-xs px-2 py-1 rounded font-bold animate-pulse" style={{
-                        background: '#d8c5a2',
-                        color: '#000000'
-                      }}>
-                        НОВЫЙ ОТВЕТ
-                      </span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedReaderMessage(selectedReaderMessage?.id === msg.id ? null : msg);
-                      }}
-                      className="text-xs sm:text-sm transition p-1 rounded"
-                      style={{ color: '#c2ab75' }}
-                    >
-                      •••
-                    </button>
-                    
-                    {selectedReaderMessage?.id === msg.id && (
-                      <div className="absolute right-0 top-8 rounded-lg p-2 z-10 min-w-[150px]" style={{
-                        background: 'rgba(194, 171, 117, 0.9)',
-                        border: '1px solid #c2ab75'
-                      }}>
-                        <button
-                          onClick={() => setSelectedReaderMessage(null)}
-                          className="w-full text-left px-3 py-2 rounded text-xs sm:text-sm transition"
-                          style={{ color: '#000000' }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          Свернуть
-                        </button>
-                        <button
-                          onClick={() => {
-                            showConfirm('Удалить сообщение?', async () => {
-                              await supabase.from('messages').delete().eq('id', msg.id);
-                              loadReaderMessages();
-                            });
-                          }}
-                          className="w-full text-left px-3 py-2 rounded text-xs sm:text-sm transition"
-                          style={{ color: '#000000' }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          Удалить
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="rounded-lg p-3 sm:p-4 mb-2 sm:mb-3" style={{
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '1px solid #c2ab75'
-                }}>
-                  <p className="text-xs mb-2" style={{ color: '#c2ab75' }}>Ваше сообщение:</p>
-                  <p className="text-xs sm:text-sm whitespace-pre-wrap break-words" style={{ color: '#d8c5a2' }}>
-                    {selectedReaderMessage?.id === msg.id 
-                      ? msg.message 
-                      : msg.message.length > 100 
-                        ? msg.message.slice(0, 100) + '...' 
-                        : msg.message
-                    }
-                  </p>
-                </div>
-
-                {msg.admin_reply && (
-                  <div className="rounded-lg p-3 sm:p-4 mb-2 sm:mb-3" style={{
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '2px solid #c2ab75'
-                  }}>
-                    <p className="text-xs mb-2 font-semibold" style={{ color: '#c2ab75' }}>
-                      Ответ автора:
-                    </p>
-                    <p className="text-xs sm:text-sm whitespace-pre-wrap break-words" style={{ color: '#d8c5a2' }}>
-                      {selectedReaderMessage?.id === msg.id 
-                        ? msg.admin_reply 
-                        : msg.admin_reply.length > 100 
-                          ? msg.admin_reply.slice(0, 100) + '...' 
-                          : msg.admin_reply
-                      }
-                    </p>
-                  </div>
-                )}
-
-                {selectedReaderMessage?.id === msg.id && msg.admin_reply && (
-                  <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: '1px solid rgba(180, 154, 95, 0.3)' }}>
-                    <h4 className="text-xs sm:text-sm font-semibold mb-2" style={{ color: '#c2ab75' }}>
-                      Ответить автору:
-                    </h4>
-                    <textarea
-                      value={replyMessageText}
-                      onChange={(e) => setReplyMessageText(e.target.value)}
-                      rows={3}
-                      placeholder="Напишите ваш ответ..."
-                      className="w-full rounded px-3 py-2 mb-2 sm:mb-3 text-sm sm:text-base focus:outline-none"
-                      style={{
-                        background: 'rgba(0, 0, 0, 0.4)',
-                        border: '1px solid rgba(180, 154, 95, 0.4)',
-                        color: '#d8c5a2'
-                      }}
-                    />
-                    <button
-                      onClick={() => sendReaderReply(msg.id)}
-                      className="px-3 sm:px-4 py-2 rounded text-xs sm:text-sm flex items-center gap-2"
-                      style={{
-                        background: '#d8c5a2',
-                        color: '#000000'
-                      }}
-                    >
-                      <Send size={12} className="sm:w-4 sm:h-4" />
-                      Отправить ответ
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* MODAL: COLLECTION */}
-{showCollectionModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full sm:max-w-5xl my-4 sm:my-8 flex flex-col max-h-[95vh] border-2 p-6" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-<div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Моя коллекция</h2>
-        <button onClick={() => setShowCollectionModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
-
-      {/* ТАБЫ */}
-      <div className="flex border-b border-gray-700 overflow-x-auto flex-shrink-0">
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes shimmerTab {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-          }
-          .tab-shimmer {
-            background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shimmerTab 3s linear infinite;
-          }
-        `}} />
-        
-        {[
-          { key: 'favorites', label: 'Избранное', icon: Heart },
-          { key: 'gallery', label: 'Галерея', icon: ImageIcon },
-        ].map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => setCollectionTab(key)}
-            className={`flex-1 min-w-[100px] px-3 sm:px-6 py-3 sm:py-4 font-semibold transition text-center whitespace-nowrap ${
-              collectionTab === key ? '' : 'bg-gray-800'
-            }`}
-            style={{
-              background: collectionTab === key 
-                ? 'linear-gradient(135deg, #a063cf 0%, #7c3aad 100%)' 
-                : 'transparent'
-            }}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <Icon size={16} className="sm:w-5 sm:h-5" style={{ color: collectionTab === key ? '#b3e7ef' : '#666' }} />
-              <span className={`text-xs sm:text-base ${collectionTab === key ? 'tab-shimmer' : 'text-gray-400'}`}>
-                {label}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* КОНТЕНТ */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-        {collectionTab === 'favorites' && (
-          <div>
-            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
-              Избранные работы ({userFavorites.length})
-            </h3>
-{userFavorites.length === 0 ? (
-  <div className="text-center py-8 sm:py-12 rounded-lg border" style={{
-    background: '#000000',
-    borderColor: 'rgba(239, 1, 203, 0.2)'
-  }}>
-    <Heart size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-      color: 'rgba(239, 1, 203, 0.3)'
-    }} />
-    <p className="text-sm sm:text-base text-white">У вас пока нет избранных работ</p>
-  </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {userFavorites.map((work) => (
-<Link
-  key={work.id}
-  href={`/work/${work.id}`}
-  className="rounded-lg overflow-hidden border-2 transition hover:scale-105"
-  style={{ 
-    borderColor: '#ef01cb',
-    boxShadow: '0 0 15px rgba(239, 1, 203, 0.4)'
-  }}
-  onClick={() => setShowCollectionModal(false)}
->
-  <div className="aspect-[2/3] bg-black relative">
-                      {work.cover_url && (
-                        <img src={work.cover_url} alt={work.title} className="w-full h-full object-cover" />
-                      )}
-                    </div>
-                    <div className="p-2 sm:p-4 bg-gray-900">
-                      <h4 className="text-white font-semibold text-xs sm:text-base mb-1 sm:mb-2 line-clamp-2">{work.title}</h4>
-                      <p className="text-gray-400 text-xs line-clamp-2">{work.description}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {collectionTab === 'gallery' && (
-          <div>
-            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-300">
-              Галерея ({userGallery.length})
-            </h3>
-{userGallery.length === 0 ? (
-  <div className="text-center py-8 sm:py-12 rounded-lg border" style={{
-    background: '#000000',
-    borderColor: 'rgba(239, 1, 203, 0.2)'
-  }}>
-    <ImageIcon size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-      color: 'rgba(239, 1, 203, 0.3)'
-    }} />
-    <p className="text-sm sm:text-base text-white">У вас пока нет сохранённых изображений</p>
-  </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {userGallery.map((img) => (
-                  <div key={img.id} className="aspect-[3/4] rounded-lg overflow-hidden border-2 border-purple-600 relative group">
-                    <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
-<button
-  onClick={() => {
-    showConfirm('Удалить изображение?', async () => {
-      await supabaseUGC.from('saved_images').delete().eq('id', img.id);
-      loadUserCollection();
-    });
-  }}
-  className="absolute top-1 right-1 sm:top-2 sm:right-2 rounded-full p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition"
-  style={{
-    background: 'linear-gradient(135deg, #ef01cb 0%, #bc0897 100%)',
-    boxShadow: '0 0 15px rgba(239, 1, 203, 0.8)'
-  }}
->
-  <X size={12} className="sm:w-4 sm:h-4" />
-</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-{/* COLLECTION MODAL - СВЕТЛАЯ ТЕМА */}
-{showCollectionModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full sm:max-w-5xl my-4 sm:my-8 flex flex-col max-h-[95vh] p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #71141f, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c2ab75',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Моя коллекция</h2>
-        <button onClick={() => setShowCollectionModal(false)} className="absolute right-0" style={{ color: '#c2ab75' }}>
-          <X size={24} />
-        </button>
-      </div>
-
-      {/* ТАБЫ */}
-      <div className="flex overflow-x-auto flex-shrink-0" style={{ borderBottom: '1px solid rgba(180, 154, 95, 0.3)' }}>
-        {[
-          { key: 'favorites', label: 'Избранное', icon: Heart },
-          { key: 'gallery', label: 'Галерея', icon: ImageIcon },
-        ].map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => setCollectionTab(key)}
-            className="flex-1 min-w-[100px] px-3 sm:px-6 py-3 sm:py-4 font-semibold transition text-center whitespace-nowrap"
-            style={{
-              background: collectionTab === key ? 'rgba(194, 171, 117, 0.2)' : 'transparent',
-              borderBottom: collectionTab === key ? '2px solid #c2ab75' : 'none'
-            }}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <Icon size={16} className="sm:w-5 sm:h-5" style={{ color: collectionTab === key ? '#c2ab75' : '#958150' }} />
-              <span className="text-xs sm:text-base" style={{ color: collectionTab === key ? '#c2ab75' : '#958150' }}>
-                {label}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* КОНТЕНТ */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-        {collectionTab === 'favorites' && (
-          <div>
-            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#d8c5a2' }}>
-              Избранные работы ({userFavorites.length})
-            </h3>
-            {userFavorites.length === 0 ? (
-              <div className="text-center py-8 sm:py-12 rounded-lg" style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(180, 154, 95, 0.3)'
-              }}>
-                <Heart size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-                  color: 'rgba(194, 171, 117, 0.5)'
-                }} />
-                <p className="text-sm sm:text-base" style={{ color: '#d8c5a2' }}>У вас пока нет избранных работ</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {userFavorites.map((work) => (
-                  <Link
-                    key={work.id}
-                    href={`/work/${work.id}`}
-                    className="rounded-lg overflow-hidden transition hover:scale-105"
-                    style={{ 
-                      border: '2px solid #c2ab75'
-                    }}
-                    onClick={() => setShowCollectionModal(false)}
-                  >
-                    <div className="aspect-[2/3] relative" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
-                      {work.cover_url && (
-                        <img src={work.cover_url} alt={work.title} className="w-full h-full object-cover" />
-                      )}
-                    </div>
-                    <div className="p-2 sm:p-4" style={{ background: 'rgba(0, 0, 0, 0.4)' }}>
-                      <h4 className="font-semibold text-xs sm:text-base mb-1 sm:mb-2 line-clamp-2" style={{ color: '#d8c5a2' }}>{work.title}</h4>
-                      <p className="text-xs line-clamp-2" style={{ color: '#c2ab75' }}>{work.description}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {collectionTab === 'gallery' && (
-          <div>
-            <h3 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#d8c5a2' }}>
-              Галерея ({userGallery.length})
-            </h3>
-            {userGallery.length === 0 ? (
-              <div className="text-center py-8 sm:py-12 rounded-lg" style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(180, 154, 95, 0.3)'
-              }}>
-                <ImageIcon size={32} className="sm:w-12 sm:h-12 mx-auto mb-3" style={{ 
-                  color: 'rgba(194, 171, 117, 0.5)'
-                }} />
-                <p className="text-sm sm:text-base" style={{ color: '#d8c5a2' }}>У вас пока нет сохранённых изображений</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {userGallery.map((img) => (
-                  <div key={img.id} className="aspect-[3/4] rounded-lg overflow-hidden relative group" style={{ border: '2px solid #c2ab75' }}>
-                    <img src={img.image_url} alt="Saved" className="w-full h-full object-cover" />
-              <button
-  onClick={() => {
-    showConfirm('Удалить изображение?', async () => {
-      await supabaseUGC.from('saved_images').delete().eq('id', img.id);
-      loadUserCollection();
-    });
-  }}
-  className="absolute top-1 right-1 sm:top-2 sm:right-2 rounded-full p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition"
-  style={{
-    background: 'linear-gradient(135deg, #c2ab75 0%, #918150 100%)',
-    boxShadow: '0 0 15px rgba(194, 171, 117, 0.8)'
-  }}
->
-<X size={12} className="sm:w-4 sm:h-4" color="#000000" />
-</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
 
 {/* МОДАЛЬНОЕ ОКНО КАРТИНКИ */}
 {selectedImage && (
@@ -3121,7 +2199,7 @@ onClick={() => {
     className="fixed inset-0 z-[100] flex items-center justify-center p-4"
     style={{
       backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(15px)'
+      backdropFilter: 'blur(8px)'
     }}
     onClick={() => setSelectedImage(null)}
   >
@@ -3131,14 +2209,14 @@ onClick={() => {
         padding: isDarkTheme ? '0' : '3px',
         background: isDarkTheme 
           ? 'transparent' 
-          : 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)'
+          : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)'
       }}>
         <img 
           src={selectedImage} 
           alt="Enlarged" 
           className="rounded-lg"
           style={{
-            border: isDarkTheme ? '2px solid #7626b5' : 'none',
+            border: isDarkTheme ? '2px solid #c9c6bb' : 'none',
             boxShadow: isDarkTheme 
               ? '0 0 30px rgba(118, 38, 181, 0.8)' 
               : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
@@ -3156,19 +2234,19 @@ onClick={() => {
         onClick={() => setSelectedImage(null)}
         className="absolute top-2 right-2 p-2 rounded-full transition-all"
         style={{
-          backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+          backgroundColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
           boxShadow: isDarkTheme 
             ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
             : 'none'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
           e.currentTarget.style.boxShadow = isDarkTheme 
             ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
             : 'none';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c9c6bb';
           e.currentTarget.style.boxShadow = isDarkTheme 
             ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
             : 'none';
@@ -3182,19 +2260,19 @@ onClick={() => {
           onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1])}
           className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
           style={{
-            backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
             boxShadow: isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
               : 'none';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none';
@@ -3209,19 +2287,19 @@ onClick={() => {
           onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1])}
           className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
           style={{
-            backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
             boxShadow: isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
               : 'none';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none';

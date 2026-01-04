@@ -748,7 +748,7 @@ if (showAgeVerification) {
 
 return (
 <div className="min-h-screen text-white" style={{ 
-  backgroundColor: isDarkTheme ? '#c2a2c3' : '#41060b'
+  backgroundColor: isDarkTheme ? '#b18dc4' : '#2d010a'
 }}>
  {/* PROGRESS BAR */}
 <div className="fixed top-0 left-0 right-0 z-50 h-1 sm:h-1.5" style={{ backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(145, 129, 80, 0.3)' }}>
@@ -756,7 +756,7 @@ return (
     className="h-full transition-all duration-150 ease-out"
 style={{ 
   width: `${readProgress}%`,
-  background: isDarkTheme ? 'linear-gradient(90deg, #9370db 0%, #c084fc 50%, #9370db 100%)' : 'linear-gradient(90deg, #918150 0%, #b8a56a 50%, #918150 100%)',
+  background: isDarkTheme ? 'linear-gradient(90deg, #9370db 0%, #c084fc 50%, #9370db 100%)' : 'linear-gradient(90deg, #5d5846 0%, #c9c6bb 50%, #65635d 100%)',
   boxShadow: isDarkTheme ? '0 0 8px rgba(147, 112, 219, 0.6), 0 0 15px rgba(192, 132, 252, 0.4)' : '0 0 8px rgba(145, 129, 80, 0.4)',
     }}
   />
@@ -764,7 +764,7 @@ style={{
     
 <header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
         backgroundColor: isDarkTheme ? '#000000' : '#eae2d7',
-        borderColor: isDarkTheme ? '#7626b5' : '#918150'
+        borderColor: isDarkTheme ? '#7626b5' : '#2d010a'
       }}>
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-2 sm:mb-4">
@@ -782,16 +782,16 @@ style={{
     onClick={() => setShowSidePanel(true)}
     className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
     style={{
-      backgroundColor: isDarkTheme ? '#7626b5' : '#5f1b1e',
+      backgroundColor: isDarkTheme ? '#7626b5' : '#2d010a',
       boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.6)' : '0 0 10px rgba(95, 27, 30, 0.6)',
-      border: isDarkTheme ? '1px solid #7626b5' : '1px solid #5f1b1e'
+      border: isDarkTheme ? '1px solid #7626b5' : '1px solid #2d010a'
     }}
 onMouseEnter={(e) => {
-  e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b3fd1' : '#7d2428';
+  e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b3fd1' : '#2d010a';
   e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(118, 38, 181, 0.8)' : '0 0 15px rgba(95, 27, 30, 0.8)';
 }}
 onMouseLeave={(e) => {
-  e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#5f1b1e';
+  e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#2d010a';
   e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.6)' : '0 0 10px rgba(95, 27, 30, 0.6)';
 }}
   >
@@ -804,13 +804,13 @@ onMouseLeave={(e) => {
     className="p-2 rounded-full flex items-center justify-center transition"
     style={{
       backgroundColor: selectedTextForBookmark 
-        ? (isDarkTheme ? '#3fcaaf' : '#85002d')
+        ? (isDarkTheme ? '#3fcaaf' : '#5d5846')
         : 'rgba(118, 38, 181, 0.3)',
       boxShadow: selectedTextForBookmark 
         ? (isDarkTheme ? '0 0 15px rgba(63, 202, 175, 0.8)' : '0 0 15px rgba(133, 0, 45, 0.8)')
         : 'none',
       border: selectedTextForBookmark 
-        ? (isDarkTheme ? '2px solid #3fcaaf' : '2px solid #85002d')
+        ? (isDarkTheme ? '2px solid #3fcaaf' : '2px solid #5d5846')
         : '2px solid rgba(118, 38, 181, 0.5)',
       width: '36px',
       height: '36px',
@@ -961,19 +961,19 @@ style={{
     backdropFilter: 'blur(10px)'
   }}>
 <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+  background: 'rgba(0, 0, 0, 0.3)',
   border: '3px solid transparent',
   borderRadius: '16px',
   backgroundClip: 'padding-box',
   position: 'relative',
-  boxShadow: '0 0 0 3px #71141f, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
 }}>
   <div style={{
     position: 'absolute',
     inset: '-3px',
     borderRadius: '16px',
     padding: '3px',
-    background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+    background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
@@ -984,7 +984,7 @@ style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
 <h2 className="text-xl sm:text-2xl font-bold" style={{
-  color: '#c2ab75',
+  color: '#c9c6bb',
   fontFamily: "'Playfair Display', Georgia, serif",
   fontStyle: 'italic',
   textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
@@ -995,7 +995,7 @@ style={{
           onClick={() => setShowChapterList(false)} 
           className="transition rounded-full p-2 absolute right-4"
           style={{
-            color: '#c2ab75',
+            color: '#65635d',
             backgroundColor: 'rgba(180, 154, 95, 0.15)',
             border: '1px solid rgba(180, 154, 95, 0.3)'
           }}
@@ -1013,12 +1013,12 @@ style={{
     border-radius: 10px;
   }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c2ab75 0%, #918150 100%);
+    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
   }
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%);
+    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
     box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
   }
 `}} />
@@ -1045,13 +1045,13 @@ style={{
               >
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
-                    color: '#d8c5a2',
+                    color: '#c9c6bb',
                     minWidth: '30px'
                   }}>
                     {ch.chapter_number}.
                   </span>
                   <span className="text-sm sm:text-base break-words flex-1" style={{
-                    color: '#d8c5a2',
+                    color: '#c9c6bb',
                     fontWeight: isActive ? '600' : '400'
                   }}>
                     {ch.title}
@@ -1187,7 +1187,7 @@ style={{
                       }}>
                         <span className="break-words flex-1">{audio.name}</span>
                         <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#e9d5ff' }}>
-                          {isPlaying ? '▶ Играет' : '⏸ Воспроизвести'}
+                          {isPlaying ? 'Играет' : 'Воспроизвести'}
                         </span>
                       </p>
                     </div>
@@ -1205,19 +1205,19 @@ style={{
     backdropFilter: 'blur(10px)'
   }}>
 <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+  background: 'rgba(0, 0, 0, 0.3)',
   border: '3px solid transparent',
   borderRadius: '16px',
   backgroundClip: 'padding-box',
   position: 'relative',
-  boxShadow: '0 0 0 3px #71141f, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
 }}>
   <div style={{
     position: 'absolute',
     inset: '-3px',
     borderRadius: '16px',
     padding: '3px',
-    background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+    background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
@@ -1228,7 +1228,7 @@ style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
 <h2 className="text-xl sm:text-2xl font-bold" style={{
-  color: '#c2ab75',
+  color: '#c9c6bb',
   fontFamily: "'Playfair Display', Georgia, serif",
   fontStyle: 'italic',
   textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
@@ -1239,7 +1239,7 @@ style={{
           onClick={() => setShowPlaylist(false)} 
           className="transition rounded-full p-2 absolute right-4"
           style={{
-            color: '#c2ab75',
+            color: '#65635d',
             backgroundColor: 'rgba(180, 154, 95, 0.15)',
             border: '1px solid rgba(180, 154, 95, 0.3)'
           }}
@@ -1257,13 +1257,13 @@ style={{
     border-radius: 10px;
   }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c2ab75 0%, #918150 100%);
+    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
+    box-shadow: 0 0 10px rgba(188, 187, 174, 0.25);
   }
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%);
-    box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
+    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
+    box-shadow: 0 0 15px rgba(188, 187, 174, 0.05);
   }
 `}} />
         <div className="space-y-3">
@@ -1277,7 +1277,7 @@ style={{
                 className="rounded-lg p-4 border-2 transition-all cursor-pointer"
                 style={{
                   background: 'rgba(0, 0, 0, 0.3)',
-                  borderColor: 'rgba(180, 154, 95, 0.4)'
+                  borderColor: 'rgba(188, 187, 174, 0.25)'
                 }}
                 onClick={() => {
                   if (audioElement) {
@@ -1291,7 +1291,7 @@ style={{
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 154, 95, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(188, 187, 174, 0.25)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
@@ -1299,11 +1299,11 @@ style={{
                 }}
               >
                 <p className="text-sm font-semibold flex items-center justify-between" style={{
-                  color: '#d8c5a2'
+                  color: '#c9c6bb'
                 }}>
                   <span className="break-words flex-1">{audio.name}</span>
-                  <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#c2ab75' }}>
-                    {isPlaying ? '▶ Играет' : '⏸ Воспроизвести'}
+                  <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#65635d' }}>
+                    {isPlaying ? 'Играет' : 'Воспроизвести'}
                   </span>
                 </p>
               </div>
@@ -1345,7 +1345,7 @@ style={{
                 }
               `}} />
               <h2 className="text-xl sm:text-2xl font-bold bookmarks-title-shimmer">
-                🔖 Закладки главы
+                Закладки главы
               </h2>
               <button 
                 onClick={() => setShowBookmarksModal(false)} 
@@ -1444,19 +1444,19 @@ style={{
     backdropFilter: 'blur(10px)'
   }}>
 <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+  background: 'rgba(0, 0, 0, 0.3)',
   border: '3px solid transparent',
   borderRadius: '16px',
   backgroundClip: 'padding-box',
   position: 'relative',
-  boxShadow: '0 0 0 3px #71141f, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
 }}>
   <div style={{
     position: 'absolute',
     inset: '-3px',
     borderRadius: '16px',
     padding: '3px',
-    background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+    background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
@@ -1467,20 +1467,20 @@ style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
 <h2 className="text-xl sm:text-2xl font-bold" style={{
-  color: '#c2ab75',
+  color: '#c9c6bb',
   fontFamily: "'Playfair Display', Georgia, serif",
   fontStyle: 'italic',
   textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
 }}>
-          🔖 Закладки главы
+          Закладки главы
         </h2>
         <button 
           onClick={() => setShowBookmarksModal(false)} 
           className="transition rounded-full p-2 absolute right-4"
           style={{
-            color: '#c2ab75',
+            color: '#c9c6bb',
             backgroundColor: 'rgba(180, 154, 95, 0.15)',
-            border: '1px solid rgba(180, 154, 95, 0.3)'
+            border: '1px solid rgba(180, 154, 70, 0.0)'
           }}
         >
           <X size={24} />
@@ -1497,12 +1497,12 @@ style={{
     border-radius: 10px;
   }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c2ab75 0%, #918150 100%);
+    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
   }
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%);
+    background: linear-gradient(135deg, #c9c6bb 0%, #5d5846 100%);
     box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
   }
 `}} />
@@ -1511,7 +1511,7 @@ style={{
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(194, 171, 117, 0.5)" strokeWidth="2" className="mx-auto mb-4">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
             </svg>
-            <p style={{ color: '#c2ab75' }}>В этой главе нет закладок</p>
+            <p style={{ color: '#c9c6bb' }}>В этой главе нет закладок</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1534,8 +1534,8 @@ style={{
                 }}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#c2ab75' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#c2ab75" stroke="#c2ab75" strokeWidth="2">
+                  <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#c9c6bb' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#c9c6bb" stroke="#c9c6bb" strokeWidth="2">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
                     </svg>
                     Закладка
@@ -1551,11 +1551,11 @@ style={{
                   </button>
                 </div>
                 <div className="rounded p-3 mb-2" style={{ background: 'rgba(0, 0, 0, 0.4)' }}>
-                  <p className="text-sm line-clamp-3" style={{ color: '#d8c5a2' }}>
+                  <p className="text-sm line-clamp-3" style={{ color: '#c9c6bb' }}>
                     &quot;{bookmark.selected_text}&quot;
                   </p>
                 </div>
-                <p className="text-xs" style={{ color: '#c2ab75', opacity: 0.7 }}>
+                <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
                   {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
                 </p>
               </div>
@@ -1579,7 +1579,7 @@ style={{
 .work-title-shimmer {
   background: ${isDarkTheme 
     ? 'linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%)' 
-    : 'linear-gradient(90deg, #62091e 0%, #d6c79e 50%, #62091e 100%)'};
+    : 'linear-gradient(90deg, #65635d 0%, #d6c79e 50%, #65635d 100%)'};
   background-size: ${isDarkTheme ? '200% auto' : '200% auto'};
     background-size: ${isDarkTheme ? '200% auto' : '100% auto'};
     -webkit-background-clip: text;
@@ -1595,7 +1595,7 @@ style={{
   </>
 )}
 <h1 className="text-base sm:text-lg md:text-xl font-bold mb-2 break-words" style={{
-  color: isDarkTheme ? '#7626b5' : '#958450',
+  color: isDarkTheme ? '#7626b5' : '#65635d',
   textShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.8)' : 'none',
   fontFamily: "'Playfair Display', Georgia, serif",
   fontStyle: isDarkTheme ? 'normal' : 'italic'
@@ -1606,7 +1606,7 @@ style={{
 
 <div className="rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
   backgroundColor: isDarkTheme ? '#000000' : '#eae2d7',
-  borderColor: isDarkTheme ? '#9333ea' : '#918150',
+  borderColor: isDarkTheme ? '#9333ea' : '#65635d',
   boxShadow: isDarkTheme ? '0 0 20px rgba(147, 51, 234, 0.6), 0 0 40px rgba(147, 51, 234, 0.4)' : '0 0 15px rgba(145, 129, 80, 0.3)'
 }}>
 <style dangerouslySetInnerHTML={{
@@ -1659,7 +1659,7 @@ style={{
     }
 
     .tooltip-word {
-      color: #ef4444 !important;
+      color: #65635d !important;
       cursor: help !important;
       position: static !important;
       display: inline !important;
@@ -1683,7 +1683,7 @@ style={{
       max-height: 60vh !important;
       overflow-y: auto !important;
       z-index: 99999 !important;
-      border: 2px solid #dc2626 !important;
+      border: 2px solid #65635d !important;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7) !important;
       line-height: 1.6 !important;
       text-align: left !important;
@@ -1711,12 +1711,12 @@ style={{
     }
       
     ::selection {
-      background-color: ${isDarkTheme ? '#3fcaaf' : '#c0a76d'} !important;
+      background-color: ${isDarkTheme ? '#3fcaaf' : '#65635d'} !important;
       color: #000000 !important;
     }
 
     ::-moz-selection {
-      background-color: ${isDarkTheme ? '#3fcaaf' : '#c0a76d'} !important;
+      background-color: ${isDarkTheme ? '#3fcaaf' : '#65635d'} !important;
       color: #000000 !important;
     }
 
@@ -1748,12 +1748,12 @@ style={{
     }
 
     .chapter-text-content::selection {
-      background-color: ${isDarkTheme ? '#3fcaaf' : '#c0a76d'} !important;
+      background-color: ${isDarkTheme ? '#3fcaaf' : '#65635d'} !important;
       color: #000000 !important;
     }
 
     .chapter-text-content::-moz-selection {
-      background-color: ${isDarkTheme ? '#3fcaaf' : '#c0a76d'} !important;
+      background-color: ${isDarkTheme ? '#3fcaaf' : '#65635d'} !important;
       color: #000000 !important;
     }
   `
@@ -1780,7 +1780,7 @@ style={{
   .overflow-x-auto::-webkit-scrollbar-thumb {
     background: ${isDarkTheme 
       ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-      : 'linear-gradient(135deg, #c2ab75 0%, #918150 100%)'};
+      : 'linear-gradient(135deg, #c9c6bb 0%, #65635d 100%)'};
     border-radius: 10px;
     box-shadow: ${isDarkTheme 
       ? '0 0 10px rgba(147, 112, 219, 0.8)' 
@@ -1789,7 +1789,7 @@ style={{
   .overflow-x-auto::-webkit-scrollbar-thumb:hover {
     background: ${isDarkTheme 
       ? 'linear-gradient(135deg, #b48dc4 0%, #9370db 100%)' 
-      : 'linear-gradient(135deg, #d8c5a2 0%, #c2ab75 100%)'};
+      : 'linear-gradient(135deg, #c9c6bb 0%, #65635d 100%)'};
     box-shadow: ${isDarkTheme 
       ? '0 0 15px rgba(180, 141, 196, 1)' 
       : '0 0 15px rgba(216, 197, 162, 0.8)'};
@@ -1810,7 +1810,7 @@ style={{
     key={index} 
     className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative"
 style={{
-  borderColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+  borderColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
   boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(192, 167, 109, 0.5)'
 }}
           >
@@ -1827,7 +1827,7 @@ style={{
   style={{
     background: isDarkTheme 
       ? (savedImages.includes(img) ? 'rgba(239, 1, 203, 0.9)' : 'rgba(0, 0, 0, 0.7)')
-      : '#85002d',
+      : '#40030f',
     backdropFilter: 'blur(10px)',
     boxShadow: savedImages.includes(img)
       ? (isDarkTheme 
@@ -1840,10 +1840,10 @@ style={{
     width="20" 
     height="20" 
     viewBox="0 0 24 24" 
-    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#d8c5a2') : 'none'}
+    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#65635d') : 'none'}
     stroke={isDarkTheme 
       ? (savedImages.includes(img) ? '#ffffff' : '#ef01cb')
-      : '#d8c5a2'}
+      : '#c9c6bb'}
     strokeWidth="2"
   >
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1859,19 +1859,19 @@ style={{
   onClick={() => scrollCharacterCarousel('left')}
   className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';
@@ -1884,19 +1884,19 @@ style={{
   onClick={() => scrollCharacterCarousel('right')}
   className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';
@@ -1919,7 +1919,7 @@ style={{
     <div className="rounded-2xl w-full max-w-md p-6" style={{
       background: isDarkTheme 
         ? 'rgba(147, 51, 234, 0.15)' 
-        : 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: isDarkTheme 
         ? '2px solid #9333ea' 
         : '3px solid transparent',
@@ -1937,7 +1937,7 @@ style={{
           inset: '-3px',
           borderRadius: '16px',
           padding: '3px',
-          background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+          background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
           maskComposite: 'exclude',
@@ -1946,7 +1946,7 @@ style={{
         }} />
       )}
       <p className="text-center text-base sm:text-lg mb-6 whitespace-pre-wrap" style={{
-        color: isDarkTheme ? '#ffffff' : '#d8c5a2'
+        color: isDarkTheme ? '#ffffff' : '#c9c6bb'
       }}>
         {confirmMessage}
       </p>
@@ -1963,7 +1963,7 @@ style={{
               style={{
                 background: isDarkTheme 
                   ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                  : '#d8c5a2',
+                  : '#c9c6bb',
                 color: isDarkTheme ? '#ffffff' : '#000000',
                 boxShadow: isDarkTheme 
                   ? '0 0 15px rgba(147, 112, 219, 0.6)' 
@@ -1978,9 +1978,9 @@ style={{
               className="flex-1 py-3 rounded-lg font-bold transition"
               style={{
                 background: isDarkTheme ? 'transparent' : 'rgba(216, 197, 162, 0.15)',
-                borderColor: isDarkTheme ? '#9370db' : '#d8c5a2',
-                border: isDarkTheme ? '2px solid #9370db' : '2px solid #d8c5a2',
-                color: isDarkTheme ? '#9370db' : '#d8c5a2'
+                borderColor: isDarkTheme ? '#9370db' : '#65635d',
+                border: isDarkTheme ? '2px solid #9370db' : '2px solid #c9c6bb',
+                color: isDarkTheme ? '#9370db' : '#c9c6bb'
               }}
             >
               Отмена
@@ -1993,7 +1993,7 @@ style={{
             style={{
               background: isDarkTheme 
                 ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : '#d8c5a2',
+                : '#c9c6bb',
               color: isDarkTheme ? '#ffffff' : '#000000',
               boxShadow: isDarkTheme 
                 ? '0 0 15px rgba(147, 112, 219, 0.6)' 
@@ -2027,18 +2027,18 @@ style={{
               onClick={handlePrevClick}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
 style={{
-  background: isDarkTheme ? '#9333ea' : '#c1b286',
-  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c1b286',
+  background: isDarkTheme ? '#9333ea' : '#c9c6bb',
+  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
   boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
   color: isDarkTheme ? '#ffffff' : '#000000'
 }}
 onMouseEnter={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#d4c49a';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 15px rgba(193, 178, 134, 0.6)';
+  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
+  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
 }}
 onMouseLeave={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c1b286';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)';
+  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
+  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
 }}
             >
               <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
@@ -2050,7 +2050,7 @@ onMouseLeave={(e) => {
           )}
           
 <span className="text-xs sm:text-sm order-first sm:order-none font-semibold" style={{
-  color: isDarkTheme ? '#ffffff' : '#dfd7bf'
+  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
 }}>
             Глава {chapter.chapter_number} из {allChapters.length}
           </span>
@@ -2060,18 +2060,18 @@ onMouseLeave={(e) => {
               onClick={handleNextClick}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
 style={{
-  background: isDarkTheme ? '#9333ea' : '#c1b286',
-  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c1b286',
+  background: isDarkTheme ? '#9333ea' : '#c9c6bb',
+  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
   boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
   color: isDarkTheme ? '#ffffff' : '#000000'
 }}
 onMouseEnter={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#d4c49a';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 15px rgba(193, 178, 134, 0.6)';
+  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
+  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
 }}
 onMouseLeave={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c1b286';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)';
+  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
+  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
 }}
             >
               <span className="hidden sm:inline">{t.nextChapter}</span>
@@ -2290,7 +2290,7 @@ style={{
                     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
                   }}
                 >
-                  ТЁМНАЯ
+                  НЕОН
                 </span>
                 <span 
                   className="text-xs font-bold transition-opacity duration-300"
@@ -2299,7 +2299,7 @@ style={{
                     textShadow: 'none'
                   }}
                 >
-                  СВЕТЛАЯ
+                  ГОТИКА
                 </span>
               </div>
             </button>
@@ -2312,17 +2312,18 @@ style={{
     {!isDarkTheme && (
   <div className="fixed top-0 right-0 h-full w-full sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{ 
     borderLeft: '12px solid',
-    borderImage: 'linear-gradient(to bottom, #b49a5f 0%, #8b7345 20%, #6b5530 40%, #4a3a1f 60%, #2a1f0f 80%, #000000 100%) 1',
+   borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
     boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-    backgroundImage: 'url(/textures/red-musse.jpg)',
+    backgroundImage: 'url(/textures/darkness.jpg)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat'
   }}>
         <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.15) 0%, rgba(144, 120, 60, 0.1) 100%)',
-          borderBottom: '1px solid rgba(158, 144, 76, 0.2)',
-          boxShadow: '0 8px 32px rgba(158, 144, 76, 0.1)'
+background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.25) 0%, rgba(188, 187, 174, 0.15) 100%)',
+borderBottom: '1px solid rgba(188, 187, 174, 0.35)',
+boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+
         }}>
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes champagneBubbles {
@@ -2334,7 +2335,7 @@ style={{
               100% { background-position: 200% center; }
             }
             .champagne-text {
-              background: linear-gradient(90deg, #c9b587 0%, #9e904c 50%, #c9b587 100%);
+              background: linear-gradient(90deg, #c9c6bb 0%, #c9c6bb 50%, #bcbbae 100%);
               background-size: 200% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
@@ -2356,12 +2357,12 @@ style={{
             onClick={() => setShowSidePanel(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all z-20"
             style={{
-              background: 'rgba(158, 144, 76, 0.2)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(158, 144, 76, 0.3)'
+              background: '1px solid rgba(188, 187, 174, 0.35)',
+              backdropFilter: 'blur(1px)',
+              border: '0 4px 15px rgba(188, 187, 174, 0.15)'
             }}
           >
-            <X size={20} color="#9e904c" />
+            <X size={20} color="#c9c6bb" />
           </button>
         </div>
 
@@ -2380,10 +2381,10 @@ style={{
         }}
         className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
         style={{
-          background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-          border: '1px solid rgba(158, 144, 76, 0.3)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(188, 187, 174, 0.35)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
         }}
       >
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -2416,10 +2417,10 @@ style={{
         }}
         className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
         style={{
-          background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-          border: '1px solid rgba(158, 144, 76, 0.3)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(188, 187, 174, 0.35)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
         }}
       >
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -2451,10 +2452,10 @@ style={{
           }}
           className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
           style={{
-            background: 'linear-gradient(135deg, rgba(158, 144, 76, 0.2), rgba(144, 120, 60, 0.2))',
-            border: '1px solid rgba(158, 144, 76, 0.3)',
-            backdropFilter: 'blur(10px)',
-            boxShadow: '0 4px 15px rgba(158, 144, 76, 0.1)'
+          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(188, 187, 174, 0.35)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
           }}
         >
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
@@ -2521,7 +2522,7 @@ style={{
                     textShadow: 'none'
                   }}
                 >
-                  ТЁМНАЯ
+                  НЕОН
                 </span>
                 <span 
                   className="text-xs font-bold transition-opacity duration-300"
@@ -2530,7 +2531,7 @@ style={{
                     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
                   }}
                 >
-                  СВЕТЛАЯ
+                  ГОТИКА
                 </span>
               </div>
             </button>
@@ -2557,14 +2558,14 @@ style={{
         padding: isDarkTheme ? '0' : '3px',
         background: isDarkTheme 
           ? 'transparent' 
-          : 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)'
+          : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)'
       }}>
         <img 
           src={selectedImage} 
           alt="Enlarged" 
           className="rounded-lg"
           style={{
-            border: isDarkTheme ? '2px solid #7626b5' : 'none',
+            border: isDarkTheme ? '2px solid #c9c6bb' : 'none',
             boxShadow: isDarkTheme 
               ? '0 0 30px rgba(118, 38, 181, 0.8)' 
               : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
@@ -2583,19 +2584,19 @@ style={{
         onClick={() => setSelectedImage(null)}
         className="absolute top-2 right-2 p-2 rounded-full transition-all"
         style={{
-          backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+          backgroundColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
           boxShadow: isDarkTheme 
             ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
             : 'none'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
           e.currentTarget.style.boxShadow = isDarkTheme 
             ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
             : 'none';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c9c6bb';
           e.currentTarget.style.boxShadow = isDarkTheme 
             ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
             : 'none';
@@ -2610,19 +2611,19 @@ style={{
           onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) - 1])}
           className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
           style={{
-            backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
             boxShadow: isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
               : 'none';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none';
@@ -2638,19 +2639,19 @@ style={{
           onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) + 1])}
           className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
           style={{
-            backgroundColor: isDarkTheme ? '#7626b5' : '#c0a76d',
+            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
             boxShadow: isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#d4c49a';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
               : 'none';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c0a76d';
+            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
             e.currentTarget.style.boxShadow = isDarkTheme 
               ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
               : 'none';

@@ -49,6 +49,19 @@ if (action === 'save_image') {
   return NextResponse.json({ success: true, data });
 }
 
+if (action === 'add_favorite') {
+  const { data, error } = await supabaseUGC
+    .from('user_favorites')
+    .insert({
+      user_id: userId,
+      work_id: workId
+    })
+    .select();
+  
+  if (error) throw error;
+  return NextResponse.json({ success: true, data });
+}
+
     if (action === 'remove_favorite') {
       const { error } = await supabaseUGC
         .from('user_favorites')
