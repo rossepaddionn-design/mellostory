@@ -37,6 +37,10 @@ const [isDarkTheme, setIsDarkTheme] = useState(true);
 const [selectedImage, setSelectedImage] = useState(null);
 const [confirmAction, setConfirmAction] = useState(null);
 const [confirmMessage, setConfirmMessage] = useState('');
+const [showRatingModal, setShowRatingModal] = useState(false);
+const [averageRating, setAverageRating] = useState(0);
+const [totalRatings, setTotalRatings] = useState(0);
+const [userRating, setUserRating] = useState(null);
 
 const carouselRef = useRef(null);
 
@@ -168,6 +172,8 @@ useEffect(() => {
   
 if (chapterId && workId) {
     loadAllData();
+
+  
     
 // ⬇️ Подсветка текста закладки
     const bookmarkText = sessionStorage.getItem('highlightBookmark');
@@ -376,7 +382,14 @@ useEffect(() => {
           content: '<p class="text-gray-500 text-center py-8">Загрузка текста...</p>'
         });
         setLoading(false);
-
+// Загружаем рейтинг из работы
+if (workRes.data) {
+  if (workRes.data.manual_rating_count > 0) {
+    const avg = workRes.data.manual_rating_sum / workRes.data.manual_rating_count;
+    setAverageRating(avg);
+    setTotalRatings(workRes.data.manual_rating_count);
+  }
+}
         // ЗАГРУЖАЕМ ТЕКСТ ИЗ SUPABASE #2
         try {
           const { data: textData, error: textError } = await supabaseChapters
@@ -407,6 +420,7 @@ useEffect(() => {
     }
   };
 
+  
   const getPreviousChapter = () => {
     if (!allChapters || allChapters.length === 0) return null;
     const currentIndex = allChapters.findIndex(ch => String(ch.id) === String(chapterId));
@@ -564,6 +578,17 @@ const deleteBookmark = async (bookmarkId) => {
       showConfirm('Ошибка удаления', null);
     }
   });
+};
+
+const submitRating = async (rating) => {
+  if (!currentUser) {
+    showConfirm('Войдите, чтобы оставить оценку');
+    return;
+  }
+  
+  showConfirm('Спасибо за оценку!');
+  setUserRating(rating);
+  setShowRatingModal(false);
 };
 
 if (loading) {
@@ -2021,67 +2046,130 @@ style={{
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-3 sm:gap-4">
-          {prevChapter ? (
-            <button 
-              onClick={handlePrevClick}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
-style={{
-  background: isDarkTheme ? '#9333ea' : '#c9c6bb',
-  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
-  boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
-  color: isDarkTheme ? '#ffffff' : '#000000'
-}}
-onMouseEnter={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
-}}
-onMouseLeave={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
-}}
-            >
-              <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">{t.previousChapter}</span>
-              <span className="sm:hidden">Пред.</span>
-            </button>
-          ) : (
-            <div className="hidden sm:block"></div>
-          )}
-          
-<span className="text-xs sm:text-sm order-first sm:order-none font-semibold" style={{
-  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
-}}>
-            Глава {chapter.chapter_number} из {allChapters.length}
-          </span>
+{/* КНОПКИ НАВИГАЦИИ И ДЕЙСТВИЯ */}
+<div className="space-y-4 mb-6 sm:mb-8">
+  {/* Оценка и обсуждение */}
+  <div className="flex gap-3 justify-center">
+    <button
+      onClick={() => setShowRatingModal(true)}
+      className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base flex items-center gap-2 border-2"
+      style={{
+        background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)',
+        borderColor: isDarkTheme ? '#9333ea' : '#c9c6b0',
+        color: '#FFFFFF',
+        boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none',
+        backdropFilter: 'blur(10px)'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(201, 198, 176, 0.4)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 10px rgba(201, 198, 176, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span className="hidden sm:inline">
+        {averageRating > 0 ? averageRating.toFixed(1) : 'Оценить'}
+      </span>
+      <span className="sm:hidden">
+        {averageRating > 0 ? averageRating.toFixed(1) : '★'}
+      </span>
+    </button>
 
-          {nextChapter ? (
-            <button 
-              onClick={handleNextClick}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
-style={{
-  background: isDarkTheme ? '#9333ea' : '#c9c6bb',
-  border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-  boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
-  color: isDarkTheme ? '#ffffff' : '#000000'
-}}
-onMouseEnter={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
-}}
-onMouseLeave={(e) => {
-  e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
-}}
-            >
-              <span className="hidden sm:inline">{t.nextChapter}</span>
-              <span className="sm:hidden">След.</span>
-              <ChevronRight size={18} className="sm:w-5 sm:h-5" />
-            </button>
-          ) : (
-            <div className="hidden sm:block"></div>
-          )}
-        </div>
+    <Link
+      href={`/work/${workId}/discussion`}
+      className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base flex items-center gap-2 border-2"
+      style={{
+        background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)',
+        borderColor: isDarkTheme ? '#9333ea' : '#c9c6b0',
+        color: '#FFFFFF',
+        boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none',
+        backdropFilter: 'blur(10px)'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(201, 198, 176, 0.4)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 10px rgba(201, 198, 176, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span className="hidden sm:inline">Обсуждение</span>
+      <span className="sm:hidden">💬</span>
+    </Link>
+  </div>
+
+  {/* Навигация между главами */}
+  <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+    {prevChapter ? (
+      <button 
+        onClick={handlePrevClick}
+        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+        style={{
+          background: isDarkTheme ? '#9333ea' : '#c9c6bb',
+          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
+          boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
+          color: isDarkTheme ? '#ffffff' : '#000000'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
+          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
+          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+        }}
+      >
+        <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+        <span className="hidden sm:inline">{t.previousChapter}</span>
+        <span className="sm:hidden">Пред.</span>
+      </button>
+    ) : (
+      <div className="hidden sm:block"></div>
+    )}
+    
+    <span className="text-xs sm:text-sm order-first sm:order-none font-semibold" style={{
+      color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+    }}>
+      Глава {chapter.chapter_number} из {allChapters.length}
+    </span>
+
+    {nextChapter ? (
+      <button 
+        onClick={handleNextClick}
+        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+        style={{
+          background: isDarkTheme ? '#9333ea' : '#c9c6bb',
+          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
+          boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
+          color: isDarkTheme ? '#ffffff' : '#000000'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
+          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
+          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+        }}
+      >
+        <span className="hidden sm:inline">{t.nextChapter}</span>
+        <span className="sm:hidden">След.</span>
+        <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+      </button>
+    ) : (
+      <div className="hidden sm:block"></div>
+    )}
+  </div>
+</div>
 
 {/* БОКОВАЯ ПАНЕЛЬ МЕНЮ */}
 {showSidePanel && (
@@ -2541,6 +2629,150 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     )}
   </>
 )}
+
+{/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
+{showRatingModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+    <div className="rounded-xl p-6 sm:p-8 max-w-md w-full relative" style={{
+      background: isDarkTheme 
+        ? 'rgba(147, 51, 234, 0.15)'
+        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: isDarkTheme 
+        ? '2px solid #9333ea'
+        : '3px solid transparent',
+      borderRadius: isDarkTheme ? '12px' : '16px',
+      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
+      backdropFilter: 'blur(20px)',
+      boxShadow: isDarkTheme 
+        ? '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+    }}>
+      {!isDarkTheme && (
+        <div style={{
+          position: 'absolute',
+          inset: '-3px',
+          borderRadius: '16px',
+          padding: '3px',
+          background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+          pointerEvents: 'none',
+          zIndex: -1
+        }} />
+      )}
+
+      <button
+        onClick={() => setShowRatingModal(false)}
+        className="absolute top-4 right-4 transition"
+        style={{
+          color: isDarkTheme ? '#c084fc' : '#65635d'
+        }}
+      >
+        <X size={24} />
+      </button>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shimmerRating {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+      `}} />
+      
+      <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center" style={{
+        color: isDarkTheme ? '#c084fc' : 'transparent',
+        textShadow: isDarkTheme ? '0 0 15px rgba(192, 132, 252, 0.8)' : 'none',
+        background: !isDarkTheme ? 'linear-gradient(90deg, #65635d 0%, #ffffff 50%, #65635d 100%)' : 'none',
+        backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
+        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
+        backgroundClip: !isDarkTheme ? 'text' : 'unset',
+        animation: !isDarkTheme ? 'shimmerRating 3s linear infinite' : 'none'
+      }}>
+        Оцените работу
+      </h3>
+      
+      {!currentUser ? (
+        <p className="text-center py-4" style={{ 
+          color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
+        }}>
+          Войдите, чтобы оставить оценку
+        </p>
+      ) : (
+        <>
+          <p className="mb-6 text-sm sm:text-base" style={{ 
+            color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
+          }}>
+            {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+          </p>
+          
+          <div className="grid grid-cols-5 gap-2 sm:gap-3">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <button
+                key={num}
+                onClick={() => submitRating(num)}
+                className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
+                  userRating === num
+                    ? 'bg-purple-600 text-white'
+                    : 'text-purple-200 hover:text-white'
+                }`}
+                style={userRating === num ? (
+                  isDarkTheme ? {
+                    background: 'rgba(147, 51, 234, 0.8)',
+                    boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
+                  } : {
+                    background: '#65635d',
+                    color: '#ffffff'
+                  }
+                ) : (
+                  isDarkTheme ? {
+                    background: 'rgba(147, 51, 234, 0.2)',
+                    border: '1px solid rgba(147, 51, 234, 0.4)'
+                  } : {
+                    background: 'rgba(101, 99, 93, 0.2)',
+                    border: '1px solid rgba(101, 99, 93, 0.4)',
+                    color: '#c9c6bb'
+                  }
+                )}
+                onMouseEnter={(e) => {
+                  if (userRating !== num) {
+                    if (isDarkTheme) {
+                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
+                      e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
+                    } else {
+                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.4)';
+                    }
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (userRating !== num) {
+                    if (isDarkTheme) {
+                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    } else {
+                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.2)';
+                    }
+                  }
+                }}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+          
+          {totalRatings > 0 && (
+            <p className="text-center mt-4 text-xs sm:text-sm" style={{ 
+              color: isDarkTheme ? '#d8b4fe' : '#c9c6bb'
+            }}>
+              Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+)}
+
 
 {/* МОДАЛЬНОЕ ОКНО КАРТИНКИ */}
 {selectedImage && (

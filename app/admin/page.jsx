@@ -34,6 +34,7 @@ const [workForm, setWorkForm] = useState({
     pairing: '',
     description: '',
     author_note: '',
+    disclaimer: '',
     genres: '',
     tags: '',
     spoiler_tags: '',
@@ -127,6 +128,7 @@ const workData = {
   pairing: workForm.pairing ? workForm.pairing.trim() : null,
   description: workForm.description.trim(),
   author_note: workForm.author_note.trim(),
+  disclaimer: workForm.disclaimer.trim(),
   genres: workForm.genres ? workForm.genres.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
   tags: workForm.tags ? workForm.tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
   spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
@@ -584,6 +586,7 @@ setWorkForm({
     pairing: workToEdit.pairing || '',
     description: workToEdit.description || '',
     author_note: workToEdit.author_note || '',
+    disclaimer: workToEdit.disclaimer || '',
     genres: workToEdit.genres?.join(', ') || '',
     tags: workToEdit.tags?.join(', ') || '',
     spoiler_tags: workToEdit.spoiler_tags?.join(', ') || '',
@@ -726,6 +729,13 @@ setWorkForm({
 />
                       <textarea value={workForm.description} onChange={(e) => setWorkForm({...workForm, description: e.target.value})} rows={4} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Описание" />
                       <textarea value={workForm.author_note} onChange={(e) => setWorkForm({...workForm, author_note: e.target.value})} rows={2} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Примечание автора" />
+                        <textarea 
+  value={workForm.disclaimer} 
+  onChange={(e) => setWorkForm({...workForm, disclaimer: e.target.value})} 
+  rows={3} 
+  className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" 
+  placeholder="Дисклеймер (опционально): В данной главе могут присутствовать..."
+/>
                     </div>
                   </div>
                 </div>

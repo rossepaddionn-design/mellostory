@@ -71,6 +71,10 @@ const [activeCategory, setActiveCategory] = useState('novel');
 const [showConfirmModal, setShowConfirmModal] = useState(false);
 const [confirmMessage, setConfirmMessage] = useState('');
 const [confirmAction, setConfirmAction] = useState(null);
+const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
+const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+const [changeEmailForm, setChangeEmailForm] = useState({ newEmail: '', password: '' });
+const [changePasswordForm, setChangePasswordForm] = useState({ currentPassword: '', newPassword: '' });
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
@@ -434,6 +438,66 @@ const toggleTheme = () => {
   const newTheme = !isDarkTheme;
   setIsDarkTheme(newTheme);
   localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+};
+
+const handleChangeEmail = async () => {
+  if (!changeEmailForm.newEmail || !changeEmailForm.password) {
+    showConfirm('Заполните все поля!');
+    return;
+  }
+
+  // Проверяем пароль
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: changeEmailForm.password
+  });
+
+  if (signInError) {
+    showConfirm('Неверный пароль!');
+    return;
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    email: changeEmailForm.newEmail
+  });
+
+  if (error) {
+    showConfirm('Ошибка: ' + error.message);
+  } else {
+    showConfirm('Проверьте новую почту для подтверждения!');
+    setShowChangeEmailModal(false);
+    setChangeEmailForm({ newEmail: '', password: '' });
+  }
+};
+
+const handleChangePassword = async () => {
+  if (!changePasswordForm.currentPassword || !changePasswordForm.newPassword) {
+    showConfirm('Заполните все поля!');
+    return;
+  }
+
+  // Проверяем текущий пароль
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: changePasswordForm.currentPassword
+  });
+
+  if (signInError) {
+    showConfirm('Неверный текущий пароль!');
+    return;
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: changePasswordForm.newPassword
+  });
+
+  if (error) {
+    showConfirm('Ошибка: ' + error.message);
+  } else {
+    showConfirm('Пароль успешно изменён!');
+    setShowChangePasswordModal(false);
+    setChangePasswordForm({ currentPassword: '', newPassword: '' });
+  }
 };
 
 const handleDeleteAccount = async () => {
@@ -856,19 +920,23 @@ return (
         </select>
       </div>
       <div className="flex-shrink-0">
-        {!user ? (
-          <button
-            onClick={() => setShowAuthModal(true)}
-            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-            style={{
-              background: 'rgba(147, 112, 219, 0.3)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(147, 112, 219, 0.5)'
-            }}
-          >
-            <User size={14} className="sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">{t.login}</span>
-          </button>
+{!user ? (
+  <button
+    onClick={() => setShowAuthModal(true)}
+    className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+    style={{
+      background: isDarkTheme 
+        ? 'rgba(147, 112, 219, 0.3)'
+        : 'rgba(184, 171, 127, 0.3)',
+      backdropFilter: 'blur(10px)',
+      border: isDarkTheme 
+        ? '1px solid rgba(147, 112, 219, 0.5)'
+        : '1px solid rgba(184, 171, 127, 0.5)'
+    }}
+  >
+    <User size={14} className="sm:w-5 sm:h-5" />
+    <span className="hidden sm:inline">{t.login}</span>
+  </button>
         ) : (
 <button
   onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
@@ -1496,9 +1564,9 @@ background: isDarkTheme
 
 
 {/* AUTH MODAL */}
-{showAuthModal && (
+{showAuthModal && isDarkTheme && (
   <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-lg w-full max-w-md p-4 sm:p-8 border-2" style={{
+    <div className="rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-8 border-2" style={{
       background: 'rgba(103, 50, 123, 0.3)',
       backdropFilter: 'blur(10px)',
       borderColor: '#9370db'
@@ -1535,37 +1603,37 @@ background: isDarkTheme
         {authMode === 'register' && (
           <div>
             <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.nickname}</label>
-<input
-  type="text"
-  placeholder={t.nickname}
-  value={authForm.nickname}
-  onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
-  className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-  style={{ 
-    background: 'rgba(0, 0, 0, 0.3)',
-    borderColor: '#67327b'
-  }}
-  onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
-  onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
-/>
+            <input
+              type="text"
+              placeholder={t.nickname}
+              value={authForm.nickname}
+              onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
+              className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+              style={{ 
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderColor: '#67327b'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+            />
           </div>
         )}
 
         <div>
           <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.email}</label>
-<input
-  type="email"
-  placeholder={t.email}
-  value={authForm.email}
-  onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-  className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
-  style={{ 
-    background: 'rgba(0, 0, 0, 0.3)',
-    borderColor: '#67327b'
-  }}
-  onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
-  onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
-/>
+          <input
+            type="email"
+            placeholder={t.email}
+            value={authForm.email}
+            onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderColor: '#67327b'
+            }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#9370db'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#67327b'}
+          />
         </div>
 
         <div>
@@ -1648,6 +1716,26 @@ background: isDarkTheme
           {authMode === 'login' ? t.login : t.register}
         </button>
 
+        {authMode === 'login' && (
+          <button
+            onClick={async () => {
+              if (!authForm.email) {
+                showConfirm('Введите email для восстановления пароля');
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(authForm.email);
+              if (error) {
+                showConfirm('Ошибка: ' + error.message);
+              } else {
+                showConfirm('Проверьте почту! Мы отправили ссылку для восстановления пароля.');
+              }
+            }}
+            className="w-full text-gray-400 hover:text-white text-xs"
+          >
+            Забыли пароль?
+          </button>
+        )}
+
         <button
           onClick={() => {
             setAuthMode(authMode === 'login' ? 'register' : 'login');
@@ -1657,6 +1745,12 @@ background: isDarkTheme
         >
           {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
         </button>
+
+        {authMode === 'register' && (
+          <p className="text-xs text-gray-400 text-center mt-2">
+            Заполнив все графы данными не нажимайте несколько раз по кнопке "Регистрация" - только один раз, иначе у вас несколько раз проходит регистрация. Чтобы подтвердить аккаунт проверьте почту от имени Supabase.
+          </p>
+        )}
       </div>
     </div>
   </div>
@@ -1665,7 +1759,7 @@ background: isDarkTheme
 {/* AUTH MODAL - СВЕТЛАЯ ТЕМА */}
 {showAuthModal && !isDarkTheme && (
   <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-8 relative" style={{
+    <div className="rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative" style={{
       background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: '3px solid transparent',
       borderRadius: '24px',
@@ -1822,6 +1916,27 @@ background: isDarkTheme
           {authMode === 'login' ? t.login : t.register}
         </button>
 
+        {authMode === 'login' && (
+          <button
+            onClick={async () => {
+              if (!authForm.email) {
+                showConfirm('Введите email для восстановления пароля');
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(authForm.email);
+              if (error) {
+                showConfirm('Ошибка: ' + error.message);
+              } else {
+                showConfirm('Проверьте почту! Мы отправили ссылку для восстановления пароля.');
+              }
+            }}
+            className="w-full text-xs"
+            style={{ color: '#c2ab75' }}
+          >
+            Забыли пароль?
+          </button>
+        )}
+
         <button
           onClick={() => {
             setAuthMode(authMode === 'login' ? 'register' : 'login');
@@ -1832,6 +1947,12 @@ background: isDarkTheme
         >
           {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
         </button>
+
+        {authMode === 'register' && (
+          <p className="text-xs text-center mt-2" style={{ color: '#c2ab75' }}>
+            Заполнив все графы данными не нажимайте несколько раз по кнопке "Регистрация" - только один раз, иначе у вас несколько раз проходит регистрация. Чтобы подтвердить аккаунт проверьте почту от имени Supabase.
+          </p>
+        )}
       </div>
     </div>
   </div>
@@ -2736,27 +2857,84 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
+        {/* КНОПКА СМЕНЫ EMAIL */}
+        <button
+          onClick={() => {
+            setShowChangeEmailModal(true);
+            setShowManagementModal(false);
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'rgba(147, 112, 219, 0.3)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(147, 112, 219, 0.5)',
+            color: '#ffffff'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
+            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
+          }}
+        >
+          Сменить email
+        </button>
+
+        {/* КНОПКА СМЕНЫ ПАРОЛЯ */}
+        <button
+          onClick={() => {
+            setShowChangePasswordModal(true);
+            setShowManagementModal(false);
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'rgba(147, 112, 219, 0.3)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(147, 112, 219, 0.5)',
+            color: '#ffffff'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
+            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
+          }}
+        >
+          Сменить пароль
+        </button>
+
         {/* КНОПКА УДАЛЕНИЯ */}
         <button
           onClick={() => {
             setShowDeleteAccountModal(true);
             setShowManagementModal(false);
           }}
-          className="w-full py-3 rounded-lg font-bold transition border-2"
+          className="w-full py-3 rounded-lg font-bold transition"
           style={{
-            background: 'transparent',
-            borderColor: '#9333ea',
-            color: '#9370db'
+            background: 'rgba(147, 112, 219, 0.3)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(147, 112, 219, 0.5)',
+            color: '#ffffff'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#b48dc4'}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = '#9333ea'}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
+            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
+          }}
         >
           Удалить профиль
         </button>
 
         {/* ТЕМА */}
-        <div>
+        <div className="pt-4">
           <p className="text-white mb-2 text-sm shimmer-btn-text">Интерфейс сайта:</p>
           <button
             onClick={toggleTheme}
@@ -2787,7 +2965,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         </div>
 
         {/* СНЕГ */}
-        <div>
+        <div className="pt-2">
           <p className="text-white mb-2 text-sm shimmer-btn-text">Эффект снега:</p>
           <button
             onClick={() => setShowSnow(!showSnow)}
@@ -2858,7 +3036,55 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
+        <button
+          onClick={() => {
+            setShowChangeEmailModal(true);
+            setShowManagementModal(false);
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'rgba(201, 198, 187, 0.2)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(201, 198, 187, 0.4)',
+            color: '#c9c6bb'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
+          }}
+        >
+          Сменить email
+        </button>
+
+        <button
+          onClick={() => {
+            setShowChangePasswordModal(true);
+            setShowManagementModal(false);
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'rgba(201, 198, 187, 0.2)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(201, 198, 187, 0.4)',
+            color: '#c9c6bb'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
+          }}
+        >
+          Сменить пароль
+        </button>
+
         <button
           onClick={() => {
             setShowDeleteAccountModal(true);
@@ -2866,27 +3092,37 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
           }}
           className="w-full py-3 rounded-lg font-bold transition"
           style={{
-            background: '#c9c6bb',
-            color: '#000000'
+            background: 'rgba(201, 198, 187, 0.2)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(201, 198, 187, 0.4)',
+            color: '#c9c6bb'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
+            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
           }}
         >
           Удалить профиль
         </button>
 
-        <div>
+        <div className="pt-4">
           <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Интерфейс сайта:</p>
           <button
             onClick={toggleTheme}
             className="w-full relative rounded-full p-1 transition-all duration-300"
-style={{
-  background: isDarkTheme 
-    ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-    : 'linear-gradient(135deg, #c9c6bb%, #65635d 100%)',
-  boxShadow: isDarkTheme 
-    ? '0 0 20px rgba(147, 112, 219, 0.6)' 
-    : '0 0 15px rgba(216, 197, 162, 0.4)',
-  height: '40px'
-}}
+            style={{
+              background: isDarkTheme 
+                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
+                : 'linear-gradient(135deg, #c9c6bb 0%, #65635d 100%)',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 112, 219, 0.6)' 
+                : '0 0 15px rgba(216, 197, 162, 0.4)',
+              height: '40px'
+            }}
           >
             <div 
               className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
@@ -2905,20 +3141,20 @@ style={{
           </button>
         </div>
 
-        <div>
+        <div className="pt-2">
           <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Эффект снега:</p>
           <button
             onClick={() => setShowSnow(!showSnow)}
             className="w-full relative rounded-full p-1 transition-all duration-300"
-style={{
-  background: isDarkTheme 
-    ? 'linear-gradient(135deg, #939085 0%, #c9c6bb 100%)' 
-    : 'linear-gradient(135deg, #65635d 0%, #c9c6bb 100%)',
-  boxShadow: isDarkTheme 
-    ? '0 0 20px rgba(147, 112, 219, 0.6)' 
-    : '0 0 15px rgba(216, 197, 162, 0.4)',
-  height: '40px'
-}}
+            style={{
+              background: isDarkTheme 
+                ? 'linear-gradient(135deg, #939085 0%, #c9c6bb 100%)' 
+                : 'linear-gradient(135deg, #65635d 0%, #c9c6bb 100%)',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 112, 219, 0.6)' 
+                : '0 0 15px rgba(216, 197, 162, 0.4)',
+              height: '40px'
+            }}
           >
             <div 
               className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
@@ -3439,6 +3675,372 @@ onClick={async () => {
             ОК
           </button>
         )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* CHANGE EMAIL MODAL - ТЕМНАЯ ТЕМА */}
+{showChangeEmailModal && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Смена email</h2>
+        <button onClick={() => {
+          setShowChangeEmailModal(false);
+          setChangeEmailForm({ newEmail: '', password: '' });
+        }} className="text-gray-400 hover:text-white absolute right-0">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Новый email</label>
+          <input
+            type="email"
+            value={changeEmailForm.newEmail}
+            onChange={(e) => setChangeEmailForm({...changeEmailForm, newEmail: e.target.value})}
+            placeholder="Новый email"
+            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">
+            Текущий пароль <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            value={changeEmailForm.password}
+            onChange={(e) => setChangeEmailForm({...changeEmailForm, password: e.target.value})}
+            placeholder="Ваш пароль"
+            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={handleChangeEmail}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
+            color: '#ffffff'
+          }}
+        >
+          Сменить email
+        </button>
+
+        <button
+          onClick={() => {
+            setShowChangeEmailModal(false);
+            setChangeEmailForm({ newEmail: '', password: '' });
+          }}
+          className="w-full py-3 rounded-lg font-bold transition border-2"
+          style={{
+            background: 'transparent',
+            borderColor: '#9333ea',
+            color: '#9370db'
+          }}
+        >
+          Отмена
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* CHANGE EMAIL MODAL - СВЕТЛАЯ ТЕМА */}
+{showChangeEmailModal && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '3px solid transparent',
+      borderRadius: '24px',
+      backgroundClip: 'padding-box',
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '24px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+      
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Смена email</h2>
+        <button onClick={() => {
+          setShowChangeEmailModal(false);
+          setChangeEmailForm({ newEmail: '', password: '' });
+        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Новый email</label>
+          <input
+            type="email"
+            value={changeEmailForm.newEmail}
+            onChange={(e) => setChangeEmailForm({...changeEmailForm, newEmail: e.target.value})}
+            placeholder="Новый email"
+            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid rgba(180, 154, 95, 0.4)',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>
+            Текущий пароль <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            value={changeEmailForm.password}
+            onChange={(e) => setChangeEmailForm({...changeEmailForm, password: e.target.value})}
+            placeholder="Ваш пароль"
+            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid rgba(180, 154, 95, 0.4)',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={handleChangeEmail}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: '#c9c6bb',
+            color: '#000000'
+          }}
+        >
+          Сменить email
+        </button>
+
+        <button
+          onClick={() => {
+            setShowChangeEmailModal(false);
+            setChangeEmailForm({ newEmail: '', password: '' });
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'transparent',
+            border: '2px solid #c9c6bb',
+            color: '#c9c6bb'
+          }}
+        >
+          Отмена
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* CHANGE PASSWORD MODAL - ТЕМНАЯ ТЕМА */}
+{showChangePasswordModal && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Смена пароля</h2>
+        <button onClick={() => {
+          setShowChangePasswordModal(false);
+          setChangePasswordForm({ currentPassword: '', newPassword: '' });
+        }} className="text-gray-400 hover:text-white absolute right-0">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Текущий пароль</label>
+          <input
+            type="password"
+            value={changePasswordForm.currentPassword}
+            onChange={(e) => setChangePasswordForm({...changePasswordForm, currentPassword: e.target.value})}
+            placeholder="Текущий пароль"
+            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Новый пароль</label>
+          <input
+            type="password"
+            value={changePasswordForm.newPassword}
+            onChange={(e) => setChangePasswordForm({...changePasswordForm, newPassword: e.target.value})}
+            placeholder="Новый пароль"
+            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={handleChangePassword}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
+            color: '#ffffff'
+          }}
+        >
+          Сменить пароль
+        </button>
+
+        <button
+          onClick={() => {
+            setShowChangePasswordModal(false);
+            setChangePasswordForm({ currentPassword: '', newPassword: '' });
+          }}
+          className="w-full py-3 rounded-lg font-bold transition border-2"
+          style={{
+            background: 'transparent',
+            borderColor: '#9333ea',
+            color: '#9370db'
+          }}
+        >
+          Отмена
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* CHANGE PASSWORD MODAL - СВЕТЛАЯ ТЕМА */}
+{showChangePasswordModal && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '3px solid transparent',
+      borderRadius: '24px',
+      backgroundClip: 'padding-box',
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '24px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+      
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Смена пароля</h2>
+        <button onClick={() => {
+          setShowChangePasswordModal(false);
+          setChangePasswordForm({ currentPassword: '', newPassword: '' });
+        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Текущий пароль</label>
+          <input
+            type="password"
+            value={changePasswordForm.currentPassword}
+            onChange={(e) => setChangePasswordForm({...changePasswordForm, currentPassword: e.target.value})}
+            placeholder="Текущий пароль"
+            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid rgba(180, 154, 95, 0.4)',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Новый пароль</label>
+          <input
+            type="password"
+            value={changePasswordForm.newPassword}
+            onChange={(e) => setChangePasswordForm({...changePasswordForm, newPassword: e.target.value})}
+            placeholder="Новый пароль"
+            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid rgba(180, 154, 95, 0.4)',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={handleChangePassword}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: '#c9c6bb',
+            color: '#000000'
+          }}
+        >
+          Сменить пароль
+        </button>
+
+        <button
+          onClick={() => {
+            setShowChangePasswordModal(false);
+            setChangePasswordForm({ currentPassword: '', newPassword: '' });
+          }}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'transparent',
+            border: '2px solid #c9c6bb',
+            color: '#c9c6bb'
+          }}
+        >
+          Отмена
+        </button>
       </div>
     </div>
   </div>

@@ -118,13 +118,26 @@ const commentsPerPage = 10;
         }
     }
     
-    const newText = text.substring(0, start) + formattedText + text.substring(end);
-    setText(newText);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
-    }, 0);
+const newText = text.substring(0, start) + formattedText + text.substring(end);
+setText(newText);
+
+// Вычисляем правильную позицию курсора
+let cursorPosition;
+if (format === 'bold' || format === 'italic' || format === 'underline') {
+  // Для простых тегов ставим курсор после закрывающего тега
+  cursorPosition = start + formattedText.length;
+} else if (format === 'spoiler') {
+  // Для спойлера: <spoiler>текст</spoiler> - курсор после </spoiler>
+  cursorPosition = start + formattedText.length;
+} else if (format.startsWith('#')) {
+  // Для цвета: <color=#xxx>текст</color> - курсор после </color>
+  cursorPosition = start + formattedText.length;
+}
+
+setTimeout(() => {
+  textarea.focus();
+  textarea.setSelectionRange(cursorPosition, cursorPosition);
+}, 0);
     
     setShowColorPicker(false);
     setShowReplyColorPicker(false);
@@ -158,13 +171,19 @@ const commentsPerPage = 10;
     }
 
     try {
-      const { data: profile } = await supabase
-        .from('reader_profiles')
-        .select('nickname')
-        .eq('user_id', currentUser.id)
-        .single();
-
-      const nickname = profile?.nickname || currentUser.email?.split('@')[0] || 'Аноним';
+// Проверяем, это админ или обычный пользователь
+let nickname;
+if (currentUser.email === 'rossepaddionn@gmail.com') {
+  nickname = 'Мелло';
+} else {
+  const { data: profile } = await supabase
+    .from('reader_profiles')
+    .select('nickname')
+    .eq('user_id', currentUser.id)
+    .single();
+  
+  nickname = profile?.nickname || currentUser.email?.split('@')[0] || 'Аноним';
+}
 
       const res = await fetch('/api/ugc', {
         method: 'POST',

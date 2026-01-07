@@ -15,6 +15,7 @@ export default function WorkPage() {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSpoilers, setShowSpoilers] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [viewCount, setViewCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   const [totalRatings, setTotalRatings] = useState(0);
@@ -867,48 +868,101 @@ return (
         100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
       }
     `}} />
-<button
-  onClick={() => setShowSpoilers(!showSpoilers)}
-  className="w-full rounded px-3 py-2 flex items-center justify-between transition text-left border-2" style={{
-    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 158, 158, 0.2)',
-    borderColor: isDarkTheme ? '#ffffff' : '#9e9e9e',
-    color: '#ffffff',
-    boxShadow: isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none',
-    animation: isDarkTheme ? 'shimmer-white 2s ease-in-out infinite' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(158, 158, 158, 0.3)';
-    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)' : '0 0 10px rgba(158, 158, 158, 0.3)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 158, 158, 0.2)';
-    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none';
-  }}
->
-  <span className="text-xs sm:text-sm font-medium flex items-center gap-2">
-    <AlertTriangle size={14} className="sm:w-4 sm:h-4" />
-    {t.spoilerTags}
-  </span>
-  {showSpoilers ? <ChevronUp size={16} className="sm:w-5 sm:h-5" /> : <ChevronDown size={16} className="sm:w-5 sm:h-5" />}
-</button>
+    <button
+      onClick={() => setShowSpoilers(!showSpoilers)}
+      className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition text-left border-2"
+      style={{
+        backgroundColor: '#000000',
+        borderColor: isDarkTheme ? '#ffffff' : '#9e9e9e',
+        color: '#ffffff',
+        boxShadow: isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none',
+        animation: isDarkTheme ? 'shimmer-white 2s ease-in-out infinite' : 'none'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 158, 158, 0.2)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)' : '0 0 10px rgba(158, 158, 158, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = '#000000';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none';
+      }}
+    >
+      <span className="text-sm sm:text-base font-medium flex items-center gap-2">
+        <AlertTriangle size={16} className="sm:w-5 sm:h-5" />
+        {t.spoilerTags}
+      </span>
+      {showSpoilers ? <ChevronUp size={18} className="sm:w-5 sm:h-5" /> : <ChevronDown size={18} className="sm:w-5 sm:h-5" />}
+    </button>
     
- {showSpoilers && (
-  <div className="mt-2 px-3 py-2 text-xs sm:text-sm rounded" style={{
-    backgroundColor: '#6b6b6b',
-    border: '1px solid #333'
-  }}>
-    {spoilerTagsArray.map((spoiler, i, arr) => {
-      const trimmedSpoiler = spoiler.trim();
-      if (!trimmedSpoiler) return null;
-      return (
-        <span key={i}>
-          <GenreTag name={trimmedSpoiler} />
-          {i < arr.length - 1 && ', '}
-        </span>
-      );
-    })}
+    {showSpoilers && (
+      <div className="mt-3 rounded-xl px-4 py-3 text-sm sm:text-base border-2 whitespace-pre-wrap" style={{
+        backgroundColor: '#000000',
+        borderColor: isDarkTheme ? '#ffffff' : '#9e9e9e',
+        color: '#ffffff',
+        boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.2)' : 'none'
+      }}>
+        {spoilerTagsArray.map((spoiler, i, arr) => {
+          const trimmedSpoiler = spoiler.trim();
+          if (!trimmedSpoiler) return null;
+          return (
+            <span key={i}>
+              <GenreTag name={trimmedSpoiler} />
+              {i < arr.length - 1 && ', '}
+            </span>
+          );
+        })}
+      </div>
+    )}
   </div>
 )}
+
+{/* ДИСКЛЕЙМЕР */}
+{work.disclaimer && work.disclaimer.trim() && (
+  <div className="mb-4 sm:mb-6">
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes shimmer-disclaimer {
+        0% { box-shadow: 0 0 10px rgba(45, 1, 10, 0.6), 0 0 20px rgba(45, 1, 10, 0.4); }
+        50% { box-shadow: 0 0 18px rgba(45, 1, 10, 0.9), 0 0 35px rgba(45, 1, 10, 0.6); }
+        100% { box-shadow: 0 0 10px rgba(45, 1, 10, 0.6), 0 0 20px rgba(45, 1, 10, 0.4); }
+      }
+    `}} />
+    
+    <button
+      onClick={() => setShowDisclaimer(!showDisclaimer)}
+      className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition text-left border-2"
+      style={{
+        backgroundColor: '#000000',
+        borderColor: '#750017ff',
+        color: '#ffffff',
+        boxShadow: '0 0 10px rgba(112, 2, 24, 0.6), 0 0 20px rgba(29, 0, 6, 0.4)',
+        animation: 'shimmer-disclaimer 2s ease-in-out infinite'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 0 18px rgba(97, 0, 19, 0.9), 0 0 35px rgba(45, 1, 10, 0.6)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 0 10px rgba(112, 2, 24, 0.6), 0 0 20px rgba(172, 0, 34, 0.4)';
+      }}
+    >
+      <span className="text-sm sm:text-base font-bold flex items-center gap-2">
+        <AlertTriangle size={16} className="sm:w-5 sm:h-5" style={{ color: '#750017ff', filter: 'drop-shadow(0 0 6px rgba(90, 0, 18, 0.8))' }} />
+        <span style={{ color: '#8d001cff', textShadow: '0 0 8px rgba(73, 0, 0, 0.8)' }}>Дисклеймер</span>
+      </span>
+      {showDisclaimer ? <ChevronUp size={18} className="sm:w-5 sm:h-5" style={{ color: '#750017ff' }} /> : <ChevronDown size={18} className="sm:w-5 sm:h-5" style={{ color: '#2d010a' }} />}
+    </button>
+    
+    {showDisclaimer && (
+      <div className="mt-3 rounded-xl px-4 py-3 border-2 whitespace-pre-wrap text-sm sm:text-base"
+        style={{
+          backgroundColor: '#000000',
+          borderColor: '#2d010a',
+          color: '#c7c7c7ff',
+          boxShadow: '0 0 10px rgba(155, 19, 46, 0.4)'
+        }}
+      >
+        {work.disclaimer}
+      </div>
+    )}
   </div>
 )}
 
@@ -1279,83 +1333,147 @@ return (
 </div>
       </main>
 {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
-      {showRatingModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-          <div className="rounded-xl p-6 sm:p-8 max-w-md w-full border-2 relative" style={{
-            background: 'rgba(147, 51, 234, 0.15)',
-            borderColor: '#9333ea',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
-          }}>
-            <button
-              onClick={() => setShowRatingModal(false)}
-              className="absolute top-4 right-4 text-purple-300 hover:text-purple-100 transition"
-            >
-              <X size={24} />
-            </button>
-            
-            <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{
-              color: '#c084fc',
-              textShadow: '0 0 15px rgba(192, 132, 252, 0.8)'
-            }}>
-              Оцените работу
-            </h3>
-            
-            {!currentUser ? (
-              <p className="text-center py-4" style={{ color: '#e9d5ff' }}>
-                Войдите, чтобы оставить оценку
-              </p>
-            ) : (
-              <>
-                <p className="mb-6 text-sm sm:text-base" style={{ color: '#e9d5ff' }}>
-                  {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
-                </p>
-                
-                <div className="grid grid-cols-5 gap-2 sm:gap-3">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => submitRating(num)}
-                      className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
-                        userRating === num
-                          ? 'bg-purple-600 text-white'
-                          : 'text-purple-200 hover:text-white'
-                      }`}
-                      style={userRating === num ? {
-                        background: 'rgba(147, 51, 234, 0.8)',
-                        boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
-                      } : {
-                        background: 'rgba(147, 51, 234, 0.2)',
-                        border: '1px solid rgba(147, 51, 234, 0.4)'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (userRating !== num) {
-                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
-                          e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (userRating !== num) {
-                          e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }
-                      }}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-                
-                {totalRatings > 0 && (
-                  <p className="text-center mt-4 text-xs sm:text-sm" style={{ color: '#d8b4fe' }}>
-                    Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+{showRatingModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+    <div className="rounded-xl p-6 sm:p-8 max-w-md w-full relative" style={{
+      background: isDarkTheme 
+        ? 'rgba(147, 51, 234, 0.15)'
+        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: isDarkTheme 
+        ? '2px solid #9333ea'
+        : '3px solid transparent',
+      borderRadius: isDarkTheme ? '12px' : '16px',
+      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
+      backdropFilter: 'blur(20px)',
+      boxShadow: isDarkTheme 
+        ? '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+    }}>
+      {!isDarkTheme && (
+        <div style={{
+          position: 'absolute',
+          inset: '-3px',
+          borderRadius: '16px',
+          padding: '3px',
+          background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+          pointerEvents: 'none',
+          zIndex: -1
+        }} />
       )}
+
+      <button
+        onClick={() => setShowRatingModal(false)}
+        className="absolute top-4 right-4 transition"
+        style={{
+          color: isDarkTheme ? '#c084fc' : '#65635d'
+        }}
+      >
+        <X size={24} />
+      </button>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shimmerRating {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+      `}} />
+      
+      <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center" style={{
+        color: isDarkTheme ? '#c084fc' : 'transparent',
+        textShadow: isDarkTheme ? '0 0 15px rgba(192, 132, 252, 0.8)' : 'none',
+        background: !isDarkTheme ? 'linear-gradient(90deg, #65635d 0%, #ffffff 50%, #65635d 100%)' : 'none',
+        backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
+        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
+        backgroundClip: !isDarkTheme ? 'text' : 'unset',
+        animation: !isDarkTheme ? 'shimmerRating 3s linear infinite' : 'none'
+      }}>
+        Оцените работу
+      </h3>
+      
+      {!currentUser ? (
+        <p className="text-center py-4" style={{ 
+          color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
+        }}>
+          Войдите, чтобы оставить оценку
+        </p>
+      ) : (
+        <>
+          <p className="mb-6 text-sm sm:text-base" style={{ 
+            color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
+          }}>
+            {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+          </p>
+          
+          <div className="grid grid-cols-5 gap-2 sm:gap-3">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <button
+                key={num}
+                onClick={() => submitRating(num)}
+                className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
+                  userRating === num
+                    ? 'bg-purple-600 text-white'
+                    : 'text-purple-200 hover:text-white'
+                }`}
+                style={userRating === num ? (
+                  isDarkTheme ? {
+                    background: 'rgba(147, 51, 234, 0.8)',
+                    boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
+                  } : {
+                    background: '#65635d',
+                    color: '#ffffff'
+                  }
+                ) : (
+                  isDarkTheme ? {
+                    background: 'rgba(147, 51, 234, 0.2)',
+                    border: '1px solid rgba(147, 51, 234, 0.4)'
+                  } : {
+                    background: 'rgba(101, 99, 93, 0.2)',
+                    border: '1px solid rgba(101, 99, 93, 0.4)',
+                    color: '#c9c6bb'
+                  }
+                )}
+                onMouseEnter={(e) => {
+                  if (userRating !== num) {
+                    if (isDarkTheme) {
+                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
+                      e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
+                    } else {
+                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.4)';
+                    }
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (userRating !== num) {
+                    if (isDarkTheme) {
+                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    } else {
+                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.2)';
+                    }
+                  }
+                }}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+          
+          {totalRatings > 0 && (
+            <p className="text-center mt-4 text-xs sm:text-sm" style={{ 
+              color: isDarkTheme ? '#d8b4fe' : '#c9c6bb'
+            }}>
+              Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+)}
 
 {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
 {showConfirmModal && (
