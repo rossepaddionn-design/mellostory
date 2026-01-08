@@ -75,6 +75,12 @@ const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
 const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 const [changeEmailForm, setChangeEmailForm] = useState({ newEmail: '', password: '' });
 const [changePasswordForm, setChangePasswordForm] = useState({ currentPassword: '', newPassword: '' });
+const [showCalendarModal, setShowCalendarModal] = useState(false);
+const [showEventModal, setShowEventModal] = useState(false);
+const [selectedDate, setSelectedDate] = useState(null);
+const [eventText, setEventText] = useState('');
+const [calendarEvents, setCalendarEvents] = useState({});
+const [currentMonth, setCurrentMonth] = useState(new Date());
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
@@ -82,6 +88,88 @@ const showConfirm = (message, action = null) => {
   setShowConfirmModal(true);
 };
 
+const loadCalendarEvents = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('calendar_events')
+      .eq('id', 1)
+      .single();
+    
+    if (data?.calendar_events) {
+      setCalendarEvents(typeof data.calendar_events === 'string' 
+        ? JSON.parse(data.calendar_events) 
+        : data.calendar_events);
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки событий:', err);
+  }
+};
+
+const saveEvent = async () => {
+  if (!eventText.trim()) {
+    showConfirm('Введите текст события!');
+    return;
+  }
+
+  const dateKey = selectedDate.toISOString().split('T')[0];
+  const newEvents = { ...calendarEvents };
+  
+  if (!newEvents[dateKey]) {
+    newEvents[dateKey] = [];
+  }
+  
+  if (newEvents[dateKey].length >= 10) {
+    showConfirm('Максимум 10 событий на день!');
+    return;
+  }
+  
+  newEvents[dateKey].push(eventText);
+
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, calendar_events: newEvents }, { onConflict: 'id' });
+
+  if (error) {
+    showConfirm('Ошибка: ' + error.message);
+  } else {
+    setCalendarEvents(newEvents);
+    setEventText('');
+    setShowEventModal(false);
+    showConfirm('Событие добавлено!');
+  }
+};
+
+const deleteEvent = async (eventIndex) => {
+  const dateKey = selectedDate.toISOString().split('T')[0];
+  const newEvents = { ...calendarEvents };
+  newEvents[dateKey].splice(eventIndex, 1);
+  
+  if (newEvents[dateKey].length === 0) {
+    delete newEvents[dateKey];
+  }
+
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, calendar_events: newEvents }, { onConflict: 'id' });
+
+  if (error) {
+    showConfirm('Ошибка: ' + error.message);
+  } else {
+    setCalendarEvents(newEvents);
+  }
+};
+
+const getDaysInMonth = (date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDayOfWeek = firstDay.getDay();
+  
+  return { daysInMonth, startingDayOfWeek };
+};
 
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
@@ -744,6 +832,10 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [showSnow]); // ← ДОБАВИЛИ ЗАВИСИМОСТЬ
 
+useEffect(() => {
+  loadCalendarEvents();
+}, []);
+
 return (
     <>
       <link rel="preload" href="/images/main-bg.jpg" as="image" />
@@ -1369,6 +1461,42 @@ background: isDarkTheme
         </div>
 </main>
 
+{/* РАСПИСАНИЕ ОБНОВЛЕНИЙ */}
+<div className="max-w-5xl mx-auto mt-8 sm:mt-12 px-4 relative z-0">
+  <button
+    onClick={() => {
+      setShowCalendarModal(true);
+      loadCalendarEvents();
+    }}
+    className="w-full py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] text-base sm:text-xl relative overflow-hidden flex items-center justify-center gap-3"
+    style={{
+      background: isDarkTheme 
+        ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
+        : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
+      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
+      backdropFilter: 'blur(20px)',
+      boxShadow: isDarkTheme 
+        ? '0 0 30px rgba(147, 51, 234, 0.4)'
+        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
+      color: isDarkTheme ? '#b3e7ef' : '#c8c0c2',
+      fontFamily: "'Playfair Display', Georgia, serif"
+    }}
+  >
+    <span>Расписание обновлений сайта и работ</span>
+    <svg 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2"
+      className="flex-shrink-0"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+</div>
+
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
 <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{
@@ -1478,11 +1606,19 @@ background: isDarkTheme
             <p className="text-gray-400 text-sm">
               Скоро здесь появится работа
             </p>
+          
           </div>
         )}
       </div>
     ))}
   </div>
+    {/* НОВЫЙ ТЕКСТ ДОБАВЛЯЕТСЯ ЗДЕСЬ */}
+  <p className="text-center mt-6 text-xs sm:text-sm opacity-70" style={{
+    color: isDarkTheme ? '#b3e7ef' : '#c8c0c2',
+    fontFamily: "'Playfair Display', Georgia, serif"
+  }}>
+    Обновление рейтинга и статистики просмотров производится один раз в три дня на основе суммарных пользовательских оценок. Раздел «Популярные работы» обновляется еженедельно.
+  </p>
 </div>
 
 {/* НОВОСТИ */}
@@ -1759,106 +1895,84 @@ background: isDarkTheme
 {/* AUTH MODAL - СВЕТЛАЯ ТЕМА */}
 {showAuthModal && !isDarkTheme && (
   <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    <div className="rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-8 border-2" style={{
+      background: 'rgba(0, 0, 0, 0.95)',
+      borderColor: '#c9c6bb',
+      backdropFilter: 'blur(10px)'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic',
-          textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
+      <div className="flex justify-center items-center mb-4 sm:mb-6 relative">
+        <h2 className="text-xl sm:text-2xl font-bold" style={{
+          color: '#c9c6bb'
         }}>
           {authMode === 'login' ? t.login : t.register}
         </h2>
         <button onClick={() => {
           setShowAuthModal(false);
           setAgreedToPrivacy(false);
-        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
+        }} className="text-gray-400 hover:text-white absolute right-0">
           <X size={24} />
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {authMode === 'register' && (
           <div>
-            <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>{t.nickname}</label>
+            <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.nickname}</label>
             <input
               type="text"
               placeholder={t.nickname}
               value={authForm.nickname}
               onChange={(e) => setAuthForm({...authForm, nickname: e.target.value})}
-              className="w-full rounded px-4 py-3 focus:outline-none"
+              className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
               style={{ 
-                background: 'rgba(0, 0, 0, 0.4)',
-                borderColor: 'rgba(180, 154, 95, 0.4)',
-                border: '1px solid rgba(180, 154, 95, 0.4)',
-                color: '#c9c6bb'
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderColor: '#c9c6bb'
               }}
               onFocus={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
-              onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(180, 154, 95, 0.4)'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
             />
           </div>
         )}
 
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>{t.email}</label>
+          <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.email}</label>
           <input
             type="email"
             placeholder={t.email}
             value={authForm.email}
             onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-            className="w-full rounded px-4 py-3 focus:outline-none"
+            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
             style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderColor: '#c9c6bb'
             }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
-            onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(180, 154, 95, 0.4)'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>{t.password}</label>
+          <label className="block text-gray-300 text-sm mb-1 sm:mb-2">{t.password}</label>
           <input
             type="password"
             placeholder={t.password}
             value={authForm.password}
             onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
-            className="w-full rounded px-4 py-3 focus:outline-none"
+            className="w-full border rounded px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none text-white"
             style={{
               background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
+              borderColor: '#c9c6bb'
             }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
-            onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(180, 154, 95, 0.4)'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#c9c6bb'}
           />
         </div>
 
         {authMode === 'register' && (
           <div className="space-y-3">
-            <div className="flex items-start gap-2 p-3 rounded-lg" style={{
+            <div className="flex items-start gap-2 p-3 rounded-lg border" style={{
               background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(180, 154, 95, 0.3)'
+              borderColor: '#c9c6bb'
             }}>
               <input
                 type="checkbox"
@@ -1868,17 +1982,17 @@ background: isDarkTheme
                 className="mt-1 w-4 h-4 cursor-pointer flex-shrink-0"
                 style={{ accentColor: '#c9c6bb' }}
               />
-              <label htmlFor="privacy-checkbox-light" className="text-sm cursor-pointer" style={{ color: '#d8c5a2' }}>
+              <label htmlFor="privacy-checkbox-light" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
                 Я согласен с{' '}
-                <Link href="/privacy" className="hover:text-white underline" style={{ color: '#c2ab75' }} target="_blank">
+                <Link href="/privacy" className="hover:text-white underline" style={{ color: '#c9c6bb' }} target="_blank">
                   Политикой конфиденциальности
                 </Link>
               </label>
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-lg" style={{
+            <div className="flex items-start gap-2 p-3 rounded-lg border" style={{
               background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(180, 154, 95, 0.3)'
+              borderColor: '#c9c6bb'
             }}>
               <input
                 type="checkbox"
@@ -1888,9 +2002,9 @@ background: isDarkTheme
                 className="mt-1 w-4 h-4 cursor-pointer flex-shrink-0"
                 style={{ accentColor: '#c9c6bb' }}
               />
-              <label htmlFor="terms-checkbox-light" className="text-sm cursor-pointer" style={{ color: '#d8c5a2' }}>
+              <label htmlFor="terms-checkbox-light" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
                 Я согласен с{' '}
-                <Link href="/terms" className="hover:text-white underline" style={{ color: '#c2ab75' }} target="_blank">
+                <Link href="/terms" className="hover:text-white underline" style={{ color: '#c9c6bb' }} target="_blank">
                   Пользовательским соглашением
                 </Link>
               </label>
@@ -1900,17 +2014,10 @@ background: isDarkTheme
 
         <button
           onClick={authMode === 'login' ? handleLogin : handleRegister}
-          className="w-full py-3 rounded-lg font-bold transition"
+          className="w-full py-2 sm:py-3 rounded-lg font-bold transition text-sm sm:text-base"
           style={{
-            background: '#d8c5a2',
-            color: '#000000',
-            boxShadow: '0 0 15px rgba(216, 197, 162, 0.4)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(216, 197, 162, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(216, 197, 162, 0.4)';
+            background: '#c9c6bb',
+            color: '#000000'
           }}
         >
           {authMode === 'login' ? t.login : t.register}
@@ -1930,8 +2037,7 @@ background: isDarkTheme
                 showConfirm('Проверьте почту! Мы отправили ссылку для восстановления пароля.');
               }
             }}
-            className="w-full text-xs"
-            style={{ color: '#c2ab75' }}
+            className="w-full text-gray-400 hover:text-white text-xs"
           >
             Забыли пароль?
           </button>
@@ -1942,14 +2048,13 @@ background: isDarkTheme
             setAuthMode(authMode === 'login' ? 'register' : 'login');
             setAgreedToPrivacy(false);
           }}
-          className="w-full text-sm"
-          style={{ color: '#c2ab75' }}
+          className="w-full text-gray-400 hover:text-white text-xs sm:text-sm"
         >
           {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
         </button>
 
         {authMode === 'register' && (
-          <p className="text-xs text-center mt-2" style={{ color: '#c2ab75' }}>
+          <p className="text-xs text-gray-400 text-center mt-2">
             Заполнив все графы данными не нажимайте несколько раз по кнопке "Регистрация" - только один раз, иначе у вас несколько раз проходит регистрация. Чтобы подтвердить аккаунт проверьте почту от имени Supabase.
           </p>
         )}
@@ -2882,6 +2987,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         >
           Сменить email
         </button>
+        <p className="text-xs text-gray-400 text-center mt-2">
+  Для подтверждения аккаунта проверьте письмо от Supabase на электронной почте.
+</p>
 
         {/* КНОПКА СМЕНЫ ПАРОЛЯ */}
         <button
@@ -2908,6 +3016,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
           Сменить пароль
         </button>
 
+        <p className="text-xs text-gray-400 text-center mt-2">
+  Изменение пароля через личный кабинет производится без дополнительного подтверждения по электронной почте.
+</p>
         {/* КНОПКА УДАЛЕНИЯ */}
         <button
           onClick={() => {
@@ -3060,6 +3171,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         >
           Сменить email
         </button>
+<p className="text-xs text-center mt-2" style={{ color: '#c9c6bb' }}>
+  Для подтверждения аккаунта проверьте письмо от Supabase на электронной почте.
+</p>
 
         <button
           onClick={() => {
@@ -3084,7 +3198,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         >
           Сменить пароль
         </button>
-
+<p className="text-xs text-center mt-2" style={{ color: '#c9c6bb' }}>
+  Изменение пароля через личный кабинет производится без дополнительного подтверждения по электронной почте.
+</p>
         <button
           onClick={() => {
             setShowDeleteAccountModal(true);
@@ -3608,7 +3724,7 @@ onClick={async () => {
     backdropFilter: 'blur(10px)'
   }}>
     <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #71141f 0%, #4a0d15 100%)',
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
       border: '3px solid transparent',
       borderRadius: '16px',
       backgroundClip: 'padding-box',
@@ -3619,7 +3735,7 @@ onClick={async () => {
         inset: '-3px',
         borderRadius: '16px',
         padding: '3px',
-        background: 'linear-gradient(135deg, #b49a5f 0%, #000000 100%)',
+       background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
         WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
         WebkitMaskComposite: 'xor',
         maskComposite: 'exclude',
@@ -4042,6 +4158,262 @@ onClick={async () => {
           Отмена
         </button>
       </div>
+    </div>
+  </div>
+)}
+
+{/* CALENDAR MODAL - ТЕМНАЯ ТЕМА */}
+{showCalendarModal && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-3xl p-6 border-2 max-h-[90vh] overflow-y-auto" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Расписание обновлений</h2>
+        <button onClick={() => setShowCalendarModal(false)} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 hover:bg-purple-500/20 rounded">
+          ←
+        </button>
+        <span className="text-lg font-bold" style={{ color: '#b3e7ef' }}>
+          {currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
+        </span>
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 hover:bg-purple-500/20 rounded">
+          →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-2">
+        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+          <div key={day} className="text-center font-bold text-sm" style={{ color: '#9370db' }}>{day}</div>
+        ))}
+        
+        {(() => {
+          const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
+          const days = [];
+          
+          for (let i = 0; i < (startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1); i++) {
+            days.push(<div key={`empty-${i}`} />);
+          }
+          
+          for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+            const dateKey = date.toISOString().split('T')[0];
+            const hasEvents = calendarEvents[dateKey]?.length > 0;
+            
+            days.push(
+              <button
+                key={day}
+onClick={() => {
+  setSelectedDate(date);
+  setShowEventModal(true); // ← убрали проверку isAdmin
+}}
+                className="aspect-square rounded-lg flex items-center justify-center text-sm transition"
+                style={{
+                  background: hasEvents ? 'rgba(91, 1, 32, 0.5)' : 'rgba(147, 112, 219, 0.1)',
+                  border: hasEvents ? '2px solid #5b0120' : '1px solid rgba(147, 112, 219, 0.3)',
+                  boxShadow: hasEvents ? '0 0 15px rgba(91, 1, 32, 0.6)' : 'none',
+                  color: '#ffffff'
+                }}
+              >
+                {day}
+              </button>
+            );
+          }
+          
+          return days;
+        })()}
+      </div>
+
+      {!isAdmin && (
+        <div className="mt-6 p-4 rounded-lg" style={{ background: 'rgba(147, 112, 219, 0.2)' }}>
+          <p className="text-sm text-gray-300">Нажмите на дату, чтобы увидеть запланированные события</p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+{/* CALENDAR MODAL - СВЕТЛАЯ ТЕМА */}
+{showCalendarModal && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto overflow-x-hidden" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '3px solid transparent',
+      borderRadius: '24px',
+      backgroundClip: 'padding-box',
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '24px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+      
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Расписание обновлений</h2>
+        <button onClick={() => setShowCalendarModal(false)} style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 rounded" style={{ color: '#c9c6bb' }}>
+          ←
+        </button>
+        <span className="text-lg font-bold" style={{ color: '#c9c6bb' }}>
+          {currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
+        </span>
+        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 rounded" style={{ color: '#c9c6bb' }}>
+          →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-2">
+        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+          <div key={day} className="text-center font-bold text-sm" style={{ color: '#c9c6bb' }}>{day}</div>
+        ))}
+        
+        {(() => {
+          const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
+          const days = [];
+          
+          for (let i = 0; i < (startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1); i++) {
+            days.push(<div key={`empty-${i}`} />);
+          }
+          
+          for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+            const dateKey = date.toISOString().split('T')[0];
+            const hasEvents = calendarEvents[dateKey]?.length > 0;
+            
+            days.push(
+              <button
+                key={day}
+onClick={() => {
+  setSelectedDate(date);
+  setShowEventModal(true); // ← убрали проверку isAdmin
+                }}
+                className="aspect-square rounded-lg flex items-center justify-center text-sm transition"
+                style={{
+                  background: hasEvents ? 'rgba(91, 1, 32, 0.5)' : 'rgba(201, 198, 187, 0.1)',
+                  border: hasEvents ? '2px solid #5b0120' : '1px solid rgba(201, 198, 187, 0.3)',
+                  boxShadow: hasEvents ? '0 0 15px rgba(91, 1, 32, 0.6)' : 'none',
+                  color: '#c9c6bb'
+                }}
+              >
+                {day}
+              </button>
+            );
+          }
+          
+          return days;
+        })()}
+      </div>
+
+      {!isAdmin && (
+<div className="mt-6 p-4 rounded-lg" style={{ 
+  background: 'rgba(201, 198, 187, 0.2)',
+  border: '1px solid rgba(201, 198, 187, 0.3)'
+}}>
+  <p className="text-sm" style={{ color: '#c9c6bb' }}>
+    Нажмите на дату, чтобы увидеть запланированные события
+  </p>
+</div>
+      )}
+    </div>
+  </div>
+)}
+
+{/* EVENT MODAL - для всех пользователей */}
+{showEventModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-[60] flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: isDarkTheme ? 'rgba(147, 51, 234, 0.15)' : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      borderColor: isDarkTheme ? '#9333ea' : '#c9c6bb',
+      backdropFilter: 'blur(20px)',
+      boxShadow: isDarkTheme ? '0 0 30px rgba(147, 51, 234, 0.6)' : 'inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold" style={{ 
+          color: isDarkTheme ? '#b3e7ef' : '#c9c6bb' 
+        }}>
+          {selectedDate?.toLocaleDateString('ru-RU')}
+        </h3>
+        <button onClick={() => setShowEventModal(false)} style={{ color: isDarkTheme ? '#ffffff' : '#c9c6bb' }}>
+          <X size={20} />
+        </button>
+      </div>
+
+      {/* СПИСОК СОБЫТИЙ - ВИДЯТ ВСЕ */}
+      <div className="space-y-3 mb-4">
+        {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length > 0 ? (
+          calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event, idx) => (
+            <div key={idx} className="flex justify-between items-center p-2 rounded" style={{
+              background: 'rgba(91, 1, 32, 0.3)',
+              border: '1px solid #5b0120'
+            }}>
+              <span className="text-sm" style={{ color: '#ffffff' }}>{event}</span>
+              {isAdmin && (
+                <button onClick={() => deleteEvent(idx)} className="text-red-500 hover:text-red-400">
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-sm" style={{ color: isDarkTheme ? '#9ca3af' : '#c9c6bb' }}>
+            На эту дату событий нет
+          </p>
+        )}
+      </div>
+
+      {/* ФОРМА ДОБАВЛЕНИЯ - ТОЛЬКО ДЛЯ АДМИНА */}
+      {isAdmin && (
+        <>
+          <textarea
+            value={eventText}
+            onChange={(e) => setEventText(e.target.value)}
+            placeholder="Введите событие..."
+            rows={3}
+            className="w-full rounded px-3 py-2 mb-4 text-sm"
+            style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: isDarkTheme ? '1px solid #9333ea' : '1px solid #c9c6bb',
+              color: '#ffffff'
+            }}
+          />
+
+          <button
+            onClick={saveEvent}
+            className="w-full py-2 rounded font-bold"
+            style={{
+              background: isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb',
+              color: isDarkTheme ? '#ffffff' : '#000000'
+            }}
+          >
+            Сохранить событие
+          </button>
+        </>
+      )}
     </div>
   </div>
 )}
