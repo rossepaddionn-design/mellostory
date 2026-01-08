@@ -81,13 +81,6 @@ const [selectedDate, setSelectedDate] = useState(null);
 const [eventText, setEventText] = useState('');
 const [calendarEvents, setCalendarEvents] = useState({});
 const [currentMonth, setCurrentMonth] = useState(new Date());
-const [showPageBgEditor, setShowPageBgEditor] = useState(false);
-const [editingTheme, setEditingTheme] = useState('dark'); // 'dark' или 'light'
-const [previewDevice, setPreviewDevice] = useState('desktop'); // 'desktop' или 'mobile'
-const [darkBgImage, setDarkBgImage] = useState(null);
-const [lightBgImage, setLightBgImage] = useState(null);
-const [darkBgPosition, setDarkBgPosition] = useState({ x: 50, y: 50 });
-const [lightBgPosition, setLightBgPosition] = useState({ x: 50, y: 50 });
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
@@ -345,48 +338,42 @@ const checkUser = async () => {
     }
   };
 
-const loadSettings = async () => {
-  try {
-    const cachedColor = localStorage.getItem('titleColor');
-    if (cachedColor) {
-      setTitleColor(cachedColor);
-    }
-
-    const { data, error } = await supabase
-      .from('site_settings')
-      .select('title_color, news_text, about_text, popular_works, dark_bg_url, dark_bg_position, light_bg_url, light_bg_position')
-      .eq('id', 1)
-      .maybeSingle();
-    
-    if (data && !error) {
-      if (data.title_color && data.title_color.trim() !== '') {
-        setTitleColor(data.title_color);
-        localStorage.setItem('titleColor', data.title_color);
+  const loadSettings = async () => {
+    try {
+      const cachedColor = localStorage.getItem('titleColor');
+      if (cachedColor) {
+        setTitleColor(cachedColor);
       }
-      if (data.news_text) setNewsText(data.news_text);
-      if (data.about_text) setAboutText(data.about_text);
+
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('title_color, news_text, about_text, popular_works')
+        .eq('id', 1)
+        .maybeSingle();
       
-      // ЗАГРУЖАЕМ ФОНЫ
-      if (data.dark_bg_url) setDarkBgImage(data.dark_bg_url);
-      if (data.dark_bg_position) setDarkBgPosition(data.dark_bg_position);
-      if (data.light_bg_url) setLightBgImage(data.light_bg_url);
-      if (data.light_bg_position) setLightBgPosition(data.light_bg_position);
-      
-      if (data.popular_works) {
-        try {
-          const parsed = typeof data.popular_works === 'string' 
-            ? JSON.parse(data.popular_works) 
-            : data.popular_works;
-          setPopularWorks(parsed);
-        } catch (e) {
-          console.error('Ошибка парсинга popular_works:', e);
+      if (data && !error) {
+        if (data.title_color && data.title_color.trim() !== '') {
+          setTitleColor(data.title_color);
+          localStorage.setItem('titleColor', data.title_color);
+        }
+        if (data.news_text) setNewsText(data.news_text);
+        if (data.about_text) setAboutText(data.about_text);
+        
+        if (data.popular_works) {
+          try {
+            const parsed = typeof data.popular_works === 'string' 
+              ? JSON.parse(data.popular_works) 
+              : data.popular_works;
+            setPopularWorks(parsed);
+          } catch (e) {
+            console.error('Ошибка парсинга popular_works:', e);
+          }
         }
       }
+    } catch (err) {
+      console.error('Ошибка загрузки настроек:', err);
     }
-  } catch (err) {
-    console.error('Ошибка загрузки настроек:', err);
-  }
-};
+  };
 
   const loadManagementData = async () => {
     if (!isAdmin) return;
@@ -940,13 +927,9 @@ return (
 <div 
   className="fixed inset-0 -z-10"
   style={{
-    backgroundColor: '#000000',
-    backgroundImage: isDarkTheme && darkBgImage ? `url(${darkBgImage})` : !isDarkTheme && lightBgImage ? `url(${lightBgImage})` : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: isDarkTheme ? `${darkBgPosition.x}% ${darkBgPosition.y}%` : `${lightBgPosition.x}% ${lightBgPosition.y}%`,
-    backgroundRepeat: 'no-repeat'
-  }}
-/>
+    backgroundColor: isDarkTheme ? '#000000' : '#000000',
+        }}
+      />
 
 {/* HEADER */}
 <div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
@@ -1490,7 +1473,7 @@ background: isDarkTheme
       background: isDarkTheme 
         ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
         : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #afafa9ff',
+      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
       backdropFilter: 'blur(20px)',
       boxShadow: isDarkTheme 
         ? '0 0 30px rgba(147, 51, 234, 0.4)'
@@ -3322,17 +3305,6 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     </div>
 
     <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
-    <button
-  onClick={() => setShowPageBgEditor(true)}
-  className="w-full bg-purple-600 hover:bg-purple-700 py-2 sm:py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <circle cx="8.5" cy="8.5" r="1.5"/>
-    <path d="M21 15l-5-5L5 21"/>
-  </svg>
-  Фон страницы
-</button>
       <button
         onClick={() => {
           setShowManagementModal(true);
@@ -4441,268 +4413,6 @@ onClick={() => {
           >
             Сохранить событие
           </button>
-        </>
-      )}
-    </div>
-  </div>
-)}
-
-{showPageBgEditor && isAdmin && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-[999] flex items-center justify-center p-4">
-    <div className="bg-gray-900 rounded-2xl w-full max-w-4xl p-6 border-2 border-purple-600 max-h-[95vh] overflow-y-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-purple-500">Редактор фона страницы</h2>
-        <button onClick={() => setShowPageBgEditor(false)} className="text-gray-400 hover:text-white">
-          <X size={24} />
-        </button>
-      </div>
-
-      {/* ВКЛАДКИ ТЕМ */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setEditingTheme('dark')}
-          className={`flex-1 py-3 rounded-lg font-bold transition ${
-            editingTheme === 'dark' ? 'bg-purple-600' : 'bg-gray-700'
-          }`}
-        >
-          🌙 Темная тема
-        </button>
-        <button
-          onClick={() => setEditingTheme('light')}
-          className={`flex-1 py-3 rounded-lg font-bold transition ${
-            editingTheme === 'light' ? 'bg-purple-600' : 'bg-gray-700'
-          }`}
-        >
-          ☀️ Светлая тема
-        </button>
-      </div>
-
-      {/* ЗАГРУЗКА */}
-      <div className="mb-6">
-        <label className="block w-full py-4 border-2 border-dashed border-purple-500 rounded-lg text-center cursor-pointer hover:bg-purple-500/10">
-          <input 
-            type="file" 
-            accept="image/*" 
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  if (editingTheme === 'dark') {
-                    setDarkBgImage(ev.target.result);
-                  } else {
-                    setLightBgImage(ev.target.result);
-                  }
-                };
-                reader.readAsDataURL(file);
-              }
-            }}
-          />
-          <svg className="mx-auto mb-2" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <span className="text-purple-400">Загрузить фон для {editingTheme === 'dark' ? 'темной' : 'светлой'} темы</span>
-        </label>
-      </div>
-
-      {((editingTheme === 'dark' && darkBgImage) || (editingTheme === 'light' && lightBgImage)) && (
-        <>
-          <div className="mb-6 space-y-4">
-            {/* СЛАЙДЕРЫ */}
-            <div>
-              <label className="block text-white mb-2 text-sm">
-                Горизонтальное положение: {editingTheme === 'dark' ? darkBgPosition.x : lightBgPosition.x}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={editingTheme === 'dark' ? darkBgPosition.x : lightBgPosition.x}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  if (editingTheme === 'dark') {
-                    setDarkBgPosition({...darkBgPosition, x: val});
-                  } else {
-                    setLightBgPosition({...lightBgPosition, x: val});
-                  }
-                }}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                style={{accentColor: '#9333ea'}}
-              />
-            </div>
-
-            <div>
-              <label className="block text-white mb-2 text-sm">
-                Вертикальное положение: {editingTheme === 'dark' ? darkBgPosition.y : lightBgPosition.y}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={editingTheme === 'dark' ? darkBgPosition.y : lightBgPosition.y}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  if (editingTheme === 'dark') {
-                    setDarkBgPosition({...darkBgPosition, y: val});
-                  } else {
-                    setLightBgPosition({...lightBgPosition, y: val});
-                  }
-                }}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                style={{accentColor: '#9333ea'}}
-              />
-            </div>
-          </div>
-
-          {/* ПРЕВЬЮ */}
-          <div className="mb-6">
-            <div className="bg-gray-800 rounded-lg p-4 border-2 border-purple-500">
-              <div className="grid grid-cols-2 gap-4">
-                {/* ПК */}
-                <div>
-                  <p className="text-white text-sm mb-2 text-center">💻 ПК</p>
-                  <div 
-                    className="w-full h-48 rounded border-2 border-gray-600"
-                    style={{
-                      backgroundImage: editingTheme === 'dark' ? `url(${darkBgImage})` : `url(${lightBgImage})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: editingTheme === 'dark' 
-                        ? `${darkBgPosition.x}% ${darkBgPosition.y}%` 
-                        : `${lightBgPosition.x}% ${lightBgPosition.y}%`,
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  />
-                </div>
-
-                {/* МОБИЛЬНЫЙ */}
-                <div>
-                  <p className="text-white text-sm mb-2 text-center">📱 Мобильный</p>
-                  <div className="flex justify-center">
-                    <div 
-                      className="w-32 h-48 rounded border-2 border-gray-600"
-                      style={{
-                        backgroundImage: editingTheme === 'dark' ? `url(${darkBgImage})` : `url(${lightBgImage})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: editingTheme === 'dark' 
-                          ? `${darkBgPosition.x}% ${darkBgPosition.y}%` 
-                          : `${lightBgPosition.x}% ${lightBgPosition.y}%`,
-                        backgroundRepeat: 'no-repeat'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* БЫСТРЫЕ ПОЗИЦИИ */}
-          <div className="mb-6">
-            <p className="text-white text-sm mb-2">Быстрые позиции:</p>
-            <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 0, y: 0});
-                else setLightBgPosition({x: 0, y: 0});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ↖️ Верх-лево
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 50, y: 0});
-                else setLightBgPosition({x: 50, y: 0});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ⬆️ Верх-центр
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 100, y: 0});
-                else setLightBgPosition({x: 100, y: 0});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ↗️ Верх-право
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 0, y: 50});
-                else setLightBgPosition({x: 0, y: 50});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ⬅️ Центр-лево
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 50, y: 50});
-                else setLightBgPosition({x: 50, y: 50});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                🎯 Центр
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 100, y: 50});
-                else setLightBgPosition({x: 100, y: 50});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ➡️ Центр-право
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 0, y: 100});
-                else setLightBgPosition({x: 0, y: 100});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ↙️ Низ-лево
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 50, y: 100});
-                else setLightBgPosition({x: 50, y: 100});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ⬇️ Низ-центр
-              </button>
-              <button onClick={() => {
-                if (editingTheme === 'dark') setDarkBgPosition({x: 100, y: 100});
-                else setLightBgPosition({x: 100, y: 100});
-              }} className="bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm">
-                ↘️ Низ-право
-              </button>
-            </div>
-          </div>
-
-          {/* КНОПКИ */}
-          <div className="flex gap-4">
-            <button
-              onClick={() => {
-                if (editingTheme === 'dark') {
-                  setDarkBgImage(null);
-                  setDarkBgPosition({ x: 50, y: 50 });
-                } else {
-                  setLightBgImage(null);
-                  setLightBgPosition({ x: 50, y: 50 });
-                }
-              }}
-              className="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-lg font-bold"
-            >
-              🗑️ Удалить
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  const { error } = await supabase
-                    .from('site_settings')
-                    .upsert({ 
-                      id: 1, 
-                      dark_bg_url: darkBgImage,
-                      dark_bg_position: darkBgPosition,
-                      light_bg_url: lightBgImage,
-                      light_bg_position: lightBgPosition
-                    }, { onConflict: 'id' });
-
-                  if (error) {
-                    showConfirm('Ошибка: ' + error.message);
-                  } else {
-                    showConfirm('✅ Фон сохранён! Перезагрузи страницу.');
-                    setShowPageBgEditor(false);
-                  }
-                } catch (err) {
-                  showConfirm('Ошибка: ' + err.message);
-                }
-              }}
-              className="flex-1 bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold"
-            >
-              💾 Сохранить
-            </button>
-          </div>
         </>
       )}
     </div>
