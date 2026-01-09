@@ -290,7 +290,7 @@ return (
     <button
       key={cat.key}
       onClick={() => setCategory(cat.key)}
-      className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition relative text-sm sm:text-base"
+      className="px-2sm:px-6 py-1 sm:py-2 rounded-lg transition relative text-sm sm:text-base"
       style={{
         background: category === cat.key 
           ? (isDarkTheme ? 'rgba(147, 112, 219, 0.5)' : 'rgba(194, 194, 168, 0.5)')
