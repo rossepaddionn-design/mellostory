@@ -320,7 +320,7 @@ return (
           </div>
 
 {category === 'series' ? (
-  <div className="grid grid-cols-3 gap-6">
+ <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
     {series.map(s => (
       <div key={s.id} className="relative">
         {/* Карточка серии */}
@@ -392,7 +392,7 @@ return (
     ))}
   </div>
 ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {filteredWorks.map(work => (
                 <div 
                   key={work.id} 
@@ -498,7 +498,7 @@ return (
           />
         )}
 
-        <div className="grid grid-cols-4 gap-4 mt-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
           {seriesWorks.map(work => (
             <div 
               key={work.id} 
@@ -590,14 +590,15 @@ return (
                 borderRadius: '8px'
               }}
             >
-              <div 
-                className="flex flex-col md:grid md:grid-cols-[260px_1fr] gap-6 p-6 max-h-[85vh] overflow-y-auto" 
-                style={{
-                  background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
-                  borderRadius: '8px'
-                }}
-              >
-                <div className="aspect-[2/3] w-full bg-gray-800 rounded-lg overflow-hidden relative">
+<div 
+  className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 max-h-[85vh] overflow-y-auto relative" 
+  style={{
+    background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
+    boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none',
+    borderRadius: isDarkTheme ? '14px' : '10px'
+  }}
+>
+               <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
                   {expandedWork.cover_url && (
                     <Image 
                       src={expandedWork.cover_url} 
@@ -658,9 +659,9 @@ return (
                     </div>
                   </div>
 
-                  <Link 
-                    href={`/work/${expandedWork.id}`}
-                    className="block w-full text-white font-bold py-3 rounded-lg text-center transition"
+                <Link 
+  href={`/work/${work.id}`}
+  className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
                     style={{
                       background: isDarkTheme 
                         ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
