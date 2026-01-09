@@ -392,49 +392,35 @@ return (
     ))}
   </div>
 ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {filteredWorks.map(work => (
-                <div 
-                  key={work.id} 
-                  onClick={() => setExpandedWork(work)}
-                  className="cursor-pointer"
-                >
-<div className="overflow-hidden transition-all duration-300 rounded-lg">
-                    <div className="aspect-[2/3] bg-gray-800 relative">
-                      {work.cover_url && (
-                        <Image 
-                          src={work.cover_url} 
-                          alt={work.title} 
-                          fill 
-                          className="object-cover" 
-                        />
-                      )}
-                    </div>
-                    <div className="p-6 bg-black">
-                      <h3 className="text-xl font-bold text-center mb-3 text-white">
-                        {work.title}
-                      </h3>
-                      <p className="text-sm text-gray-400 text-center line-clamp-3 mb-4">
-                        {work.description}
-                      </p>
-<div className="flex gap-2 justify-center flex-wrap">
-  <span className="text-xs bg-gray-800 px-3 py-1 rounded-full text-white">
-    {work.direction}
-  </span>
-  <span className="text-xs bg-red-900 px-3 py-1 rounded-full text-white">
-    {work.rating}
-  </span>
-  <span className="text-xs bg-gray-700 px-3 py-1 rounded-full text-white">
-    {work.status}
-  </span>
-</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    {filteredWorks.map(work => (
+      <div 
+        key={work.id} 
+        onClick={() => setExpandedWork(work)}
+        className="cursor-pointer"
+      >
+        <div className="overflow-hidden transition-all duration-300 rounded-lg">
+          <div className="aspect-[2/3] bg-gray-800 relative">
+            {work.cover_url && (
+              <Image 
+                src={work.cover_url} 
+                alt={work.title} 
+                fill 
+                className="object-cover" 
+              />
+            )}
+          </div>
+          <div className="p-4 bg-black">
+            <h3 className="text-lg font-bold text-center text-white">
+              {work.title}
+            </h3>
+          </div>
         </div>
+      </div>
+    ))}
+  </div>
+)}
+</div>
 
 {/* EXPANDED SERIES */}
 {expandedSeries && (() => {
@@ -565,7 +551,7 @@ return (
 
 
 
-        {/* EXPANDED WORK */}
+{/* EXPANDED WORK */}
         {expandedWork && (
           <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-4 overflow-y-auto">
             <button 
@@ -590,83 +576,99 @@ return (
                 borderRadius: '8px'
               }}
             >
-<div 
-  className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 max-h-[85vh] overflow-y-auto relative" 
-  style={{
-    background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
-    boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none',
-    borderRadius: isDarkTheme ? '14px' : '10px'
-  }}
->
-               <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-                  {expandedWork.cover_url && (
+              <div 
+                className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 max-h-[85vh] overflow-y-auto relative" 
+                style={{
+                  background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
+                  boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none',
+                  borderRadius: isDarkTheme ? '14px' : '10px'
+                }}
+              >
+                <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  {expandedWork.cover_url ? (
                     <Image 
                       src={expandedWork.cover_url} 
                       alt={expandedWork.title} 
                       fill
                       className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                      priority
                     />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                      Нет обложки
+                    </div>
                   )}
                 </div>
-
+                
                 <div className="flex flex-col justify-between">
                   <div>
-                    <h3 className="text-3xl font-bold mb-4" style={{ 
-                      color: isDarkTheme ? '#bc8dd8' : '#c9c6bb'
-                    }}>
-                      {expandedWork.title}
-                    </h3>
-
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4" style={{ 
+                      color: isDarkTheme ? '#bc8dd8' : '#c9c6bb',
+                      textShadow: isDarkTheme ? '0 0 20px rgba(188, 141, 216, 0.8)' : 'none',
+                      fontStyle: !isDarkTheme ? 'italic' : 'normal',
+                      background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #65635d 100%)' : 'none',
+                      WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+                      WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
+                      backgroundClip: !isDarkTheme ? 'text' : 'unset'
+                    }}>{expandedWork.title}</h3>
+                    
                     {(expandedWork.fandom || expandedWork.pairing) && (
                       <div className="mb-3 space-y-1">
                         {expandedWork.fandom && (
-                          <div className="text-sm">
+                          <div className="text-xs sm:text-sm">
                             <span className="text-gray-400">Фандом: </span>
-                            <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>
-                              {expandedWork.fandom}
-                            </span>
+                            <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>{expandedWork.fandom}</span>
                           </div>
                         )}
                         {expandedWork.pairing && (
-                          <div className="text-sm">
+                          <div className="text-xs sm:text-sm">
                             <span className="text-gray-400">Пейринг: </span>
-                            <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>
-                              {expandedWork.pairing}
-                            </span>
+                            <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>{expandedWork.pairing}</span>
                           </div>
                         )}
                       </div>
                     )}
-
+                    
                     {expandedWork.description && (
-                      <p className="text-sm mb-4 leading-relaxed whitespace-pre-wrap" style={{ 
-                        color: isDarkTheme ? '#9ca3af' : '#ffffff'
-                      }}>
-                        {expandedWork.description}
-                      </p>
+                      <p className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed whitespace-pre-wrap break-words" style={{ 
+                        color: isDarkTheme ? '#9ca3af' : '#ffffff',
+                        wordBreak: 'break-word', 
+                        overflowWrap: 'break-word' 
+                      }}>{expandedWork.description}</p>
                     )}
-
-<div className="flex gap-2 flex-wrap mb-4">
-  <span className="text-xs bg-gray-800 px-3 py-1 rounded-full text-white">
-    {expandedWork.direction}
-  </span>
-  <span className="text-xs bg-red-900 px-3 py-1 rounded-full text-white">
-    {expandedWork.rating}
-  </span>
-  <span className="text-xs bg-gray-700 px-3 py-1 rounded-full text-white">
-    {expandedWork.status}
-  </span>
+                    
+                    <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
+                      <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{expandedWork.direction}</span>
+                      <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{expandedWork.rating}</span>
+                      <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{expandedWork.status}</span>
                     </div>
                   </div>
-
-                <Link 
-  href={`/work/${work.id}`}
-  className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+                  
+                  <Link 
+                    href={`/work/${expandedWork.id}`}
+                    className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+                    onClick={(e) => e.stopPropagation()}
                     style={{
                       background: isDarkTheme 
                         ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
                         : '#c9c6bb',
+                      boxShadow: isDarkTheme 
+                        ? '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
+                        : 'none',
                       color: isDarkTheme ? '#ffffff' : '#000000'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isDarkTheme) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #bc8dd8 100%)';
+                        e.currentTarget.style.boxShadow = '0 0 20px rgba(213, 172, 236, 0.9), 0 0 35px rgba(188, 141, 216, 0.7)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isDarkTheme) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)';
+                        e.currentTarget.style.boxShadow = '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)';
+                      }
                     }}
                   >
                     Начать читать
