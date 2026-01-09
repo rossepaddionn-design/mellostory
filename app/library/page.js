@@ -280,44 +280,44 @@ return (
   Библиотека
 </h1>
 
-          <div className="flex gap-4 mb-8 justify-center flex-wrap">
-            {[
-              { key: 'novel', label: 'Романы' },
-              { key: 'longfic', label: 'Лонгфики' },
-              { key: 'minific', label: 'Минифики' },
-              { key: 'series', label: 'Серийные' }
-            ].map(cat => (
-              <button
-                key={cat.key}
-                onClick={() => setCategory(cat.key)}
-                className="px-6 py-2 rounded-lg transition relative"
-                style={{
-                  background: category === cat.key 
-                    ? (isDarkTheme ? 'rgba(147, 112, 219, 0.5)' : 'rgba(194, 194, 168, 0.5)')
-                    : 'transparent',
-                  border: isDarkTheme ? '2px solid #9370db' : '2px solid #c2c2a8',
-                  color: isDarkTheme ? '#ffffff' : '#c2c2a8'
-                }}
-              >
-                {cat.label}
-{cat.key === 'series' && isAdmin && (
-  <div
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowSeriesModal(true);
-    }}
-    className="absolute -top-2 -right-2 rounded-full p-1 cursor-pointer"
-    style={{
-      background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-      boxShadow: '0 0 10px rgba(147, 112, 219, 0.8)'
-    }}
-  >
-    <Plus size={16} />
-  </div>
-)}
-              </button>
-            ))}
-          </div>
+<div className="flex gap-4 mb-8 justify-center flex-wrap">
+  {[
+    { key: 'novel', label: 'Романы' },
+    { key: 'longfic', label: 'Лонгфики' },
+    { key: 'minific', label: 'Минифики' },
+    { key: 'series', label: 'Серийные' }
+  ].map(cat => (
+    <button
+      key={cat.key}
+      onClick={() => setCategory(cat.key)}
+      className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition relative text-sm sm:text-base"
+      style={{
+        background: category === cat.key 
+          ? (isDarkTheme ? 'rgba(147, 112, 219, 0.5)' : 'rgba(194, 194, 168, 0.5)')
+          : 'transparent',
+        border: isDarkTheme ? '2px solid #9370db' : '2px solid #c2c2a8',
+        color: isDarkTheme ? '#ffffff' : '#c2c2a8'
+      }}
+    >
+      {cat.label}
+      {cat.key === 'series' && isAdmin && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowSeriesModal(true);
+          }}
+          className="absolute -top-2 -right-2 rounded-full p-1 cursor-pointer"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 10px rgba(147, 112, 219, 0.8)'
+          }}
+        >
+          <Plus size={16} />
+        </div>
+      )}
+    </button>
+  ))}
+</div>
 
 {category === 'series' ? (
  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
