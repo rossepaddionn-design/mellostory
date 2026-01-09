@@ -940,8 +940,8 @@ return (
   style={{
     padding: '3px',
     background: isDarkTheme 
-      ? 'linear-gradient(135deg, #200a2e 0%, #000000 50%, #200a2e 100%)'
-      : 'linear-gradient(135deg, #c2beae 0%, #000000 50%, #c2beae 100%)'
+      ? 'linear-gradient(135deg, #160420ff 0%, #000000 50%, #160620ff 100%)'
+      : 'linear-gradient(135deg, #3b3b39ff 0%, #000000 50%, #3d3d3cff 100%)'
   }}
 >
       {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
@@ -1011,38 +1011,56 @@ return (
           <option value="en">EN</option>
         </select>
       </div>
-      <div className="flex-shrink-0">
-{!user ? (
-  <button
-    onClick={() => setShowAuthModal(true)}
-    className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-    style={{
-      background: isDarkTheme 
-        ? 'rgba(147, 112, 219, 0.3)'
-        : 'rgba(184, 171, 127, 0.3)',
-      backdropFilter: 'blur(10px)',
-      border: isDarkTheme 
-        ? '1px solid rgba(147, 112, 219, 0.5)'
-        : '1px solid rgba(184, 171, 127, 0.5)'
-    }}
-  >
-    <User size={14} className="sm:w-5 sm:h-5" />
-    <span className="hidden sm:inline">{t.login}</span>
-  </button>
+      
+      {/* КНОПКИ СПРАВА */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <Link
+          href="/library"
+          className="px-3 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+          style={{
+            background: isDarkTheme 
+              ? 'rgba(147, 112, 219, 0.3)'
+              : 'rgba(184, 171, 127, 0.3)',
+            backdropFilter: 'blur(10px)',
+            border: isDarkTheme 
+              ? '1px solid rgba(147, 112, 219, 0.5)'
+              : '1px solid rgba(184, 171, 127, 0.5)'
+          }}
+        >
+          <span>Библиотека</span>
+        </Link>
+
+        {!user ? (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+            style={{
+              background: isDarkTheme 
+                ? 'rgba(147, 112, 219, 0.3)'
+                : 'rgba(184, 171, 127, 0.3)',
+              backdropFilter: 'blur(10px)',
+              border: isDarkTheme 
+                ? '1px solid rgba(147, 112, 219, 0.5)'
+                : '1px solid rgba(184, 171, 127, 0.5)'
+            }}
+          >
+            <User size={14} className="sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">{t.login}</span>
+          </button>
         ) : (
-<button
-  onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
-  className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-  style={{
-    background: isDarkTheme 
-      ? 'rgba(147, 112, 219, 0.3)'
-      : 'rgba(184, 171, 127, 0.3)',
-    backdropFilter: 'blur(10px)',
-    border: isDarkTheme 
-      ? '1px solid rgba(147, 112, 219, 0.5)'
-      : '1px solid rgba(184, 171, 127, 0.5)'
-  }}
->
+          <button
+            onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
+            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+            style={{
+              background: isDarkTheme 
+                ? 'rgba(147, 112, 219, 0.3)'
+                : 'rgba(184, 171, 127, 0.3)',
+              backdropFilter: 'blur(10px)',
+              border: isDarkTheme 
+                ? '1px solid rgba(147, 112, 219, 0.5)'
+                : '1px solid rgba(184, 171, 127, 0.5)'
+            }}
+          >
             <Menu size={14} className="sm:w-5 sm:h-5" />
             <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">
               {isAdmin ? 'Админ' : userProfile?.nickname}
@@ -1103,399 +1121,45 @@ return (
   </div>
 </div>
 
-{/* NAVIGATION */}
-<div className="relative z-10 px-4 sm:px-8 py-4">
-  <div className="max-w-7xl mx-auto">
- <nav className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 text-sm sm:text-base flex-wrap">
-  {[
-   { key: 'novel', label: t.novels },
-    { key: 'longfic', label: t.longfic },
-    { key: 'minific', label: t.minific },
-  ].map((item) => {
-    const isActive = activeCategory === item.key;
-    
-    if (!isDarkTheme) {
-      return (
-        <button
-          key={item.key}
-          onClick={() => {
-            setActiveCategory(item.key);
-            setCurrentSlide(0);
-            setExpandedWork(null);
-          }}
-          className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap relative"
-style={{
-  background: isActive ? 'rgba(194, 194, 168, 0.3)' : 'transparent', // ← Активная = матовая, неактивная = прозрачная
-  border: '2px solid #c2c2a8', // ← Рамка всегда одинаковая
-  borderRadius: '12px',
-  color: '#c2c2a8' // ← Текст всегда #c2c2a8
-}}
-        >
-          <div style={{
-            position: 'absolute',
-            inset: '-3px',
-            borderRadius: '12px',
-            padding: '3px',
-            background: 'linear-gradient(135deg, #62091e 0%, #000000 100%)',
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            WebkitMaskComposite: 'xor',
-            maskComposite: 'exclude',
-            pointerEvents: 'none',
-            zIndex: -1
-          }} />
-          {item.label}
-        </button>
-      );
-    }
-    
-    return (
-      <button
-        key={item.key}
-        onClick={() => {
-          setActiveCategory(item.key);
-          setCurrentSlide(0);
-          setExpandedWork(null);
-        }}
-        className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2.5 border-2 rounded-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap"
-        style={{
-          borderColor: isActive ? '#a87ec4' : '#7430a1',
-          backgroundColor: 'transparent',
-          color: '#ffffff'
-        }}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.borderColor = '#a87ec4';
-            e.currentTarget.style.boxShadow = '0 0 10px rgba(168, 126, 196, 0.6)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.borderColor = '#7430a1';
-            e.currentTarget.style.boxShadow = 'none';
-          }
-        }}
-      >
-        {item.label}
-      </button>
-    );
-  })}
-</nav>
-  </div>
-</div>
 
-
-
- {/* MAIN CONTENT */}
-<main className="pb-16 sm:pb-32 px-4 sm:px-8 min-h-screen" style={{ paddingTop: isDarkTheme ? '0' : '1rem' }}>
-        <div className="max-w-7xl mx-auto relative z-10">
-{loading ? (
-  <div className="text-center py-12 sm:py-20">
-    <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2" style={{ 
-      borderColor: isDarkTheme ? '#8b3cc8' : '#c9c6bb' 
-    }}></div>
-  </div>
-          ) : displayWorks.length === 0 ? (
-            <div className="text-center py-12 sm:py-20">
-              <p className="text-gray-400 text-lg sm:text-xl">{t.noWorks}</p>
-            </div>
-          ) : (
-            <>
-              <div className="relative">
-                {displayWorks.length > 1 && (
-                  <>
-<button
-  onClick={() => {
-    setCurrentSlide((currentSlide - 1 + displayWorks.length) % displayWorks.length);
-    setExpandedWork(null);
-  }}
-  className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
-  style={{
-    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#c9c6bb',
-    boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)' : 'none',
-    color: '#000000'
-  }}
->
-  <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
-</button>
-
-<button
-  onClick={() => {
-    setCurrentSlide((currentSlide + 1) % displayWorks.length);
-    setExpandedWork(null);
-  }}
-  className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 rounded-full p-1 sm:p-2 transition hover:scale-110"
-  style={{
-    backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.9)' : '#c9c6bb',
-    boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4)' : 'none',
-    color: '#000000'
-  }}
->
-  <ChevronRight size={16} className="sm:w-5 sm:h-5" />
-</button>
-                  </>
-                )}
-
-                <div className="flex items-center justify-center py-8 sm:py-12 overflow-hidden" style={{ minHeight: '300px' }}>
-                  {displayWorks.map((work, idx) => {
-                    const isCenter = idx === currentSlide;
-                    const isExpanded = expandedWork === work.id;
-
-                    if (!isCenter && !isExpanded) return null;
-
-                    return (
-                      <div
-                        key={work.id}
-                        className={`transition-all duration-700 ${
-                          isExpanded 
-                            ? 'fixed inset-0 z-[9999] flex items-center justify-center bg-black p-4 sm:p-8 overflow-y-auto' 
-                            : 'w-full max-w-[280px] sm:max-w-[320px]'
-                        }`}
-                      >
-{isExpanded && (
-<button 
-  onClick={(e) => {
-    e.stopPropagation();
-    setExpandedWork(null);
-  }}
-  className="fixed top-4 sm:top-8 right-4 sm:right-8 rounded-full p-2 sm:p-3 transition z-[10000]"
-  style={{
-    background: isDarkTheme 
-      ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-      : '#c9c6bb',
-    boxShadow: isDarkTheme 
-      ? '0 0 20px rgba(188, 141, 216, 0.9), 0 0 35px rgba(147, 112, 219, 0.7)'
-      : 'none'
-  }}
-  onMouseEnter={(e) => {
-    if (isDarkTheme) {
-      e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #bc8dd8 100%)';
-      e.currentTarget.style.boxShadow = '0 0 25px rgba(213, 172, 236, 1), 0 0 45px rgba(188, 141, 216, 0.8)';
-    }
-  }}
-  onMouseLeave={(e) => {
-    if (isDarkTheme) {
-      e.currentTarget.style.background = 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)';
-      e.currentTarget.style.boxShadow = '0 0 20px rgba(188, 141, 216, 0.9), 0 0 35px rgba(147, 112, 219, 0.7)';
-    }
-  }}
->
-  <X size={24} className="sm:w-8 sm:h-8" />
-</button>
-)}
-                        
-<div 
-  className={`relative overflow-hidden transition-all duration-300 ${!isExpanded && 'cursor-pointer'}`}
-  style={{ 
-    padding: isDarkTheme ? '6px' : '3px',
-    background: isDarkTheme 
-      ? 'linear-gradient(135deg, #000000 0%, #8c32d2 50%, #000000 100%)'
-      : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-    maxWidth: isExpanded ? '1000px' : 'auto',
-    width: '100%',
-    borderRadius: '8px',
-    position: 'relative'
-  }}
-  onClick={() => !isExpanded && setExpandedWork(work.id)}
->
-{isExpanded ? (
-<div 
-  className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 max-h-[85vh] overflow-y-auto relative" 
-  style={{
-background: isDarkTheme
-  ? '#000000'
-  : 'rgba(0, 0, 0, 0.95)',
-
-    boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none',
-    borderRadius: isDarkTheme ? '14px' : '10px'
-  }}
->
-    <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-      {work.cover_url ? (
-        <Image 
-          src={work.cover_url} 
-          alt={work.title} 
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 400px"
-          priority
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-          Нет обложки
-        </div>
-      )}
-    </div>
-    
-    <div className="flex flex-col justify-between">
-      <div>
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4" style={{ 
-          color: isDarkTheme ? '#bc8dd8' : '#c9c6bb',
-          textShadow: isDarkTheme ? '0 0 20px rgba(188, 141, 216, 0.8)' : 'none',
-          fontStyle: !isDarkTheme ? 'italic' : 'normal',
-          background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #65635d 100%)' : 'none',
-          WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-          WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-          backgroundClip: !isDarkTheme ? 'text' : 'unset'
-        }}>{work.title}</h3>
-        
-        {(work.fandom || work.pairing) && (
-          <div className="mb-3 space-y-1">
-            {work.fandom && (
-              <div className="text-xs sm:text-sm">
-                <span className="text-gray-400">Фандом: </span>
-                <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>{work.fandom}</span>
-              </div>
-            )}
-            {work.pairing && (
-              <div className="text-xs sm:text-sm">
-                <span className="text-gray-400">Пейринг: </span>
-                <span style={{ color: isDarkTheme ? '#e5e5e5' : '#ffffff' }}>{work.pairing}</span>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {work.description && (
-          <p className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed whitespace-pre-wrap break-words" style={{ 
-            color: isDarkTheme ? '#9ca3af' : '#ffffff',
-            wordBreak: 'break-word', 
-            overflowWrap: 'break-word' 
-          }}>{work.description}</p>
-        )}
-        
-        <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
-          <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
-          <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
-          <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
-        </div>
-      </div>
-      
-      <Link 
-        href={`/work/${work.id}`}
-        className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: isDarkTheme 
-            ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-            : '#c9c6bb',
-          boxShadow: isDarkTheme 
-            ? '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
-            : 'none',
-          color: isDarkTheme ? '#ffffff' : '#000000'
-        }}
-        onMouseEnter={(e) => {
-          if (isDarkTheme) {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #bc8dd8 100%)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(213, 172, 236, 0.9), 0 0 35px rgba(188, 141, 216, 0.7)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (isDarkTheme) {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)';
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)';
-          }
-        }}
-      >
-        {t.startReading}
-      </Link>
-    </div>
-  </div>
-) : (
-  <>
-    <div className="aspect-[2/3] bg-gray-800 relative">
-      {work.cover_url ? (
-        <Image 
-          src={work.cover_url} 
-          alt={work.title} 
-          fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, 400px"
-          priority={idx === currentSlide}
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-          Нет обложки
-        </div>
-      )}
-    </div>
-    <div className="p-4 sm:p-6 bg-black">
-      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-2 sm:mb-3 text-white">{work.title}</h3>
-      <p className="text-xs sm:text-sm text-gray-400 text-center line-clamp-3 mb-3 sm:mb-4">{work.description}</p>
-      <div className="flex gap-2 justify-center flex-wrap">
-        <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{work.direction}</span>
-        <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{work.rating}</span>
-        <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{work.status}</span>
-      </div>
-    </div>
-  </>
-)}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
- {displayWorks.length > 1 && (
-  <div className="flex justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
-    {displayWorks.map((_, idx) => (
-      <button
-        key={idx}
-        onClick={() => {
-          setCurrentSlide(idx);
-          setExpandedWork(null);
-        }}
-        className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300`}
-        style={{
-          backgroundColor: idx === currentSlide 
-            ? (isDarkTheme ? '#ce0dbe' : '#c9c6bb')
-            : '#ffffff',
-          transform: idx === currentSlide ? 'scale(1.5)' : 'scale(1)'
-        }}
-      />
-                  ))}
-                </div>
-              )} 
-            </>
-          )}
-        </div>
-</main>
 
 {/* РАСПИСАНИЕ ОБНОВЛЕНИЙ */}
 <div className="max-w-5xl mx-auto mt-8 sm:mt-12 px-4 relative z-0">
-  <button
-    onClick={() => {
-      setShowCalendarModal(true);
-      loadCalendarEvents();
-    }}
-    className="w-full py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] text-base sm:text-xl relative overflow-hidden flex items-center justify-center gap-3"
-    style={{
-      background: isDarkTheme 
-        ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
-        : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.4)'
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
-      color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
-fontFamily: "'Playfair Display', Georgia, serif",
-fontStyle: isDarkTheme ? 'normal' : 'italic'  // ← ДОБАВЬ ЭТУ СТРОКУ
-    }}
+<button
+  onClick={() => {
+    setShowCalendarModal(true);
+    loadCalendarEvents();
+  }}
+  className="w-full py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex items-center justify-center gap-2 sm:gap-3"
+  style={{
+    background: isDarkTheme 
+      ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
+      : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
+    border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
+    backdropFilter: 'blur(20px)',
+    boxShadow: isDarkTheme 
+      ? '0 0 30px rgba(147, 51, 234, 0.4)'
+      : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
+    color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+    fontFamily: "'Playfair Display', Georgia, serif",
+    fontStyle: isDarkTheme ? 'normal' : 'italic'
+  }}
+>
+  <span className="text-sm sm:text-base md:text-xl text-center px-2">
+    Расписание обновлений сайта и работ
+  </span>
+  <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2"
+    className="flex-shrink-0 hidden sm:block"
   >
-    <span>Расписание обновлений сайта и работ</span>
-    <svg 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2"
-      className="flex-shrink-0"
-    >
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  </button>
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+</button>
 </div>
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
