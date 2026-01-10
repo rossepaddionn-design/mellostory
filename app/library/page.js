@@ -249,7 +249,11 @@ return (
       `}
     `}} />
 
-      <div className="min-h-screen" style={{ backgroundColor: '#000000' }}>
+<div className="min-h-screen" style={{ 
+  background: isDarkTheme 
+    ? 'linear-gradient(225deg, #000000 0%, #240046 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
+    : 'radial-gradient(ellipse 100% 50% at 50% 0%, #777167 0%, #554f46 40%, #353128 70%, #000000 100%)'
+}}>
         <div className="max-w-6xl mx-auto px-4 py-8">
           <Link 
             href="/"
@@ -270,7 +274,7 @@ return (
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   backgroundImage: isDarkTheme 
     ? 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%)'
-    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)',
+    : 'radial-gradient(ellipse at top left, #cac8c8 0%, #82713a 100%)',
   backgroundSize: isDarkTheme ? '200% auto' : 'auto',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
@@ -280,7 +284,7 @@ return (
   Библиотека
 </h1>
 
-<div className="flex gap-4 mb-8 justify-center flex-wrap">
+<div className="flex gap-2 sm:gap-4 mb-8 justify-center flex-wrap">
   {[
     { key: 'novel', label: 'Романы' },
     { key: 'longfic', label: 'Лонгфики' },
@@ -290,7 +294,7 @@ return (
     <button
       key={cat.key}
       onClick={() => setCategory(cat.key)}
-      className="px-2.5 sm:px-6 py-1 sm:py-2 rounded-lg transition relative text-sm sm:text-base"
+      className="px-2 sm:px-6 py-1 sm:py-2 rounded-lg transition relative text-xs sm:text-base"
       style={{
         background: category === cat.key 
           ? (isDarkTheme ? 'rgba(147, 112, 219, 0.5)' : 'rgba(194, 194, 168, 0.5)')
@@ -392,14 +396,14 @@ return (
     ))}
   </div>
 ) : (
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
     {filteredWorks.map(work => (
       <div 
         key={work.id} 
         onClick={() => setExpandedWork(work)}
-        className="cursor-pointer"
+        className="cursor-pointer group"
       >
-        <div className="overflow-hidden transition-all duration-300 rounded-lg">
+        <div className="overflow-hidden transition-all duration-300 rounded-lg hover:scale-105">
           <div className="aspect-[2/3] bg-gray-800 relative">
             {work.cover_url && (
               <Image 
@@ -410,7 +414,18 @@ return (
               />
             )}
           </div>
-          <div className="p-4 bg-black">
+<div className="p-4 relative overflow-hidden" style={{ background: '#000000' }}>
+            <div 
+              className="absolute bottom-0 left-0 right-0 h-1"
+              style={{
+                background: isDarkTheme 
+                  ? 'linear-gradient(90deg, transparent 0%, #b57fd4 50%, transparent 100%)'
+                  : 'linear-gradient(90deg, transparent 0%, #c9c6bb 50%, transparent 100%)',
+                boxShadow: isDarkTheme 
+                  ? '0 0 15px rgba(181, 127, 212, 0.8)' 
+                  : '0 0 15px rgba(201, 198, 187, 0.8)'
+              }}
+            />
             <h3 className="text-lg font-bold text-center text-white">
               {work.title}
             </h3>
@@ -632,16 +647,16 @@ return (
                     
                     {expandedWork.description && (
                       <p className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed whitespace-pre-wrap break-words" style={{ 
-                        color: isDarkTheme ? '#9ca3af' : '#ffffff',
+                        color: isDarkTheme ? '#ffffff' : '#ffffff',
                         wordBreak: 'break-word', 
                         overflowWrap: 'break-word' 
                       }}>{expandedWork.description}</p>
                     )}
                     
                     <div className="flex gap-2 flex-wrap mb-3 sm:mb-4">
-                      <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full">{expandedWork.direction}</span>
-                      <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full">{expandedWork.rating}</span>
-                      <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full">{expandedWork.status}</span>
+                      <span className="text-xs bg-gray-800 px-2 sm:px-3 py-1 rounded-full text-white">{expandedWork.direction}</span>
+                      <span className="text-xs bg-red-900 px-2 sm:px-3 py-1 rounded-full text-white">{expandedWork.rating}</span>
+                      <span className="text-xs bg-gray-700 px-2 sm:px-3 py-1 rounded-full text-white">{expandedWork.status}</span>
                     </div>
                   </div>
                   

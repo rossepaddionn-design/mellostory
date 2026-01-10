@@ -927,9 +927,11 @@ return (
 <div 
   className="fixed inset-0 -z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#000000' : '#000000',
-        }}
-      />
+    background: isDarkTheme 
+      ? 'linear-gradient(225deg, #000000 0%, #240046 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
+      : 'radial-gradient(ellipse 100% 50% at 50% 0%, #777167 0%, #554f46 40%, #353128 70%, #000000 100%)'
+  }}
+/>
 
 {/* HEADER */}
 <div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
@@ -941,7 +943,7 @@ return (
     padding: '3px',
     background: isDarkTheme 
       ? 'linear-gradient(135deg, #160420ff 0%, #000000 50%, #160620ff 100%)'
-      : 'linear-gradient(135deg, #3b3b39ff 0%, #000000 50%, #3d3d3cff 100%)'
+      : 'linear-gradient(135deg, rgb(46, 46, 37) 0%, #000000 50%, rgb(48, 48, 40) 100%)'
   }}
 >
       {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
@@ -965,6 +967,7 @@ return (
         
         <div className="relative z-10 h-full flex flex-col min-h-[90px] sm:min-h-[35vh]">
           
+          
           {/* ВЕРХНЯЯ ПАНЕЛЬ */}
 <div className="absolute inset-0 z-10 flex flex-col">
   <div className="px-3 sm:px-6 py-2 sm:py-4">
@@ -975,7 +978,7 @@ return (
           style={{
             background: '#42000a',
             border: '2px solid #42000a',
-            boxShadow: '0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6)',
+            boxShadow: '0 0 20px rgba(156, 3, 3, 0.9), 0 0 40px rgba(133, 5, 5, 0.6)',
             animation: 'pulse18 2s ease-in-out infinite'
           }}
         >
@@ -1164,52 +1167,53 @@ return (
 </div>
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
-<div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
-<h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{
-  color: isDarkTheme ? '#b3e7ef' : 'transparent',
-  textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
-  fontFamily: "'Playfair Display', Georgia, serif",
-  fontStyle: !isDarkTheme ? 'italic' : 'normal',
-  backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-  backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-  WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-  WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-  backgroundClip: !isDarkTheme ? 'text' : 'unset'
-}}>
-  Популярные работы
-</h2>
+<div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
+  <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{
+    color: isDarkTheme ? '#b3e7ef' : 'transparent',
+    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
+    fontFamily: "'Playfair Display', Georgia, serif",
+    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
+    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
+    backgroundClip: !isDarkTheme ? 'text' : 'unset'
+  }}>
+    Популярные работы
+  </h2>
   
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+  <div className="grid grid-cols-3 gap-2 sm:gap-6">
     {popularWorks.map((work, index) => (
-<div
-  key={work.id}
-  className="relative rounded-xl p-6 transition hover:scale-105"
-  style={{
-    background: isDarkTheme
-  ? 'rgba(0, 0, 0, 0.3)'
-  : 'transparent',
-    backdropFilter: 'blur(10px)',
-    border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
-    borderRadius: '24px',
-    backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
-    boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none',
-    position: 'relative'
-  }}
->
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: '-3px',
-      borderRadius: '24px',
-      padding: '3px',
-      background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
-      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-      WebkitMaskComposite: 'xor',
-      maskComposite: 'exclude',
-      pointerEvents: 'none',
-      zIndex: -1
-    }} />
-  )}
+      <div
+        key={work.id}
+        className="relative rounded-lg sm:rounded-xl py-3 px-2 sm:p-6 transition hover:scale-105"
+        style={{
+          background: isDarkTheme
+            ? 'rgba(0, 0, 0, 0.3)'
+            : 'transparent',
+          backdropFilter: 'blur(10px)',
+          border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
+          borderRadius: '12px',
+          backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
+          boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none',
+          position: 'relative'
+        }}
+      >
+        {!isDarkTheme && (
+          <div style={{
+            position: 'absolute',
+            inset: '-3px',
+            borderRadius: '12px',
+            padding: '3px',
+            background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+            pointerEvents: 'none',
+            zIndex: -1
+          }} />
+        )}
+        
         {isAdmin && (
           <button
             onClick={() => {
@@ -1217,13 +1221,13 @@ return (
               setEditPopularForm(work);
               setShowPopularEditModal(true);
             }}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition"
+            className="absolute top-1 right-1 sm:top-3 sm:right-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition"
             style={{
               background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
               boxShadow: '0 0 10px rgba(220, 38, 38, 0.8)'
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
@@ -1232,47 +1236,46 @@ return (
 
         {work.title ? (
           <>
-<h3 className="font-bold text-lg sm:text-xl mb-6 text-center pr-6 break-words" style={{
-  color: isDarkTheme ? '#b3e7ef' : 'transparent',
-  textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
-  fontFamily: "'Playfair Display', Georgia, serif",
-  fontStyle: !isDarkTheme ? 'italic' : 'normal',
-  backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-  backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-  WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-  WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-  backgroundClip: !isDarkTheme ? 'text' : 'unset'
-}}>
-  {work.title}
-</h3>
+            <h3 className="font-bold text-[10px] sm:text-lg md:text-xl mb-2 sm:mb-6 text-center break-words leading-tight line-clamp-2" style={{
+              color: isDarkTheme ? '#b3e7ef' : 'transparent',
+              textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontStyle: !isDarkTheme ? 'italic' : 'normal',
+              backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+              backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
+              WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+              WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
+              backgroundClip: !isDarkTheme ? 'text' : 'unset'
+            }}>
+              {work.title}
+            </h3>
             
-            <div className="flex justify-center items-center gap-6">
-              <div className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" strokeWidth="2">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-0.5 sm:gap-6">
+              <div className="flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
-<span className="text-white font-bold text-lg">
-  {work.rating || '—'}
-</span>
+                <span className="text-white font-bold text-[10px] sm:text-lg">
+                  {work.rating || '—'}
+                </span>
               </div>
               
-              <div className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
+              <div className="flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
-<span className="text-white font-bold text-lg">
-  {work.views || '—'}
-</span>
+                <span className="text-white font-bold text-[10px] sm:text-lg">
+                  {work.views || '—'}
+                </span>
               </div>
             </div>
           </>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-400 text-sm">
+          <div className="text-center py-2 sm:py-8">
+            <p className="text-gray-400 text-[10px] sm:text-sm">
               Скоро здесь появится работа
             </p>
-          
           </div>
         )}
       </div>
@@ -2182,7 +2185,7 @@ return (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
     {isDarkTheme && (
-      <div className="fixed top-0 right-0 h-full w-full sm:w-96 border-l-2 z-40 overflow-y-auto shadow-2xl" style={{ 
+      <div className="fixed top-0 right-0 h-full w-60 sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{
         borderColor: '#b3e7ef',
         backgroundImage: 'url(/textures/dark-erys.jpg)',
         backgroundSize: 'cover',
@@ -2394,8 +2397,8 @@ return (
     )}
 
     {/* СВЕТЛАЯ ПАНЕЛЬ */}
-    {!isDarkTheme && (
-      <div className="fixed top-0 right-0 h-full w-full sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{ 
+{!isDarkTheme && (
+      <div className="fixed top-0 right-0 h-full w-60 sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{
         borderLeft: '12px solid',
         borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
         boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
