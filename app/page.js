@@ -964,6 +964,7 @@ return (
         `}</style>
         
         <div className="relative z-10 h-full flex flex-col min-h-[90px] sm:min-h-[35vh]">
+          
           {/* ВЕРХНЯЯ ПАНЕЛЬ */}
 <div className="absolute inset-0 z-10 flex flex-col">
   <div className="px-3 sm:px-6 py-2 sm:py-4">
@@ -1277,6 +1278,7 @@ return (
       </div>
     ))}
   </div>
+  
     {/* НОВЫЙ ТЕКСТ ДОБАВЛЯЕТСЯ ЗДЕСЬ */}
   <p className="text-center mt-6 text-xs sm:text-sm opacity-70" style={{
     color: isDarkTheme ? '#b3e7ef' : '#c8c0c2',
