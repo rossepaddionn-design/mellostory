@@ -17,7 +17,7 @@ export default function GenreTag({ name }) {
       <button
         onClick={() => setShowPopup(true)}
         className="hover:underline cursor-pointer transition"
-        style={{ color: '#e1cdea' }}
+        style={{ color: '#ffffff' }}
       >
         {name}
       </button>
@@ -58,7 +58,7 @@ export default function GenreTag({ name }) {
   </div>
   <p
     className="text-sm sm:text-base leading-relaxed"
-    style={{ color: '#f0e5f7' }}
+    style={{ color: '#ffffff' }}
   >
     • {item.description}
   </p>

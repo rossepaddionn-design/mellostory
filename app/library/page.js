@@ -415,17 +415,6 @@ return (
             )}
           </div>
 <div className="p-4 relative overflow-hidden" style={{ background: '#000000' }}>
-            <div 
-              className="absolute bottom-0 left-0 right-0 h-1"
-              style={{
-                background: isDarkTheme 
-                  ? 'linear-gradient(90deg, transparent 0%, #b57fd4 50%, transparent 100%)'
-                  : 'linear-gradient(90deg, transparent 0%, #c9c6bb 50%, transparent 100%)',
-                boxShadow: isDarkTheme 
-                  ? '0 0 15px rgba(181, 127, 212, 0.8)' 
-                  : '0 0 15px rgba(201, 198, 187, 0.8)'
-              }}
-            />
             <h3 className="text-lg font-bold text-center text-white">
               {work.title}
             </h3>

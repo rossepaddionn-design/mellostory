@@ -14,6 +14,13 @@ export default function Home() {
   const [titleColor, setTitleColor] = useState('#ef4444');
 const [activeCategory, setActiveCategory] = useState('novel');
   const [expandedWork, setExpandedWork] = useState(null);
+
+  const [textFormatState, setTextFormatState] = useState({
+  bold: false,
+  italic: false,
+  underline: false,
+  align: 'left'
+});
   
   const [works, setWorks] = useState([]);
   const [completedWorks, setCompletedWorks] = useState([]);
@@ -80,12 +87,83 @@ const [showEventModal, setShowEventModal] = useState(false);
 const [selectedDate, setSelectedDate] = useState(null);
 const [eventText, setEventText] = useState('');
 const [calendarEvents, setCalendarEvents] = useState({});
+const [newsPosts, setNewsPosts] = useState([]);
+const [showNewsModal, setShowNewsModal] = useState(false);
+const [selectedNews, setSelectedNews] = useState(null);
+const [showAddNewsModal, setShowAddNewsModal] = useState(false);
+const [newsForm, setNewsForm] = useState({ title: '', content: '' });
+const [newsCarouselIndex, setNewsCarouselIndex] = useState(0);
 const [currentMonth, setCurrentMonth] = useState(new Date());
+
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
   setConfirmAction(() => action);
   setShowConfirmModal(true);
+};
+
+const applyTextFormat = (format) => {
+  const textarea = document.getElementById('text-editor-textarea');
+  if (!textarea) return;
+  
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selectedText = editText.substring(start, end);
+  
+  if (!selectedText) {
+    showConfirm('Выделите текст для форматирования!');
+    return;
+  }
+  
+  let formattedText = selectedText;
+  
+  switch(format) {
+    case 'bold':
+      formattedText = `**${selectedText}**`;
+      break;
+    case 'italic':
+      formattedText = `*${selectedText}*`;
+      break;
+    case 'underline':
+      formattedText = `__${selectedText}__`;
+      break;
+  }
+  
+  const newText = editText.substring(0, start) + formattedText + editText.substring(end);
+  setEditText(newText);
+  
+  setTimeout(() => {
+    textarea.focus();
+    textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+  }, 0);
+};
+
+const setTextAlignment = (align) => {
+  setTextFormatState({...textFormatState, align});
+};
+
+const renderFormattedText = (text, defaultAlign = 'left') => {
+  let align = defaultAlign;
+  let content = text;
+  
+  // Извлекаем выравнивание из текста
+  const alignMatch = text.match(/^\[ALIGN:(left|center|right)\]/);
+  if (alignMatch) {
+    align = alignMatch[1];
+    content = text.replace(/^\[ALIGN:(left|center|right)\]/, '');
+  }
+  
+  let formatted = content
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/__(.*?)__/g, '<u>$1</u>');
+  
+  return (
+    <div 
+      dangerouslySetInnerHTML={{ __html: formatted }} 
+      style={{ textAlign: align, whiteSpace: 'pre-wrap' }}
+    />
+  );
 };
 
 const loadCalendarEvents = async () => {
@@ -104,6 +182,55 @@ const loadCalendarEvents = async () => {
   } catch (err) {
     console.error('Ошибка загрузки событий:', err);
   }
+};
+
+
+
+const [formatState, setFormatState] = useState({
+  bold: false,
+  italic: false,
+  underline: false,
+  align: 'left'
+});
+
+const applyFormat = (format) => {
+  const textarea = document.getElementById('event-textarea');
+  if (!textarea) return;
+  
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selectedText = eventText.substring(start, end);
+  
+  if (!selectedText) {
+    showConfirm('Выделите текст для форматирования!');
+    return;
+  }
+  
+  let formattedText = selectedText;
+  
+  switch(format) {
+    case 'bold':
+      formattedText = `**${selectedText}**`;
+      break;
+    case 'italic':
+      formattedText = `*${selectedText}*`;
+      break;
+    case 'underline':
+      formattedText = `__${selectedText}__`;
+      break;
+  }
+  
+  const newText = eventText.substring(0, start) + formattedText + eventText.substring(end);
+  setEventText(newText);
+  
+  setTimeout(() => {
+    textarea.focus();
+    textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+  }, 0);
+};
+
+const setAlignment = (align) => {
+  setFormatState({...formatState, align});
 };
 
 const saveEvent = async () => {
@@ -138,6 +265,45 @@ const saveEvent = async () => {
     setShowEventModal(false);
     showConfirm('Событие добавлено!');
   }
+};
+
+const saveNews = async () => {
+  if (!newsForm.title.trim() || !newsForm.content.trim()) {
+    showConfirm('Заполните название и текст новости!');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('site_news')
+    .insert({
+      title: newsForm.title,
+      content: newsForm.content
+    });
+
+  if (error) {
+    showConfirm('Ошибка: ' + error.message);
+  } else {
+    setNewsForm({ title: '', content: '' });
+    setShowAddNewsModal(false);
+    loadNews();
+    showConfirm('Новость добавлена!');
+  }
+};
+
+const deleteNews = async (newsId) => {
+  showConfirm('Удалить новость?', async () => {
+    const { error } = await supabase
+      .from('site_news')
+      .delete()
+      .eq('id', newsId);
+
+    if (error) {
+      showConfirm('Ошибка: ' + error.message);
+    } else {
+      loadNews();
+      setShowNewsModal(false);
+    }
+  });
 };
 
 const deleteEvent = async (eventIndex) => {
@@ -186,12 +352,13 @@ const getDaysInMonth = (date) => {
     };
   }, [expandedWork]);
 
-  useEffect(() => {
-    loadWorks();
-    loadSettings();
-    checkUser();
-    loadSiteUpdates();
-  }, []);
+useEffect(() => {
+  loadWorks();
+  loadSettings();
+  checkUser();
+  loadSiteUpdates();
+  loadNews(); // ← ДОБАВЬ ЭТУ СТРОКУ
+}, []);
 
 useEffect(() => {
   const savedTheme = localStorage.getItem('theme');
@@ -337,6 +504,21 @@ const checkUser = async () => {
       console.error('Ошибка загрузки обновлений:', err);
     }
   };
+
+const loadNews = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('site_news')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    
+    if (error) throw error;
+    setNewsPosts(data || []);
+  } catch (err) {
+    console.error('Ошибка загрузки новостей:', err);
+  }
+};
 
   const loadSettings = async () => {
     try {
@@ -697,31 +879,33 @@ showConfirm('Вы уверены? Это действие необратимо!'
 };
   
   const saveText = async () => {
-    try {
-      const updateData = editingSection === 'news' 
-        ? { news_text: editText } 
-        : { about_text: editText };
+  try {
+    const textWithAlignment = `[ALIGN:${textFormatState.align}]${editText}`;
+    
+    const updateData = editingSection === 'news' 
+      ? { news_text: textWithAlignment } 
+      : { about_text: textWithAlignment };
 
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({ id: 1, ...updateData }, { onConflict: 'id' });
+    const { error } = await supabase
+      .from('site_settings')
+      .upsert({ id: 1, ...updateData }, { onConflict: 'id' });
 
-      if (error) throw error;
-      
-      if (editingSection === 'news') {
-        setNewsText(editText);
-      } else {
-        setAboutText(editText);
-      }
-      
-      setShowEditModal(false);
-      setEditingSection(null);
-      setEditText('');
-    showConfirm('✅ Текст сохранён!');
-    } catch (err) {
-    showConfirm('❌ Ошибка: ' + err.message);
+    if (error) throw error;
+    
+    if (editingSection === 'news') {
+      setNewsText(textWithAlignment);
+    } else {
+      setAboutText(textWithAlignment);
     }
-  };
+    
+    setShowEditModal(false);
+    setEditingSection(null);
+    setEditText('');
+    showConfirm('✅ Текст сохранён!');
+  } catch (err) {
+    showConfirm('❌ Ошибка: ' + err.message);
+  }
+};
 
   const savePopularWork = async (index) => {
     try {
@@ -1096,7 +1280,7 @@ return (
                -webkit-text-fill-color: transparent;
        background-clip: text;
        animation: shimmer 3s linear infinite;`
-    : `background-image: linear-gradient(to bottom, #4e040f  0%, #000000 100%);
+    : `background-image: linear-gradient(to bottom, #640816  0%, #000000 100%);
        -webkit-background-clip: text;
        -webkit-text-fill-color: transparent;
        background-clip: text;`
@@ -1183,103 +1367,123 @@ return (
   </h2>
   
   <div className="grid grid-cols-3 gap-2 sm:gap-6">
-    {popularWorks.map((work, index) => (
-      <div
-        key={work.id}
-        className="relative rounded-lg sm:rounded-xl py-3 px-2 sm:p-6 transition hover:scale-105"
-        style={{
-          background: isDarkTheme
-            ? 'rgba(0, 0, 0, 0.3)'
-            : 'transparent',
-          backdropFilter: 'blur(10px)',
-          border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
-          borderRadius: '12px',
-          backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
-          boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none',
-          position: 'relative'
-        }}
-      >
-        {!isDarkTheme && (
-          <div style={{
-            position: 'absolute',
-            inset: '-3px',
-            borderRadius: '12px',
-            padding: '3px',
-            background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            WebkitMaskComposite: 'xor',
-            maskComposite: 'exclude',
-            pointerEvents: 'none',
-            zIndex: -1
-          }} />
-        )}
-        
-        {isAdmin && (
-          <button
-            onClick={() => {
-              setEditingPopularIndex(index);
-              setEditPopularForm(work);
-              setShowPopularEditModal(true);
-            }}
-            className="absolute top-1 right-1 sm:top-3 sm:right-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition"
-            style={{
-              background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
-              boxShadow: '0 0 10px rgba(220, 38, 38, 0.8)'
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        )}
+{popularWorks.map((work, index) => (
+  <div key={work.id} className="relative">
+{/* БОЛЬШАЯ ЦИФРА СНАРУЖИ */}
+<div className="absolute -left-2 sm:-left-4 bottom-2 sm:bottom-4 z-20 pointer-events-none" style={{
+  fontSize: 'clamp(80px, 20vw, 180px)',
+  fontWeight: '900',
+  lineHeight: '0.75',
+  WebkitTextStroke: '3px rgba(255, 255, 255, 0.3)',
+  color: 'transparent',
+  textShadow: '0 5px 20px rgba(0, 0, 0, 0.8)',
+  transform: 'translateX(8px)' // Сдвиг вправо на 8px
+}}>
+  {index + 1}
+</div>
 
-        {work.title ? (
-          <>
-            <h3 className="font-bold text-[10px] sm:text-lg md:text-xl mb-2 sm:mb-6 text-center break-words leading-tight line-clamp-2" style={{
-              color: isDarkTheme ? '#b3e7ef' : 'transparent',
-              textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontStyle: !isDarkTheme ? 'italic' : 'normal',
-              backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-              backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-              WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-              WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-              backgroundClip: !isDarkTheme ? 'text' : 'unset'
-            }}>
-              {work.title}
-            </h3>
-            
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-0.5 sm:gap-6">
-              <div className="flex items-center gap-1">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-                <span className="text-white font-bold text-[10px] sm:text-lg">
-                  {work.rating || '—'}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-1">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                </svg>
-                <span className="text-white font-bold text-[10px] sm:text-lg">
-                  {work.views || '—'}
-                </span>
-              </div>
+    {/* КАРТОЧКА */}
+    <div className="relative rounded-lg sm:rounded-xl transition hover:scale-105 overflow-hidden" style={{
+      background: isDarkTheme ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+      backdropFilter: 'blur(10px)',
+      border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
+      borderRadius: '12px',
+      backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
+      boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none'
+    }}>
+      
+      {!isDarkTheme && (
+        <div style={{
+          position: 'absolute',
+          inset: '-3px',
+          borderRadius: '12px',
+          padding: '3px',
+          background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+          pointerEvents: 'none',
+          zIndex: -1
+        }} />
+      )}
+      
+      {isAdmin && (
+        <button
+          onClick={() => {
+            setEditingPopularIndex(index);
+            setEditPopularForm(work);
+            setShowPopularEditModal(true);
+          }}
+          className="absolute top-1 right-1 sm:top-3 sm:right-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition z-30"
+          style={{
+            background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+            boxShadow: '0 0 10px rgba(220, 38, 38, 0.8)'
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      )}
+
+      {/* ОБЛОЖКА - УЗКИЙ ВЕРТИКАЛЬНЫЙ ПРЯМОУГОЛЬНИК */}
+      {work.cover_url && (
+        <div className="w-[60%] mx-auto mt-2 sm:mt-3 rounded-lg overflow-hidden">
+          <img 
+            src={work.cover_url} 
+            alt={work.title}
+            className="w-full h-auto"
+            style={{ aspectRatio: '2/3', objectFit: 'cover' }}
+          />
+        </div>
+      )}
+
+      {work.title ? (
+        <div className="p-2 sm:p-4">
+          <h3 className="font-bold text-[10px] sm:text-base mb-2 text-center break-words line-clamp-2" style={{
+            color: isDarkTheme ? '#b3e7ef' : 'transparent',
+            textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontStyle: !isDarkTheme ? 'italic' : 'normal',
+            backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+            WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+            WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+          }}>
+            {work.title}
+          </h3>
+          
+          <div className="flex justify-center items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff" className="sm:w-4 sm:h-4">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span className="text-white font-bold text-[10px] sm:text-sm">
+                {work.rating || '—'}
+              </span>
             </div>
-          </>
-        ) : (
-          <div className="text-center py-2 sm:py-8">
-            <p className="text-gray-400 text-[10px] sm:text-sm">
-              Скоро здесь появится работа
-            </p>
+            
+            <div className="flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-4 sm:h-4">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              <span className="text-white font-bold text-[10px] sm:text-sm">
+                {work.views || '—'}
+              </span>
+            </div>
           </div>
-        )}
-      </div>
-    ))}
+        </div>
+      ) : (
+        <div className="text-center py-4 sm:py-8">
+          <p className="text-gray-400 text-[10px] sm:text-sm">
+            Скоро здесь появится работа
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+))}
   </div>
   
     {/* НОВЫЙ ТЕКСТ ДОБАВЛЯЕТСЯ ЗДЕСЬ */}
@@ -1291,80 +1495,186 @@ return (
   </p>
 </div>
 
-{/* НОВОСТИ */}
-<div className="max-w-3xl mx-auto mt-8 sm:mt-12 relative z-0">
-<div className="p-6 sm:p-10 relative" style={{
-  background: isDarkTheme 
-    ? 'rgba(147, 51, 234, 0.15)' 
-    : 'radial-gradient(ellipse at center, rgba(113, 20, 31, 0.8) 0%, rgba(74, 13, 21, 0.95) 100%)',
-  borderRadius: '24px',
-  border: isDarkTheme ? '2px solid transparent' : '2px solid #c2c2a8',
-  backgroundImage: isDarkTheme ? 'linear-gradient(#000, #000), linear-gradient(135deg, #9370db 0%, #ef01cb 100%)' : 'none',
-  backgroundOrigin: isDarkTheme ? 'border-box' : 'unset',
-  backgroundClip: isDarkTheme ? 'padding-box, border-box' : 'unset',
-  backdropFilter: 'blur(20px)',
-  boxShadow: isDarkTheme 
-    ? '0 0 30px rgba(147, 51, 234, 0.6)' 
-    : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'  // ← ДОБАВЬ ЭТО!
-}}>
-    {isAdmin && (
-      <button
-        onClick={() => {
-          setEditingSection('news');
-          setEditText(newsText);
-          setShowEditModal(true);
-        }}
-        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
-        title="Редактировать новости"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    )}
-    <div className="text-white text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
-      <p>{newsText}</p>
+{/* БЛОК НОВОСТЕЙ */}
+{newsPosts.length > 0 && (
+  <div className="max-w-5xl mx-auto mt-12 sm:mt-20 relative z-0 px-4">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl sm:text-3xl font-bold" style={{
+        color: isDarkTheme ? '#b3e7ef' : 'transparent',
+        textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
+        fontFamily: "'Playfair Display', Georgia, serif",
+        fontStyle: !isDarkTheme ? 'italic' : 'normal',
+        backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+      }}>
+        Новости
+      </h2>
+      
+      {isAdmin && (
+        <button
+          onClick={() => setShowAddNewsModal(true)}
+          className="px-4 py-2 rounded-lg font-bold text-sm transition"
+          style={{
+            background: isDarkTheme ? 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)' : '#c9c6bb',
+            color: isDarkTheme ? '#ffffff' : '#000000',
+            boxShadow: isDarkTheme ? '0 0 10px rgba(220, 38, 38, 0.8)' : 'none'
+          }}
+        >
+          + Добавить новость
+        </button>
+      )}
+    </div>
+
+    <div className="relative">
+{/* СТРЕЛКА ВЛЕВО */}
+{newsCarouselIndex > 0 && (
+  <button
+    onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
+    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-3 flex items-center justify-center transition group"
+    style={{
+  
+      width: '60px'
+    }}
+  >
+    <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
+      width: '40px',
+      height: '80px',
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: '2px solid rgba(255, 255, 255, 0.5)'
+    }}>
+      <ChevronLeft size={32} color="#ffffff" />
+    </div>
+  </button>
+)}
+
+      {/* КАРТОЧКИ НОВОСТЕЙ */}
+      <div className="overflow-hidden">
+        <div 
+          className="flex gap-4 transition-transform duration-300"
+          style={{ transform: `translateX(-${newsCarouselIndex * 100}%)` }}
+        >
+          {newsPosts.map((news) => (
+ <div
+  key={news.id}
+  onClick={() => {
+    setSelectedNews(news);
+    setShowNewsModal(true);
+  }}
+  className="min-w-full sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] p-6 rounded-xl cursor-pointer transition hover:scale-105"
+  style={{
+    background: isDarkTheme 
+      ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
+      : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
+    border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
+    backdropFilter: 'blur(20px)',
+    boxShadow: isDarkTheme 
+      ? '0 0 30px rgba(147, 51, 234, 0.4)'
+      : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+  }}
+>
+              <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{
+                color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
+              }}>
+                {news.title}
+              </h3>
+              <p className="text-sm mb-4" style={{
+                color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
+                opacity: 0.8
+              }}>
+                {new Date(news.created_at).toLocaleDateString('ru-RU', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </p>
+              <button className="text-sm font-semibold" style={{
+                color: isDarkTheme ? '#9370db' : '#c9c6bb'
+              }}>
+                Читать →
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+{/* СТРЕЛКА ВПРАВО */}
+{newsCarouselIndex < newsPosts.length - 1 && (
+  <button
+    onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
+    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-3 flex items-center justify-center transition group"
+    style={{
+     
+      width: '60px'
+    }}
+  >
+    <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
+      width: '40px',
+      height: '80px',
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: '2px solid rgba(255, 255, 255, 0.5)'
+    }}>
+      <ChevronRight size={32} color="#ffffff" />
+    </div>
+  </button>
+)}
     </div>
   </div>
-</div>
+)}
 
 {/* ABOUT SECTION */}
 <div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
 <div className="p-6 sm:p-10 relative" style={{
   background: isDarkTheme 
-    ? 'rgba(147, 51, 234, 0.15)' 
-    : 'radial-gradient(ellipse at center, rgba(113, 20, 31, 0.8) 0%, rgba(74, 13, 21, 0.95) 100%)',
+    ? 'rgba(0, 0, 0, 0.3)' 
+    : 'transparent',
   borderRadius: '24px',
-  border: isDarkTheme ? '2px solid transparent' : '2px solid #c2c2a8',
-  backgroundImage: isDarkTheme ? 'linear-gradient(#000, #000), linear-gradient(135deg, #9370db 0%, #ef01cb 100%)' : 'none',
-  backgroundOrigin: isDarkTheme ? 'border-box' : 'unset',
-  backgroundClip: isDarkTheme ? 'padding-box, border-box' : 'unset',
-  backdropFilter: 'blur(20px)',
+  border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
+  backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
+  backdropFilter: 'blur(10px)',
   boxShadow: isDarkTheme 
-    ? '0 0 30px rgba(147, 51, 234, 0.6)' 
-    : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'  // ← ДОБАВЬ ЭТО!
+    ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' 
+    : 'none'
 }}>
 
-    {isAdmin && (
-      <button
-        onClick={() => {
-          setEditingSection('about');
-          setEditText(aboutText);
-          setShowEditModal(true);
-        }}
-        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
-        title="Редактировать информацию"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    )}
-    <div className="text-white text-center leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
-      <p>{aboutText}</p>
-    </div>
+{!isDarkTheme && (
+  <div style={{
+    position: 'absolute',
+    inset: '-3px',
+    borderRadius: '24px',
+    padding: '3px',
+    background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1
+  }} />
+)}
+ {isAdmin && (
+  <button
+    onClick={() => {
+      setEditingSection('about');
+      const alignMatch = aboutText.match(/^\[ALIGN:(left|center|right)\]/);
+      const align = alignMatch ? alignMatch[1] : 'left';
+      const cleanText = aboutText.replace(/^\[ALIGN:(left|center|right)\]/, '');
+      
+      setEditText(cleanText);
+      setTextFormatState({ ...textFormatState, align });
+      setShowEditModal(true);
+    }}
+    className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
+    title="Редактировать информацию"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
+)}
+<div className="text-white text-center leading-relaxed text-sm sm:text-base">
+  {renderFormattedText(aboutText)}
+</div>
   </div>
 </div>
 
@@ -3243,12 +3553,87 @@ onClick={async () => {
         </button>
       </div>
 
+      {/* ПАНЕЛЬ ИНСТРУМЕНТОВ */}
+      <div className="flex gap-2 mb-3 flex-wrap">
+        <button
+          onClick={() => applyTextFormat('bold')}
+          className="px-3 py-2 rounded font-bold text-white"
+          style={{
+            background: textFormatState.bold ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+        >
+          B
+        </button>
+        <button
+          onClick={() => applyTextFormat('italic')}
+          className="px-3 py-2 rounded italic text-white"
+          style={{
+            background: textFormatState.italic ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+        >
+          I
+        </button>
+        <button
+          onClick={() => applyTextFormat('underline')}
+          className="px-3 py-2 rounded underline text-white"
+          style={{
+            background: textFormatState.underline ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+        >
+          U
+        </button>
+        
+        <div className="flex-1" />
+        
+        <button 
+          onClick={() => setTextAlignment('left')} 
+          className="px-3 py-2 rounded text-white"
+          style={{ 
+            background: textFormatState.align === 'left' ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+          title="По левому краю"
+        >
+          ⬅
+        </button>
+        <button 
+          onClick={() => setTextAlignment('center')} 
+          className="px-3 py-2 rounded text-white"
+          style={{ 
+            background: textFormatState.align === 'center' ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+          title="По центру"
+        >
+          ↕
+        </button>
+        <button 
+          onClick={() => setTextAlignment('right')} 
+          className="px-3 py-2 rounded text-white"
+          style={{ 
+            background: textFormatState.align === 'right' ? '#dc2626' : 'rgba(220, 38, 38, 0.3)',
+            border: '1px solid #dc2626'
+          }}
+          title="По правому краю"
+        >
+          ➡
+        </button>
+      </div>
+
       <textarea
+        id="text-editor-textarea"
         value={editText}
         onChange={(e) => setEditText(e.target.value)}
-        rows={10}
+        rows={12}
         className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 mb-4 text-sm sm:text-base focus:outline-none focus:border-red-600 text-white resize-none"
         placeholder="Введите текст..."
+        style={{
+          textAlign: textFormatState.align,
+          whiteSpace: 'pre-wrap'
+        }}
       />
 
       <button
@@ -3292,6 +3677,33 @@ onClick={async () => {
             className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
           />
         </div>
+
+<div>
+  <label className="block text-gray-300 text-sm mb-2">Обложка</label>
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      
+      if (file.size > 2 * 1024 * 1024) {
+        showConfirm('Файл слишком большой! Максимум 2MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditPopularForm({...editPopularForm, cover_url: reader.result});
+      };
+      reader.readAsDataURL(file);
+    }}
+    className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
+  />
+  {editPopularForm.cover_url && (
+    <img src={editPopularForm.cover_url} alt="Preview" className="mt-2 w-32 h-auto rounded" />
+  )}
+</div>
 
         <div>
           <label className="block text-gray-300 text-sm mb-2">Оценка</label>
@@ -4034,15 +4446,17 @@ onClick={() => {
       </div>
 
       {/* СПИСОК СОБЫТИЙ - ВИДЯТ ВСЕ */}
-      <div className="space-y-3 mb-4">
-        {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length > 0 ? (
-          calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event, idx) => (
-            <div key={idx} className="flex justify-between items-center p-2 rounded" style={{
-              background: 'rgba(91, 1, 32, 0.3)',
-              border: '1px solid #5b0120'
-            }}>
-              <span className="text-sm" style={{ color: '#ffffff' }}>{event}</span>
-              {isAdmin && (
+ <div className="space-y-3 mb-4">
+  {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length > 0 ? (
+    calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event, idx) => (
+      <div key={idx} className="flex justify-between items-start p-2 rounded" style={{
+        background: 'rgba(91, 1, 32, 0.3)',
+        border: '1px solid #5b0120'
+      }}>
+        <div className="text-sm flex-1" style={{ color: '#ffffff' }}>
+          {renderFormattedText(event)}
+        </div>
+        {isAdmin && (
                 <button onClick={() => deleteEvent(idx)} className="text-red-500 hover:text-red-400">
                   <Trash2 size={16} />
                 </button>
@@ -4058,55 +4472,324 @@ onClick={() => {
 
       {/* ФОРМА ДОБАВЛЕНИЯ - ТОЛЬКО ДЛЯ АДМИНА */}
       {isAdmin && (
-        <>
-          <textarea
-            value={eventText}
-            onChange={(e) => setEventText(e.target.value)}
-            placeholder="Введите событие..."
-            rows={3}
-            className="w-full rounded px-3 py-2 mb-4 text-sm"
-            style={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: isDarkTheme ? '1px solid #9333ea' : '1px solid #c9c6bb',
-              color: '#ffffff'
-            }}
-          />
+  <>
+    <div className="flex gap-2 mb-2">
+      <button
+        onClick={() => applyFormat('bold')}
+        className="px-3 py-1 rounded font-bold"
+        style={{
+          background: formatState.bold ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
+          border: '1px solid #9333ea'
+        }}
+      >
+        B
+      </button>
+      <button
+        onClick={() => applyFormat('italic')}
+        className="px-3 py-1 rounded italic"
+        style={{
+          background: formatState.italic ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
+          border: '1px solid #9333ea'
+        }}
+      >
+        I
+      </button>
+      <button
+        onClick={() => applyFormat('underline')}
+        className="px-3 py-1 rounded underline"
+        style={{
+          background: formatState.underline ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
+          border: '1px solid #9333ea'
+        }}
+      >
+        U
+      </button>
+      <div className="flex-1" />
+      <button onClick={() => setAlignment('left')} className="px-2 py-1" style={{ background: formatState.align === 'left' ? '#5b0120' : 'transparent' }}>⬅</button>
+      <button onClick={() => setAlignment('center')} className="px-2 py-1" style={{ background: formatState.align === 'center' ? '#5b0120' : 'transparent' }}>↕</button>
+      <button onClick={() => setAlignment('right')} className="px-2 py-1" style={{ background: formatState.align === 'right' ? '#5b0120' : 'transparent' }}>➡</button>
+    </div>
+    
+<textarea
+  id="event-textarea"
+  value={eventText}
+  onChange={(e) => setEventText(e.target.value)}
+  placeholder="Введите событие..."
+  rows={5}
+  className="w-full rounded px-3 py-2 mb-4 text-sm resize-none"
+  style={{
+    background: 'rgba(0, 0, 0, 0.4)',
+    border: isDarkTheme ? '1px solid #9333ea' : '1px solid #c9c6bb',
+    color: '#ffffff',
+    textAlign: formatState.align,
+    whiteSpace: 'pre-wrap'
+  }}
+/>
 
-          <button
-            onClick={saveEvent}
-            className="w-full py-2 rounded font-bold"
-            style={{
-              background: isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb',
-              color: isDarkTheme ? '#ffffff' : '#000000'
-            }}
-          >
-            Сохранить событие
-          </button>
+<button
+  onClick={saveEvent}
+  className="w-full py-2 rounded font-bold"
+  style={{
+    background: isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb',
+    color: isDarkTheme ? '#ffffff' : '#000000'
+  }}
+>
+  Сохранить событие
+</button>
         </>
       )}
     </div>
   </div>
 )}
 
+{/* МОДАЛЬНОЕ ОКНО ЧТЕНИЯ НОВОСТИ - ТЕМНАЯ ТЕМА */}
+{showNewsModal && selectedNews && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl p-6 border-2 max-h-[80vh] overflow-y-auto" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold shimmer-btn-text mb-2">
+            {selectedNews.title}
+          </h2>
+          <p className="text-sm text-gray-400">
+            {new Date(selectedNews.created_at).toLocaleDateString('ru-RU', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <button
+              onClick={() => deleteNews(selectedNews.id)}
+              className="text-red-500 hover:text-red-400"
+            >
+              <Trash2 size={20} />
+            </button>
+          )}
+          <button onClick={() => setShowNewsModal(false)} className="text-gray-400 hover:text-white">
+            <X size={24} />
+          </button>
+        </div>
+      </div>
+
+      <div className="text-white leading-relaxed whitespace-pre-wrap">
+        {selectedNews.content}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ЧТЕНИЯ НОВОСТИ - СВЕТЛАЯ ТЕМА */}
+{showNewsModal && selectedNews && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl p-6 relative max-h-[80vh] overflow-y-auto" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '2px solid #c2c2a8',
+      backdropFilter: 'blur(20px)',
+      boxShadow: 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+    }}>
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold mb-2" style={{
+            color: '#c9c6bb',
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontStyle: 'italic'
+          }}>
+            {selectedNews.title}
+          </h2>
+          <p className="text-sm" style={{ color: '#c9c6bb', opacity: 0.7 }}>
+            {new Date(selectedNews.created_at).toLocaleDateString('ru-RU', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <button
+              onClick={() => deleteNews(selectedNews.id)}
+              style={{ color: '#c9c6bb' }}
+            >
+              <Trash2 size={20} />
+            </button>
+          )}
+          <button onClick={() => setShowNewsModal(false)} style={{ color: '#c9c6bb' }}>
+            <X size={24} />
+          </button>
+        </div>
+      </div>
+
+      <div className="leading-relaxed whitespace-pre-wrap" style={{ color: '#c9c6bb' }}>
+        {selectedNews.content}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ НОВОСТИ - ТЕМНАЯ ТЕМА */}
+{showAddNewsModal && isAdmin && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Добавить новость</h2>
+        <button onClick={() => {
+          setShowAddNewsModal(false);
+          setNewsForm({ title: '', content: '' });
+        }} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Заголовок</label>
+          <input
+            type="text"
+            value={newsForm.title}
+            onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+            placeholder="Введите заголовок новости"
+            className="w-full border rounded px-4 py-3 text-white focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 text-sm mb-2">Текст новости</label>
+          <textarea
+            value={newsForm.content}
+            onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+            rows={8}
+            placeholder="Введите полный текст новости..."
+            className="w-full border rounded px-4 py-3 text-white focus:outline-none resize-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderColor: '#9333ea'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={saveNews}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
+          }}
+        >
+          Опубликовать
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ НОВОСТИ - СВЕТЛАЯ ТЕМА */}
+{showAddNewsModal && isAdmin && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl p-6 relative" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '2px solid #c2c2a8',
+      backdropFilter: 'blur(20px)',
+      boxShadow: 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+    }}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Добавить новость</h2>
+        <button onClick={() => {
+          setShowAddNewsModal(false);
+          setNewsForm({ title: '', content: '' });
+        }} style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Заголовок</label>
+          <input
+            type="text"
+            value={newsForm.title}
+            onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+            placeholder="Введите заголовок новости"
+            className="w-full rounded px-4 py-3 focus:outline-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid #c9c6bb',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Текст новости</label>
+          <textarea
+            value={newsForm.content}
+            onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+            rows={8}
+            placeholder="Введите полный текст новости..."
+            className="w-full rounded px-4 py-3 focus:outline-none resize-none"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.4)',
+              border: '1px solid #c9c6bb',
+              color: '#c9c6bb'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={saveNews}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: '#c9c6bb',
+            color: '#000000'
+          }}
+        >
+          Опубликовать
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 {/* FOOTER */}
 <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
-  <p className="text-base sm:text-lg mb-2">MelloStory © 2026</p>
-  <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap px-4">
-<Link href="/privacy" className="text-sm text-gray-400 hover:text-gray-400 transition underline">
-  Политика конфиденциальности
-</Link>
-<span className="text-gray-600">•</span>
-<Link href="/terms" className="text-sm text-gray-400 hover:text-gray-400 transition underline">
-  Пользовательское соглашение
-</Link>
-<span className="text-gray-600">•</span>
-<Link href="/mission" className="text-sm text-gray-400 hover:text-gray-400 transition underline">
-  Миссия сайта
-</Link>
-<span className="text-gray-600">•</span>
-<Link href="/news" className="text-sm text-gray-400 hover:text-gray-400 transition underline">
-  Новости сайта
-</Link>
+  <p className="text-sm sm:text-base mb-2">MelloStory © 2026</p>
+  <p className="text-xs sm:text-sm mb-4 px-4">Все права защищены. Копирование и распространение материалов без письменного разрешения запрещено.</p>
+  <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap px-4 text-xs sm:text-sm">
+    <Link href="/privacy" className="text-gray-400 hover:text-gray-300 transition underline">
+      Политика конфиденциальности
+    </Link>
+    <span className="text-gray-600">•</span>
+    <Link href="/terms" className="text-gray-400 hover:text-gray-300 transition underline">
+      Пользовательское соглашение
+    </Link>
+    <span className="text-gray-600">•</span>
+    <Link href="/mission" className="text-gray-400 hover:text-gray-300 transition underline">
+      Миссия сайта
+    </Link>
   </div>
 </footer>
       </div>

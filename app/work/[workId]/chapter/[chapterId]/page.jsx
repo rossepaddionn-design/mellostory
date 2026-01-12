@@ -773,7 +773,9 @@ if (showAgeVerification) {
 
 return (
 <div className="min-h-screen text-white" style={{ 
-  backgroundColor: isDarkTheme ? '#b18dc4' : '#2d010a'
+  background: isDarkTheme 
+    ? 'linear-gradient(225deg, #000000 0%, #4d3370 20%, #987caf 40%, #523166 60%, #0d0020 80%, #000000 100%)'
+    : 'radial-gradient(circle at center, #1a0000 0%, #330514 35%, #50061b 65%, #000000 100%)'
 }}>
  {/* PROGRESS BAR */}
 <div className="fixed top-0 left-0 right-0 z-50 h-1 sm:h-1.5" style={{ backgroundColor: isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(145, 129, 80, 0.3)' }}>
@@ -1620,7 +1622,7 @@ style={{
   </>
 )}
 <h1 className="text-base sm:text-lg md:text-xl font-bold mb-2 break-words" style={{
-  color: isDarkTheme ? '#7626b5' : '#65635d',
+  color: isDarkTheme ? '#c6abda' : '#807f7c',
   textShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.8)' : 'none',
   fontFamily: "'Playfair Display', Georgia, serif",
   fontStyle: isDarkTheme ? 'normal' : 'italic'
@@ -2895,6 +2897,24 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     </div>
   </div>
 )}
+
+{/* ФУТЕР С КОПИРАЙТОМ */}
+<footer className="mt-12 py-6 border-t" style={{
+  borderColor: isDarkTheme ? 'rgba(147, 112, 219, 0.3)' : 'rgba(180, 154, 95, 0.3)'
+}}>
+  <div className="text-center">
+    <p className="text-xs sm:text-sm mb-2" style={{
+      color: isDarkTheme ? '#9ca3af' : '#c9c6bb'
+    }}>
+      © {new Date().getFullYear()} MelloStory. Все права защищены.
+    </p>
+    <p className="text-xs" style={{
+      color: isDarkTheme ? '#6b7280' : '#a89f8f'
+    }}>
+      Копирование и распространение материалов без письменного разрешения запрещено.
+    </p>
+  </div>
+</footer>
       </main>
     </div>
   );

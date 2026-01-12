@@ -716,13 +716,7 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[400px_1fr] gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* ОБЛОЖКА */}
           <div>
-<div className="rounded-xl sm:rounded-2xl overflow-hidden md:sticky md:top-8 max-w-sm mx-auto md:max-w-none relative" style={{
-  padding: '3px',
-  background: isDarkTheme 
-    ? '#9333ea' 
-    : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-  borderRadius: '24px'
-}}>
+<div className="rounded-xl sm:rounded-2xl overflow-hidden md:sticky md:top-8 max-w-sm mx-auto md:max-w-none relative">
 
   
 <div className={isDarkTheme ? "pulse-cover-container shadow-2xl rounded-xl" : "shadow-2xl rounded-xl"} style={{
