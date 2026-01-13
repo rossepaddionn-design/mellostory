@@ -1,4 +1,5 @@
 'use client';
+import '@/app/fonts.css'; 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -758,7 +759,7 @@ return (
   }
 `}} />
 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words" style={{ 
-  fontFamily: "'Playfair Display', Georgia, serif",
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   color: 'transparent',
   backgroundImage: isDarkTheme 
@@ -1078,7 +1079,7 @@ return (
     : 'none'
 }}>
   <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3" style={{
-    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
     color: isDarkTheme ? '#9333ea' : 'transparent',
     background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
     WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
@@ -1098,7 +1099,7 @@ return (
       : 'none'
   }}>
     <h2 className="text-base sm:text-lg font-bold mb-2" style={{
-      fontStyle: !isDarkTheme ? 'italic' : 'normal',
+      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
       color: isDarkTheme ? '#9333ea' : 'transparent',
       background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
       WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
@@ -1230,7 +1231,7 @@ return (
 {/* СОДЕРЖАНИЕ */}
 <div className="mb-4 sm:mb-6">
   <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{ 
-    fontFamily: "'Playfair Display', Georgia, serif",
+    fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
     color: isDarkTheme ? '#D3D3D3' : 'transparent',
     background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
     WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',

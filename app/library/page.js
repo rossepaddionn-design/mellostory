@@ -1,4 +1,5 @@
 'use client';
+import '@/app/fonts.css'; 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -268,13 +269,13 @@ return (
             Назад
           </Link>
 
-<h1 className="text-3xl font-bold mb-8 text-center" style={{
+<h1 className="text-4xl font-bold mb-8 text-center" style={{
   color: isDarkTheme ? 'transparent' : 'transparent',
-  fontFamily: "'Playfair Display', Georgia, serif",
+  fontFamily: isDarkTheme ? "'druzhok', Georgia, serif" : "'miamanueva', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%)'
-    : 'radial-gradient(ellipse at top left, #cac8c8 0%, #82713a 100%)',
+    ? 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #a67cce 100%)'
+    : 'radial-gradient(ellipse at top left, #cac8c8 0%, #746d55 100%)',
   backgroundSize: isDarkTheme ? '200% auto' : 'auto',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',

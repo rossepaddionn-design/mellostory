@@ -1,4 +1,5 @@
 'use client';
+import '@/app/fonts.css'; 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -1025,16 +1026,6 @@ return (
       <link rel="preload" href="/images/main-bg.jpg" as="image" />
       <link rel="preload" href="/images/header-bg.jpg" as="image" />
 
-<style dangerouslySetInnerHTML={{__html: `
-  @font-face {
-    font-family: 'Anticva';
-    src: url('/fonts/ofont.ru_Anticva.ttf') format('truetype');
-  }
-  @font-face {
-    font-family: 'RuinedC';
-    src: url('/fonts/ofont.ru_RuinedC.ttf') format('truetype');
-  }
-`}} />
 
 <style dangerouslySetInnerHTML={{__html: `
   /* Скроллбар для модальных окон - ТЕМНАЯ ТЕМА */
@@ -1260,7 +1251,7 @@ return (
   </div>
  <div className="flex-1 flex items-center justify-center px-4 pb-8">
 <h1
-  className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest"
+  className="text-3xl sm:text-7xl md:text-6xl lg:text-8xl font-bold tracking-widest"
   style={{
     fontFamily: "'Playfair Display', Georgia, serif"
   }}
@@ -1272,18 +1263,20 @@ return (
           0% { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
-        .mello-shimmer {
-          ${isDarkTheme 
-            ? `background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #9f68f3 66%, #a855f7 100%);
-               background-size: 200% auto;
-               -webkit-background-clip: text;
-               -webkit-text-fill-color: transparent;
-       background-clip: text;
-       animation: shimmer 3s linear infinite;`
-    : `background-image: linear-gradient(to bottom, #640816  0%, #000000 100%);
+.mello-shimmer {
+  ${isDarkTheme 
+    ? `background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #9f68f3 66%, #a855f7 100%);
+       background-size: 200% auto;
        -webkit-background-clip: text;
        -webkit-text-fill-color: transparent;
-       background-clip: text;`
+       background-clip: text;
+       animation: shimmer 3s linear infinite;
+       font-family: Playfair Display, Georgia, serif;`
+    : `background-image: linear-gradient(to bottom, #640816 0%, #000000 100%);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+       font-family: Playfair Display, Georgia, serif;`
   }
 }
         .story-text {
@@ -1294,6 +1287,7 @@ return (
                -webkit-background-clip: text;
                -webkit-text-fill-color: transparent;
                background-clip: text;`
+               
           }
         }
       `
@@ -1352,10 +1346,12 @@ return (
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
-  <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8" style={{
+<h2 className="text-center mb-6 sm:mb-8" style={{
+    fontWeight: 'bold',
+    fontSize: 'clamp(1rem, 3vw, 2rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
-    fontFamily: "'Playfair Display', Georgia, serif",
+    fontFamily: isDarkTheme ? 'druzhok, Georgia, serif' : 'miamanueva, Georgia, serif',
     fontStyle: !isDarkTheme ? 'italic' : 'normal',
     backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
     backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
@@ -1497,12 +1493,12 @@ return (
 
 {/* БЛОК НОВОСТЕЙ */}
 {newsPosts.length > 0 && (
-  <div className="max-w-5xl mx-auto mt-12 sm:mt-20 relative z-0 px-4">
+  <div className="max-w-5xl mx-auto mt-1 sm:mt-20 relative z-0 px-4">
     <div className="flex justify-between items-center mb-6">
-      <h2 className="text-2xl sm:text-3xl font-bold" style={{
-        color: isDarkTheme ? '#b3e7ef' : 'transparent',
-        textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
-        fontFamily: "'Playfair Display', Georgia, serif",
+<h2 className="text-2xl sm:text-3xl font-bold" style={{
+    color: isDarkTheme ? '#b3e7ef' : 'transparent',
+    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
+    fontFamily: isDarkTheme ? 'druzhok, Georgia, serif' : 'miamanueva, Georgia, serif',
         fontStyle: !isDarkTheme ? 'italic' : 'normal',
         backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
         WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
@@ -1531,11 +1527,7 @@ return (
 {newsCarouselIndex > 0 && (
   <button
     onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
-    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-3 flex items-center justify-center transition group"
-    style={{
-  
-      width: '60px'
-    }}
+    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-2 sm:px-3 flex items-center justify-center transition group"
   >
     <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
       width: '40px',
@@ -1549,7 +1541,7 @@ return (
 )}
 
       {/* КАРТОЧКИ НОВОСТЕЙ */}
-      <div className="overflow-hidden">
+      <div className="overflow-hidden px-5 sm:px-0">
         <div 
           className="flex gap-4 transition-transform duration-300"
           style={{ transform: `translateX(-${newsCarouselIndex * 100}%)` }}
@@ -1602,11 +1594,7 @@ return (
 {newsCarouselIndex < newsPosts.length - 1 && (
   <button
     onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
-    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-3 flex items-center justify-center transition group"
-    style={{
-     
-      width: '60px'
-    }}
+    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-2 sm:px-3 flex items-center justify-center transition group"
   >
     <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
       width: '40px',
@@ -4777,7 +4765,7 @@ onClick={() => {
 {/* FOOTER */}
 <footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
   <p className="text-sm sm:text-base mb-2">MelloStory © 2026</p>
-  <p className="text-xs sm:text-sm mb-4 px-4">Все права защищены. Копирование и распространение материалов без письменного разрешения запрещено.</p>
+  <p className="text-xs sm:text-sm mb-4 px-4">Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.</p>
   <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap px-4 text-xs sm:text-sm">
     <Link href="/privacy" className="text-gray-400 hover:text-gray-300 transition underline">
       Политика конфиденциальности

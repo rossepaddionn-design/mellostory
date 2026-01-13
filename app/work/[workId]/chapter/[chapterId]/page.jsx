@@ -1,4 +1,5 @@
 'use client';
+import '@/app/fonts.css'; 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -41,6 +42,7 @@ const [showRatingModal, setShowRatingModal] = useState(false);
 const [averageRating, setAverageRating] = useState(0);
 const [totalRatings, setTotalRatings] = useState(0);
 const [userRating, setUserRating] = useState(null);
+const [downloadingTracks, setDownloadingTracks] = useState([]);
 
 const carouselRef = useRef(null);
 
@@ -555,6 +557,30 @@ const toggleTheme = () => {
   localStorage.setItem('theme', newTheme ? 'dark' : 'light');
 };
 
+const downloadTrack = async (audioUrl, audioName, index) => {
+  if (downloadingTracks.includes(index)) return;
+  
+  setDownloadingTracks([...downloadingTracks, index]);
+  
+  try {
+    const response = await fetch(audioUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = audioName || `track-${index + 1}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Ошибка скачивания:', error);
+    showConfirm('Ошибка скачивания трека');
+  } finally {
+    setDownloadingTracks(downloadingTracks.filter(i => i !== index));
+  }
+};
+
 const deleteBookmark = async (bookmarkId) => {
   showConfirm('Удалить закладку?', async () => {
     try {
@@ -882,25 +908,19 @@ style={{
             boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
           }}>
 <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-              borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
-            }}>
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes chapterTitleShimmer {
-                  0% { background-position: -200% center; }
-                  100% { background-position: 200% center; }
-                }
-                .chapter-title-shimmer {
-                  background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
-                  background-size: 200% auto;
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                  background-clip: text;
-                  animation: chapterTitleShimmer 3s linear infinite;
-                }
-              `}} />
-              <h2 className="text-xl sm:text-2xl font-bold chapter-title-shimmer">
-                Содержание
-              </h2>
+  borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+}}>
+  <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
+    background: 'linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%)',
+    backgroundSize: '200% auto',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    animation: 'chapterTitleShimmer 3s linear infinite',
+    fontFamily: "'ppelganger', Georgia, serif"
+  }}>
+    Содержание
+  </h2>
               <button 
                 onClick={() => setShowChapterList(false)} 
                 className="transition rounded-full p-2 absolute right-4"
@@ -944,36 +964,51 @@ style={{
                 {allChapters.map((ch) => {
                   const isActive = String(ch.id) === String(chapterId);
                   return (
-                    <button
-                      key={ch.id}
-                      onClick={() => handleChapterSelect(ch.id)}
-                      className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
-                      style={{
-                        background: '#000000',
-                        border: `2px solid #c978f2`
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
-                          color: '#c084fc',
-                          minWidth: '30px'
-                        }}>
-                          {ch.chapter_number}.
-                        </span>
-                        <span className="text-sm sm:text-base break-words flex-1" style={{
-                          color: '#c084fc',
-                          fontWeight: isActive ? '600' : '400'
-                        }}>
-                          {ch.title}
-                        </span>
-                      </div>
-                    </button>
+ <button
+  key={ch.id}
+  onClick={() => handleChapterSelect(ch.id)}
+  className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
+  style={{
+    background: '#000000',
+    position: 'relative',
+    borderRadius: '12px'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = 'none';
+  }}
+>
+  <div style={{
+    position: 'absolute',
+    inset: '-2px',
+    borderRadius: '12px',
+    padding: '2px',
+    background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
+    backgroundSize: '200% 100%',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1,
+    animation: 'neonBorderFlow 3s linear infinite'
+  }} />
+  <div className="flex items-center gap-3">
+    <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
+      color: '#c084fc',
+      minWidth: '30px'
+    }}>
+      {ch.chapter_number}.
+    </span>
+    <span className="text-sm sm:text-base break-words flex-1" style={{
+      color: '#c084fc',
+      fontWeight: isActive ? '600' : '400'
+    }}>
+      {ch.title}
+    </span>
+  </div>
+</button>
                   );
                 })}
               </div>
@@ -987,35 +1022,35 @@ style={{
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     backdropFilter: 'blur(10px)'
   }}>
-<div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'rgba(0, 0, 0, 0.3)',
-  border: '3px solid transparent',
-  borderRadius: '16px',
-  backgroundClip: 'padding-box',
-  position: 'relative',
-  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-}}>
-  <div style={{
-    position: 'absolute',
-    inset: '-3px',
-    borderRadius: '16px',
-    padding: '3px',
-    background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1
-  }} />
+    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background: 'rgba(0, 0, 0, 0.3)',
+      border: '3px solid transparent',
+      borderRadius: '16px',
+      backgroundClip: 'padding-box',
+      position: 'relative',
+      boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '16px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
       <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
-<h2 className="text-xl sm:text-2xl font-bold" style={{
-  color: '#c9c6bb',
-  fontFamily: "'Playfair Display', Georgia, serif",
-  fontStyle: 'italic',
-  textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
-}}>
+        <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
+          color: '#c9c6bb',
+          fontFamily: "'miamanueva', Georgia, serif",
+          fontStyle: 'italic',
+          textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
+        }}>
           Содержание
         </h2>
         <button 
@@ -1032,23 +1067,23 @@ style={{
       </div>
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <style dangerouslySetInnerHTML={{__html: `
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
-    box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
-  }
-`}} />
+          .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
+            box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
+          }
+        `}} />
         <div className="space-y-2">
           {allChapters.map((ch) => {
             const isActive = String(ch.id) === String(chapterId);
@@ -1059,7 +1094,8 @@ style={{
                 className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
                 style={{
                   background: 'rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(180, 154, 95, 0.3)'
+                  position: 'relative',
+                  borderRadius: '12px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
@@ -1070,6 +1106,20 @@ style={{
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
+                <div style={{
+                  position: 'absolute',
+                  inset: '-2px',
+                  borderRadius: '12px',
+                  padding: '2px',
+                  background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
+                  backgroundSize: '200% 100%',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                  animation: 'gothicBorderFlow 3s linear infinite'
+                }} />
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
                     color: '#c9c6bb',
@@ -1178,45 +1228,134 @@ style={{
     box-shadow: 0 0 15px rgba(180, 141, 196, 1);
   }
 `}} />
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes pulse-track {
-                  0%, 100% { box-shadow: 0 0 10px rgba(63, 202, 175, 0.6); }
-                  50% { box-shadow: 0 0 20px rgba(63, 202, 175, 0.9); }
-                }
-              `}} />
+<style dangerouslySetInnerHTML={{__html: `
+  @keyframes bar1 {
+    0%, 100% { height: 30%; }
+    50% { height: 60%; }
+  }
+  @keyframes bar2 {
+    0%, 100% { height: 50%; }
+    50% { height: 80%; }
+  }
+  @keyframes bar3 {
+    0%, 100% { height: 40%; }
+    50% { height: 70%; }
+  }
+    @keyframes cosmicSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes cosmicPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(63, 202, 175, 0.8); }
+  50% { opacity: 0.6; box-shadow: 0 0 40px rgba(63, 202, 175, 1), 0 0 60px rgba(239, 1, 203, 0.8); }
+}
+  @keyframes neonBorderFlow {
+  0% { border-image-source: linear-gradient(90deg, #ef01cb 0%, #9370db 50%, #3fcaaf 100%); }
+  25% { border-image-source: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #ef01cb 100%); }
+  50% { border-image-source: linear-gradient(90deg, #3fcaaf 0%, #ef01cb 50%, #9370db 100%); }
+  75% { border-image-source: linear-gradient(90deg, #ef01cb 0%, #9370db 50%, #3fcaaf 100%); }
+  100% { border-image-source: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #ef01cb 100%); }
+}
+@keyframes gothicBorderFlow {
+  0%, 100% { border-color: #000000; }
+  50% { border-color: #c9c6bb; }
+}
+  @keyframes neonBorderFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+`}} />
               <div className="space-y-3">
                 {JSON.parse(chapter.audio_url).map((audio, i) => {
                   const isPlaying = currentTrack === i;
                   const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
                   
                   return (
-                    <div 
-                      key={i} 
-                      className="rounded-lg p-4 border-2 transition-all cursor-pointer"
-                      style={{
-                        background: '#000000',
-                        borderColor: '#c978f2',
-                        animation: isPlaying ? 'pulse-track 2s ease-in-out infinite' : 'none'
-                      }}
-                      onClick={() => {
-                        if (audioElement) {
-                          if (audioElement.paused) {
-                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
-                            audioElement.play();
-                          } else {
-                            audioElement.pause();
-                          }
-                        }
-                      }}
-                    >
-                      <p className="text-sm font-semibold flex items-center justify-between" style={{
-                        color: '#c084fc'
-                      }}>
-                        <span className="break-words flex-1">{audio.name}</span>
-                        <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#e9d5ff' }}>
-                          {isPlaying ? 'Играет' : 'Воспроизвести'}
-                        </span>
-                      </p>
+                   <div 
+  key={i} 
+  className="rounded-lg p-4 transition-all cursor-pointer"
+  style={{
+    background: '#000000',
+    position: 'relative',
+    paddingLeft: '50px',
+    borderRadius: '12px',
+    overflow: 'visible'
+  }}
+  onClick={() => {
+    if (audioElement) {
+      if (audioElement.paused) {
+        document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
+        audioElement.play();
+      } else {
+        audioElement.pause();
+      }
+    }
+  }}
+>
+  <div style={{
+    position: 'absolute',
+    inset: '-2px',
+    borderRadius: '12px',
+    padding: '2px',
+    background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
+    backgroundSize: '200% 100%',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1,
+    animation: 'neonBorderFlow 3s linear infinite'
+  }} />
+{isPlaying && (
+  <>
+    <span style={{position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', width: '4px', height: '12px', background: '#3fcaaf', borderRadius: '2px', animation: 'bar1 0.6s ease-in-out infinite'}}></span>
+    <span style={{position: 'absolute', left: '23px', top: '50%', transform: 'translateY(-50%)', width: '4px', height: '18px', background: '#ef01cb', borderRadius: '2px', animation: 'bar2 0.6s ease-in-out infinite 0.15s'}}></span>
+    <span style={{position: 'absolute', left: '31px', top: '50%', transform: 'translateY(-50%)', width: '4px', height: '15px', background: '#9370db', borderRadius: '2px', animation: 'bar3 0.6s ease-in-out infinite 0.3s'}}></span>
+  </>
+)}
+
+  <div className="flex items-center justify-between">
+  <p className="text-sm font-semibold" style={{ color: '#c084fc', flex: 1 }}>
+    <span className="break-words">{audio.name}</span>
+  </p>
+  <div className="flex items-center gap-2 ml-3">
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        downloadTrack(audio.url || audio.data, audio.name, i);
+      }}
+      disabled={downloadingTracks.includes(i)}
+      className="p-2 rounded-full transition-all"
+      style={{
+        background: downloadingTracks.includes(i) 
+          ? 'rgba(63, 202, 175, 0.3)' 
+          : 'rgba(147, 51, 234, 0.3)',
+        border: '1px solid ' + (downloadingTracks.includes(i) ? '#3fcaaf' : '#9333ea')
+      }}
+    >
+      {downloadingTracks.includes(i) ? (
+        <div style={{
+          width: '16px',
+          height: '16px',
+          border: '2px solid transparent',
+          borderTopColor: '#3fcaaf',
+          borderRightColor: '#ef01cb',
+          borderRadius: '50%',
+          animation: 'cosmicSpin 0.8s linear infinite, cosmicPulse 2s ease-in-out infinite'
+        }} />
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      )}
+    </button>
+    <span className="text-xs whitespace-nowrap" style={{ color: '#e9d5ff' }}>
+      {isPlaying ? 'Играет' : 'Воспроизвести'}
+    </span>
+  </div>
+</div>
                     </div>
                   );
                 })}
@@ -1256,9 +1395,8 @@ style={{
       }}>
 <h2 className="text-xl sm:text-2xl font-bold" style={{
   color: '#c9c6bb',
-  fontFamily: "'Playfair Display', Georgia, serif",
-  fontStyle: 'italic',
-  textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
+  fontFamily: "'miamanueva', Georgia, serif",
+  fontStyle: 'italic'
 }}>
           Плейлист
         </h2>
@@ -1288,10 +1426,24 @@ style={{
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(188, 187, 174, 0.25);
   }
+    @keyframes dark-aura {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(98, 9, 30, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 60px rgba(98, 9, 30, 0.6), 0 0 80px rgba(133, 0, 45, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.8);
+    transform: scale(1.02);
+  }
+}
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
     box-shadow: 0 0 15px rgba(188, 187, 174, 0.05);
   }
+    @keyframes gothicBorderFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
 `}} />
         <div className="space-y-3">
           {JSON.parse(chapter.audio_url).map((audio, i) => {
@@ -1299,40 +1451,83 @@ style={{
             const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
             
             return (
-              <div 
-                key={i} 
-                className="rounded-lg p-4 border-2 transition-all cursor-pointer"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  borderColor: 'rgba(188, 187, 174, 0.25)'
-                }}
-                onClick={() => {
-                  if (audioElement) {
-                    if (audioElement.paused) {
-                      document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
-                      audioElement.play();
-                    } else {
-                      audioElement.pause();
-                    }
-                  }
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(188, 187, 174, 0.25)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <p className="text-sm font-semibold flex items-center justify-between" style={{
-                  color: '#c9c6bb'
-                }}>
-                  <span className="break-words flex-1">{audio.name}</span>
-                  <span className="text-xs ml-3 whitespace-nowrap" style={{ color: '#65635d' }}>
-                    {isPlaying ? 'Играет' : 'Воспроизвести'}
-                  </span>
-                </p>
+   <div 
+  key={i} 
+  className="rounded-lg p-4 transition-all cursor-pointer"
+  style={{
+    background: 'rgba(0, 0, 0, 0.3)',
+    position: 'relative',
+    borderRadius: '12px',
+    animation: isPlaying ? 'dark-aura 2.5s ease-in-out infinite' : 'none',
+    overflow: 'visible'
+  }}
+  onClick={() => {
+    if (audioElement) {
+      if (audioElement.paused) {
+        document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
+        audioElement.play();
+      } else {
+        audioElement.pause();
+      }
+    }
+  }}
+>
+  <div style={{
+    position: 'absolute',
+    inset: '-2px',
+    borderRadius: '12px',
+    padding: '2px',
+    background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
+    backgroundSize: '200% 100%',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1,
+    animation: 'gothicBorderFlow 3s linear infinite'
+  }} />
+<div className="flex items-center justify-between">
+  <p className="text-sm font-semibold" style={{ color: '#c9c6bb', flex: 1 }}>
+    <span className="break-words">{audio.name}</span>
+  </p>
+  <div className="flex items-center gap-2 ml-3">
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        downloadTrack(audio.url || audio.data, audio.name, i);
+      }}
+      disabled={downloadingTracks.includes(i)}
+      className="p-2 rounded-full transition-all"
+      style={{
+        background: downloadingTracks.includes(i) 
+          ? 'rgba(180, 154, 95, 0.3)' 
+          : 'rgba(0, 0, 0, 0.3)',
+        border: '1px solid ' + (downloadingTracks.includes(i) ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
+      }}
+    >
+      {downloadingTracks.includes(i) ? (
+        <div style={{
+          width: '16px',
+          height: '16px',
+          border: '2px solid transparent',
+          borderTopColor: '#c9c6bb',
+          borderRightColor: '#65635d',
+          borderRadius: '50%',
+          animation: 'cosmicSpin 0.8s linear infinite'
+        }} />
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      )}
+    </button>
+    <span className="text-xs whitespace-nowrap" style={{ color: '#65635d' }}>
+      {isPlaying ? 'Играет' : 'Воспроизвести'}
+    </span>
+  </div>
+</div>
               </div>
             );
           })}
@@ -1354,26 +1549,20 @@ style={{
             backdropFilter: 'blur(20px)',
             boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
           }}>
-            <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-              borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
-            }}>
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes bookmarksTitleShimmer {
-                  0% { background-position: -200% center; }
-                  100% { background-position: 200% center; }
-                }
-                .bookmarks-title-shimmer {
-                  background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
-                  background-size: 200% auto;
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                  background-clip: text;
-                  animation: bookmarksTitleShimmer 3s linear infinite;
-                }
-              `}} />
-              <h2 className="text-xl sm:text-2xl font-bold bookmarks-title-shimmer">
-                Закладки главы
-              </h2>
+ <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+  borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+}}>
+  <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
+    background: 'linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%)',
+    backgroundSize: '200% auto',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    animation: 'bookmarksTitleShimmer 3s linear infinite',
+    fontFamily: "'ppelganger', Georgia, serif"
+  }}>
+    Закладки главы
+  </h2>
               <button 
                 onClick={() => setShowBookmarksModal(false)} 
                 className="transition rounded-full p-2 absolute right-4"
@@ -1416,21 +1605,36 @@ style={{
               ) : (
                 <div className="space-y-3">
                   {userBookmarks.map((bookmark) => (
-                    <div 
-                      key={bookmark.id}
-                      className="rounded-lg p-4 border-2 transition-all cursor-pointer"
-                      style={{
-                        background: '#000000',
-                        borderColor: '#3fcaaf'
-                      }}
-                      onClick={() => jumpToBookmark(bookmark.selected_text)}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    >
+<div 
+  key={bookmark.id}
+  className="rounded-lg p-4 transition-all cursor-pointer"
+  style={{
+    background: '#000000',
+    position: 'relative',
+    borderRadius: '12px'
+  }}
+  onClick={() => jumpToBookmark(bookmark.selected_text)}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = 'none';
+  }}
+>
+  <div style={{
+    position: 'absolute',
+    inset: '-2px',
+    borderRadius: '12px',
+    padding: '2px',
+    background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
+    backgroundSize: '200% 100%',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1,
+    animation: 'neonBorderFlow 3s linear infinite'
+  }} />
                       <div className="flex justify-between items-start mb-2">
                         <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#3fcaaf' }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="#3fcaaf" stroke="#3fcaaf" strokeWidth="2">
@@ -1493,14 +1697,14 @@ style={{
       <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
-<h2 className="text-xl sm:text-2xl font-bold" style={{
+<h2 className="text-xl sm:text-2xl font-bold text-center" style={{
   color: '#c9c6bb',
-  fontFamily: "'Playfair Display', Georgia, serif",
+  fontFamily: "'miamanueva', Georgia, serif",
   fontStyle: 'italic',
   textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
 }}>
-          Закладки главы
-        </h2>
+  Закладки главы
+</h2>
         <button 
           onClick={() => setShowBookmarksModal(false)} 
           className="transition rounded-full p-2 absolute right-4"
@@ -1543,23 +1747,38 @@ style={{
         ) : (
           <div className="space-y-3">
             {userBookmarks.map((bookmark) => (
-              <div 
-                key={bookmark.id}
-                className="rounded-lg p-4 border-2 transition-all cursor-pointer"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  borderColor: 'rgba(180, 154, 95, 0.4)'
-                }}
-                onClick={() => jumpToBookmark(bookmark.selected_text)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 154, 95, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
+      <div 
+  key={bookmark.id}
+  className="rounded-lg p-4 transition-all cursor-pointer"
+  style={{
+    background: 'rgba(0, 0, 0, 0.3)',
+    position: 'relative',
+    borderRadius: '12px'
+  }}
+  onClick={() => jumpToBookmark(bookmark.selected_text)}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
+    e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 154, 95, 0.4)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
+    e.currentTarget.style.boxShadow = 'none';
+  }}
+>
+  <div style={{
+    position: 'absolute',
+    inset: '-2px',
+    borderRadius: '12px',
+    padding: '2px',
+    background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
+    backgroundSize: '200% 100%',
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    pointerEvents: 'none',
+    zIndex: -1,
+    animation: 'gothicBorderFlow 3s linear infinite'
+  }} />
                 <div className="flex justify-between items-start mb-2">
                   <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#c9c6bb' }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="#c9c6bb" stroke="#c9c6bb" strokeWidth="2">
@@ -1624,7 +1843,7 @@ style={{
 <h1 className="text-base sm:text-lg md:text-xl font-bold mb-2 break-words" style={{
   color: isDarkTheme ? '#c6abda' : '#807f7c',
   textShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.8)' : 'none',
-  fontFamily: "'Playfair Display', Georgia, serif",
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
   fontStyle: isDarkTheme ? 'normal' : 'italic'
 }}>
   {chapter.chapter_number}. {chapter.title}
@@ -2911,7 +3130,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     <p className="text-xs" style={{
       color: isDarkTheme ? '#6b7280' : '#a89f8f'
     }}>
-      Копирование и распространение материалов без письменного разрешения запрещено.
+      Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
     </p>
   </div>
 </footer>

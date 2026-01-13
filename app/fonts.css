@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'ppelganger';
+  src: url('/ppelganger.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'steamy';
+  src: url('/steamy.otf') format('opentype');  /* ← ИСПРАВЛЕНО */
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'druzhok';
+  src: url('/druzhok.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'miamanueva';
+  src: url('/miamanueva.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'victoriangothicone';
+  src: url('/victoriangothicone.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'RuinedC';
+  src: url('/RuinedC.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
