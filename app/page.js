@@ -1122,25 +1122,30 @@ return (
   }}
 >
       {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
-      <div 
-        className="relative rounded-lg overflow-hidden"
-        style={{
-          backgroundImage: `url(${HEADER_BG_IMAGE})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          minHeight: '90px'
-        }}
-      >
-        <style jsx>{`
-          @media (min-width: 640px) {
-            div[style*="backgroundImage"] {
-              min-height: 35vh !important;
-            }
-          }
-        `}</style>
+ <div 
+  className="relative rounded-lg overflow-hidden"
+  style={{
+    backgroundImage: `url(${HEADER_BG_IMAGE})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    minHeight: '200px'
+  }}
+>
+<style jsx>{`
+  @media (min-width: 640px) {
+    div[style*="backgroundImage"] {
+      min-height: 480px !important;
+    }
+  }
+  @media (max-width: 639px) {
+    div[style*="backgroundImage"] {
+      min-height: 200px !important;
+    }
+  }
+`}</style>
         
-        <div className="relative z-10 h-full flex flex-col min-h-[90px] sm:min-h-[35vh]">
+        <div className="relative z-10 h-full flex flex-col min-h-[200px] sm:min-h-[480px]">
           
           
           {/* ВЕРХНЯЯ ПАНЕЛЬ */}
@@ -1148,33 +1153,29 @@ return (
   <div className="px-3 sm:px-6 py-2 sm:py-4">
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2 sm:gap-4">
-        <div
-          className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
-          style={{
-            background: '#42000a',
-            border: '2px solid #42000a',
-            boxShadow: '0 0 20px rgba(156, 3, 3, 0.9), 0 0 40px rgba(133, 5, 5, 0.6)',
-            animation: 'pulse18 2s ease-in-out infinite'
-          }}
-        >
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-              @keyframes pulse18 {
-                0%, 100% {
-                  box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
-                  transform: scale(1);
-                }
-                50% {
-                  box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
-                  transform: scale(1.05);
-                }
-              }
-            `
-            }}
-          />
-          18+
-        </div>
+ <div
+  className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
+  style={{
+    background: '#42000a',
+    border: '2px solid #42000a',
+    boxShadow: '0 0 20px rgba(156, 3, 3, 0.9), 0 0 40px rgba(133, 5, 5, 0.6)',
+    animation: 'pulse18 2s ease-in-out infinite'
+  }}
+>
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes pulse18 {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
+        transform: scale(1.05);
+      }
+    }
+  `}} />
+  18+
+</div>
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
@@ -1249,12 +1250,17 @@ return (
       </div>
     </div>
   </div>
- <div className="flex-1 flex items-center justify-center px-4 pb-8">
+<div className="flex-1 flex items-center justify-center px-8 pb-20 sm:pb-0" style={{ overflow: 'visible' }}>
 <h1
-  className="text-3xl sm:text-7xl md:text-6xl lg:text-8xl font-bold tracking-widest"
-  style={{
-    fontFamily: "'Playfair Display', Georgia, serif"
-  }}
+  className={isDarkTheme 
+ ? "text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold tracking-widest whitespace-nowrap"
+  : "text-4xl sm:text-8xl md:text-12xl lg:text-9xl font-bold tracking-widest whitespace-nowrap"
+}
+ style={{
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'ckblade', Georgia, serif",
+  lineHeight: '1.2',
+  overflow: 'visible'
+}}
 >
   <style
     dangerouslySetInnerHTML={{
@@ -1270,13 +1276,11 @@ return (
        -webkit-background-clip: text;
        -webkit-text-fill-color: transparent;
        background-clip: text;
-       animation: shimmer 3s linear infinite;
-       font-family: Playfair Display, Georgia, serif;`
+       animation: shimmer 3s linear infinite;`
     : `background-image: linear-gradient(to bottom, #640816 0%, #000000 100%);
        -webkit-background-clip: text;
        -webkit-text-fill-color: transparent;
-       background-clip: text;
-       font-family: Playfair Display, Georgia, serif;`
+       background-clip: text;`
   }
 }
         .story-text {
@@ -1293,9 +1297,47 @@ return (
       `
     }}
   />
-  <span className="mello-shimmer">MELLO</span> <span className="story-text">STORY</span>
+  <span className="mello-shimmer">Mello</span> <span className="story-text">Story</span>
 </h1>
   </div>
+</div>
+{/* КНОПКА РАСПИСАНИЯ ВНУТРИ ШАПКИ */}
+<div className="absolute left-0 right-0 px-4 z-20" style={{ bottom: '16px' }}>
+  <button
+    onClick={() => {
+      setShowCalendarModal(true);
+      loadCalendarEvents();
+    }}
+    className="w-full max-w-5xl mx-auto py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex items-center justify-center gap-2 sm:gap-3"
+    style={{
+      background: isDarkTheme 
+        ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
+        : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
+      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
+      backdropFilter: 'blur(20px)',
+      boxShadow: isDarkTheme 
+        ? '0 0 30px rgba(147, 51, 234, 0.4)'
+        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
+      color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+      fontFamily: "'Playfair Display', Georgia, serif",
+      fontStyle: isDarkTheme ? 'normal' : 'italic'
+    }}
+  >
+    <span className="text-sm sm:text-base md:text-xl text-center px-2">
+      Расписание обновлений сайта и работ
+    </span>
+    <svg 
+      width="20" 
+      height="20" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2"
+      className="flex-shrink-0 hidden sm:block"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
 </div>
         </div>
       </div>
@@ -1304,46 +1346,6 @@ return (
 </div>
 
 
-
-{/* РАСПИСАНИЕ ОБНОВЛЕНИЙ */}
-<div className="max-w-5xl mx-auto mt-8 sm:mt-12 px-4 relative z-0">
-<button
-  onClick={() => {
-    setShowCalendarModal(true);
-    loadCalendarEvents();
-  }}
-  className="w-full py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex items-center justify-center gap-2 sm:gap-3"
-  style={{
-    background: isDarkTheme 
-      ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
-      : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-    border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
-    backdropFilter: 'blur(20px)',
-    boxShadow: isDarkTheme 
-      ? '0 0 30px rgba(147, 51, 234, 0.4)'
-      : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
-    color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontStyle: isDarkTheme ? 'normal' : 'italic'
-  }}
->
-  <span className="text-sm sm:text-base md:text-xl text-center px-2">
-    Расписание обновлений сайта и работ
-  </span>
-  <svg 
-    width="20" 
-    height="20" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2"
-    className="flex-shrink-0 hidden sm:block"
-  >
-    <polyline points="6 9 12 15 18 9"></polyline>
-  </svg>
-</button>
-</div>
-
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
 <h2 className="text-center mb-6 sm:mb-8" style={{
@@ -1351,7 +1353,7 @@ return (
     fontSize: 'clamp(1rem, 3vw, 2rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
-    fontFamily: isDarkTheme ? 'druzhok, Georgia, serif' : 'miamanueva, Georgia, serif',
+    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
     fontStyle: !isDarkTheme ? 'italic' : 'normal',
     backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
     backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
@@ -1498,7 +1500,7 @@ return (
 <h2 className="text-2xl sm:text-3xl font-bold" style={{
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
-    fontFamily: isDarkTheme ? 'druzhok, Georgia, serif' : 'miamanueva, Georgia, serif',
+    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
         fontStyle: !isDarkTheme ? 'italic' : 'normal',
         backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
         WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
@@ -1522,89 +1524,89 @@ return (
       )}
     </div>
 
-    <div className="relative">
-{/* СТРЕЛКА ВЛЕВО */}
-{newsCarouselIndex > 0 && (
-  <button
-    onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
-    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-2 sm:px-3 flex items-center justify-center transition group"
-  >
-    <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
-      width: '40px',
-      height: '80px',
-      background: 'rgba(255, 255, 255, 0.1)',
-      border: '2px solid rgba(255, 255, 255, 0.5)'
-    }}>
-      <ChevronLeft size={32} color="#ffffff" />
-    </div>
-  </button>
-)}
-
-      {/* КАРТОЧКИ НОВОСТЕЙ */}
-      <div className="overflow-hidden px-5 sm:px-0">
-        <div 
-          className="flex gap-4 transition-transform duration-300"
-          style={{ transform: `translateX(-${newsCarouselIndex * 100}%)` }}
-        >
-          {newsPosts.map((news) => (
- <div
-  key={news.id}
-  onClick={() => {
-    setSelectedNews(news);
-    setShowNewsModal(true);
-  }}
-  className="min-w-full sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] p-6 rounded-xl cursor-pointer transition hover:scale-105"
-  style={{
-    background: isDarkTheme 
-      ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
-      : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-    border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
-    backdropFilter: 'blur(20px)',
-    boxShadow: isDarkTheme 
-      ? '0 0 30px rgba(147, 51, 234, 0.4)'
-      : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-  }}
->
-              <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{
-                color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
-              }}>
-                {news.title}
-              </h3>
-              <p className="text-sm mb-4" style={{
-                color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
-                opacity: 0.8
-              }}>
-                {new Date(news.created_at).toLocaleDateString('ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
-              </p>
-              <button className="text-sm font-semibold" style={{
-                color: isDarkTheme ? '#9370db' : '#c9c6bb'
-              }}>
-                Читать →
-              </button>
-            </div>
-          ))}
-        </div>
+  <div className="relative">
+  {/* СТРЕЛКА ВЛЕВО */}
+  {newsCarouselIndex > 0 && (
+    <button
+      onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
+      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
+    >
+      <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
+        width: '30px',
+        height: '60px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        border: '2px solid rgba(255, 255, 255, 0.5)'
+      }}>
+        <ChevronLeft size={24} color="#ffffff" />
       </div>
+    </button>
+  )}
 
-{/* СТРЕЛКА ВПРАВО */}
-{newsCarouselIndex < newsPosts.length - 1 && (
-  <button
-    onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
-    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-2 sm:px-3 flex items-center justify-center transition group"
-  >
-    <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
-      width: '40px',
-      height: '80px',
-      background: 'rgba(255, 255, 255, 0.1)',
-      border: '2px solid rgba(255, 255, 255, 0.5)'
-    }}>
-      <ChevronRight size={32} color="#ffffff" />
+  {/* КАРТОЧКИ НОВОСТЕЙ */}
+  <div className="overflow-hidden px-8 sm:px-0">
+    <div 
+      className="flex gap-4 transition-transform duration-300"
+      style={{ transform: `translateX(-${newsCarouselIndex * 100}%)` }}
+    >
+      {newsPosts.map((news) => (
+        <div
+          key={news.id}
+          onClick={() => {
+            setSelectedNews(news);
+            setShowNewsModal(true);
+          }}
+          className="min-w-full sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] p-4 sm:p-6 rounded-xl cursor-pointer transition hover:scale-105"
+          style={{
+            background: isDarkTheme 
+              ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
+              : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
+            border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
+            backdropFilter: 'blur(20px)',
+            boxShadow: isDarkTheme 
+              ? '0 0 30px rgba(147, 51, 234, 0.4)'
+              : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+          }}
+        >
+          <h3 className="font-bold text-base sm:text-lg mb-2 line-clamp-2" style={{
+            color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
+          }}>
+            {news.title}
+          </h3>
+          <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{
+            color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
+            opacity: 0.8
+          }}>
+            {new Date(news.created_at).toLocaleDateString('ru-RU', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
+          </p>
+          <button className="text-xs sm:text-sm font-semibold" style={{
+            color: isDarkTheme ? '#9370db' : '#c9c6bb'
+          }}>
+            Читать →
+          </button>
+        </div>
+      ))}
     </div>
-  </button>
+  </div>
+
+  {/* СТРЕЛКА ВПРАВО */}
+  {newsCarouselIndex < newsPosts.length - 1 && (
+    <button
+      onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
+      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
+    >
+      <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
+        width: '30px',
+        height: '60px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        border: '2px solid rgba(255, 255, 255, 0.5)'
+      }}>
+        <ChevronRight size={24} color="#ffffff" />
+      </div>
+    </button>
 )}
     </div>
   </div>
@@ -2531,12 +2533,13 @@ return (
               }
             }
           `}} />
-          <h2 className="text-lg sm:text-xl font-bold" style={{ 
-            color: '#fff',
-            textShadow: '0 0 30px rgba(179, 231, 239, 1)',
-            position: 'relative',
-            zIndex: 1
-          }}>{userProfile.nickname}</h2>
+      <h2 className="text-2xl sm:text-4xl font-bold" style={{
+  color: '#fff',
+  textShadow: '0 0 30px rgba(179, 231, 239, 1)',
+  position: 'relative',
+  zIndex: 1,
+  fontFamily: "'ppelganger', Georgia, serif"
+}}>{userProfile.nickname}</h2>
           <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4" style={{ zIndex: 2 }}>
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
@@ -2577,7 +2580,7 @@ return (
   </svg>
   <span style={{ 
     color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+    fontFamily: "'ppelganger', Georgia, serif"
   }}>Обновления</span>
 </button>
 
@@ -2712,9 +2715,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
         }}>
 
-<h2 className="text-lg sm:text-xl font-bold text-center mb-4" style={{ 
+<h2 className="text-2xl sm:text-4xl font-bold text-center mb-4" style={{
   color: '#c9c6bb',
-  fontFamily: "'RuinedC', Georgia, serif"
+  fontFamily: "'miamanueva', Georgia, serif"
 }}>{userProfile.nickname}</h2>
 
           <style dangerouslySetInnerHTML={{__html: `
