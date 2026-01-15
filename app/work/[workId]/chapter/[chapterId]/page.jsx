@@ -1840,7 +1840,8 @@ style={{
     </p>
   </>
 )}
-<h1 className="text-base sm:text-lg md:text-xl font-bold mb-2 break-words" style={{
+<h1 className="font-bold mb-2 break-words" style={{
+  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 2rem)' : 'clamp(1rem, 2.5vw, 1.25rem)',
   color: isDarkTheme ? '#c6abda' : '#807f7c',
   textShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.8)' : 'none',
   fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
@@ -2390,6 +2391,13 @@ style={{
       <div className="hidden sm:block"></div>
     )}
   </div>
+  {/* Благодарность за прочтение */}
+  <p className="text-center text-xs sm:text-sm mt-4" style={{
+    color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+    fontStyle: 'italic'
+  }}>
+    Спасибо за прочтение!
+  </p>
 </div>
 
 {/* БОКОВАЯ ПАНЕЛЬ МЕНЮ */}

@@ -758,7 +758,8 @@ return (
     animation: workPageShimmer 3s linear infinite;
   }
 `}} />
-<h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 break-words" style={{ 
+<h1 className="font-bold mb-3 sm:mb-4 break-words" style={{
+  fontSize: isDarkTheme ? 'clamp(2rem, 5vw, 4rem)' : 'clamp(1.5rem, 4vw, 3rem)',
   fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   color: 'transparent',
@@ -1078,7 +1079,8 @@ return (
     ? '0 0 15px rgba(147, 112, 219, 0.4)' 
     : 'none'
 }}>
-  <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3" style={{
+  <h2 className="font-bold mb-2 sm:mb-3" style={{
+  fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
     fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
     color: isDarkTheme ? '#9333ea' : 'transparent',
     background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
@@ -1098,7 +1100,8 @@ return (
       ? '0 0 15px rgba(147, 112, 219, 0.4)' 
       : 'none'
   }}>
-    <h2 className="text-base sm:text-lg font-bold mb-2" style={{
+    <h2 className="font-bold mb-2" style={{
+  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 2rem)' : 'clamp(1rem, 2.5vw, 1.125rem)',
       fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
       color: isDarkTheme ? '#9333ea' : 'transparent',
       background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
@@ -1230,7 +1233,8 @@ return (
 
 {/* СОДЕРЖАНИЕ */}
 <div className="mb-4 sm:mb-6">
-  <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{ 
+ <h2 className="font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{
+  fontSize: isDarkTheme ? 'clamp(1.75rem, 4vw, 3rem)' : 'clamp(1.5rem, 3vw, 1.875rem)',
     fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
     color: isDarkTheme ? '#D3D3D3' : 'transparent',
     background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
@@ -1585,10 +1589,13 @@ return (
           background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
           borderBottom: '3px solid rgba(147, 112, 219, 0.6)'
         }}>
-          <h2 className="text-lg sm:text-xl font-bold" style={{ 
-            color: '#fff',
-            textShadow: '0 0 30px rgba(179, 231, 239, 1)'
-          }}>{userProfile.nickname}</h2>
+      <h2 className="text-2xl sm:text-4xl font-bold" style={{
+  color: '#fff',
+  textShadow: '0 0 30px rgba(179, 231, 239, 1)',
+  position: 'relative',
+  zIndex: 1,
+  fontFamily: "'ppelganger', Georgia, serif"
+}}>{userProfile.nickname}</h2>
           <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4">
             <X size={20} className="sm:w-6 sm:h-6" />
           </button>
@@ -1744,9 +1751,9 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
 
         }}>
 
-<h2 className="text-lg sm:text-xl font-bold text-center mb-4" style={{ 
-  color: '#e4e1c8',
-  fontFamily: "'RuinedC', Georgia, serif"
+<h2 className="text-2xl sm:text-4xl font-bold text-center mb-4" style={{ 
+  color: '#c9c6bb',
+  fontFamily: "'miamanueva', Georgia, serif"
 }}>{userProfile.nickname}</h2>
 
           <style dangerouslySetInnerHTML={{__html: `

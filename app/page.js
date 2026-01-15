@@ -1350,7 +1350,7 @@ return (
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
 <h2 className="text-center mb-6 sm:mb-8" style={{
     fontWeight: 'bold',
-    fontSize: 'clamp(1rem, 3vw, 2rem)',
+    fontSize: isDarkTheme ? 'clamp(2.5rem, 5vw, 4.5rem)' : 'clamp(1rem, 3vw, 2rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
     fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
@@ -1485,7 +1485,8 @@ return (
   </div>
   
     {/* НОВЫЙ ТЕКСТ ДОБАВЛЯЕТСЯ ЗДЕСЬ */}
-  <p className="text-center mt-6 text-xs sm:text-sm opacity-70" style={{
+  <p className="text-center mt-6 opacity-70" style={{
+  fontSize: 'clamp(0.65rem, 1.5vw, 0.875rem)',
     color: isDarkTheme ? '#b3e7ef' : '#c8c0c2',
     fontFamily: "'Playfair Display', Georgia, serif"
   }}>
@@ -1497,7 +1498,8 @@ return (
 {newsPosts.length > 0 && (
   <div className="max-w-5xl mx-auto mt-1 sm:mt-20 relative z-0 px-4">
     <div className="flex justify-between items-center mb-6">
-<h2 className="text-2xl sm:text-3xl font-bold" style={{
+<h2 className="font-bold" style={{
+    fontSize: isDarkTheme ? 'clamp(2rem, 4vw, 3.5rem)' : 'clamp(1.5rem, 3vw, 1.875rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
     fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',

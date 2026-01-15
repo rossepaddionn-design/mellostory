@@ -269,9 +269,10 @@ return (
             Назад
           </Link>
 
-<h1 className="text-4xl font-bold mb-8 text-center" style={{
+<h1 className="font-bold mb-8 text-center" style={{
+  fontSize: isDarkTheme ? 'clamp(2.5rem, 6vw, 4rem)' : 'clamp(2rem, 4vw, 2.5rem)',
   color: isDarkTheme ? 'transparent' : 'transparent',
-  fontFamily: isDarkTheme ? "'druzhok', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   backgroundImage: isDarkTheme 
     ? 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #a67cce 100%)'
