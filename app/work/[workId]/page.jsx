@@ -1578,7 +1578,7 @@ return (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
     {isDarkTheme && (
-      <div className="fixed top-0 right-0 h-full w-60 sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{
+       <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
         borderColor: '#b3e7ef',
         backgroundImage: 'url(/textures/dark-erys.jpg)',
         backgroundSize: 'cover',
@@ -1735,7 +1735,7 @@ onClick={() => {
 
    {/* СВЕТЛАЯ ПАНЕЛЬ */}
     {!isDarkTheme && (
-     <div className="fixed top-0 right-0 h-full w-60 sm:w-96 z-40 overflow-y-auto shadow-2xl" style={{
+     <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
         borderLeft: '12px solid',
         borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
         boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
