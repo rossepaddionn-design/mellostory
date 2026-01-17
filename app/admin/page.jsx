@@ -373,16 +373,44 @@ const createNewChapter = () => {
     }
   };
 
-  const handleCoverUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setWorkForm({...workForm, cover_image: event.target.result});
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+const handleCoverUpload = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Файл слишком большой! Максимум 5MB');
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    
+    // Генерируем уникальное имя
+    const fileName = `work-${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+    
+    // Загружаем в Storage
+    const { data, error } = await supabase.storage
+      .from('covers')
+      .upload(`works/${fileName}`, file, {
+        cacheControl: '3600',
+        upsert: true
+      });
+    
+    if (error) throw error;
+    
+    // Получаем публичный URL
+    const { data: urlData } = supabase.storage
+      .from('covers')
+      .getPublicUrl(`works/${fileName}`);
+    
+    setWorkForm({...workForm, cover_image: urlData.publicUrl});
+    alert('✅ Обложка загружена!');
+  } catch (err) {
+    alert('Ошибка загрузки: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleImageUpload = (e, target) => {
     const files = Array.from(e.target.files || []);

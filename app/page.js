@@ -528,31 +528,42 @@ const loadNews = async () => {
         setTitleColor(cachedColor);
       }
 
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('title_color, news_text, about_text, popular_works')
-        .eq('id', 1)
-        .maybeSingle();
+ const { data, error } = await supabase
+  .from('site_settings')
+  .select('title_color, news_text, about_text, popular_works, popular_covers')
+  .eq('id', 1)
+  .maybeSingle();
+
+if (data && !error) {
+  if (data.title_color && data.title_color.trim() !== '') {
+    setTitleColor(data.title_color);
+    localStorage.setItem('titleColor', data.title_color);
+  }
+  if (data.news_text) setNewsText(data.news_text);
+  if (data.about_text) setAboutText(data.about_text);
+  
+  if (data.popular_works) {
+    try {
+      const parsed = typeof data.popular_works === 'string' 
+        ? JSON.parse(data.popular_works) 
+        : data.popular_works;
       
-      if (data && !error) {
-        if (data.title_color && data.title_color.trim() !== '') {
-          setTitleColor(data.title_color);
-          localStorage.setItem('titleColor', data.title_color);
-        }
-        if (data.news_text) setNewsText(data.news_text);
-        if (data.about_text) setAboutText(data.about_text);
-        
-        if (data.popular_works) {
-          try {
-            const parsed = typeof data.popular_works === 'string' 
-              ? JSON.parse(data.popular_works) 
-              : data.popular_works;
-            setPopularWorks(parsed);
-          } catch (e) {
-            console.error('Ошибка парсинга popular_works:', e);
-          }
-        }
-      }
+      // Добавляем обложки из отдельной колонки
+      const covers = data.popular_covers ? 
+        (typeof data.popular_covers === 'string' ? JSON.parse(data.popular_covers) : data.popular_covers) 
+        : [{}, {}, {}];
+      
+      const combined = parsed.map((work, i) => ({
+        ...work,
+        cover_url: covers[i]?.url || work.cover_url || ''
+      }));
+      
+      setPopularWorks(combined);
+    } catch (e) {
+      console.error('Ошибка парсинга popular_works:', e);
+    }
+  }
+}
     } catch (err) {
       console.error('Ошибка загрузки настроек:', err);
     }
@@ -908,17 +919,23 @@ showConfirm('Вы уверены? Это действие необратимо!'
   }
 };
 
-  const savePopularWork = async (index) => {
-    try {
-      const updatedWorks = [...popularWorks];
-      updatedWorks[index] = { ...editPopularForm, id: index + 1 };
+ const savePopularWork = async (index) => {
+  try {
+    const updatedWorks = [...popularWorks];
+    const { cover_url, ...workData } = editPopularForm;
+    updatedWorks[index] = { ...workData, id: index + 1 };
+    
+    // Обложки отдельно
+    const covers = popularWorks.map(w => ({ url: w.cover_url || '' }));
+    covers[index] = { url: cover_url || '' };
 
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({ 
-          id: 1, 
-          popular_works: updatedWorks 
-        }, { onConflict: 'id' });
+    const { error } = await supabase
+      .from('site_settings')
+      .upsert({ 
+        id: 1, 
+        popular_works: updatedWorks,
+        popular_covers: covers
+      }, { onConflict: 'id' });
 
       if (error) throw error;
       
@@ -1563,7 +1580,7 @@ return (
   
   <div className="grid grid-cols-3 gap-2 sm:gap-6">
 {popularWorks.map((work, index) => (
-  <div key={work.id} className="relative">
+  <div key={index} className="relative">
     {/* БОЛЬШАЯ ЦИФРА СНАРУЖИ */}
     <div className="absolute -left-2 sm:-left-4 bottom-2 sm:bottom-4 z-20 pointer-events-none" style={{
       fontSize: 'clamp(80px, 20vw, 180px)',
@@ -3873,11 +3890,30 @@ onClick={async () => {
         return;
       }
       
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditPopularForm({...editPopularForm, cover_url: reader.result});
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Генерируем уникальное имя файла
+        const fileName = `popular-${editingPopularIndex + 1}-${Date.now()}.${file.name.split('.').pop()}`;
+        
+        // Загружаем в Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('covers')
+          .upload(`popular/${fileName}`, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+        
+        if (error) throw error;
+        
+        // Получаем публичный URL
+        const { data: urlData } = supabase.storage
+          .from('covers')
+          .getPublicUrl(`popular/${fileName}`);
+        
+        setEditPopularForm({...editPopularForm, cover_url: urlData.publicUrl});
+        showConfirm('Обложка загружена!');
+      } catch (err) {
+        showConfirm('Ошибка загрузки: ' + err.message);
+      }
     }}
     className="w-full bg-gray-800 border border-gray-700 rounded px-4 py-3 text-white focus:outline-none focus:border-red-600"
   />

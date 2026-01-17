@@ -76,12 +76,33 @@ const seriesNoteRef = useRef(null);
 const handleSeriesCoverUpload = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    setSeriesCoverUrl(reader.result);
-  };
-  reader.readAsDataURL(file);
+  
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Файл слишком большой! Максимум 5MB');
+    return;
+  }
+  
+  try {
+    const fileName = `series-${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+    
+    const { data, error } = await supabase.storage
+      .from('covers')
+      .upload(`series/${fileName}`, file, {
+        cacheControl: '3600',
+        upsert: true
+      });
+    
+    if (error) throw error;
+    
+    const { data: urlData } = supabase.storage
+      .from('covers')
+      .getPublicUrl(`series/${fileName}`);
+    
+    setSeriesCoverUrl(urlData.publicUrl);
+    alert('✅ Обложка загружена!');
+  } catch (err) {
+    alert('Ошибка загрузки: ' + err.message);
+  }
 };
 
 const createSeries = async () => {
@@ -616,12 +637,11 @@ return (
         }}>
           <div className="aspect-[2/3] bg-gray-800 relative">
             {work.cover_url && (
-              <Image 
-                src={work.cover_url} 
-                alt={work.title} 
-                fill 
-                className="object-cover" 
-              />
+<img 
+  src={work.cover_url} 
+  alt={work.title} 
+  className="w-full h-full object-cover"
+/>
             )}
           </div>
 <div className={`p-3 sm:p-4 relative overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
@@ -829,17 +849,14 @@ style={{
   background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
 }}
               >
-                <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
-                  {expandedWork.cover_url ? (
-                    <Image 
-                      src={expandedWork.cover_url} 
-                      alt={expandedWork.title} 
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      priority
-                    />
-                  ) : (
+ <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
+  {expandedWork.cover_url ? (
+    <img 
+      src={expandedWork.cover_url} 
+      alt={expandedWork.title} 
+      className="w-full h-full object-cover"
+    />
+  ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
                       Нет обложки
                     </div>
