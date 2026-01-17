@@ -207,83 +207,290 @@ const applySeriesFormatting = (type, field) => {
 
 return (
   <>
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes shimmer-btn {
-        0% { background-position: -200% center; }
-        100% { background-position: 200% center; }
+<style dangerouslySetInnerHTML={{__html: `
+  /* Анимация для градиента текста "Библиотека" в темной теме */
+  @keyframes shimmer-btn {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* Анимация волн для букв "Библиотека" в светлой теме */
+  @keyframes letterWave {
+    0%, 100% {
+      color: #b6b5b3;
+      text-shadow: 0 0 10px rgba(100, 96, 86, 0.5);
+    }
+    25% {
+      color: #a19d98;
+      text-shadow: 0 0 5px rgba(85, 75, 63, 0.3);
+    }
+    50% {
+      color: #1b1616;
+      text-shadow: none;
+    }
+    75% {
+      color: #4e4c49;
+      text-shadow: 0 0 5px rgba(139, 115, 85, 0.3);
+    }
+  }
+
+  /* Неоновая лава-лампа для карточек в темной теме */
+  @keyframes neonLava1 {
+    0%, 100% { 
+      transform: translate(-30%, -30%) scale(1);
+      opacity: 0.6;
+    }
+    50% { 
+      transform: translate(30%, 30%) scale(1.2);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes neonLava2 {
+    0%, 100% { 
+      transform: translate(25%, -25%) scale(1.1);
+      opacity: 0.7;
+    }
+    50% { 
+      transform: translate(-25%, 25%) scale(1);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes neonLava3 {
+    0%, 100% { 
+      transform: translate(-20%, 20%) scale(1.05);
+      opacity: 0.65;
+    }
+    50% { 
+      transform: translate(20%, -20%) scale(1.15);
+      opacity: 0.75;
+    }
+  }
+
+  /* Класс для неоновой лава-лампы */
+  .neon-pulse {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .neon-pulse::before,
+  .neon-pulse::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .neon-pulse::before {
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(112, 219, 169, 0.8) 0%, transparent 25%),
+      radial-gradient(circle at 70% 60%, rgba(239, 1, 203, 0.7) 0%, transparent 30%),
+      radial-gradient(circle at 50% 80%, rgba(146, 56, 230, 0.6) 0%, transparent 35%);
+    filter: blur(40px);
+    animation: neonLava1 8s ease-in-out infinite;
+  }
+
+  .neon-pulse::after {
+    background: 
+      radial-gradient(circle at 80% 20%, rgba(239, 1, 203, 0.7) 0%, transparent 28%),
+      radial-gradient(circle at 30% 70%, rgba(147, 112, 219, 0.65) 0%, transparent 32%),
+      radial-gradient(circle at 60% 40%, rgba(62, 222, 247, 0.5) 0%, transparent 25%);
+    filter: blur(35px);
+    animation: neonLava2 10s ease-in-out infinite reverse;
+  }
+
+  .neon-pulse > * {
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Стили скроллбара и тумана в зависимости от темы */
+  ${isDarkTheme ? `
+    /* ТЕМНАЯ ТЕМА - Скроллбар */
+    .overflow-y-auto::-webkit-scrollbar {
+      width: 8px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
+      box-shadow: 0 0 15px rgba(180, 141, 196, 1);
+    }
+  ` : `
+    /* СВЕТЛАЯ ТЕМА - Скроллбар */
+    .overflow-y-auto::-webkit-scrollbar {
+      width: 8px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(80, 79, 78, 0.6);
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
+      box-shadow: 0 0 15px rgba(78, 77, 76, 0.8);
+    }
+
+    /* СВЕТЛАЯ ТЕМА - Анимация тумана (первый слой) */
+    @keyframes fog1 {
+      0%, 100% { 
+        transform: translate(-30%, -30%) rotate(0deg);
+        opacity: 0.6;
       }
-      
-      ${isDarkTheme ? `
-      .overflow-y-auto::-webkit-scrollbar {
-        width: 8px;
+      50% { 
+        transform: translate(30%, 30%) rotate(180deg);
+        opacity: 0.4;
       }
-      .overflow-y-auto::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 10px;
+    }
+
+    /* СВЕТЛАЯ ТЕМА - Анимация тумана (второй слой) */
+    @keyframes fog2 {
+      0%, 100% { 
+        transform: translate(25%, -25%) rotate(0deg);
+        opacity: 0.55;
       }
-      .overflow-y-auto::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
+      50% { 
+        transform: translate(-25%, 25%) rotate(-180deg);
+        opacity: 0.35;
       }
-      .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
-        box-shadow: 0 0 15px rgba(180, 141, 196, 1);
-      }
-      ` : `
-      .overflow-y-auto::-webkit-scrollbar {
-        width: 8px;
-      }
-      .overflow-y-auto::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 10px;
-      }
-      .overflow-y-auto::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(80, 79, 78, 0.6);
-      }
-      .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-        box-shadow: 0 0 15px rgba(78, 77, 76, 0.8);
-      }
-      `}
-    `}} />
+    }
+
+    /* СВЕТЛАЯ ТЕМА - Контейнер для тумана */
+    .fog-overlay {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* СВЕТЛАЯ ТЕМА - Псевдоэлементы для клубящегося тумана */
+    .fog-overlay::before,
+    .fog-overlay::after {
+      content: '';
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(243, 243, 243, 0.5) 0%, transparent 12%),
+        radial-gradient(circle at 60% 70%, rgba(200, 200, 200, 0.45) 0%, transparent 15%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 14%),
+        radial-gradient(circle at 40% 80%, rgba(189, 179, 179, 0.48) 0%, transparent 16%),
+        radial-gradient(circle at 50% 50%, rgba(240, 240, 240, 0.35) 0%, transparent 20%);
+      filter: blur(20px);
+      pointer-events: none;
+    }
+
+    .fog-overlay::before {
+      animation: fog1 16s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    .fog-overlay::after {
+      animation: fog2 12s ease-in-out infinite;
+      z-index: 1;
+      background-image: 
+        radial-gradient(circle at 35% 45%, rgba(255, 251, 251, 0.45) 0%, transparent 13%),
+        radial-gradient(circle at 75% 55%, rgba(210, 210, 210, 0.42) 0%, transparent 16%),
+        radial-gradient(circle at 15% 65%, rgba(250, 250, 250, 0.47) 0%, transparent 14%),
+        radial-gradient(circle at 90% 40%, rgba(230, 230, 230, 0.4) 0%, transparent 18%);
+    }
+
+    /* СВЕТЛАЯ ТЕМА - Контент поверх тумана */
+    .fog-overlay > * {
+      position: relative;
+      z-index: 2;
+    }
+  `}
+`}} />
 
 <div className="min-h-screen" style={{ 
   background: isDarkTheme 
-    ? 'linear-gradient(225deg, #000000 0%, #240046 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
-    : 'radial-gradient(ellipse 100% 50% at 50% 0%, #777167 0%, #554f46 40%, #353128 70%, #000000 100%)'
+    ? 'linear-gradient(225deg, #000000 0%, #250214 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
+    :   'radial-gradient(circle at 10% 90%, #c2c2a8 0%, #6b6353 20%, #3d3529 40%, #1a1410 70%, #0d0a08 100%)'
 }}>
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <Link 
-            href="/"
-            className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-lg"
-            style={{
-              background: isDarkTheme ? 'rgba(147, 112, 219, 0.3)' : 'rgba(194, 194, 168, 0.3)',
-              border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
-              color: isDarkTheme ? '#ffffff' : '#c2c2a8'
-            }}
-          >
-            <ChevronLeft size={20} />
-            Назад
-          </Link>
+<div className="flex flex-row justify-between items-center gap-1 sm:gap-2 mb-3">
+<Link 
+  href="/"
+  className="inline-flex items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 rounded-lg flex-shrink-0 text-sm"
+  style={{
+    background: isDarkTheme ? 'rgba(147, 112, 219, 0.3)' : 'rgba(194, 194, 168, 0.3)',
+    border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
+    color: isDarkTheme ? '#ffffff' : '#c2c2a8'
+  }}
+>
+  <ChevronLeft size={20} />
+  Назад
+</Link>
 
-<h1 className="font-bold mb-8 text-center" style={{
-  fontSize: isDarkTheme ? 'clamp(2.5rem, 6vw, 4rem)' : 'clamp(2rem, 4vw, 2.5rem)',
-  color: isDarkTheme ? 'transparent' : 'transparent',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  <input
+    type="text"
+    placeholder="Поиск по названию..."
+    className="px-4 py-1 rounded-lg flex-0.5 sm:flex-initial sm:w-80 text-sm"
+    style={{
+      background: isDarkTheme ? 'rgba(147, 112, 219, 0.2)' : 'rgba(194, 194, 168, 0.2)',
+      border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
+      color: isDarkTheme ? '#ffffff' : '#c2c2a8'
+    }}
+    onChange={(e) => {
+      const value = e.target.value.toLowerCase();
+      if (!value) {
+        loadWorks();
+      } else {
+        setWorks(prev => prev.filter(w => w.title.toLowerCase().includes(value)));
+      }
+    }}
+  />
+</div>
+
+<h1 className="font-bold mb-3 text-center" style={{
+  fontSize: isDarkTheme ? 'clamp(2.5rem, 6vw, 4rem)' : 'clamp(2rem, 6vw, 5rem)',
+  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'sooonsi', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
-  backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #a67cce 100%)'
-    : 'radial-gradient(ellipse at top left, #cac8c8 0%, #746d55 100%)',
-  backgroundSize: isDarkTheme ? '200% auto' : 'auto',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  animation: isDarkTheme ? 'shimmer-btn 3s linear infinite' : 'none'
+  textAlign: 'center',
+  width: '100%'
 }}>
-  Библиотека
+  {isDarkTheme ? (
+    <span style={{
+      backgroundImage: 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #a67cce 100%)',
+      backgroundSize: '200% auto',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      animation: 'shimmer-btn 3s linear infinite'
+    }}>
+      Библиотека
+    </span>
+  ) : (
+    'Библиотека'.split('').map((char, index) => (
+      <span
+        key={index}
+        style={{
+          display: 'inline-block',
+          animation: `letterWave 8s ease-in-out infinite`,
+          animationDelay: `${index * 0.3}s`
+        }}
+      >
+        {char}
+      </span>
+    ))
+  )}
 </h1>
 
 <div className="flex gap-2 sm:gap-4 mb-8 justify-center flex-wrap">
@@ -291,7 +498,7 @@ return (
     { key: 'novel', label: 'Романы' },
     { key: 'longfic', label: 'Лонгфики' },
     { key: 'minific', label: 'Минифики' },
-    { key: 'series', label: 'Серийные' }
+    { key: 'series', label: 'Серии' }
   ].map(cat => (
     <button
       key={cat.key}
@@ -330,10 +537,14 @@ return (
     {series.map(s => (
       <div key={s.id} className="relative">
         {/* Карточка серии */}
-        <div 
-          onClick={() => setExpandedSeries(s.id)}
-          className="cursor-pointer overflow-hidden transition-all duration-300 rounded-lg"
-        >
+<div 
+  onClick={() => setExpandedSeries(s.id)}
+  className="cursor-pointer overflow-hidden transition-all duration-300 rounded-lg hover:scale-105"
+  style={{
+    background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
+    border: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid rgba(194, 194, 168, 0.3)'
+  }}
+>
           <div className="aspect-[2/3] bg-gray-800 relative">
             {s.cover_url && (
               <Image 
@@ -344,24 +555,18 @@ return (
               />
             )}
           </div>
-          <div className="p-6 bg-black">
-            <h3 className="text-xl font-bold text-center mb-3" style={{ 
-              color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
-            }}>
-              {s.name}
-            </h3>
-            {s.description && (
-              <div 
-                className="text-sm text-gray-400 text-center line-clamp-3 mb-4"
-                dangerouslySetInnerHTML={{ __html: s.description }}
-              />
-            )}
-            {s.note && (
-              <div 
-                className="text-xs text-gray-500 text-center line-clamp-2"
-                dangerouslySetInnerHTML={{ __html: s.note }}
-              />
-            )}
+          <div className={`p-3 sm:p-4 relative overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
+  background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
+}}>
+<h3 className="text-center mb-2 line-clamp-2" style={{ 
+  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 1.5rem)' : 'clamp(0.875rem, 2.5vw, 1.125rem)',
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontStyle: !isDarkTheme ? 'italic' : 'normal',
+  fontWeight: 'bold',
+  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+}}>
+  {s.name}
+</h3>
           </div>
         </div>
 
@@ -405,7 +610,10 @@ return (
         onClick={() => setExpandedWork(work)}
         className="cursor-pointer group"
       >
-        <div className="overflow-hidden transition-all duration-300 rounded-lg hover:scale-105">
+        <div className="overflow-hidden transition-all duration-300 rounded-lg hover:scale-105" style={{
+          background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
+          border: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid rgba(194, 194, 168, 0.3)'
+        }}>
           <div className="aspect-[2/3] bg-gray-800 relative">
             {work.cover_url && (
               <Image 
@@ -416,11 +624,36 @@ return (
               />
             )}
           </div>
-<div className="p-4 relative overflow-hidden" style={{ background: '#000000' }}>
-            <h3 className="text-lg font-bold text-center text-white">
-              {work.title}
-            </h3>
-          </div>
+<div className={`p-3 sm:p-4 relative overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
+  background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
+}}>
+<h3 className="text-center mb-2 line-clamp-2" style={{ 
+  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 1.5rem)' : 'clamp(0.875rem, 2.5vw, 1.125rem)',
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontStyle: !isDarkTheme ? 'italic' : 'normal',
+  fontWeight: 'bold',
+  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+}}>
+  {work.title}
+</h3>
+  <div className="flex justify-center">
+    <span className="rounded-full" style={{
+      fontSize: 'clamp(0.625rem, 1.5vw, 0.75rem)',
+      padding: 'clamp(2px, 0.5vw, 4px) clamp(6px, 2vw, 10px)',
+      background: work.status === 'Завершён' 
+        ? (isDarkTheme ? 'rgba(34, 197, 94, 0.2)' : 'rgba(194, 194, 168, 0.3)')
+        : (isDarkTheme ? 'rgba(251, 191, 36, 0.2)' : 'rgba(194, 194, 168, 0.2)'),
+      color: work.status === 'Завершён'
+        ? (isDarkTheme ? '#86efac' : '#c9c6bb')
+        : (isDarkTheme ? '#ffe476' : '#dad9d7'),
+      border: isDarkTheme 
+        ? `1px solid ${work.status === 'Завершён' ? '#22c55e' : '#ffe476'}`
+        : '1px solid rgba(194, 194, 168, 0.5)'
+    }}>
+      {work.status}
+    </span>
+  </div>
+</div>
         </div>
       </div>
     ))}
@@ -448,107 +681,114 @@ return (
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)' }}>
-      <button 
-        onClick={() => setExpandedSeries(null)}
-        className="fixed top-8 right-8 rounded-full p-3 transition z-[10001]"
+<button 
+  onClick={() => setExpandedSeries(null)}
+  className="absolute top-2 right-2 sm:top-4 sm:right-4 rounded-lg p-2 transition z-[10001]"
         style={{
           background: isDarkTheme 
-            ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-            : '#c9c6bb'
+            ? 'rgba(147, 112, 219, 0.3)'
+            : 'rgba(194, 194, 168, 0.3)',
+          border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
+          boxShadow: isDarkTheme 
+            ? '0 0 15px rgba(147, 112, 219, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
+            : 'none',
+          color: isDarkTheme ? '#ffffff' : '#c2c2a8'
         }}
       >
-        <X size={24} />
+        <X size={20} />
       </button>
 
       <div 
-        className="w-full max-w-6xl rounded-lg p-8 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-6xl rounded-lg overflow-hidden transition-all duration-300"
         style={{
-          background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
-          border: isDarkTheme ? '2px solid #9370db' : '2px solid #c2c2a8'
+          background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
+          border: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid rgba(194, 194, 168, 0.3)'
         }}
       >
-        <h2 className="text-3xl font-bold mb-4 text-center" style={{ 
-          color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif"
+        <div className="p-8 max-h-[85vh] overflow-y-auto" style={{
+          background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
         }}>
-          {currentSeries.name}
-        </h2>
+          <h2 className="text-3xl font-bold mb-4 text-center" style={{ 
+            color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+            fontFamily: "'Playfair Display', Georgia, serif"
+          }}>
+            {currentSeries.name}
+          </h2>
 
-        {currentSeries.description && (
-          <div 
-            className="text-lg text-center mb-4 leading-relaxed"
-            style={{ color: isDarkTheme ? '#ffffff' : '#ffffff' }}
-            dangerouslySetInnerHTML={{ __html: currentSeries.description }}
-          />
-        )}
-
-        {currentSeries.note && (
-          <div 
-            className="text-sm text-center mb-8"
-            style={{ color: isDarkTheme ? '#9ca3af' : '#9ca3af' }}
-            dangerouslySetInnerHTML={{ __html: currentSeries.note }}
-          />
-        )}
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
-          {seriesWorks.map(work => (
+          {currentSeries.description && (
             <div 
-              key={work.id} 
-              onClick={() => {
-                setExpandedSeries(null);
-                setExpandedWork(work);
-              }}
-              className="cursor-pointer transition-transform hover:scale-105"
-            >
-              <div className="overflow-hidden rounded-lg" style={{
-                background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
-                border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8'
-              }}>
-                <div className="aspect-[2/3] bg-gray-800 relative">
-                  {work.cover_url && (
-                    <Image 
-                      src={work.cover_url} 
-                      alt={work.title} 
-                      fill 
-                      className="object-cover" 
-                    />
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-center mb-3" style={{ 
-                    color: isDarkTheme ? '#ffffff' : '#ffffff' 
-                  }}>
-                    {work.title}
-                  </h3>
-                  <p className="text-sm text-center line-clamp-3 mb-4" style={{ 
-                    color: isDarkTheme ? '#9ca3af' : '#9ca3af' 
-                  }}>
-                    {work.description}
-                  </p>
-                  <div className="flex gap-2 justify-center flex-wrap">
-                    <span className="text-xs px-3 py-1 rounded-full" style={{
-                      background: isDarkTheme ? '#374151' : '#4b5563',
-                      color: '#ffffff'
-                    }}>
-                      {work.direction}
-                    </span>
-                    <span className="text-xs px-3 py-1 rounded-full" style={{
-                      background: '#7f1d1d',
-                      color: '#ffffff'
-                    }}>
-                      {work.rating}
-                    </span>
-                    <span className="text-xs px-3 py-1 rounded-full" style={{
-                      background: isDarkTheme ? '#374151' : '#4b5563',
-                      color: '#ffffff'
-                    }}>
-                      {work.status}
-                    </span>
+              className="text-lg text-center mb-4 leading-relaxed"
+              style={{ color: isDarkTheme ? '#ffffff' : '#ffffff' }}
+              dangerouslySetInnerHTML={{ __html: currentSeries.description }}
+            />
+          )}
+
+          {currentSeries.note && (
+            <div 
+              className="text-sm text-center mb-8"
+              style={{ color: isDarkTheme ? '#9ca3af' : '#9ca3af' }}
+              dangerouslySetInnerHTML={{ __html: currentSeries.note }}
+            />
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
+            {seriesWorks.map(work => (
+              <div 
+                key={work.id} 
+                onClick={() => {
+                  setExpandedSeries(null);
+                  setExpandedWork(work);
+                }}
+                className="cursor-pointer transition-transform hover:scale-105"
+              >
+                <div className="overflow-hidden rounded-lg" style={{
+                  background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
+                  border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8'
+                }}>
+                  <div className="aspect-[2/3] bg-gray-800 relative">
+                    {work.cover_url && (
+                      <Image 
+                        src={work.cover_url} 
+                        alt={work.title} 
+                        fill 
+                        className="object-cover" 
+                      />
+                    )}
                   </div>
+<div className={`p-3 sm:p-4 relative overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
+  background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
+}}>
+  <h3 className="text-center mb-2 line-clamp-2" style={{ 
+    fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 1.5rem)' : 'clamp(0.875rem, 2.5vw, 1.125rem)',
+    fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    fontWeight: 'bold',
+    color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+  }}>
+    {work.title}
+  </h3>
+  <div className="flex justify-center">
+    <span className="rounded-full" style={{
+      fontSize: 'clamp(0.625rem, 1.5vw, 0.75rem)',
+      padding: 'clamp(2px, 0.5vw, 4px) clamp(6px, 2vw, 10px)',
+      background: work.status === 'Завершён' 
+        ? (isDarkTheme ? 'rgba(34, 197, 94, 0.2)' : 'rgba(194, 194, 168, 0.3)')
+        : (isDarkTheme ? 'rgba(251, 191, 36, 0.2)' : 'rgba(194, 194, 168, 0.2)'),
+      color: work.status === 'Завершён'
+        ? (isDarkTheme ? '#86efac' : '#c9c6bb')
+        : (isDarkTheme ? '#ffe476' : '#dad9d7'),
+      border: isDarkTheme 
+        ? `1px solid ${work.status === 'Завершён' ? '#22c55e' : '#ffe476'}`
+        : '1px solid rgba(194, 194, 168, 0.5)'
+    }}>
+      {work.status}
+    </span>
+  </div>
+</div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -560,35 +800,34 @@ return (
 {/* EXPANDED WORK */}
         {expandedWork && (
           <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-4 overflow-y-auto">
-            <button 
-              onClick={() => setExpandedWork(null)}
-              className="fixed top-8 right-8 rounded-full p-3 transition z-[10000]"
-              style={{
-                background: isDarkTheme 
-                  ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-                  : '#c9c6bb'
-              }}
-            >
-              <X size={24} />
-            </button>
-
-            <div 
-              className="w-full max-w-4xl"
-              style={{ 
-                padding: isDarkTheme ? '6px' : '3px',
-                background: isDarkTheme 
-                  ? 'linear-gradient(135deg, #000000 0%, #8c32d2 50%, #000000 100%)'
-                  : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-                borderRadius: '8px'
-              }}
-            >
+<button 
+  onClick={() => setExpandedWork(null)}
+  className="absolute top-2 right-2 sm:top-4 sm:right-4 rounded-lg p-2 transition z-[10000]"
+  style={{
+    background: isDarkTheme 
+      ? 'rgba(147, 112, 219, 0.3)'
+      : 'rgba(194, 194, 168, 0.3)',
+    border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
+    boxShadow: isDarkTheme 
+      ? '0 0 15px rgba(147, 112, 219, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
+      : 'none',
+    color: isDarkTheme ? '#ffffff' : '#c2c2a8'
+  }}
+>
+  <X size={20} />
+</button>
+<div 
+  className="w-full max-w-4xl overflow-hidden transition-all duration-300 rounded-lg relative"
+  style={{
+    background: isDarkTheme ? 'rgba(147, 112, 219, 0.1)' : 'rgba(194, 194, 168, 0.1)',
+    border: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid rgba(194, 194, 168, 0.3)'
+  }}
+>
               <div 
                 className="flex flex-col sm:grid sm:grid-cols-[220px_1fr] md:grid-cols-[260px_1fr] gap-4 sm:gap-6 p-4 sm:p-6 max-h-[85vh] overflow-y-auto relative" 
-                style={{
-                  background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.95)',
-                  boxShadow: !isDarkTheme ? 'inset 0 0 50px rgba(0, 0, 0, 0.6)' : 'none',
-                  borderRadius: isDarkTheme ? '14px' : '10px'
-                }}
+style={{
+  background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)'
+}}
               >
                 <div className="aspect-[2/3] w-full sm:w-auto bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 relative">
                   {expandedWork.cover_url ? (
@@ -609,15 +848,15 @@ return (
                 
                 <div className="flex flex-col justify-between">
                   <div>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4" style={{ 
-                      color: isDarkTheme ? '#bc8dd8' : '#c9c6bb',
-                      textShadow: isDarkTheme ? '0 0 20px rgba(188, 141, 216, 0.8)' : 'none',
-                      fontStyle: !isDarkTheme ? 'italic' : 'normal',
-                      background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #65635d 100%)' : 'none',
-                      WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-                      WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-                      backgroundClip: !isDarkTheme ? 'text' : 'unset'
-                    }}>{expandedWork.title}</h3>
+<h3 className="mb-3 line-clamp-2" style={{ 
+  fontSize: isDarkTheme ? 'clamp(2rem, 5vw, 2.5rem)' : 'clamp(1.125rem, 3.6vw, 1.8rem)',
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontStyle: !isDarkTheme ? 'italic' : 'normal',
+  fontWeight: 'bold',
+  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+}}>
+  {expandedWork.title}
+</h3>
                     
                     {(expandedWork.fandom || expandedWork.pairing) && (
                       <div className="mb-3 space-y-1">
@@ -651,34 +890,23 @@ return (
                     </div>
                   </div>
                   
-                  <Link 
-                    href={`/work/${expandedWork.id}`}
-                    className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      background: isDarkTheme 
-                        ? 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)'
-                        : '#c9c6bb',
-                      boxShadow: isDarkTheme 
-                        ? '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
-                        : 'none',
-                      color: isDarkTheme ? '#ffffff' : '#000000'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (isDarkTheme) {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #d5acec 0%, #bc8dd8 100%)';
-                        e.currentTarget.style.boxShadow = '0 0 20px rgba(213, 172, 236, 0.9), 0 0 35px rgba(188, 141, 216, 0.7)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (isDarkTheme) {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #bc8dd8 0%, #9370db 100%)';
-                        e.currentTarget.style.boxShadow = '0 0 15px rgba(188, 141, 216, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)';
-                      }
-                    }}
-                  >
-                    Начать читать
-                  </Link>
+<Link 
+  href={`/work/${expandedWork.id}`}
+  className="block w-full text-white font-bold py-2 sm:py-3 rounded-lg text-center transition text-sm sm:text-base"
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    background: isDarkTheme 
+      ? 'rgba(147, 112, 219, 0.3)'
+      : 'rgba(194, 194, 168, 0.3)',
+    border: isDarkTheme ? '1px solid #9370db' : '1px solid #c2c2a8',
+    boxShadow: isDarkTheme 
+      ? '0 0 15px rgba(147, 112, 219, 0.8), 0 0 25px rgba(147, 112, 219, 0.6)'
+      : 'none',
+    color: isDarkTheme ? '#ffffff' : '#c2c2a8'
+  }}
+>
+  Начать читать
+</Link>
                 </div>
               </div>
             </div>

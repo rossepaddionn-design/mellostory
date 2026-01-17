@@ -1028,6 +1028,195 @@ return (
 
 
 <style dangerouslySetInnerHTML={{__html: `
+/* Анимация волн для букв "Story" в светлой теме */
+@keyframes letterWave {
+  0%, 100% {
+    color: #b6b5b3;
+    text-shadow: 0 0 10px rgba(100, 96, 86, 0.5);
+  }
+  25% {
+    color: #a19d98;
+    text-shadow: 0 0 5px rgba(85, 75, 63, 0.3);
+  }
+  50% {
+    color: #1b1616;
+    text-shadow: none;
+  }
+  75% {
+    color: #4e4c49;
+    text-shadow: 0 0 5px rgba(139, 115, 85, 0.3);
+  }
+}
+  /* Неоновая лава-лампа для карточек в темной теме */
+@keyframes neonLava1 {
+  0%, 100% { 
+    transform: translate(-30%, -30%) scale(1);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translate(30%, 30%) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes neonLava2 {
+  0%, 100% { 
+    transform: translate(25%, -25%) scale(1.1);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translate(-25%, 25%) scale(1);
+    opacity: 0.5;
+  }
+}
+
+.neon-pulse {
+  position: relative;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.neon-pulse::before,
+.neon-pulse::after {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.neon-pulse::before {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(112, 219, 169, 0.8) 0%, transparent 25%),
+    radial-gradient(circle at 70% 60%, rgba(239, 1, 203, 0.7) 0%, transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(146, 56, 230, 0.6) 0%, transparent 35%);
+  filter: blur(40px);
+  animation: neonLava1 8s ease-in-out infinite;
+}
+
+.neon-pulse::after {
+  background: 
+    radial-gradient(circle at 80% 20%, rgba(239, 1, 203, 0.7) 0%, transparent 28%),
+    radial-gradient(circle at 30% 70%, rgba(147, 112, 219, 0.65) 0%, transparent 32%),
+    radial-gradient(circle at 60% 40%, rgba(62, 222, 247, 0.5) 0%, transparent 25%);
+  filter: blur(35px);
+  animation: neonLava2 10s ease-in-out infinite reverse;
+}
+
+.neon-pulse > img {
+  position: relative;
+  z-index: 1;
+}
+
+.fog-overlay {
+  position: relative;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.fog-overlay::before,
+.fog-overlay::after {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(243, 243, 243, 0.5) 0%, transparent 12%),
+    radial-gradient(circle at 60% 70%, rgba(200, 200, 200, 0.45) 0%, transparent 15%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 14%),
+    radial-gradient(circle at 40% 80%, rgba(189, 179, 179, 0.48) 0%, transparent 16%),
+    radial-gradient(circle at 50% 50%, rgba(240, 240, 240, 0.35) 0%, transparent 20%);
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fog-overlay::before {
+  animation: fog1 16s ease-in-out infinite;
+}
+
+.fog-overlay::after {
+  animation: fog2 12s ease-in-out infinite;
+  background-image: 
+    radial-gradient(circle at 35% 45%, rgba(255, 251, 251, 0.45) 0%, transparent 13%),
+    radial-gradient(circle at 75% 55%, rgba(210, 210, 210, 0.42) 0%, transparent 16%),
+    radial-gradient(circle at 15% 65%, rgba(250, 250, 250, 0.47) 0%, transparent 14%),
+    radial-gradient(circle at 90% 40%, rgba(230, 230, 230, 0.4) 0%, transparent 18%);
+}
+
+.fog-overlay > img {
+  position: relative;
+  z-index: 1;
+}
+
+/* Туман для светлой темы */
+@keyframes fog1 {
+  0%, 100% { 
+    transform: translate(-30%, -30%) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translate(30%, 30%) rotate(180deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes fog2 {
+  0%, 100% { 
+    transform: translate(25%, -25%) rotate(0deg);
+    opacity: 0.55;
+  }
+  50% { 
+    transform: translate(-25%, 25%) rotate(-180deg);
+    opacity: 0.35;
+  }
+}
+
+.fog-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.fog-overlay::before,
+.fog-overlay::after {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(243, 243, 243, 0.5) 0%, transparent 12%),
+    radial-gradient(circle at 60% 70%, rgba(200, 200, 200, 0.45) 0%, transparent 15%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 14%),
+    radial-gradient(circle at 40% 80%, rgba(189, 179, 179, 0.48) 0%, transparent 16%),
+    radial-gradient(circle at 50% 50%, rgba(240, 240, 240, 0.35) 0%, transparent 20%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.fog-overlay::before {
+  animation: fog1 16s ease-in-out infinite;
+  z-index: 1;
+}
+
+.fog-overlay::after {
+  animation: fog2 12s ease-in-out infinite;
+  z-index: 1;
+  background-image: 
+    radial-gradient(circle at 35% 45%, rgba(255, 251, 251, 0.45) 0%, transparent 13%),
+    radial-gradient(circle at 75% 55%, rgba(210, 210, 210, 0.42) 0%, transparent 16%),
+    radial-gradient(circle at 15% 65%, rgba(250, 250, 250, 0.47) 0%, transparent 14%),
+    radial-gradient(circle at 90% 40%, rgba(230, 230, 230, 0.4) 0%, transparent 18%);
+}
+
+.fog-overlay > * {
+  position: relative;
+  z-index: 2;
+}
   /* Скроллбар для модальных окон - ТЕМНАЯ ТЕМА */
   ${isDarkTheme ? `
   .overflow-y-auto::-webkit-scrollbar {
@@ -1104,7 +1293,7 @@ return (
   style={{
     background: isDarkTheme 
       ? 'linear-gradient(225deg, #000000 0%, #240046 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
-      : 'radial-gradient(ellipse 100% 50% at 50% 0%, #777167 0%, #554f46 40%, #353128 70%, #000000 100%)'
+      : 'radial-gradient(circle at 10% 90%, #c2c2a8 0%, #6b6353 20%, #3d3529 40%, #1a1410 70%, #0d0a08 100%)'
   }}
 />
 
@@ -1183,7 +1372,7 @@ return (
           style={{
             background: 'rgba(0, 0, 0, 0.6)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(63, 58, 58, 0.2)',
             color: 'white'
           }}
         >
@@ -1257,7 +1446,7 @@ return (
   : "text-4xl sm:text-8xl md:text-12xl lg:text-9xl font-bold tracking-widest whitespace-nowrap"
 }
  style={{
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'ckblade', Georgia, serif",
+  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'victiriya', Georgia, serif",
   lineHeight: '1.2',
   overflow: 'visible'
 }}
@@ -1283,21 +1472,29 @@ return (
        background-clip: text;`
   }
 }
-        .story-text {
-          ${isDarkTheme
-            ? `color: #cdb0e3;
-               text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);`
-            : `background: radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%);
-               -webkit-background-clip: text;
-               -webkit-text-fill-color: transparent;
-               background-clip: text;`
-               
-          }
-        }
+ .story-text {
+  color: #cdb0e3;
+  text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);
+}
       `
     }}
   />
-  <span className="mello-shimmer">Mello</span> <span className="story-text">Story</span>
+<span className="mello-shimmer">Mello</span> {isDarkTheme ? (
+  <span className="story-text">Story</span>
+) : (
+  'Story'.split('').map((char, index) => (
+    <span
+      key={`story-${index}`}
+      style={{
+        display: 'inline-block',
+        animation: `letterWave 8s ease-in-out infinite`,
+        animationDelay: `${(5 + index) * 0.3}s`
+      }}
+    >
+      {char}
+    </span>
+  ))
+)}
 </h1>
   </div>
 </div>
@@ -1367,43 +1564,29 @@ return (
   <div className="grid grid-cols-3 gap-2 sm:gap-6">
 {popularWorks.map((work, index) => (
   <div key={work.id} className="relative">
-{/* БОЛЬШАЯ ЦИФРА СНАРУЖИ */}
-<div className="absolute -left-2 sm:-left-4 bottom-2 sm:bottom-4 z-20 pointer-events-none" style={{
-  fontSize: 'clamp(80px, 20vw, 180px)',
-  fontWeight: '900',
-  lineHeight: '0.75',
-  WebkitTextStroke: '3px rgba(255, 255, 255, 0.3)',
-  color: 'transparent',
-  textShadow: '0 5px 20px rgba(0, 0, 0, 0.8)',
-  transform: 'translateX(8px)' // Сдвиг вправо на 8px
-}}>
-  {index + 1}
-</div>
+    {/* БОЛЬШАЯ ЦИФРА СНАРУЖИ */}
+    <div className="absolute -left-2 sm:-left-4 bottom-2 sm:bottom-4 z-20 pointer-events-none" style={{
+      fontSize: 'clamp(80px, 20vw, 180px)',
+      fontWeight: '900',
+      lineHeight: '0.75',
+      WebkitTextStroke: '3px rgba(255, 255, 255, 0.3)',
+      color: 'transparent',
+      textShadow: '0 5px 20px rgba(0, 0, 0, 0.8)',
+      transform: 'translateX(8px)'
+    }}>
+      {index + 1}
+    </div>
 
-    {/* КАРТОЧКА */}
-    <div className="relative rounded-lg sm:rounded-xl transition hover:scale-105 overflow-hidden" style={{
-      background: isDarkTheme ? 'rgba(0, 0, 0, 0.3)' : 'transparent',
+    {/* КАРТОЧКА С ЭФФЕКТАМИ НА ЗАДНИКЕ */}
+    <div className={`relative rounded-l.1g sm:rounded-xl transition hover:scale-105 overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
+      background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)',
       backdropFilter: 'blur(10px)',
-      border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
+      border: isDarkTheme ? '2px solid #9b73b0' : '1px solid #acaca8',
       borderRadius: '12px',
       backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
       boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none'
     }}>
-      
-      {!isDarkTheme && (
-        <div style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: '12px',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          pointerEvents: 'none',
-          zIndex: -1
-        }} />
-      )}
+    
       
       {isAdmin && (
         <button
@@ -1425,20 +1608,25 @@ return (
         </button>
       )}
 
-      {/* ОБЛОЖКА - УЗКИЙ ВЕРТИКАЛЬНЫЙ ПРЯМОУГОЛЬНИК */}
+      {/* ОБЛОЖКА */}
       {work.cover_url && (
-        <div className="w-[60%] mx-auto mt-2 sm:mt-3 rounded-lg overflow-hidden">
+        <div className="w-[60%] mx-auto mt-2 sm:mt-3 rounded-lg overflow-hidden relative z-10">
           <img 
             src={work.cover_url} 
             alt={work.title}
-            className="w-full h-auto"
-            style={{ aspectRatio: '2/3', objectFit: 'cover' }}
+            style={{ 
+              aspectRatio: '2/3', 
+              objectFit: 'cover',
+              width: '100%',
+              height: 'auto',
+              display: 'block'
+            }}
           />
         </div>
       )}
 
       {work.title ? (
-        <div className="p-2 sm:p-4">
+        <div className="p-2 sm:p-4 relative z-10">
           <h3 className="font-bold text-[10px] sm:text-base mb-2 text-center break-words line-clamp-2" style={{
             color: isDarkTheme ? '#b3e7ef' : 'transparent',
             textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
@@ -1473,7 +1661,7 @@ return (
           </div>
         </div>
       ) : (
-        <div className="text-center py-4 sm:py-8">
+        <div className="text-center py-4 sm:py-8 relative z-10">
           <p className="text-gray-400 text-[10px] sm:text-sm">
             Скоро здесь появится работа
           </p>
@@ -1496,10 +1684,10 @@ return (
 
 {/* БЛОК НОВОСТЕЙ */}
 {newsPosts.length > 0 && (
-  <div className="max-w-5xl mx-auto mt-1 sm:mt-20 relative z-0 px-4">
-    <div className="flex justify-between items-center mb-6">
-<h2 className="font-bold" style={{
-    fontSize: isDarkTheme ? 'clamp(2rem, 4vw, 3.5rem)' : 'clamp(1.5rem, 3vw, 1.875rem)',
+<div className="max-w-5xl mx-auto mt-1 sm:mt-14 relative z-0 px-4">
+<div className="mb-8 mt-6 sm:mt-0">
+      <h2 className="font-bold text-center mb-6" style={{
+    fontSize: isDarkTheme ? 'clamp(2.5rem, 5vw, 4.5rem)' : 'clamp(1rem, 3vw, 2rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
     fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
@@ -4321,23 +4509,12 @@ onClick={() => {
   <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
     <div className="rounded-2xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto overflow-x-hidden" style={{
       background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
+      border: '1px solid #acaca8',
       borderRadius: '24px',
       backgroundClip: 'padding-box',
       boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
+
       
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold" style={{

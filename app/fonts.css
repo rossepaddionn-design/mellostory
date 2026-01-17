@@ -39,8 +39,29 @@
 }
 
 @font-face {
-  font-family: 'RuinedC';
-  src: url('/RuinedC.otf') format('opentype');
+  font-family: 'rosses';
+  src: url('/rosses.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'plommir';
+  src: url('/plommir.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'sooonsi';
+  src: url('/sooonsi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'victiriya';
+  src: url('/victiriya.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
