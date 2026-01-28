@@ -1318,39 +1318,230 @@ style={{
         </div>
       )}
 
-      {showPlaylist && !isDarkTheme && chapter?.audio_url && (
+{showPlaylist && chapter?.audio_url && (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     backdropFilter: 'blur(10px)'
   }}>
-<div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'rgba(0, 0, 0, 0.3)',
-  border: '3px solid transparent',
-  borderRadius: '16px',
-  backgroundClip: 'padding-box',
-  position: 'relative',
-  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-}}>
-  <div style={{
-    position: 'absolute',
-    inset: '-3px',
-    borderRadius: '16px',
-    padding: '3px',
-    background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1
-  }} />
+    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      border: '2px solid #9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+    }}>
+      <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
+        borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+      }}>
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes playlistTitleShimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          .playlist-title-shimmer {
+            background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: playlistTitleShimmer 3s linear infinite;
+          }
+        `}} />
+        <h2 className="text-xl sm:text-2xl font-bold playlist-title-shimmer">
+          Плейлист
+        </h2>
+        <button 
+          onClick={() => setShowPlaylist(false)} 
+          className="transition rounded-full p-2 absolute right-4"
+          style={{
+            color: '#ffffff',
+            backgroundColor: 'rgba(147, 51, 234, 0.3)',
+            border: '2px solid rgba(255, 255, 255, 0.5)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.5)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+          }}
+        >
+          <X size={24} />
+        </button>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <style dangerouslySetInnerHTML={{__html: `
+          .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
+            box-shadow: 0 0 15px rgba(180, 141, 196, 1);
+          }
+          @keyframes neonBorderFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+          }
+        `}} />
+        
+        <div className="space-y-3">
+          {JSON.parse(chapter.audio_url).map((audio, i) => {
+            const isPlaying = currentTrack === i;
+            const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
+            
+            return (
+              <div 
+                key={i} 
+                className="rounded-lg p-4 transition-all"
+                style={{
+                  background: '#000000',
+                  position: 'relative',
+                  borderRadius: '12px',
+                  overflow: 'visible'
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  inset: '-2px',
+                  borderRadius: '12px',
+                  padding: '2px',
+                  background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
+                  backgroundSize: '200% 100%',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                  animation: 'neonBorderFlow 3s linear infinite'
+                }} />
+
+                <div className="flex items-center justify-between gap-3">
+                  {/* НАЗВАНИЕ ТРЕКА */}
+                  <p className="text-xs font-semibold line-clamp-1 flex-1" style={{ color: '#c084fc' }}>
+                    {audio.name}
+                  </p>
+
+                  {/* КНОПКИ */}
+                  <div className="flex items-center gap-2">
+                    {/* ВОСПРОИЗВЕДЕНИЕ/ПАУЗА */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (audioElement) {
+                          if (audioElement.paused) {
+                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
+                            audioElement.play();
+                          } else {
+                            audioElement.pause();
+                          }
+                        }
+                      }}
+                      className="p-2 rounded-full transition-all flex-shrink-0"
+                      style={{
+                        background: isPlaying ? 'rgba(239, 1, 203, 0.3)' : 'rgba(147, 51, 234, 0.3)',
+                        border: '1px solid ' + (isPlaying ? '#ef01cb' : '#9333ea')
+                      }}
+                    >
+                      {isPlaying ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef01cb" stroke="#ef01cb" strokeWidth="2">
+                          <rect x="6" y="4" width="4" height="16"/>
+                          <rect x="14" y="4" width="4" height="16"/>
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+                          <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* СКАЧИВАНИЕ */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadTrack(audio.url || audio.data, audio.name, i);
+                      }}
+                      disabled={downloadingTracks.includes(i)}
+                      className="p-2 rounded-full transition-all flex-shrink-0"
+                      style={{
+                        background: downloadingTracks.includes(i) 
+                          ? 'rgba(63, 202, 175, 0.3)' 
+                          : 'rgba(147, 51, 234, 0.3)',
+                        border: '1px solid ' + (downloadingTracks.includes(i) ? '#3fcaaf' : '#9333ea')
+                      }}
+                    >
+                      {downloadingTracks.includes(i) ? (
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid transparent',
+                          borderTopColor: '#3fcaaf',
+                          borderRightColor: '#ef01cb',
+                          borderRadius: '50%',
+                          animation: 'cosmicSpin 0.8s linear infinite, cosmicPulse 2s ease-in-out infinite'
+                        }} />
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showPlaylist && !isDarkTheme && chapter?.audio_url && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backdropFilter: 'blur(10px)'
+  }}>
+    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background: 'rgba(0, 0, 0, 0.3)',
+      border: '3px solid transparent',
+      borderRadius: '16px',
+      backgroundClip: 'padding-box',
+      position: 'relative',
+      boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '16px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+      
       <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
         borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
       }}>
-<h2 className="text-xl sm:text-2xl font-bold" style={{
-  color: '#c9c6bb',
-  fontFamily: "'miamanueva', Georgia, serif",
-  fontStyle: 'italic'
-}}>
+        <h2 className="text-xl sm:text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'miamanueva', Georgia, serif",
+          fontStyle: 'italic'
+        }}>
           Плейлист
         </h2>
         <button 
@@ -1365,122 +1556,136 @@ style={{
           <X size={24} />
         </button>
       </div>
+      
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <style dangerouslySetInnerHTML={{__html: `
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(188, 187, 174, 0.25);
-  }
-    @keyframes dark-aura {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(98, 9, 30, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.6);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 60px rgba(98, 9, 30, 0.6), 0 0 80px rgba(133, 0, 45, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.8);
-    transform: scale(1.02);
-  }
-}
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
-    box-shadow: 0 0 15px rgba(188, 187, 174, 0.05);
-  }
-    @keyframes gothicBorderFlow {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-`}} />
+          .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(188, 187, 174, 0.25);
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
+            box-shadow: 0 0 15px rgba(188, 187, 174, 0.05);
+          }
+          @keyframes gothicBorderFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+          }
+        `}} />
+        
         <div className="space-y-3">
           {JSON.parse(chapter.audio_url).map((audio, i) => {
             const isPlaying = currentTrack === i;
             const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
             
             return (
-   <div 
-  key={i} 
-  className="rounded-lg p-4 transition-all cursor-pointer"
-  style={{
-    background: 'rgba(0, 0, 0, 0.3)',
-    position: 'relative',
-    borderRadius: '12px',
-    animation: isPlaying ? 'dark-aura 2.5s ease-in-out infinite' : 'none',
-    overflow: 'visible'
-  }}
-  onClick={() => {
-    if (audioElement) {
-      if (audioElement.paused) {
-        document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
-        audioElement.play();
-      } else {
-        audioElement.pause();
-      }
-    }
-  }}
->
-  <div style={{
-    position: 'absolute',
-    inset: '-2px',
-    borderRadius: '12px',
-    padding: '2px',
-    background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
-    backgroundSize: '200% 100%',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1,
-    animation: 'gothicBorderFlow 3s linear infinite'
-  }} />
-<div className="flex items-center justify-between">
-  <p className="text-sm font-semibold" style={{ color: '#c9c6bb', flex: 1 }}>
-    <span className="break-words">{audio.name}</span>
-  </p>
-  <div className="flex items-center gap-2 ml-3">
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        downloadTrack(audio.url || audio.data, audio.name, i);
-      }}
-      disabled={downloadingTracks.includes(i)}
-      className="p-2 rounded-full transition-all"
-      style={{
-        background: downloadingTracks.includes(i) 
-          ? 'rgba(180, 154, 95, 0.3)' 
-          : 'rgba(0, 0, 0, 0.3)',
-        border: '1px solid ' + (downloadingTracks.includes(i) ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
-      }}
-    >
-      {downloadingTracks.includes(i) ? (
-        <div style={{
-          width: '16px',
-          height: '16px',
-          border: '2px solid transparent',
-          borderTopColor: '#c9c6bb',
-          borderRightColor: '#65635d',
-          borderRadius: '50%',
-          animation: 'cosmicSpin 0.8s linear infinite'
-        }} />
-      ) : (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-      )}
-    </button>
-    <span className="text-xs whitespace-nowrap" style={{ color: '#65635d' }}>
-      {isPlaying ? 'Играет' : 'Воспроизвести'}
-    </span>
-  </div>
-</div>
+              <div 
+                key={i} 
+                className="rounded-lg p-4 transition-all"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  position: 'relative',
+                  borderRadius: '12px',
+                  overflow: 'visible'
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  inset: '-2px',
+                  borderRadius: '12px',
+                  padding: '2px',
+                  background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
+                  backgroundSize: '200% 100%',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                  animation: 'gothicBorderFlow 3s linear infinite'
+                }} />
+
+                <div className="flex items-center justify-between gap-3">
+                  {/* НАЗВАНИЕ ТРЕКА */}
+                  <p className="text-xs font-semibold line-clamp-1 flex-1" style={{ color: '#c9c6bb' }}>
+                    {audio.name}
+                  </p>
+
+                  {/* КНОПКИ */}
+                  <div className="flex items-center gap-2">
+                    {/* ВОСПРОИЗВЕДЕНИЕ/ПАУЗА */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (audioElement) {
+                          if (audioElement.paused) {
+                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
+                            audioElement.play();
+                          } else {
+                            audioElement.pause();
+                          }
+                        }
+                      }}
+                      className="p-2 rounded-full transition-all flex-shrink-0"
+                      style={{
+                        background: isPlaying ? 'rgba(180, 154, 95, 0.5)' : 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid ' + (isPlaying ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
+                      }}
+                    >
+                      {isPlaying ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#c9c6bb" stroke="#c9c6bb" strokeWidth="2">
+                          <rect x="6" y="4" width="4" height="16"/>
+                          <rect x="14" y="4" width="4" height="16"/>
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+                          <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* СКАЧИВАНИЕ */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadTrack(audio.url || audio.data, audio.name, i);
+                      }}
+                      disabled={downloadingTracks.includes(i)}
+                      className="p-2 rounded-full transition-all flex-shrink-0"
+                      style={{
+                        background: downloadingTracks.includes(i) 
+                          ? 'rgba(180, 154, 95, 0.3)' 
+                          : 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid ' + (downloadingTracks.includes(i) ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
+                      }}
+                    >
+                      {downloadingTracks.includes(i) ? (
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid transparent',
+                          borderTopColor: '#c9c6bb',
+                          borderRightColor: '#65635d',
+                          borderRadius: '50%',
+                          animation: 'cosmicSpin 0.8s linear infinite'
+                        }} />
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             );
           })}

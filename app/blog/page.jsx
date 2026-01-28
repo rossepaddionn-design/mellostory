@@ -119,17 +119,26 @@ return (
     `}</style>
     
     {/* ФОН */}
-    <div className="fixed inset-0 -z-10" style={{
-  backgroundImage: isDarkTheme 
-    ? isMobile 
-      ? 'url(/images/darnesthemepc.webp)' 
-      : 'url(/images/darknesas1.webp)'
-    : isMobile
+<div 
+  style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: -10,
+    backgroundImage: isDarkTheme 
+      ? isMobile 
+        ? 'url(/images/darnesthemepc.webp)' 
+        : 'url(/images/darknesas1.webp)'
+      : isMobile
         ? 'url(/images/111.webp)'
         : 'url(/images/alllisender.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }} />
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat'
+  }}
+/>
 
       {/* HEADER */}
 <div className="max-w-7xl mx-auto px-4 py-8">

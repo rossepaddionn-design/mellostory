@@ -1126,7 +1126,7 @@ return (
     className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative cursor-pointer"
     style={{
       borderColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
-      boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(192, 167, 109, 0.5)'
+      boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(17, 17, 16, 0.5)'
     }}
     onClick={() => setSelectedImage(img)}
                       >
@@ -1153,7 +1153,7 @@ return (
     width="20" 
     height="20" 
     viewBox="0 0 24 24" 
-    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#65635d') : 'none'}
+    fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#474746') : 'none'}
     stroke={isDarkTheme 
       ? (savedImages.includes(img) ? '#ffffff' : '#ef01cb')
       : '#c9c6bb'}
@@ -1172,19 +1172,19 @@ return (
   onClick={() => scrollCharacterCarousel('left')}
   className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#313130',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#313130';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#313130';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';
@@ -1196,19 +1196,19 @@ return (
   onClick={() => scrollCharacterCarousel('right')}
   className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
   style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
+    backgroundColor: isDarkTheme ? '#7626b5' : '#313130',
     boxShadow: isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#313130';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
       : 'none';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
+    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#313130';
     e.currentTarget.style.boxShadow = isDarkTheme 
       ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
       : 'none';

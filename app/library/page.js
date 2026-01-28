@@ -418,19 +418,26 @@ return (
 `}} />
 
 <div className="min-h-screen relative">
-<div className="fixed inset-0 -z-10" style={{
-  backgroundImage: isDarkTheme 
-    ? isMobile 
-      ? 'url(/images/darnesthemepc.webp)' 
-      : 'url(/images/darknesas1.webp)'
-    : isMobile
+<div 
+  style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: -10,
+    backgroundImage: isDarkTheme 
+      ? isMobile 
+        ? 'url(/images/darnesthemepc.webp)' 
+        : 'url(/images/darknesas1.webp)'
+      : isMobile
         ? 'url(/images/111.webp)'
         : 'url(/images/alllisender.webp)',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  backgroundAttachment: isDarkTheme ? 'fixed' : 'scroll'
-}} />
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat'
+  }}
+/>
         <div className="max-w-6xl mx-auto px-4 py-8">
 <div className="flex flex-row justify-between items-center gap-1 sm:gap-2 mb-3">
 <Link 

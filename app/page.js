@@ -1840,10 +1840,6 @@ return (
                  background-clip: text;`
             }
           }
-          .story-text {
-            color: #cdb0e3;
-            text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);
-          }
         `
       }}
     />
@@ -1857,16 +1853,14 @@ return (
   Mello
 </span>
 {isDarkTheme ? (
-  <span 
-    className="story-text" 
-    style={{ 
-      fontSize: 'clamp(5rem, 15vw, 14rem)',
-paddingLeft: '1.7em',
-transform: 'translateY(-0.10em)'
-    }}
-  >
-    Story
-  </span>
+<span style={{ 
+  fontSize: 'clamp(5rem, 15vw, 14rem)',
+  paddingLeft: '1.7em',
+  transform: 'translateY(-0.10em)',
+  color: '#a4d9f1'
+}}>
+  Story
+</span>
 ) : (
   <span style={{ 
     fontSize: 'clamp(5rem, 14vw, 12rem)',
