@@ -179,13 +179,18 @@ return (
       `}</style>
 
 <div className="min-h-screen text-white overflow-x-hidden relative">
-      <div className="fixed inset-0 -z-10"
+      <div 
         style={{
-          backgroundImage: isMobile ? 'url(/images/22222.webp)' : 'url(/images/22222.webp)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: -10,
+          backgroundImage: isMobile ? 'url(/images/11111.webp)' : 'url(/images/22222.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
+          backgroundRepeat: 'no-repeat'
         }}
       />
         

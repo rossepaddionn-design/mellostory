@@ -1384,8 +1384,14 @@ return (
       
       
       <div className="min-h-screen text-white overflow-x-hidden relative">
-<div className="fixed inset-0 -z-10"
+<div 
   style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: -10,
     backgroundImage: isDarkTheme 
       ? isMobile 
         ? 'url(/images/darnesthemepc.webp)' 
@@ -1395,8 +1401,7 @@ return (
         : 'url(/images/alllisender.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed'
+    backgroundRepeat: 'no-repeat'
   }}
 />
 
@@ -1482,6 +1487,16 @@ return (
         max-width: 200px;
         opacity: 1;
       }
+        /* Фикс для мобильного фона */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+  .fixed.inset-0.-z-10 {
+    position: absolute !important;
+    min-height: 100% !important;
+  }
+}
     `}} />
     
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
