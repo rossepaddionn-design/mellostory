@@ -1451,9 +1451,24 @@ return (
     }}
     className="p-2 transition relative flex items-center group"
     style={{
-      background: 'transparent',
-      border: 'none',
-      overflow: 'hidden'
+      background: isSubscribed 
+        ? (isDarkTheme 
+          ? 'rgba(179, 231, 239, 0.2)' 
+          : 'rgba(98, 9, 30, 0.3)') 
+        : 'transparent',
+      border: isSubscribed 
+        ? (isDarkTheme ? '2px solid #b3e7ef' : '2px solid #62091e')
+        : 'none',
+      overflow: 'hidden',
+      borderRadius: '8px',
+      boxShadow: isSubscribed 
+        ? (isDarkTheme 
+          ? '0 0 20px rgba(179, 231, 239, 0.6)' 
+          : '0 0 20px rgba(98, 9, 30, 0.6)')
+        : 'none',
+      animation: isSubscribed 
+        ? (isDarkTheme ? 'neonPulseSubscribed 2s ease-in-out infinite' : 'burgundyPulseSubscribed 2s ease-in-out infinite')
+        : 'none'
     }}
   >
     <style dangerouslySetInnerHTML={{__html: `
