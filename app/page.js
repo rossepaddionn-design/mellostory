@@ -1396,7 +1396,7 @@ return (
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    backgroundAttachment: isDarkTheme ? 'fixed' : 'scroll'
+    backgroundAttachment: 'fixed'
   }}
 />
 
