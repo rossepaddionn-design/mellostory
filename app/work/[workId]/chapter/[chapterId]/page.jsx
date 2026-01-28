@@ -653,49 +653,42 @@ if (loading) {
 // Модальное окно проверки возраста
 if (showAgeVerification) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
+<div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
       background: 'rgba(0, 0, 0, 0.95)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)'
     }}>
-      {/* Модальное окно */}
       <div className="relative z-10 w-full max-w-md mx-4">
         <div 
           className="rounded-2xl p-8 border-2 relative"
           style={{
-            background: 'rgba(0, 0, 0, 0.95)',
+            background: 'rgba(147, 51, 234, 0.15)',
             borderColor: '#9333ea',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.4)'
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
           }}
         >
-          {/* Заголовок MelloStory */}
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes shimmerAge {
               0% { background-position: -200% center; }
               100% { background-position: 200% center; }
             }
-            .age-shimmer-mello {
-              background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
+            .age-shimmer-text {
+              background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #9f68f3 66%, #a855f7 100%);
               background-size: 200% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
               background-clip: text;
               animation: shimmerAge 3s linear infinite;
             }
-            .age-shimmer-story {
-              color: #8c32d2;
-              text-shadow: 0 0 20px rgba(140, 50, 210, 0.9), 0 0 40px rgba(140, 50, 210, 0.6);
-            }
           `}} />
           
-          <h1 className="text-4xl font-bold text-center mb-6" style={{
-            fontFamily: "'Playfair Display', Georgia, serif"
+          <h1 className="text-5xl font-bold text-center mb-6 age-shimmer-text" style={{
+            fontFamily: "'plommir', Georgia, serif"
           }}>
-            <span className="age-shimmer-mello">MELLO</span>
-            <span className="age-shimmer-story">STORY</span>
+            MelloStory
           </h1>
           
-          {/* Текст предупреждения */}
           <div className="text-center mb-6">
             <p className="text-white text-lg font-semibold mb-2">
               Сайт содержит материалы 18+
@@ -705,91 +698,51 @@ if (showAgeVerification) {
             </p>
           </div>
           
-          {/* Кнопки */}
-<style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPurplePulse {
-    0%, 100% { 
-      box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
-                  0 0 20px rgba(183, 91, 205, 0.3),
-                  0 0 30px rgba(183, 91, 205, 0.2);
-    }
-    50% { 
-      box-shadow: 0 0 15px rgba(183, 91, 205, 0.6), 
-                  0 0 30px rgba(183, 91, 205, 0.5),
-                  0 0 45px rgba(183, 91, 205, 0.3);
-    }
-  }
-  
-  .pink-neon-button {
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: 2px solid rgba(183, 91, 205, 0.5) !important;
-    box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
-                0 0 20px rgba(183, 91, 205, 0.3),
-                0 0 30px rgba(183, 91, 205, 0.2) !important;
-    animation: neonPurplePulse 3s ease-in-out infinite !important;
-    transition: all 0.3s ease !important;
-    color: #ffffff !important;
-  }
-  
-  .pink-neon-button:hover {
-    border-color: rgba(183, 91, 205, 0.9) !important;
-    box-shadow: 0 0 20px rgba(183, 91, 205, 0.8), 
-                0 0 40px rgba(183, 91, 205, 0.6),
-                0 0 60px rgba(183, 91, 205, 0.4) !important;
-    transform: translateY(-2px) !important;
-  }
-  
-  .pink-neon-button:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 0 30px rgba(183, 91, 205, 1), 
-                0 0 50px rgba(183, 91, 205, 0.8),
-                0 0 70px rgba(183, 91, 205, 0.5) !important;
-  }
-`}} />
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes neonPurplePulse {
+              0%, 100% { 
+                box-shadow: 0 0 10px rgba(147, 112, 219, 0.6), 
+                            0 0 20px rgba(147, 112, 219, 0.4);
+              }
+              50% { 
+                box-shadow: 0 0 15px rgba(147, 112, 219, 0.8), 
+                            0 0 30px rgba(147, 112, 219, 0.6);
+              }
+            }
+            
+            .neon-button {
+              background: linear-gradient(135deg, #9370db 0%, #67327b 100%) !important;
+              box-shadow: 0 0 15px rgba(147, 112, 219, 0.6) !important;
+              animation: neonPurplePulse 3s ease-in-out infinite !important;
+              transition: all 0.3s ease !important;
+            }
+            
+            .neon-button:hover {
+              box-shadow: 0 0 20px rgba(147, 112, 219, 0.8), 
+                          0 0 40px rgba(147, 112, 219, 0.6) !important;
+              transform: translateY(-2px) !important;
+            }
+          `}} />
 
-<div className="space-y-3 mb-6">
-  <button
-    onClick={() => {
-      window.location.href = '/?login=true';
-    }}
-    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
-  >
-    Войти
-  </button>
-  
-  <button
-    onClick={() => {
-      window.location.href = '/?register=true';
-    }}
-    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
-  >
-    Регистрация
-  </button>
-</div>
-          
-{/* Логотип внизу */}
-<div className="flex justify-center">
-  <div style={{
-    width: '128px',
-    height: '128px',
-    borderRadius: '50%',
-    background: '#000000',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden'
-  }}>
-    <img 
-      src="/logo.png"
-      alt="MelloStory" 
-      style={{ 
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover'
-      }}
-    />
-  </div>
-</div>
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                window.location.href = '/welcome?login=true';
+              }}
+              className="neon-button w-full py-3 rounded-lg font-bold text-base"
+            >
+              Войти
+            </button>
+            
+            <button
+              onClick={() => {
+                window.location.href = '/welcome?register=true';
+              }}
+              className="neon-button w-full py-3 rounded-lg font-bold text-base"
+            >
+              Регистрация
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -821,14 +774,14 @@ style={{
       }}>
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-2 sm:mb-4">
-            <div className="flex gap-2 sm:gap-4 items-center flex-1 min-w-0">
-              <Link href="/" className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap" style={{ color: isDarkTheme ? '#9ca3af' : '#000000' }}>
-                {t.backToMain}
-              </Link>
-              <Link href={`/work/${workId}`} className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap hidden sm:inline" style={{ color: isDarkTheme ? '#7626b5' : '#5f1b1e' }}>
-                ← {t.backToWork}
-              </Link>
-            </div>
+<div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+  <Link href="/" className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap" style={{ color: isDarkTheme ? '#9ca3af' : '#000000' }}>
+    {t.backToMain}
+  </Link>
+  <Link href={`/work/${workId}`} className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap" style={{ color: isDarkTheme ? '#7626b5' : '#5f1b1e' }}>
+    ← {t.backToWork}
+  </Link>
+</div>
             
 <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
 <button
@@ -1835,9 +1788,13 @@ style={{
     font-family: 'Playfair Display', Georgia, serif;
   }
 `}} />
-    <p className="mb-4 text-xl sm:text-2xl md:text-3xl break-words font-bold text-center work-title-shimmer" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic' }}>
-      {work.title}
-    </p>
+<p className="mb-3 break-words font-bold text-center work-title-shimmer" style={{ 
+  fontSize: isDarkTheme ? 'clamp(2rem, 5vw, 3.5rem)' : 'clamp(1.25rem, 3vw, 2rem)',
+  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif", 
+  fontStyle: isDarkTheme ? 'normal' : 'italic' 
+}}>
+  {work.title}
+</p>
   </>
 )}
 <h1 className="font-bold mb-2 break-words" style={{
@@ -2042,10 +1999,6 @@ style={{
       : '0 0 15px rgba(216, 197, 162, 0.8)'};
   }
 `}} />
-    <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
-      <ImageIcon size={18} className="sm:w-5 sm:h-5" />
-      {t.images}
-    </h3>
     
     <div className="relative">
 <div 
@@ -2274,80 +2227,42 @@ style={{
   <div className="flex gap-3 justify-center">
     <button
       onClick={() => setShowRatingModal(true)}
-      className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base flex items-center gap-2 border-2"
+      className="px-4 sm:px-6 py-2 sm:py-3 transition text-sm sm:text-base flex items-center gap-2"
       style={{
-        background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)',
-        borderColor: isDarkTheme ? '#9333ea' : '#c9c6b0',
-        color: '#FFFFFF',
-        boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none',
-        backdropFilter: 'blur(10px)'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(201, 198, 176, 0.4)';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 10px rgba(201, 198, 176, 0.3)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+        background: 'transparent',
+        color: isDarkTheme ? '#c084fc' : '#c9c6bb'
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke={isDarkTheme ? '#c084fc' : '#c9c6bb'} strokeWidth="2">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
-      <span className="hidden sm:inline">
-        {averageRating > 0 ? averageRating.toFixed(1) : 'Оценить'}
-      </span>
-      <span className="sm:hidden">
-        {averageRating > 0 ? averageRating.toFixed(1) : '★'}
-      </span>
+      <span>{averageRating > 0 ? averageRating.toFixed(1) : 'Оценить'}</span>
     </button>
 
     <Link
       href={`/work/${workId}/discussion`}
-      className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base flex items-center gap-2 border-2"
+      className="px-4 sm:px-6 py-2 sm:py-3 transition text-sm sm:text-base flex items-center gap-2"
       style={{
-        background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)',
-        borderColor: isDarkTheme ? '#9333ea' : '#c9c6b0',
-        color: '#FFFFFF',
-        boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none',
-        backdropFilter: 'blur(10px)'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(201, 198, 176, 0.4)';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : '0 0 10px rgba(201, 198, 176, 0.3)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+        background: 'transparent',
+        color: isDarkTheme ? '#c084fc' : '#c9c6bb'
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme ? '#c084fc' : '#c9c6bb'} strokeWidth="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      <span className="hidden sm:inline">Обсуждение</span>
-      <span className="sm:hidden">💬</span>
+      <span>Обсуждение</span>
     </Link>
   </div>
 
   {/* Навигация между главами */}
-  <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+  <div className="flex flex-row justify-between items-center gap-3 sm:gap-4">
     {prevChapter ? (
       <button 
         onClick={handlePrevClick}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+        className="w-full sm:w-auto flex items-center justify-center gap-2 transition text-sm sm:text-base"
         style={{
-          background: isDarkTheme ? '#9333ea' : '#c9c6bb',
-          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
-          boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
-          color: isDarkTheme ? '#ffffff' : '#000000'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
-          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
-          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+          background: 'transparent',
+          color: isDarkTheme ? '#c084fc' : '#c9c6bb'
         }}
       >
         <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
@@ -2358,29 +2273,19 @@ style={{
       <div className="hidden sm:block"></div>
     )}
     
-    <span className="text-xs sm:text-sm order-first sm:order-none font-semibold" style={{
-      color: isDarkTheme ? '#ffffff' : '#c9c6bb'
-    }}>
-      Глава {chapter.chapter_number} из {allChapters.length}
-    </span>
+<span className="text-xs sm:text-sm font-semibold" style={{
+  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+}}>
+  Глава {chapter.chapter_number} из {allChapters.length}
+</span>
 
     {nextChapter ? (
       <button 
         onClick={handleNextClick}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition text-sm sm:text-base"
+        className="w-full sm:w-auto flex items-center justify-center gap-2 transition text-sm sm:text-base"
         style={{
-          background: isDarkTheme ? '#9333ea' : '#c9c6bb',
-          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-          boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(193, 178, 134, 0.4)',
-          color: isDarkTheme ? '#ffffff' : '#000000'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#a855f7' : '#65635d';
-          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.8)' : 'none';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#c9c6bb';
-          e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6)' : 'none';
+          background: 'transparent',
+          color: isDarkTheme ? '#c084fc' : '#c9c6bb'
         }}
       >
         <span className="hidden sm:inline">{t.nextChapter}</span>
@@ -2404,17 +2309,17 @@ style={{
 {showSidePanel && (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
-    {isDarkTheme && (
-    <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-3xl" style={{
-  borderColor: '#b3e7ef',
-  backgroundImage: 'url(/textures/dark-erys.jpg)',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat'
+  {isDarkTheme && (
+    <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-2xl border-2" style={{
+    background: 'rgba(147, 51, 234, 0.15)',
+    borderColor: '#9333ea',
+    backdropFilter: 'blur(20px)',
+    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
 }}>
 <div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-          borderBottom: '3px solid rgba(147, 112, 219, 0.6)'
+  background: 'rgba(139, 60, 200, 0.3)',
+  backdropFilter: 'blur(10px)',
+  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
         }}>
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes shineHeader {
@@ -2607,7 +2512,6 @@ style={{
                     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
                   }}
                 >
-                  НЕОН
                 </span>
                 <span 
                   className="text-xs font-bold transition-opacity duration-300"
@@ -2616,7 +2520,6 @@ style={{
                     textShadow: 'none'
                   }}
                 >
-                  ГОТИКА
                 </span>
               </div>
             </button>
@@ -2630,15 +2533,15 @@ style={{
   <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-3xl" style={{
     borderLeft: '12px solid',
    borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
-    boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-    backgroundImage: 'url(/textures/darkness.jpg)',
+        boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
+    background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat'
   }}>
         <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.25) 0%, rgba(188, 187, 174, 0.15) 100%)',
-borderBottom: '1px solid rgba(188, 187, 174, 0.35)',
+background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
+borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
         }}>
@@ -2652,7 +2555,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
               100% { background-position: 200% center; }
             }
             .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #c9c6bb 50%, #bcbbae 100%);
+              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%);
               background-size: 200% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
@@ -2674,9 +2577,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
             onClick={() => setShowSidePanel(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all z-20"
             style={{
-              background: '1px solid rgba(188, 187, 174, 0.35)',
+              background: 'rgba(26, 26, 26, 0.35)',
               backdropFilter: 'blur(1px)',
-              border: '0 4px 15px rgba(188, 187, 174, 0.15)'
+              border: '1px solid rgba(10, 10, 10, 0.15)'
             }}
           >
             <X size={20} color="#c9c6bb" />
@@ -2698,28 +2601,28 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         }}
         className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
         style={{
-          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(188, 187, 174, 0.35)',
+          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
         }}
       >
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-          background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+          background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
         }} />
         
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#62091e" strokeWidth="2" className="relative z-10">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
         </svg>
         <span className="relative z-10 text-center" style={{ 
-          background: 'linear-gradient(90deg, #62091e 0%, #d6c79e 50%, #62091e 100%)',
+          background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
           backgroundSize: '200% auto',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
           animation: 'shimmerGoldBtn 3s linear infinite',
-          fontStyle: 'italic',
+          fontStyle: 'normal',
           fontWeight: '600'
         }}>
           Главы
@@ -2734,27 +2637,27 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         }}
         className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
         style={{
-          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(188, 187, 174, 0.35)',
+          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
         }}
       >
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-          background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+          background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
         }} />
         
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#62091e" strokeWidth="2" className="relative z-10">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
         </svg>
         <span className="relative z-10 text-center" style={{ 
-          background: 'linear-gradient(90deg, #62091e 0%, #d6c79e 50%, #62091e 100%)',
+          background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
           backgroundSize: '200% auto',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
           animation: 'shimmerGoldBtn 3s linear infinite',
-          fontStyle: 'italic',
+          fontStyle: 'normal',
           fontWeight: '600'
         }}>
           Закладки
@@ -2769,28 +2672,28 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
           }}
           className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
           style={{
-          background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(188, 187, 174, 0.35)',
+          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+ border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
           }}
         >
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-            background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+           background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
           }} />
           
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#62091e" strokeWidth="2" className="relative z-10">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
             <circle cx="12" cy="12" r="10"/>
             <polygon points="10 8 16 12 10 16 10 8"/>
           </svg>
           <span className="relative z-10 text-center" style={{  
-            background: 'linear-gradient(90deg, #62091e 0%, #d6c79e 50%, #62091e 100%)',
+            background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
             animation: 'shimmerGoldBtn 3s linear infinite',
-            fontStyle: 'italic',
+            fontStyle: 'normal',
             fontWeight: '600'
           }}>
             Плейлист
@@ -2839,7 +2742,6 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                     textShadow: 'none'
                   }}
                 >
-                  НЕОН
                 </span>
                 <span 
                   className="text-xs font-bold transition-opacity duration-300"
@@ -2848,7 +2750,6 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
                   }}
                 >
-                  ГОТИКА
                 </span>
               </div>
             </button>

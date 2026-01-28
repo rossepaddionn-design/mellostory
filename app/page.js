@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+import { supabaseBlog } from '@/lib/supabase-blog';
 import { ChevronLeft, ChevronRight, X, Menu, LogOut, User, MessageSquare, Palette, FileText, Settings, Trash2, Send, Mail, MailOpen, AlertTriangle, Reply } from 'lucide-react';
 import { supabaseUGC } from '@/lib/supabase-ugc';
 import { Heart, Bookmark, Image as ImageIcon } from 'lucide-react';
 
 
 export default function Home() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [language, setLanguage] = useState('ru');
   const [titleColor, setTitleColor] = useState('#ef4444');
@@ -74,7 +77,6 @@ const [activeCategory, setActiveCategory] = useState('novel');
   const [selectedComment, setSelectedComment] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
-  const [showSnow, setShowSnow] = useState(true); // управление снегом
   const [isDarkTheme, setIsDarkTheme] = useState(true);
 const [showConfirmModal, setShowConfirmModal] = useState(false);
 const [confirmMessage, setConfirmMessage] = useState('');
@@ -95,7 +97,13 @@ const [showAddNewsModal, setShowAddNewsModal] = useState(false);
 const [newsForm, setNewsForm] = useState({ title: '', content: '' });
 const [newsCarouselIndex, setNewsCarouselIndex] = useState(0);
 const [currentMonth, setCurrentMonth] = useState(new Date());
-
+const [notifications, setNotifications] = useState([]);
+const [unreadCount, setUnreadCount] = useState(0);
+const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
+const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+const [isMobile, setIsMobile] = useState(false);
+const [showNewsletterModal, setShowNewsletterModal] = useState(false);
+const [isSubscribed, setIsSubscribed] = useState(false);
 
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
@@ -340,7 +348,7 @@ const getDaysInMonth = (date) => {
 
   const ADMIN_PASSWORD = 'M@___m@_18_97_mam@_mello_18_97_06_mama';
   const ADMIN_EMAIL = 'rossepaddionn@gmail.com';
-  const HEADER_BG_IMAGE = isDarkTheme ? '/images/header-bg-v2.jpg' : '/images/darknesswoo.jpg';
+
 
   useEffect(() => {
     if (expandedWork) {
@@ -354,12 +362,36 @@ const getDaysInMonth = (date) => {
   }, [expandedWork]);
 
 useEffect(() => {
-  loadWorks();
-  loadSettings();
-  checkUser();
-  loadSiteUpdates();
-  loadNews(); // ← ДОБАВЬ ЭТУ СТРОКУ
+  const checkAndRedirect = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      router.push('/welcome');
+    } else {
+      loadWorks();
+      loadSettings();
+      checkUser();
+      loadSiteUpdates();
+      loadNews();
+    }
+  };
+  
+  checkAndRedirect();
 }, []);
+
+useEffect(() => {
+  const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
+
+// ДОБАВЬ НОВЫЙ useEffect для уведомлений
+useEffect(() => {
+  if (user && userProfile) {
+    loadNotifications();
+  }
+}, [user, userProfile]);
 
 useEffect(() => {
   const savedTheme = localStorage.getItem('theme');
@@ -436,6 +468,20 @@ const checkUser = async () => {
     // Всё ОК - устанавливаем профиль
     setUserProfile(profile);
     setIsAdmin(false);
+
+// Проверяем подписку на рассылку в supabaseBlog
+try {
+  const { data: subscription } = await supabaseBlog
+    .from('newsletter_subscribers')
+    .select('is_active')
+    .eq('user_id', session.user.id)
+    .maybeSingle();
+
+  setIsSubscribed(subscription?.is_active || false);
+} catch (err) {
+  console.error('Ошибка загрузки статуса рассылки:', err);
+  setIsSubscribed(false);
+}
     
   } else {
     const adminSession = localStorage.getItem('admin_session');
@@ -518,6 +564,64 @@ const loadNews = async () => {
     setNewsPosts(data || []);
   } catch (err) {
     console.error('Ошибка загрузки новостей:', err);
+  }
+};
+
+
+const loadNotifications = async () => {
+  if (!user || !userProfile) return;
+  
+  try {
+    const [notificationsRes, countRes] = await Promise.all([
+      fetch(`/api/ugc?action=get_notifications&userId=${user.id}`),
+      fetch(`/api/ugc?action=get_unread_count&userId=${user.id}`)
+    ]);
+    
+    const notificationsData = await notificationsRes.json();
+    const countData = await countRes.json();
+    
+    if (notificationsData.notifications) {
+      setNotifications(notificationsData.notifications);
+    }
+    
+    if (countData.count !== undefined) {
+      setUnreadCount(countData.count);
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки уведомлений:', err);
+  }
+};
+
+const markNotificationAsRead = async (notificationId) => {
+  try {
+    await fetch('/api/ugc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'mark_as_read',
+        userId: user.id,
+        notificationId: notificationId
+      })
+    });
+    
+    loadNotifications(); // Перезагружаем
+  } catch (err) {
+    console.error('Ошибка отметки уведомления:', err);
+  }
+};
+
+const handleNotificationClick = async (notification) => {
+  // Отмечаем как прочитанное
+  await markNotificationAsRead(notification.id);
+  
+  // Перенаправляем в зависимости от типа
+  if (notification.type === 'new_work' || notification.type === 'new_chapter') {
+    window.location.href = `/work/${notification.work_id}`;
+  } else if (notification.type === 'comment_reply') {
+    // ← ИСПРАВЛЕНО: перенаправление на страницу обсуждения
+    window.location.href = `/work/${notification.work_id}/discussion`;
+  } else if (notification.type === 'admin_message') {
+    window.location.href = '/my-messages';
   }
 };
 
@@ -702,19 +806,22 @@ const handleLogin = async () => {
   }
 };
 
-  const handleLogout = async () => {
-    if (isAdmin) {
-      setIsAdmin(false);
-      setUser(null);
-      localStorage.removeItem('admin_session');
-    } else {
-      await supabase.auth.signOut();
-      setUser(null);
-      setUserProfile(null);
-    }
-    setShowReaderPanel(false);
-    setShowAdminPanel(false);
-  };
+const handleLogout = async () => {
+  if (isAdmin) {
+    setIsAdmin(false);
+    setUser(null);
+    localStorage.removeItem('admin_session');
+  } else {
+    await supabase.auth.signOut();
+    setUser(null);
+    setUserProfile(null);
+  }
+  setShowReaderPanel(false);
+  setShowAdminPanel(false);
+  
+  // Перенаправляем на велком
+  window.location.href = '/welcome';
+};
 
 const toggleTheme = () => {
   const newTheme = !isDarkTheme;
@@ -851,29 +958,51 @@ showConfirm('Вы уверены? Это действие необратимо!'
     }
   };
 
-  const replyToMessage = async (messageId) => {
-    if (!replyText.trim()) {
+const replyToMessage = async (messageId) => {
+  if (!replyText.trim()) {
     showConfirm('Напишите ответ!');
-      return;
-    }
+    return;
+  }
 
-    const { error } = await supabase
-      .from('messages')
-      .update({ 
-        admin_reply: replyText.trim(),
-        is_read: true 
-      })
-      .eq('id', messageId);
+  // Находим сообщение чтобы получить user_id автора
+  const message = messages.find(m => m.id === messageId);
+  if (!message) {
+    showConfirm('Сообщение не найдено');
+    return;
+  }
 
-    if (error) {
+  const { error } = await supabase
+    .from('messages')
+    .update({ 
+      admin_reply: replyText.trim(),
+      is_read: true 
+    })
+    .eq('id', messageId);
+
+  if (error) {
     showConfirm('Ошибка: ' + error.message);
-    } else {
-    showConfirm('Ответ отправлен!');
-      setReplyText('');
-      setSelectedMessage(null);
-      loadManagementData();
+  } else {
+    // СОЗДАЁМ УВЕДОМЛЕНИЕ
+    try {
+      await fetch('/api/ugc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_admin_message_notification',
+          userId: message.from_user_id,
+          messageId: messageId
+        })
+      });
+    } catch (notifError) {
+      console.error('Ошибка создания уведомления:', notifError);
     }
-  };
+    
+    showConfirm('Ответ отправлен!');
+    setReplyText('');
+    setSelectedMessage(null);
+    loadManagementData();
+  }
+};
 
  const deleteMessage = async (messageId) => {
   showConfirm('Удалить сообщение?', async () => {
@@ -949,48 +1078,54 @@ showConfirm('Вы уверены? Это действие необратимо!'
     }
   };
 
-  const translations = {
-    ru: {
-      completed: 'Завершённые',
-      ongoing: 'Онгоинги',
-      minific: 'Минифики',
-      longfic: 'Лонгфики',
-      novels: 'Романы',
-      about: 'Обо мне',
-      login: 'Вход',
-      register: 'Регистрация',
-      logout: 'Выход',
-      nickname: 'Никнейм',
-      email: 'Email',
-      password: 'Пароль',
-      noWorks: 'Работы не найдены',
-      startReading: 'Начать читать',
-      disclaimer18: 'Предупреждение о содержании для взрослых (18+)',
-      disclaimerText: 'Веб-сайт содержит материалы, предназначенные исключительно для лиц, достигших совершеннолетия (18 лет и старше). Продолжая использование данного ресурса, вы подтверждаете, что являетесь совершеннолетним в соответствии с законодательством вашей страны. Материалы сайта могут содержать сцены насилия, откровенные сексуальные сцены и иной контент, не предназначенный для несовершеннолетних. Администрация сайта не несет ответственности за последствия доступа к материалам со стороны лиц, не достигших 18 лет.',
-      copyrightTitle: 'Авторские права и интеллектуальная собственность',
-      copyrightText: 'Все литературные произведения, размещенные на данном веб-сайте, являются объектами авторского права и охраняются в соответствии с действующим законодательством об интеллектуальной собственности. Любое воспроизведение, распространение, публичный показ, перевод или иное использование произведений без письменного согласия правообладателя категорически запрещено и может повлечь за собой гражданско-правовую и уголовную ответственность в соответствии с применимым законодательством.'
-    },
-    en: {
-      completed: 'Completed',
-      ongoing: 'Ongoing',
-      minific: 'Minifics',
-      longfic: 'Longfics',
-      novels: 'Novels',
-      about: 'About Me',
-      login: 'Login',
-      register: 'Register',
-      logout: 'Logout',
-      nickname: 'Nickname',
-      email: 'Email',
-      password: 'Password',
-      noWorks: 'No works found',
-      startReading: 'Start Reading',
-      disclaimer18: 'Adult Content Warning (18+)',
-      disclaimerText: 'This website contains materials intended exclusively for adults.',
-      copyrightTitle: 'Copyright and Intellectual Property',
-      copyrightText: 'All literary works posted on this website are copyrighted and protected under applicable intellectual property law.'
-    }
-  };
+const translations = {
+  ru: {
+    about: 'Обо мне',
+    login: 'Вход',
+    register: 'Регистрация',
+    logout: 'Выход',
+    nickname: 'Никнейм',
+    email: 'Email',
+    password: 'Пароль',
+    noWorks: 'Работы не найдены',
+    startReading: 'Начать читать',
+    updates: 'Обновления',
+    myCollection: 'Моя коллекция',
+    myMessages: 'Мои сообщения',
+    settings: 'Настройки',
+    library: 'Библиотека',
+    blog: 'Блог',
+    notifications: 'Уведомления',
+    mailing: 'Рассылка',
+    schedule: 'Расписание',
+    news: 'Новости',
+    information: 'Информация',
+    popularWorks: 'Популярные работы'
+  },
+  en: {
+    about: 'About Me',
+    login: 'Login',
+    register: 'Register',
+    logout: 'Logout',
+    nickname: 'Nickname',
+    email: 'Email',
+    password: 'Password',
+    noWorks: 'No works found',
+    startReading: 'Start Reading',
+    updates: 'Updates',
+    myCollection: 'My Collection',
+    myMessages: 'My Messages',
+    settings: 'Settings',
+    library: 'Library',
+    blog: 'Blog',
+    notifications: 'Notifications',
+    mailing: 'Mailing',
+    schedule: 'Schedule',
+    news: 'News',
+    information: 'Information',
+    popularWorks: 'Popular Works'
+  }
+};
 
   const t = translations[language];
 
@@ -1007,32 +1142,6 @@ showConfirm('Вы уверены? Это действие необратимо!'
 
   const displayWorks = getCurrentWorks();
 
-// ❄️ ЭФФЕКТ СНЕГА
-useEffect(() => {
-  if (!showSnow) return; // если выключен - не запускаем
-  
-  const createSnowflake = () => {
-    const snowflake = document.createElement('div');
-    snowflake.className = 'snowflake';
-    snowflake.innerHTML = '❄';
-    snowflake.style.left = Math.random() * 100 + '%';
-    snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-    snowflake.style.opacity = Math.random() * 0.7 + 0.3;
-    snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-    
-    document.querySelector('.snow-container')?.appendChild(snowflake);
-    
-    setTimeout(() => {
-      snowflake.remove();
-    }, 5000);
-  };
-  
-  // Адаптивная частота для мобильных
-  const isMobile = window.innerWidth < 768;
-  const interval = setInterval(createSnowflake, isMobile ? 500 : 300);
-  
-  return () => clearInterval(interval);
-}, [showSnow]); // ← ДОБАВИЛИ ЗАВИСИМОСТЬ
 
 useEffect(() => {
   loadCalendarEvents();
@@ -1273,285 +1382,483 @@ return (
   `}
 `}} />
       
-      {/* ❄️ СТИЛИ И КОНТЕЙНЕР ДЛЯ СНЕГА */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .snow-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100vh;
-          pointer-events: none;
-          z-index: 9999;
-          overflow: hidden;
-        }
-        
-        .snowflake {
-          position: absolute;
-          top: -20px;
-          color: rgba(255, 255, 255, 0.9);
-          text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-          animation: fall linear forwards;
-          user-select: none;
-        }
-        
-        @keyframes fall {
-          to {
-            transform: translateY(100vh) rotate(360deg);
-          }
-        }
-      `}} />
-      
-      <div className="snow-container"></div>
       
       <div className="min-h-screen text-white overflow-x-hidden relative">
-<div 
-  className="fixed inset-0 -z-10"
+<div className="fixed inset-0 -z-10"
   style={{
-    background: isDarkTheme 
-      ? 'linear-gradient(225deg, #000000 0%, #240046 20%, #6c20c9 40%, #5c0250 60%, #0d0020 80%, #000000 100%)'
-      : 'radial-gradient(circle at 10% 90%, #c2c2a8 0%, #6b6353 20%, #3d3529 40%, #1a1410 70%, #0d0a08 100%)'
+    backgroundImage: isDarkTheme 
+      ? isMobile 
+        ? 'url(/images/darnesthemepc.webp)' 
+        : 'url(/images/darknesas1.webp)'
+      : isMobile
+        ? 'url(/images/111.webp)'
+        : 'url(/images/alllisender.webp)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: isDarkTheme ? 'fixed' : 'scroll'
   }}
 />
 
 {/* HEADER */}
-<div className="relative overflow-hidden px-4 sm:px-8 pt-4 sm:pt-6">
+<div className="relative overflow-visible px-4 sm:px-8 pt-4 sm:pt-6">
   <div className="max-w-7xl mx-auto">
-    {/* РАМКА С ГРАДИЕНТОМ */}
-<div 
-  className="relative overflow-hidden rounded-lg"
-  style={{
-    padding: '3px',
-    background: isDarkTheme 
-      ? 'linear-gradient(135deg, #160420ff 0%, #000000 50%, #160620ff 100%)'
-      : 'linear-gradient(135deg, rgb(46, 46, 37) 0%, #000000 50%, rgb(48, 48, 40) 100%)'
-  }}
->
-      {/* ФОНОВОЕ ИЗОБРАЖЕНИЕ */}
- <div 
-  className="relative rounded-lg overflow-hidden"
-  style={{
-    backgroundImage: `url(${HEADER_BG_IMAGE})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    minHeight: '200px'
-  }}
->
-<style jsx>{`
-  @media (min-width: 640px) {
-    div[style*="backgroundImage"] {
-      min-height: 480px !important;
-    }
-  }
-  @media (max-width: 639px) {
-    div[style*="backgroundImage"] {
-      min-height: 200px !important;
-    }
-  }
-`}</style>
+    {/* БЕЗ РАМКИ И ФОНА - ПРОСТО КОНТЕНТ */}
+    <div className="relative overflow-hidden rounded-lg">
+      
+      {/* КОНТЕЙНЕР БЕЗ ФОНОВОГО ИЗОБРАЖЕНИЯ */}
+      <div 
+        className="relative rounded-lg overflow-hidden"
+        style={{
+          background: 'transparent', // ← Просто прозрачный
+          minHeight: '200px'
+        }}
+      >
+        <style jsx>{`
+          @media (min-width: 640px) {
+            div[style*="minHeight"] {
+              min-height: 480px !important;
+            }
+          }
+          @media (max-width: 639px) {
+            div[style*="minHeight"] {
+              min-height: 200px !important;
+            }
+          }
+        `}</style>
         
         <div className="relative z-10 h-full flex flex-col min-h-[200px] sm:min-h-[480px]">
           
           
-          {/* ВЕРХНЯЯ ПАНЕЛЬ */}
+{/* ВЕРХНЯЯ ПАНЕЛЬ */}
 <div className="absolute inset-0 z-10 flex flex-col">
   <div className="px-3 sm:px-6 py-2 sm:py-4">
     <div className="flex justify-between items-center">
-      <div className="flex items-center gap-2 sm:gap-4">
- <div
-  className="rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0"
+      <div className="flex items-center gap-1 sm:gap-4">
+      </div>
+      
+ <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+
+{/* РАССЫЛКА */}
+<div className="relative">
+  <button
+    onClick={() => {
+      if (user && userProfile) {
+        setShowNewsletterModal(true);
+      } else {
+        showConfirm('Войдите в аккаунт для управления рассылкой');
+      }
+    }}
+    className="p-2 transition relative flex items-center group"
+    style={{
+      background: 'transparent',
+      border: 'none',
+      overflow: 'hidden'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      .group span {
+        max-width: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+      .group:hover span,
+      .group:active span {
+        max-width: 200px;
+        opacity: 1;
+      }
+    `}} />
+    
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    
+    <span className="ml-2 whitespace-nowrap text-sm font-medium">
+      Рассылка
+    </span>
+  </button>
+</div>
+
+{/* СМЕНА ЯЗЫКА */}
+  <div className="relative">
+    <button
+      onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
+      className="p-2 transition relative flex items-center group"
+      style={{
+        background: 'transparent',
+        border: 'none',
+        overflow: 'hidden'
+      }}
+    >
+      <style dangerouslySetInnerHTML={{__html: `
+        .group span {
+          max-width: 0;
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+        .group:hover span,
+        .group:active span {
+          max-width: 200px;
+          opacity: 1;
+        }
+      `}} />
+      
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M2 12h20"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      
+      <span className="ml-2 whitespace-nowrap text-sm font-medium">
+        {language === 'ru' ? 'RU' : 'EN'}
+      </span>
+    </button>
+  </div>
+
+  {/* УВЕДОМЛЕНИЯ */}
+  {user && userProfile && (
+    <div className="relative">
+      <button
+        onClick={() => {
+          setShowNotificationsPanel(!showNotificationsPanel);
+          if (!showNotificationsPanel) {
+            loadNotifications();
+          }
+        }}
+        className="p-2 transition relative flex items-center group"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          overflow: 'hidden'
+        }}
+      >
+        <style dangerouslySetInnerHTML={{__html: `
+          .group span {
+            max-width: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+          }
+          .group:hover span,
+          .group:active span {
+            max-width: 200px;
+            opacity: 1;
+          }
+        `}} />
+        
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        
+<span className="ml-2 whitespace-nowrap text-sm font-medium">
+  {t.notifications}
+</span>
+        
+        {unreadCount > 0 && (
+          <span 
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
+            style={{
+              background: isDarkTheme ? '#ef01cb' : '#62091e',
+              color: '#ffffff',
+              boxShadow: isDarkTheme ? '0 0 10px rgba(239, 1, 203, 0.8)' : 'none',
+              maxWidth: 'none',
+              opacity: 1
+            }}
+          >
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {showNotificationsPanel && (
+        <div 
+          className="fixed right-2 w-50 sm:w-80 rounded-xl p-2 sm:p-4 shadow-2xl z-[10000] max-h-48 sm:max-h-96 overflow-y-auto"
+          style={{
+            background: isDarkTheme 
+              ? 'rgba(126, 50, 189, 0.5)'
+              : 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(20px)',
+            border: isDarkTheme ? '1px solid rgba(102, 69, 146, 0.6)' : '1px solid rgba(0, 0, 0, 0.6)',
+            top: isMobile ? '60px' : '80px'
+          }}
+        >
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold text-sm" style={{ color: isDarkTheme ? '#b3e7ef' : '#c9c6bb' }}>
+              Уведомления
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setShowNotificationsModal(true);
+                  loadNotifications();
+                }}
+                className="text-xs underline"
+                style={{ color: isDarkTheme ? '#9370db' : '#c9c6bb' }}
+              >
+                Все
+              </button>
+              <button
+                onClick={() => setShowNotificationsPanel(false)}
+                className="hover:opacity-70 transition"
+                style={{ color: isDarkTheme ? '#b3e7ef' : '#c9c6bb' }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+
+          {notifications.length === 0 ? (
+            <p className="text-xs text-center py-4" style={{ color: isDarkTheme ? '#ffffff' : '#c9c6bb' }}>
+              Нет уведомлений
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {notifications.slice(0, 5).map((notif) => (
+                <button
+                  key={notif.id}
+                  onClick={() => {
+                    handleNotificationClick(notif);
+                    setShowNotificationsPanel(false);
+                  }}
+                  className="w-full text-left p-2 rounded transition"
+                  style={{
+                    background: notif.is_read 
+                      ? 'rgba(0, 0, 0, 0.2)' 
+                      : isDarkTheme 
+                        ? 'rgba(239, 1, 203, 0.2)' 
+                        : 'rgba(98, 9, 30, 0.3)',
+                    border: notif.is_read ? 'none' : isDarkTheme ? '1px solid #ef01cb' : '1px solid #62091e'
+                  }}
+                >
+                  <p className="text-xs font-semibold mb-1" style={{ color: '#ffffff' }}>
+                    {notif.message}
+                  </p>
+                  <p className="text-[10px]" style={{ color: isDarkTheme ? '#9ca3af' : '#c9c6bb' }}>
+                    {new Date(notif.created_at).toLocaleDateString('ru-RU')}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+  
+
+  {/* БИБЛИОТЕКА */}
+  <Link
+    href="/library"
+    className="p-2 transition flex items-center group"
+    style={{
+      background: 'transparent',
+      border: 'none',
+      overflow: 'hidden'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      .group span {
+        max-width: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+      .group:hover span,
+      .group:active span {
+        max-width: 200px;
+        opacity: 1;
+      }
+    `}} />
+    
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+<span className="ml-2 whitespace-nowrap text-sm font-medium">
+  {t.library}
+</span>
+  </Link>
+
+{/* ИКОНКА БЛОГА */}
+<Link
+  href="/blog"
+  className="p-2 transition relative flex items-center group"
   style={{
-    background: '#42000a',
-    border: '2px solid #42000a',
-    boxShadow: '0 0 20px rgba(156, 3, 3, 0.9), 0 0 40px rgba(133, 5, 5, 0.6)',
-    animation: 'pulse18 2s ease-in-out infinite'
+    background: 'transparent',
+    border: 'none',
+    overflow: 'hidden'
   }}
 >
   <style dangerouslySetInnerHTML={{__html: `
-    @keyframes pulse18 {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(220, 0, 0, 0.9), 0 0 40px rgba(255, 0, 0, 0.6);
-        transform: scale(1);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8);
-        transform: scale(1.05);
-      }
+    .group span {
+      max-width: 0;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .group:hover span,
+    .group:active span {
+      max-width: 200px;
+      opacity: 1;
     }
   `}} />
-  18+
-</div>
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="rounded px-2 sm:px-3 py-1 text-xs sm:text-sm"
-          style={{
-            background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(63, 58, 58, 0.2)',
-            color: 'white'
-          }}
-        >
-          <option value="ru">RU</option>
-          <option value="en">EN</option>
-        </select>
-      </div>
-      
-      {/* КНОПКИ СПРАВА */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Link
-          href="/library"
-          className="px-3 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-          style={{
-            background: isDarkTheme 
-              ? 'rgba(147, 112, 219, 0.3)'
-              : 'rgba(184, 171, 127, 0.3)',
-            backdropFilter: 'blur(10px)',
-            border: isDarkTheme 
-              ? '1px solid rgba(147, 112, 219, 0.5)'
-              : '1px solid rgba(184, 171, 127, 0.5)'
-          }}
-        >
-          <span>Библиотека</span>
-        </Link>
+  
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+  
+  <span className="ml-2 whitespace-nowrap text-sm font-medium">
+  {t.blog}
+  </span>
+</Link>
 
-        {!user ? (
-          <button
-            onClick={() => setShowAuthModal(true)}
-            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-            style={{
-              background: isDarkTheme 
-                ? 'rgba(147, 112, 219, 0.3)'
-                : 'rgba(184, 171, 127, 0.3)',
-              backdropFilter: 'blur(10px)',
-              border: isDarkTheme 
-                ? '1px solid rgba(147, 112, 219, 0.5)'
-                : '1px solid rgba(184, 171, 127, 0.5)'
-            }}
-          >
-            <User size={14} className="sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">{t.login}</span>
-          </button>
-        ) : (
-          <button
-            onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
-            className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
-            style={{
-              background: isDarkTheme 
-                ? 'rgba(147, 112, 219, 0.3)'
-                : 'rgba(184, 171, 127, 0.3)',
-              backdropFilter: 'blur(10px)',
-              border: isDarkTheme 
-                ? '1px solid rgba(147, 112, 219, 0.5)'
-                : '1px solid rgba(184, 171, 127, 0.5)'
-            }}
-          >
-            <Menu size={14} className="sm:w-5 sm:h-5" />
-            <span className="max-w-[80px] sm:max-w-none truncate text-xs sm:text-base">
-              {isAdmin ? 'Админ' : userProfile?.nickname}
-            </span>
-          </button>
-        )}
-      </div>
+  {/* ВХОД/МЕНЮ */}
+  {!user ? (
+    <button
+      onClick={() => setShowAuthModal(true)}
+      className="p-2 transition flex items-center group"
+      style={{
+        background: 'transparent',
+        border: 'none',
+        overflow: 'hidden'
+      }}
+    >
+      <style dangerouslySetInnerHTML={{__html: `
+        .group span {
+          max-width: 0;
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+        .group:hover span,
+        .group:active span {
+          max-width: 200px;
+          opacity: 1;
+        }
+      `}} />
+      
+      <User size={20} />
+      <span className="ml-2 whitespace-nowrap text-sm font-medium">
+        {t.login}
+      </span>
+    </button>
+  ) : (
+    <button
+      onClick={() => (isAdmin ? setShowAdminPanel(true) : setShowReaderPanel(true))}
+      className="p-2 transition flex items-center group"
+      style={{
+        background: 'transparent',
+        border: 'none',
+        overflow: 'hidden'
+      }}
+    >
+      <style dangerouslySetInnerHTML={{__html: `
+        .group span {
+          max-width: 0;
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+        .group:hover span,
+        .group:active span {
+          max-width: 200px;
+          opacity: 1;
+        }
+      `}} />
+      
+      <Menu size={20} />
+      <span className="ml-2 whitespace-nowrap text-sm font-medium">
+        {isAdmin ? 'Админ' : userProfile?.nickname}
+      </span>
+    </button>
+  )}
+</div>
     </div>
   </div>
 <div className="flex-1 flex items-center justify-center px-8 pb-20 sm:pb-0" style={{ overflow: 'visible' }}>
-<h1
-  className={isDarkTheme 
- ? "text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold tracking-widest whitespace-nowrap"
-  : "text-4xl sm:text-8xl md:text-12xl lg:text-9xl font-bold tracking-widest whitespace-nowrap"
-}
- style={{
-  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'victiriya', Georgia, serif",
-  lineHeight: '1.2',
-  overflow: 'visible'
-}}
->
-  <style
-    dangerouslySetInnerHTML={{
-      __html: `
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-.mello-shimmer {
-  ${isDarkTheme 
-    ? `background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #9f68f3 66%, #a855f7 100%);
-       background-size: 200% auto;
-       -webkit-background-clip: text;
-       -webkit-text-fill-color: transparent;
-       background-clip: text;
-       animation: shimmer 3s linear infinite;`
-    : `background-image: linear-gradient(to bottom, #640816 0%, #000000 100%);
-       -webkit-background-clip: text;
-       -webkit-text-fill-color: transparent;
-       background-clip: text;`
-  }
-}
- .story-text {
-  color: #cdb0e3;
-  text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);
-}
-      `
-    }}
-  />
-<span className="mello-shimmer">Mello</span> {isDarkTheme ? (
-  <span className="story-text">Story</span>
-) : (
-  'Story'.split('').map((char, index) => (
-    <span
-      key={`story-${index}`}
-      style={{
-        display: 'inline-block',
-        animation: `letterWave 8s ease-in-out infinite`,
-        animationDelay: `${(5 + index) * 0.3}s`
-      }}
-    >
-      {char}
-    </span>
-  ))
-)}
-</h1>
-  </div>
-</div>
-{/* КНОПКА РАСПИСАНИЯ ВНУТРИ ШАПКИ */}
-<div className="absolute left-0 right-0 px-4 z-20" style={{ bottom: '16px' }}>
-  <button
-    onClick={() => {
-      setShowCalendarModal(true);
-      loadCalendarEvents();
-    }}
-    className="w-full max-w-5xl mx-auto py-4 sm:py-6 rounded-2xl font-bold transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex items-center justify-center gap-2 sm:gap-3"
+  <h1
+    className={isDarkTheme 
+      ? "font-bold tracking-widest whitespace-nowrap"
+      : "font-bold tracking-widest whitespace-nowrap"
+    }
     style={{
-      background: isDarkTheme 
-        ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
-        : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-      border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.4)'
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
-      color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
-      fontFamily: "'Playfair Display', Georgia, serif",
-      fontStyle: isDarkTheme ? 'normal' : 'italic'
+      fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'victiriya', Georgia, serif",
+      lineHeight: '1',
+      overflow: 'visible',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      transform: !isDarkTheme && isMobile ? 'scale(0.9)' : 'none',
+      transformOrigin: 'center'
     }}
   >
-    <span className="text-sm sm:text-base md:text-xl text-center px-2">
-      Расписание обновлений сайта и работ
-    </span>
-    <svg 
-      width="20" 
-      height="20" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2"
-      className="flex-shrink-0 hidden sm:block"
-    >
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  </button>
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          .mello-shimmer {
+            ${isDarkTheme 
+              ? `background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #68d3f3 66%, #a855f7 100%);
+                 background-size: 200% auto;
+                 -webkit-background-clip: text;
+                 -webkit-text-fill-color: transparent;
+                 background-clip: text;
+                 animation: shimmer 3s linear infinite;`
+              : `background-image: linear-gradient(to bottom, #690615 0%, #000000 100%);
+                 -webkit-background-clip: text;
+                 -webkit-text-fill-color: transparent;
+                 background-clip: text;`
+            }
+          }
+          .story-text {
+            color: #cdb0e3;
+            text-shadow: 0 0 30px rgba(205, 176, 227, 1), 0 0 60px rgba(205, 176, 227, 0.6);
+          }
+        `
+      }}
+    />
+    <span 
+  className="mello-shimmer" 
+  style={{ 
+    fontSize: 'clamp(5rem, 15vw, 14rem)',
+    marginBottom: '-0.15em'
+  }}
+>
+  Mello
+</span>
+{isDarkTheme ? (
+  <span 
+    className="story-text" 
+    style={{ 
+      fontSize: 'clamp(5rem, 15vw, 14rem)',
+paddingLeft: '1.7em',
+transform: 'translateY(-0.10em)'
+    }}
+  >
+    Story
+  </span>
+) : (
+  <span style={{ 
+    fontSize: 'clamp(5rem, 14vw, 12rem)',
+paddingLeft: '1.7em',
+transform: 'translateY(-0.18em)'
+  }}>
+    {'Story'.split('').map((char, index) => (
+      <span
+        key={`story-${index}`}
+        style={{
+          display: 'inline-block',
+          animation: `letterWave 8s ease-in-out infinite`,
+          animationDelay: `${(5 + index) * 0.9}s`
+        }}
+      >
+        {char}
+      </span>
+    ))}
+  </span>
+)}
+  </h1>
+</div>
 </div>
         </div>
       </div>
@@ -1562,9 +1869,9 @@ return (
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
-<h2 className="text-center mb-6 sm:mb-8" style={{
+<h2 className="text-center mb-6 sm:mb-8 mt-6 sm:mt-0" style={{
     fontWeight: 'bold',
-    fontSize: isDarkTheme ? 'clamp(2.5rem, 5vw, 4.5rem)' : 'clamp(1rem, 3vw, 2rem)',
+    fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
     fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
@@ -1575,12 +1882,12 @@ return (
     WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
     backgroundClip: !isDarkTheme ? 'text' : 'unset'
   }}>
-    Популярные работы
+   {t.popularWorks}
   </h2>
   
-  <div className="grid grid-cols-3 gap-2 sm:gap-6">
+<div className="grid grid-cols-3 gap-2 sm:gap-6">
 {popularWorks.map((work, index) => (
-  <div key={index} className="relative">
+  <div key={index} className="relative" style={{ minHeight: isMobile ? '150px' : '380px' }}> {/* ← ДОБАВЬ */}
     {/* БОЛЬШАЯ ЦИФРА СНАРУЖИ */}
     <div className="absolute -left-2 sm:-left-4 bottom-2 sm:bottom-4 z-20 pointer-events-none" style={{
       fontSize: 'clamp(80px, 20vw, 180px)',
@@ -1588,23 +1895,24 @@ return (
       lineHeight: '0.75',
       WebkitTextStroke: '3px rgba(255, 255, 255, 0.3)',
       color: 'transparent',
-      textShadow: '0 5px 20px rgba(0, 0, 0, 0.8)',
+      textShadow: '0 5px 20px rgba(0, 0, 0, 0.9)',
       transform: 'translateX(8px)'
     }}>
       {index + 1}
     </div>
 
     {/* КАРТОЧКА С ЭФФЕКТАМИ НА ЗАДНИКЕ */}
-    <div className={`relative rounded-l.1g sm:rounded-xl transition hover:scale-105 overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
-      background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)',
-      backdropFilter: 'blur(10px)',
-      border: isDarkTheme ? '2px solid #9b73b0' : '1px solid #acaca8',
-      borderRadius: '12px',
-      backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
-      boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none'
-    }}>
-    
-      
+<div className={`relative rounded-l.1g sm:rounded-xl transition hover:scale-105 overflow-hidden ${!isDarkTheme ? 'fog-overlay' : 'neon-pulse'}`} style={{
+  background: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.7)',
+  backdropFilter: 'blur(10px)',
+  border: isDarkTheme ? '2px solid #9b73b0' : '1px solid #353534',
+  borderRadius: '12px',
+  backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
+  boxShadow: isDarkTheme ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' : 'none',
+  display: 'flex',           
+  flexDirection: 'column',   
+  height: '100%'             
+}}>
       {isAdmin && (
         <button
           onClick={() => {
@@ -1642,19 +1950,21 @@ return (
         </div>
       )}
 
-      {work.title ? (
-        <div className="p-2 sm:p-4 relative z-10">
-          <h3 className="font-bold text-[10px] sm:text-base mb-2 text-center break-words line-clamp-2" style={{
-            color: isDarkTheme ? '#b3e7ef' : 'transparent',
-            textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontStyle: !isDarkTheme ? 'italic' : 'normal',
-            backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-            WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-            WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
-          }}>
-            {work.title}
-          </h3>
+{(work.title || work.rating || work.views) ? (
+  <div className="p-2 sm:p-4 relative z-10 flex-1 flex flex-col justify-end">
+{work.title && (
+  <h3 className="font-bold text-[10px] sm:text-base mb-2 text-center break-words line-clamp-2" style={{
+    color: isDarkTheme ? '#b3e7ef' : 'transparent',
+    textShadow: isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.6)' : 'none',
+    fontFamily: "'Playfair Display', Georgia, serif",
+    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+  }}>
+    {work.title}
+  </h3>
+)}
           
           <div className="flex justify-center items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1">
@@ -1697,14 +2007,63 @@ return (
   }}>
     Обновление рейтинга и статистики просмотров производится один раз в три дня на основе суммарных пользовательских оценок. Раздел «Популярные работы» обновляется еженедельно.
   </p>
+
+  {/* КНОПКА РАСПИСАНИЯ ПОД ПОПУЛЯРНЫМИ РАБОТАМИ */}
+  <div className="mt-8">
+<button
+  onClick={() => {
+    setShowCalendarModal(true);
+    loadCalendarEvents();
+  }}
+  className="w-full py-4 sm:py-6 font-bold transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-3"
+  style={{
+    background: 'transparent',
+    border: 'none'
+  }}
+>
+  <span style={{
+    fontSize: isDarkTheme ? 'clamp(3rem, 8vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
+    color: isDarkTheme ? '#b3e7ef' : 'transparent',
+    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
+    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
+    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+  }}>
+   {t.schedule}
+  </span>
+<svg 
+  width="24" 
+  height="24" 
+  viewBox="0 0 24 24" 
+  fill="none" 
+  stroke={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
+  strokeWidth="2"
+  className="sm:w-10 sm:h-10"
+  style={{ 
+    animation: 'bounce 2s infinite',
+    filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
+  }}
+>
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+  `}} />
+</button>
+  </div>
 </div>
 
 {/* БЛОК НОВОСТЕЙ */}
 {newsPosts.length > 0 && (
-<div className="max-w-5xl mx-auto mt-1 sm:mt-14 relative z-0 px-4">
-<div className="mb-8 mt-6 sm:mt-0">
-      <h2 className="font-bold text-center mb-6" style={{
-    fontSize: isDarkTheme ? 'clamp(2.5rem, 5vw, 4.5rem)' : 'clamp(1rem, 3vw, 2rem)',
+<div className="max-w-7xl mt-1 sm:mt-14 relative z-0 px-4 sm:px-8">
+<div className="mb-8 mt-9 sm:mt-12">
+<h2 className="font-bold text-left mb-4 mt-6 sm:mt-0" style={{
+     fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
     color: isDarkTheme ? '#b3e7ef' : 'transparent',
     textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
     fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
@@ -1713,13 +2072,13 @@ return (
         WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
         WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
       }}>
-        Новости
+       {t.news}
       </h2>
       
-      {isAdmin && (
+{isAdmin && (
         <button
           onClick={() => setShowAddNewsModal(true)}
-          className="px-4 py-2 rounded-lg font-bold text-sm transition"
+          className="px-4 py-2 rounded-lg font-bold text-sm transition mb-6"
           style={{
             background: isDarkTheme ? 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)' : '#c9c6bb',
             color: isDarkTheme ? '#ffffff' : '#000000',
@@ -1731,123 +2090,119 @@ return (
       )}
     </div>
 
-  <div className="relative">
-  {/* СТРЕЛКА ВЛЕВО */}
-  {newsCarouselIndex > 0 && (
-    <button
-      onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
-      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
-    >
-      <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
-        width: '30px',
-        height: '60px',
-        background: 'rgba(255, 255, 255, 0.1)',
-        border: '2px solid rgba(255, 255, 255, 0.5)'
-      }}>
-        <ChevronLeft size={24} color="#ffffff" />
-      </div>
-    </button>
-  )}
+  <div className="relative max-w-4xl">
+{/* СТРЕЛКА ВЛЕВО */}
+{newsCarouselIndex > 0 && (
+  <button
+    onClick={() => setNewsCarouselIndex(newsCarouselIndex - 1)}
+    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
+  >
+    <div className="flex items-center justify-center transition-all group-hover:scale-125">
+      <ChevronLeft 
+        size={24} 
+        color={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
+        style={{ 
+          animation: 'bounce 2s infinite',
+          filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
+        }}
+      />
+    </div>
+  </button>
+)}
 
   {/* КАРТОЧКИ НОВОСТЕЙ */}
-  <div className="overflow-hidden px-8 sm:px-0">
+<div className="overflow-hidden px-0">
     <div 
       className="flex gap-4 transition-transform duration-300"
       style={{ transform: `translateX(-${newsCarouselIndex * 100}%)` }}
     >
-      {newsPosts.map((news) => (
-        <div
-          key={news.id}
-          onClick={() => {
-            setSelectedNews(news);
-            setShowNewsModal(true);
-          }}
-          className="min-w-full sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] p-4 sm:p-6 rounded-xl cursor-pointer transition hover:scale-105"
-          style={{
-            background: isDarkTheme 
-              ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(147, 51, 234, 0.1) 100%)'
-              : 'linear-gradient(135deg, rgba(194, 194, 168, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%)',
-            border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c2c2a8',
-            backdropFilter: 'blur(20px)',
-            boxShadow: isDarkTheme 
-              ? '0 0 30px rgba(147, 51, 234, 0.4)'
-              : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-          }}
-        >
-          <h3 className="font-bold text-base sm:text-lg mb-2 line-clamp-2" style={{
-            color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
-          }}>
-            {news.title}
-          </h3>
-          <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{
-            color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
-            opacity: 0.8
-          }}>
-            {new Date(news.created_at).toLocaleDateString('ru-RU', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            })}
-          </p>
-          <button className="text-xs sm:text-sm font-semibold" style={{
-            color: isDarkTheme ? '#9370db' : '#c9c6bb'
-          }}>
-            Читать →
-          </button>
-        </div>
-      ))}
+ {newsPosts.map((news) => (
+  <div
+    key={news.id}
+    onClick={() => {
+      setSelectedNews(news);
+      setShowNewsModal(true);
+    }}
+    className="min-w-[calc(50%-8px)] sm:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-11px)] p-3 sm:p-4 cursor-pointer transition"
+    style={{
+      background: 'transparent'
+    }}
+  >
+    <h3 
+      className="font-bold text-base sm:text-lg mb-2 line-clamp-2 transition-colors duration-300 hover-news-title"
+      style={{
+        color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
+      }}
+    >
+      <style dangerouslySetInnerHTML={{__html: `
+        .hover-news-title:hover {
+          color: ${isDarkTheme ? '#ba0db3 !important' : '#6b1429 !important'};
+        }
+      `}} />
+      {news.title}
+    </h3>
+    <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{
+      color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
+      opacity: 0.8
+    }}>
+      {new Date(news.created_at).toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })}
+    </p>
+<div className="flex items-center gap-2">
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes slideRight {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+    .animate-slide-right {
+      animation: slideRight 1.5s ease-in-out infinite;
+    }
+  `}} />
+  <span className="text-xs sm:text-sm font-semibold" style={{
+    color: isDarkTheme ? '#9370db' : '#c9c6bb'
+  }}>
+    Подробнее
+  </span>
+  <span className="animate-slide-right" style={{
+    color: isDarkTheme ? '#9370db' : '#c9c6bb'
+  }}>
+    →
+  </span>
+</div>
+  </div>
+))}
     </div>
   </div>
 
-  {/* СТРЕЛКА ВПРАВО */}
-  {newsCarouselIndex < newsPosts.length - 1 && (
-    <button
-      onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
-      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
-    >
-      <div className="rounded-sm flex items-center justify-center transition-all group-hover:scale-125" style={{
-        width: '30px',
-        height: '60px',
-        background: 'rgba(255, 255, 255, 0.1)',
-        border: '2px solid rgba(255, 255, 255, 0.5)'
-      }}>
-        <ChevronRight size={24} color="#ffffff" />
-      </div>
-    </button>
+{/* СТРЕЛКА ВПРАВО */}
+{newsCarouselIndex < newsPosts.length - 1 && (
+  <button
+    onClick={() => setNewsCarouselIndex(newsCarouselIndex + 1)}
+    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
+  >
+    <div className="flex items-center justify-center transition-all group-hover:scale-125">
+      <ChevronRight 
+        size={24} 
+        color={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
+        style={{ 
+          animation: 'bounce 2s infinite',
+          filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
+        }}
+      />
+    </div>
+  </button>
 )}
     </div>
   </div>
 )}
 
 {/* ABOUT SECTION */}
-<div className="max-w-3xl mx-auto mt-12 sm:mt-20 relative z-0">
-<div className="p-6 sm:p-10 relative" style={{
-  background: isDarkTheme 
-    ? 'rgba(0, 0, 0, 0.3)' 
-    : 'transparent',
-  borderRadius: '24px',
-  border: isDarkTheme ? '2px solid #9b73b0' : '3px solid transparent',
-  backgroundClip: !isDarkTheme ? 'padding-box' : 'border-box',
-  backdropFilter: 'blur(10px)',
-  boxShadow: isDarkTheme 
-    ? '0 0 20px rgba(155, 115, 176, 0.6), 0 0 40px rgba(155, 115, 176, 0.3)' 
-    : 'none'
-}}>
+<div className="max-w-7xl mx-auto mt-12 sm:mt-20 relative z-0 px-4 sm:px-8">
+<div className="max-w-2xl sm:ml-auto">
 
-{!isDarkTheme && (
-  <div style={{
-    position: 'absolute',
-    inset: '-3px',
-    borderRadius: '24px',
-    padding: '3px',
-    background: 'linear-gradient(135deg, #c2c2a8 0%, #000000 100%)',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1
-  }} />
-)}
  {isAdmin && (
   <button
     onClick={() => {
@@ -1869,12 +2224,44 @@ return (
     </svg>
   </button>
 )}
-<div className="text-white text-center leading-relaxed text-sm sm:text-base">
-  {renderFormattedText(aboutText)}
+<div className="text-left leading-relaxed">
+<h2 className="font-bold mb-8 mt-6 sm:mt-0" style={{
+    fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
+    color: isDarkTheme ? '#b3e7ef' : 'transparent',
+    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
+    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
+    fontStyle: !isDarkTheme ? 'italic' : 'normal',
+    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
+    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+  }}>
+   {t.information}
+  </h2>
+ <div className="text-white text-base sm:text-lg mb-8 max-w-xl">
+    {renderFormattedText(aboutText)}
+  </div>
+  <div className="mt-8 text-white text-base sm:text-lg max-w-xl">
+    <p className="mb-2">Если у вас возникнут трудности или вопросы при регистрации и отсутствует возможность написать из личного кабинета, вы можете связаться со мной по электронной почте:</p>
+    <a 
+      href="mailto:mellostory@protonmail.com"
+      className="inline-block font-bold underline transition"
+      style={{
+        color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+        textShadow: isDarkTheme ? '0 0 10px rgba(179, 231, 239, 0.6)' : 'none'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.textShadow = isDarkTheme ? '0 0 20px rgba(179, 231, 239, 1)' : 'none';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.textShadow = isDarkTheme ? '0 0 10px rgba(179, 231, 239, 0.6)' : 'none';
+      }}
+    >
+      mellostory@protonmail.com
+    </a>
+  </div>
 </div>
   </div>
 </div>
-
 
 {/* AUTH MODAL */}
 {showAuthModal && isDarkTheme && (
@@ -2061,7 +2448,8 @@ return (
 
         {authMode === 'register' && (
           <p className="text-xs text-gray-400 text-center mt-2">
-            Заполнив все графы данными не нажимайте несколько раз по кнопке "Регистрация" - только один раз, иначе у вас несколько раз проходит регистрация. Чтобы подтвердить аккаунт проверьте почту от имени Supabase.
+            После заполнения всех полей нажимайте кнопку «Регистрация» только один раз. Повторное нажатие может привести к многократному созданию аккаунта.
+Для подтверждения регистрации проверьте письмо от Supabase в вашей электронной почте.
           </p>
         )}
       </div>
@@ -2691,18 +3079,18 @@ return (
 {showReaderPanel && userProfile && (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
-    {isDarkTheme && (
-     <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
-        borderColor: '#b3e7ef',
-        backgroundImage: 'url(/textures/dark-erys.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-        <div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-          borderBottom: '3px solid rgba(147, 112, 219, 0.6)'
-        }}>
+{isDarkTheme && (
+ <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl border-2" style={{
+    background: 'rgba(147, 51, 234, 0.15)',
+    borderColor: '#9333ea',
+    backdropFilter: 'blur(20px)',
+    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  }}>
+<div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
+  background: 'rgba(139, 60, 200, 0.3)',
+  backdropFilter: 'blur(10px)',
+  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
+}}>
           <style dangerouslySetInnerHTML={{__html: `
             @keyframes shineHeader {
               0% { left: -100%; }
@@ -2787,8 +3175,9 @@ return (
   </svg>
   <span style={{ 
     color: '#ffffff',
-    fontFamily: "'ppelganger', Georgia, serif"
-  }}>Обновления</span>
+  }}>
+   {t.updates}
+  </span>
 </button>
 
 <Link
@@ -2815,7 +3204,9 @@ return (
   <span style={{ 
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Моя коллекция</span>
+  }}>
+    {t.myCollection}
+  </span>
 </Link>
 
 <Link
@@ -2842,7 +3233,9 @@ return (
   <span style={{ 
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Мои сообщения</span>
+  }}>
+    {t.myMessages}
+    </span>
 </Link>
 
  <button
@@ -2869,7 +3262,9 @@ return (
   <span style={{ 
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Настройки</span>
+  }}>
+    {t.settings}
+  </span>
 </button>
 
 <div className="mt-4">
@@ -2897,7 +3292,9 @@ return (
     <span style={{ 
       color: '#ffffff',
       textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-    }}>Выход</span>
+    }}>
+     {t.logout}
+    </span>
   </button>
 </div>
         </div>
@@ -2910,21 +3307,21 @@ return (
         borderLeft: '12px solid',
         borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
         boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-        backgroundImage: 'url(/textures/darkness.jpg)',
+        background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.25) 0%, rgba(188, 187, 174, 0.15) 100%)',
-borderBottom: '1px solid rgba(188, 187, 174, 0.35)',
+background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
+borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
         }}>
 
-<h2 className="text-2xl sm:text-4xl font-bold text-center mb-4" style={{
-  color: '#c9c6bb',
-  fontFamily: "'miamanueva', Georgia, serif"
+<h2 className="text-4xl sm:text-5xl font-bold text-center mb-4" style={{
+  color: '#757162',
+  fontFamily: "'sooonsi', Georgia, serif"
 }}>{userProfile.nickname}</h2>
 
           <style dangerouslySetInnerHTML={{__html: `
@@ -2937,7 +3334,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
               100% { background-position: 200% center; }
             }
             .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #c9c6bb 50%, #bcbbae 100%);
+              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%);
               background-size: 200% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
@@ -2951,9 +3348,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
   onClick={() => setShowReaderPanel(false)}
   className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
             style={{
-              background: 'rgba(188, 187, 174, 0.35)',
+              background: 'rgba(26, 26, 26, 0.35)',
               backdropFilter: 'blur(1px)',
-              border: '1px solid rgba(188, 187, 174, 0.15)'
+              border: '1px solid rgba(10, 10, 10, 0.15)'
             }}
           >
             <X size={20} color="#c9c6bb" />
@@ -2966,48 +3363,48 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     setShowUpdatesModal(true);
     loadSiteUpdates();
   }}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
   style={{
-    background: siteUpdates.length > 0 ? '#35030e' : 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#62091e"} strokeWidth="2" className="relative z-10">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#61031b"} strokeWidth="2" className="relative z-10">
     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
     <path d="M2 17l10 5 10-5"/>
     <path d="M2 12l10 5 10-5"/>
   </svg>
   <span className="relative z-10" style={{ 
-    color: siteUpdates.length > 0 ? '#e9e6d8' : '#62091e',
+    color: siteUpdates.length > 0 ? '#e9e6d8' : '#68021c',
     fontStyle: 'italic'
   }}>
-    Обновления
+    {t.updates}
   </span>
 </button>
 
 <Link
   href="/collection"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
   style={{
-    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <Heart size={20} color="#62091e" className="relative z-10" />
+  <Heart size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -3016,27 +3413,27 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     fontStyle: 'normal',
     fontWeight: '600'
   }}>
-    Моя коллекция
+    {t.myCollection}
   </span>
 </Link>
 
 <Link
   href="/my-messages"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
   style={{
-    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <MessageSquare size={20} color="#62091e" className="relative z-10" />
+  <MessageSquare size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -3045,22 +3442,22 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     fontStyle: 'normal',
     fontWeight: '600'
   }}>
-    Мои сообщения
+    {t.myMessages}
   </span>
 </Link>
 
  <button
   onClick={() => setShowManagementModal(true)}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
   style={{
-              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-              border: '1px solid rgba(188, 187, 174, 0.35)',
-              backdropFilter: 'blur(1px)',
-              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
   <style dangerouslySetInnerHTML={{__html: `
@@ -3070,9 +3467,9 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     }
   `}} />
   
-  <Settings size={20} color="#62091e" className="relative z-10" />
+  <Settings size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+   background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -3081,28 +3478,28 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     fontStyle: 'normal',
     fontWeight: '600'
   }}>
-    Настройки
+    {t.settings}
   </span>
 </button>
 
 <div className="mt-4">
   <button
     onClick={handleLogout}
-    className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-    style={{
-              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-              border: '1px solid rgba(188, 187, 174, 0.35)',
-              backdropFilter: 'blur(1px)',
-              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
-    }}
-  >
-    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-      background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
-    }} />
+  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
+  style={{
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
+  }}
+>
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
+  }} />
     
-    <LogOut size={20} color="#62091e" className="relative z-10" />
-    <span className="relative z-10" style={{ 
-      background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    <LogOut size={20} color="#d8d7d7" className="relative z-10" />
+<span className="relative z-10" style={{ 
+      background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
       backgroundSize: '200% auto',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
@@ -3111,7 +3508,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       fontStyle: 'normal',
       fontWeight: '600'
     }}>
-      Выход
+      {t.logout}
     </span>
   </button>
 </div>
@@ -3141,6 +3538,54 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       </div>
 
       <div className="space-y-3">
+
+{/* КНОПКА РАССЫЛКИ */}
+<button
+  onClick={() => {
+    setShowNewsletterModal(true);
+    setShowManagementModal(false);
+  }}
+  className="w-full py-3 rounded-lg font-bold transition relative overflow-hidden"
+  style={{
+    background: isSubscribed 
+      ? 'rgba(179, 231, 239, 0.2)' 
+      : 'rgba(147, 112, 219, 0.3)',
+    backdropFilter: 'blur(10px)',
+    border: isSubscribed 
+      ? '2px solid #b3e7ef' 
+      : '1px solid rgba(147, 112, 219, 0.5)',
+    color: '#ffffff',
+    boxShadow: isSubscribed 
+      ? '0 0 20px rgba(179, 231, 239, 0.6)' 
+      : 'none'
+  }}
+>
+ {isSubscribed && (
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes neonPulseSubscribed {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(179, 231, 239, 0.6), 0 0 10px rgba(179, 231, 239, 0.4);
+        border-color: #b3e7ef;
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(179, 231, 239, 1), 0 0 20px rgba(179, 231, 239, 0.8);
+        border-color: #68d3f3;
+      }
+    }
+    button[style*="rgba(179, 231, 239, 0.2)"] {
+      animation: neonPulseSubscribed 2s ease-in-out infinite !important;
+    }
+  `}} />
+)}
+  <div className="flex items-center justify-center gap-2">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    <span>{isSubscribed ? 'Рассылка активна' : 'Подписаться на рассылку'}</span>
+  </div>
+</button>
+
         {/* КНОПКА СМЕНЫ EMAIL */}
         <button
           onClick={() => {
@@ -3252,37 +3697,6 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
             </div>
           </button>
         </div>
-
-        {/* СНЕГ */}
-        <div className="pt-2">
-          <p className="text-white mb-2 text-sm shimmer-btn-text">Эффект снега:</p>
-          <button
-            onClick={() => setShowSnow(!showSnow)}
-            className="w-full relative rounded-full p-1 transition-all duration-300"
-            style={{
-              background: showSnow 
-                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-              boxShadow: showSnow ? '0 0 20px rgba(147, 112, 219, 0.6)' : '0 0 10px rgba(255, 255, 255, 0.1)',
-              height: '40px'
-            }}
-          >
-            <div 
-              className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                background: showSnow ? 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)' : 'linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%)',
-                boxShadow: showSnow ? '0 2px 8px rgba(255, 255, 255, 0.5)' : '0 2px 8px rgba(0, 0, 0, 0.5)',
-                transform: showSnow ? 'translateX(240px)' : 'translateX(0)',
-              }}
-            >
-              <span style={{ fontSize: '16px', filter: 'grayscale(100%)' }}>
-                {showSnow ? '❄️' : '☀️'}
-              </span>
-            </div>
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -3326,6 +3740,54 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
       </div>
 
       <div className="space-y-3">
+
+{/* КНОПКА РАССЫЛКИ */}
+<button
+  onClick={() => {
+    setShowNewsletterModal(true);
+    setShowManagementModal(false);
+  }}
+  className="w-full py-3 rounded-lg font-bold transition relative overflow-hidden"
+  style={{
+    background: isSubscribed 
+      ? 'rgba(98, 9, 30, 0.3)' 
+      : 'rgba(201, 198, 187, 0.2)',
+    backdropFilter: 'blur(10px)',
+    border: isSubscribed 
+      ? '2px solid #62091e' 
+      : '1px solid rgba(201, 198, 187, 0.4)',
+    color: '#c9c6bb',
+    boxShadow: isSubscribed 
+      ? '0 0 20px rgba(98, 9, 30, 0.6)' 
+      : 'none'
+  }}
+>
+{isSubscribed && (
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes burgundyPulseSubscribed {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(98, 9, 30, 0.8), 0 0 10px rgba(0, 0, 0, 0.9);
+        border-color: #62091e;
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(98, 9, 30, 1), 0 0 25px rgba(0, 0, 0, 1);
+        border-color: #3b0512;
+      }
+    }
+    button[style*="rgba(98, 9, 30, 0.3)"] {
+      animation: burgundyPulseSubscribed 2s ease-in-out infinite !important;
+    }
+  `}} />
+)}
+  <div className="flex items-center justify-center gap-2">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    <span>{isSubscribed ? 'Рассылка активна' : 'Подписаться на рассылку'}</span>
+  </div>
+</button>
+
         <button
           onClick={() => {
             setShowChangeEmailModal(true);
@@ -3430,38 +3892,6 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
             >
               <span style={{ fontSize: '16px', filter: 'grayscale(100%)' }}>
                 {isDarkTheme ? '🌙' : '☀️'}
-              </span>
-            </div>
-          </button>
-        </div>
-
-        <div className="pt-2">
-          <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Эффект снега:</p>
-          <button
-            onClick={() => setShowSnow(!showSnow)}
-            className="w-full relative rounded-full p-1 transition-all duration-300"
-            style={{
-              background: isDarkTheme 
-                ? 'linear-gradient(135deg, #939085 0%, #c9c6bb 100%)' 
-                : 'linear-gradient(135deg, #65635d 0%, #c9c6bb 100%)',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 112, 219, 0.6)' 
-                : '0 0 15px rgba(216, 197, 162, 0.4)',
-              height: '40px'
-            }}
-          >
-            <div 
-              className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                background: showSnow ? 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)' : 'linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%)',
-                boxShadow: showSnow ? '0 2px 8px rgba(255, 255, 255, 0.5)' : '0 2px 8px rgba(0, 0, 0, 0.5)',
-                transform: showSnow ? 'translateX(240px)' : 'translateX(0)',
-              }}
-            >
-              <span style={{ fontSize: '16px', filter: 'grayscale(100%)' }}>
-                {showSnow ? '❄️' : '☀️'}
               </span>
             </div>
           </button>
@@ -4980,8 +5410,379 @@ onClick={() => {
   </div>
 )}
 
+{/* МОДАЛЬНОЕ ОКНО ВСЕХ УВЕДОМЛЕНИЙ - ТЕМНАЯ ТЕМА */}
+{showNotificationsModal && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Все уведомления</h2>
+        <button onClick={() => setShowNotificationsModal(false)} className="text-gray-400 hover:text-white">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto space-y-3">
+        {notifications.length === 0 ? (
+          <p className="text-center py-8 text-gray-400">Нет уведомлений</p>
+        ) : (
+          notifications.map((notif) => (
+            <button
+              key={notif.id}
+              onClick={() => {
+                handleNotificationClick(notif);
+                setShowNotificationsModal(false);
+              }}
+              className="w-full text-left p-4 rounded-lg transition"
+              style={{
+                background: notif.is_read ? 'rgba(0, 0, 0, 0.3)' : 'rgba(239, 1, 203, 0.2)',
+                border: notif.is_read ? '1px solid rgba(147, 112, 219, 0.3)' : '2px solid #ef01cb',
+                boxShadow: notif.is_read ? 'none' : '0 0 15px rgba(239, 1, 203, 0.4)'
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  {notif.type === 'new_work' || notif.type === 'new_chapter' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#ef01cb' }}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                  ) : notif.type === 'comment_reply' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3e7ef" strokeWidth="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-semibold mb-1">{notif.message}</p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(notif.created_at).toLocaleDateString('ru-RU', {
+                      day: 'numeric',
+                      month: 'long',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* МОДАЛЬНОЕ ОКНО ВСЕХ УВЕДОМЛЕНИЙ - СВЕТЛАЯ ТЕМА */}
+{showNotificationsModal && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 relative" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '3px solid transparent',
+      borderRadius: '24px',
+      backgroundClip: 'padding-box',
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '24px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Все уведомления</h2>
+        <button onClick={() => setShowNotificationsModal(false)} style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto space-y-3">
+        {notifications.length === 0 ? (
+          <p className="text-center py-8" style={{ color: '#c9c6bb' }}>Нет уведомлений</p>
+        ) : (
+          notifications.map((notif) => (
+            <button
+              key={notif.id}
+              onClick={() => {
+                handleNotificationClick(notif);
+                setShowNotificationsModal(false);
+              }}
+              className="w-full text-left p-4 rounded-lg transition"
+              style={{
+                background: notif.is_read ? 'rgba(0, 0, 0, 0.3)' : 'rgba(98, 9, 30, 0.3)',
+                border: notif.is_read ? '1px solid rgba(201, 198, 187, 0.3)' : '2px solid #62091e'
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  {notif.type === 'new_work' || notif.type === 'new_chapter' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#62091e' }}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                  ) : notif.type === 'comment_reply' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold mb-1" style={{ color: '#c9c6bb' }}>{notif.message}</p>
+                  <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
+                    {new Date(notif.created_at).toLocaleDateString('ru-RU', {
+                      day: 'numeric',
+                      month: 'long',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* NEWSLETTER MODAL - ТЕМНАЯ ТЕМА */}
+{showNewsletterModal && isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
+      background: 'rgba(147, 51, 234, 0.15)',
+      borderColor: '#9333ea',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+    }}>
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold shimmer-btn-text">Почтовая рассылка</h2>
+        <button onClick={() => setShowNewsletterModal(false)} className="text-gray-400 hover:text-white absolute right-0">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="mb-6 p-4 rounded-lg" style={{
+        background: 'rgba(147, 112, 219, 0.2)',
+        border: '1px solid rgba(147, 112, 219, 0.4)'
+      }}>
+        <p className="text-white text-sm leading-relaxed">
+          Подписавшись на рассылку, вы будете получать уведомления о новых главах и произведениях прямо на вашу почту (<span className="font-semibold">{userProfile?.email}</span>).
+          <br/><br/>
+          Вы можете отказаться от рассылки в любой момент через настройки.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <button
+onClick={async () => {
+  try {
+    const { error } = await supabaseBlog
+      .from('newsletter_subscribers')
+      .upsert({
+        user_id: user.id,
+        email: userProfile.email,
+        nickname: userProfile.nickname,
+        is_active: true
+      }, { 
+        onConflict: 'user_id' 
+      });
+
+    if (error) throw error;
+    
+    setIsSubscribed(true);
+    showConfirm('Вы успешно подписались на рассылку!');
+    setShowNewsletterModal(false);
+  } catch (err) {
+    showConfirm('Ошибка: ' + err.message);
+  }
+}}
+          className="w-full py-3 rounded-lg font-bold transition"
+          style={{
+            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
+            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
+            color: '#ffffff'
+          }}
+        >
+          Получать уведомления
+        </button>
+
+        <button
+onClick={async () => {
+  try {
+    const { error } = await supabaseBlog
+      .from('newsletter_subscribers')
+      .update({ is_active: false })
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+    
+    setIsSubscribed(false);
+    showConfirm('Вы отказались от рассылки');
+    setShowNewsletterModal(false);
+  } catch (err) {
+    showConfirm('Ошибка: ' + err.message);
+  }
+}}
+          className="w-full py-3 rounded-lg font-bold transition border-2"
+          style={{
+            background: 'transparent',
+            borderColor: '#9333ea',
+            color: '#9370db'
+          }}
+        >
+          Отказаться
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* NEWSLETTER MODAL - СВЕТЛАЯ ТЕМА */}
+{showNewsletterModal && !isDarkTheme && (
+  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
+      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
+      border: '3px solid transparent',
+      borderRadius: '24px',
+      backgroundClip: 'padding-box',
+      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: '-3px',
+        borderRadius: '24px',
+        padding: '3px',
+        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+        zIndex: -1
+      }} />
+
+      <div className="flex justify-center items-center mb-6 relative">
+        <h2 className="text-2xl font-bold" style={{
+          color: '#c9c6bb',
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: 'italic'
+        }}>Почтовая рассылка</h2>
+        <button onClick={() => setShowNewsletterModal(false)} className="absolute right-0" style={{ color: '#c9c6bb' }}>
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="mb-6 p-4 rounded-lg" style={{
+        background: 'rgba(201, 198, 187, 0.15)',
+        border: '1px solid rgba(201, 198, 187, 0.3)'
+      }}>
+        <p className="text-sm leading-relaxed" style={{ color: '#c9c6bb' }}>
+          Подписавшись на рассылку, вы будете получать уведомления о новых главах и произведениях прямо на вашу почту (<span className="font-semibold">{userProfile?.email}</span>).
+          <br/><br/>
+          Вы можете отказаться от рассылки в любой момент через настройки.
+        </p>
+      </div>
+
+ <div className="space-y-3">
+  <button
+    onClick={async () => {
+      try {
+        const { error } = await supabaseBlog
+          .from('newsletter_subscribers')
+          .upsert({
+            user_id: user.id,
+            email: userProfile.email,
+            nickname: userProfile.nickname,
+            is_active: true
+          }, { 
+            onConflict: 'user_id' 
+          });
+
+        if (error) throw error;
+        
+        setIsSubscribed(true);
+        showConfirm('Вы успешно подписались на рассылку!');
+        setShowNewsletterModal(false);
+      } catch (err) {
+        showConfirm('Ошибка: ' + err.message);
+      }
+    }}
+    className="w-full py-3 rounded-lg font-bold transition"
+    style={{
+      background: '#c9c6bb',
+      color: '#000000'
+    }}
+  >
+    Получать уведомления
+  </button>
+
+  <button
+    onClick={async () => {
+      try {
+        const { error } = await supabaseBlog
+          .from('newsletter_subscribers')
+          .update({ is_active: false })
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        setIsSubscribed(false);
+        showConfirm('Вы отказались от рассылки');
+        setShowNewsletterModal(false);
+      } catch (err) {
+        showConfirm('Ошибка: ' + err.message);
+      }
+    }}
+    className="w-full py-3 rounded-lg font-bold transition"
+    style={{
+      background: 'transparent',
+      border: '2px solid #c9c6bb',
+      color: '#c9c6bb'
+    }}
+  >
+    Отказаться
+  </button>
+      </div>
+    </div>
+  </div>
+)}
+
 {/* FOOTER */}
-<footer className="bg-black py-6 sm:py-8 text-center text-gray-500 relative z-[5] border-t border-gray-800">
+<footer className="py-6 sm:py-8 text-center text-gray-500 relative z-[5]" style={{
+  background: 'transparent',
+  borderTop: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid #1f2937'
+}}>
   <p className="text-sm sm:text-base mb-2">MelloStory © 2026</p>
   <p className="text-xs sm:text-sm mb-4 px-4">Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.</p>
   <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap px-4 text-xs sm:text-sm">

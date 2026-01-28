@@ -27,13 +27,16 @@ export default function MissionPage() {
       {/* Header */}
       <div className="bg-black border-b border-gray-800 py-4 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link 
-            href="/" 
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition"
-          >
-            <ChevronLeft size={20} />
-            <span className="text-sm sm:text-base">Вернуться на главную</span>
-          </Link>
+<button 
+  onClick={() => window.history.back()}
+  className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 sm:mb-8 transition"
+>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+  Закрыть
+</button>
         </div>
       </div>
 

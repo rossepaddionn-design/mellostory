@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'steamy';
-  src: url('/steamy.otf') format('opentype');  /* ← ИСПРАВЛЕНО */
+  src: url('/steamy.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -25,14 +25,6 @@
 @font-face {
   font-family: 'miamanueva';
   src: url('/miamanueva.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'ckblade';
-  src: url('/ckblade.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -62,6 +54,34 @@
 @font-face {
   font-family: 'victiriya';
   src: url('/victiriya.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'darkrosse';
+  src: url('/darkrosse.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'kikamori';
+  src: url('/kikamori.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'neffeli';
+  src: url('/neffeli.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ombrosi';
+  src: url('/ombrosi.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

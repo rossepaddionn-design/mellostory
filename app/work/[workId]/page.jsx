@@ -534,7 +534,7 @@ if (showAgeVerification) {
 <div className="space-y-3 mb-6">
   <button
     onClick={() => {
-      window.location.href = '/?login=true';
+     window.location.href = '/welcome?login=true';
     }}
     className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
@@ -543,7 +543,7 @@ if (showAgeVerification) {
   
   <button
     onClick={() => {
-      window.location.href = '/?register=true';
+      window.location.href = '/welcome?register=true';
     }}
     className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
   >
@@ -683,7 +683,7 @@ return (
 }}>
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <Link href="/" className="inline-flex items-center gap-2 transition text-sm sm:text-base" style={{
-  color: isDarkTheme ? '#9ca3af' : '#d4cece'
+  color: isDarkTheme ? '#9ca3af' : '#c0c0c0'
 }}>
             <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
             {t.backToMain}
@@ -695,12 +695,12 @@ return (
               className="px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
               style={{
                 background: isDarkTheme 
-                  ? 'rgba(147, 112, 219, 0.3)'
-                  : 'rgba(184, 171, 127, 0.3)',
+                  ? 'rgba(7, 7, 7, 0.3)'
+                  : 'rgba(0, 0, 0, 0.3)',
                 backdropFilter: 'blur(10px)',
                 border: isDarkTheme 
-                  ? '1px solid rgba(147, 112, 219, 0.5)'
-                  : '1px solid rgba(184, 171, 127, 0.5)'
+                  ? '1px solid rgba(2, 2, 2, 0.5)'
+                  : '1px solid rgba(0, 0, 0, 0.5)'
               }}
             >
               <Menu size={14} className="sm:w-5 sm:h-5" />
@@ -760,12 +760,12 @@ return (
 `}} />
 <h1 className="font-bold mb-3 sm:mb-4 break-words" style={{
   fontSize: isDarkTheme ? 'clamp(2rem, 5vw, 4rem)' : 'clamp(1.5rem, 4vw, 3rem)',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   color: 'transparent',
   backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%)'
-    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)',
+    ? 'linear-gradient(90deg, #cf7dff 0%, #af71ff 50%, #953ff7 100%)'
+    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
   backgroundSize: '200% auto',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
@@ -775,51 +775,72 @@ return (
   {work.title}
 </h1>
 
-            {/* ФАНДОМ И ПЕЙРИНГ */}
-            {(work.fandom || work.pairing) && (
-              <div className="mb-4 sm:mb-5 space-y-2">
-                {work.fandom && (
-                  <div>
-                    <span className="text-gray-400 text-xs sm:text-sm">Фандом: </span>
-                    <span className="text-gray-200 text-sm sm:text-base break-words">{work.fandom}</span>
-                  </div>
-                )}
-                {work.pairing && (
-                  <div>
-                    <span className="text-gray-400 text-xs sm:text-sm">Пейринг: </span>
-                    <span className="text-gray-200 text-sm sm:text-base break-words">{work.pairing}</span>
-                  </div>
-                )}
-              </div>
-            )}
+{/* ФАНДОМ И ПЕЙРИНГ */}
+{(work.fandom || work.pairing) && (
+  <div className="mb-1 space-y-0.5">
+    {work.fandom && (
+      <div>
+        <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Фандом: </span>
+        <span className="text-gray-200 text-xs sm:text-sm break-words">{work.fandom}</span>
+      </div>
+    )}
+    {work.pairing && (
+      <div>
+        <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Пейринг: </span>
+        <span className="text-gray-200 text-xs sm:text-sm break-words">{work.pairing}</span>
+      </div>
+    )}
+  </div>
+)}
 
-            {/* БЕЙДЖИ */}
-            <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center">
-              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.direction}</span>
-              <span className="bg-red-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">{work.rating}</span>
-              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>{work.status}</span>
-              {work.total_pages > 0 && (
-                <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm" style={{ backgroundColor: '#D3D3D3', color: '#000000' }}>
-                  Страниц: {work.total_pages.toLocaleString()}
-                </span>
-              )}
-              {work.category && (
-                <span className="bg-purple-900 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
-                  {{
-                    novel: 'Роман',
-                    longfic: 'Лонгфик',
-                    minific: 'Минифик',
-                    ongoing: 'Онгоинг',
-                    completed: 'Завершён'
-                  }[work.category] || work.category}
-                </span>
-              )}
-            </div>
+{/* ИНФОРМАЦИЯ О РАБОТЕ */}
+<div className="mb-1 space-y-0.5">
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Направление: </span>
+    <span className="text-xs sm:text-sm">
+      <GenreTag name={work.direction} />
+    </span>
+  </div>
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Рейтинг: </span>
+    <span className="text-xs sm:text-sm">
+      <GenreTag name={work.rating} />
+    </span>
+  </div>
+{work.category && (
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Категория: </span>
+    <span className="text-xs sm:text-sm">
+      <GenreTag name={{
+        novel: 'Роман',
+        longfic: 'Лонгфик',
+        minific: 'Минифик'
+      }[work.category] || work.category} />
+    </span>
+  </div>
+)}
+{work.status && (
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Статус: </span>
+    <span className="text-xs sm:text-sm">
+      <GenreTag name={{
+        completed: 'Завершён',
+        ongoing: 'В процессе'
+      }[work.status] || work.status} />
+    </span>
+  </div>
+)}
+  {work.total_pages > 0 && (
+    <div>
+      <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Всего страниц: </span>
+      <span className="text-gray-200 text-xs sm:text-sm">{work.total_pages.toLocaleString()}</span>
+    </div>
+  )}
 
-            {/* ЖАНРЫ */}
+{/* ЖАНРЫ */}
 {work.genres && (Array.isArray(work.genres) ? work.genres.length > 0 : work.genres.trim().length > 0) && (
-  <div className="mb-3 sm:mb-4">
-    <span className="text-gray-400 text-xs sm:text-sm">{t.genres}: </span>
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>{t.genres}: </span>
     <span className="text-xs sm:text-sm">
       {(Array.isArray(work.genres) ? work.genres : work.genres.split(',')).map((genre, i, arr) => {
         const trimmedGenre = genre.trim();
@@ -835,10 +856,10 @@ return (
   </div>
 )}
 
-            {/* ТЕГИ */}
+{/* ТЕГИ */}
 {work.tags && (Array.isArray(work.tags) ? work.tags.length > 0 : work.tags.trim().length > 0) && (
-  <div className="mb-3 sm:mb-4">
-    <span className="text-gray-400 text-xs sm:text-sm">{t.tags}: </span>
+  <div>
+    <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>{t.tags}: </span>
     <span className="text-xs sm:text-sm">
       {(Array.isArray(work.tags) ? work.tags : work.tags.split(',')).map((tag, i, arr) => {
         const trimmedTag = tag.trim();
@@ -853,49 +874,44 @@ return (
     </span>
   </div>
 )}
+</div>
 
 {/* СПОЙЛЕРНЫЕ МЕТКИ */}
 {spoilerTagsArray.length > 0 && (
-  <div className="mb-4 sm:mb-6">
+  <div className="mb-1">
     <style dangerouslySetInnerHTML={{__html: `
-      @keyframes shimmer-white {
-        0% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
-        50% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3); }
-        100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2); }
-      }
+  @keyframes arrowBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+  }
+  .arrow-animated {
+    animation: arrowBounce 1.5s ease-in-out infinite;
+  }
     `}} />
-    <button
-      onClick={() => setShowSpoilers(!showSpoilers)}
-      className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition text-left border-2"
-      style={{
-        backgroundColor: '#000000',
-        borderColor: isDarkTheme ? '#ffffff' : '#9e9e9e',
-        color: '#ffffff',
-        boxShadow: isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none',
-        animation: isDarkTheme ? 'shimmer-white 2s ease-in-out infinite' : 'none'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 158, 158, 0.2)';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 12px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)' : '0 0 10px rgba(158, 158, 158, 0.3)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = '#000000';
-        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2)' : 'none';
-      }}
-    >
-      <span className="text-sm sm:text-base font-medium flex items-center gap-2">
-        <AlertTriangle size={16} className="sm:w-5 sm:h-5" />
-        {t.spoilerTags}
-      </span>
-      {showSpoilers ? <ChevronUp size={18} className="sm:w-5 sm:h-5" /> : <ChevronDown size={18} className="sm:w-5 sm:h-5" />}
-    </button>
+<button
+  onClick={() => setShowSpoilers(!showSpoilers)}
+  className="flex items-center gap-2 transition text-left mb-1"
+  style={{
+    backgroundColor: 'transparent',
+    padding: 0
+  }}
+>
+  <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>
+    {t.spoilerTags}:
+  </span>
+  <div className={!showSpoilers ? 'arrow-animated' : ''} style={{
+    transform: showSpoilers ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: 'transform 0.3s ease',
+    color: isDarkTheme ? '#9333ea' : '#47051e'
+  }}>
+    <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+  </div>
+</button>
     
-    {showSpoilers && (
-      <div className="mt-3 rounded-xl px-4 py-3 text-sm sm:text-base border-2 whitespace-pre-wrap" style={{
-        backgroundColor: '#000000',
-        borderColor: isDarkTheme ? '#ffffff' : '#9e9e9e',
-        color: '#ffffff',
-        boxShadow: isDarkTheme ? '0 0 15px rgba(255, 255, 255, 0.2)' : 'none'
+{showSpoilers && (
+  <div className="text-xs sm:text-sm whitespace-pre-wrap" style={{
+        backgroundColor: 'transparent',
+        color: '#ffffff'
       }}>
         {spoilerTagsArray.map((spoiler, i, arr) => {
           const trimmedSpoiler = spoiler.trim();
@@ -914,46 +930,30 @@ return (
 
 {/* ДИСКЛЕЙМЕР */}
 {work.disclaimer && work.disclaimer.trim() && (
-  <div className="mb-4 sm:mb-6">
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes shimmer-disclaimer {
-        0% { box-shadow: 0 0 10px rgba(45, 1, 10, 0.6), 0 0 20px rgba(45, 1, 10, 0.4); }
-        50% { box-shadow: 0 0 18px rgba(45, 1, 10, 0.9), 0 0 35px rgba(45, 1, 10, 0.6); }
-        100% { box-shadow: 0 0 10px rgba(45, 1, 10, 0.6), 0 0 20px rgba(45, 1, 10, 0.4); }
-      }
-    `}} />
+  <div className="mb-1">
+<button
+  onClick={() => setShowDisclaimer(!showDisclaimer)}
+  className="flex items-center gap-2 transition text-left mb-1"
+  style={{
+    backgroundColor: 'transparent',
+    padding: 0
+  }}
+>
+  <span className="text-sm sm:text-base" style={{ color: isDarkTheme ? '#9333ea' : '#47051e' }}>Дисклеймер:</span>
+  <div className={!showDisclaimer ? 'arrow-animated' : ''} style={{
+    transform: showDisclaimer ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: 'transform 0.3s ease',
+    color: isDarkTheme ? '#9333ea' : '#47051e'
+  }}>
+    <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+  </div>
+</button>
     
-    <button
-      onClick={() => setShowDisclaimer(!showDisclaimer)}
-      className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition text-left border-2"
-      style={{
-        backgroundColor: '#000000',
-        borderColor: '#750017ff',
-        color: '#ffffff',
-        boxShadow: '0 0 10px rgba(112, 2, 24, 0.6), 0 0 20px rgba(29, 0, 6, 0.4)',
-        animation: 'shimmer-disclaimer 2s ease-in-out infinite'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 0 18px rgba(97, 0, 19, 0.9), 0 0 35px rgba(45, 1, 10, 0.6)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 0 10px rgba(112, 2, 24, 0.6), 0 0 20px rgba(172, 0, 34, 0.4)';
-      }}
-    >
-      <span className="text-sm sm:text-base font-bold flex items-center gap-2">
-        <AlertTriangle size={16} className="sm:w-5 sm:h-5" style={{ color: '#750017ff', filter: 'drop-shadow(0 0 6px rgba(90, 0, 18, 0.8))' }} />
-        <span style={{ color: '#8d001cff', textShadow: '0 0 8px rgba(73, 0, 0, 0.8)' }}>Дисклеймер</span>
-      </span>
-      {showDisclaimer ? <ChevronUp size={18} className="sm:w-5 sm:h-5" style={{ color: '#750017ff' }} /> : <ChevronDown size={18} className="sm:w-5 sm:h-5" style={{ color: '#2d010a' }} />}
-    </button>
-    
-    {showDisclaimer && (
-      <div className="mt-3 rounded-xl px-4 py-3 border-2 whitespace-pre-wrap text-sm sm:text-base"
+{showDisclaimer && (
+  <div className="whitespace-pre-wrap text-xs sm:text-sm"
         style={{
-          backgroundColor: '#000000',
-          borderColor: '#2d010a',
-          color: '#c7c7c7ff',
-          boxShadow: '0 0 10px rgba(155, 19, 46, 0.4)'
+          backgroundColor: 'transparent',
+          color: '#ffffff'
         }}
       >
         {work.disclaimer}
@@ -966,8 +966,8 @@ return (
               <div 
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                 style={{
-                  backgroundColor: '#1a1a1a',
-                  border: '1px solid #333',
+                  backgroundColor: '#0e0e0e',
+                  border: '1px solid #2e2e2e',
                   color: '#FFFFFF'
                 }}
               >
@@ -996,19 +996,19 @@ return (
   onClick={() => setShowRatingModal(true)}
   className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
   style={{
-    background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)',
-    borderColor: isDarkTheme ? '#9333ea' : '#c9c6b0',
+    background: isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(3, 3, 3, 0.2)',
+    borderColor: isDarkTheme ? '#9333ea' : '#333333',
     color: '#FFFFFF',
     boxShadow: isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4)' : 'none',
     backdropFilter: 'blur(10px)',
     animation: isDarkTheme ? 'shimmer-purple 2s ease-in-out infinite' : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(201, 198, 176, 0.4)';
-    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.9), 0 0 30px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(201, 198, 176, 0.3)';
+    e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.4)' : 'rgba(8, 8, 8, 0.4)';
+    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(147, 51, 234, 0.9), 0 0 30px rgba(147, 51, 234, 0.6)' : '0 0 10px rgba(5, 5, 5, 0.3)';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(201, 198, 176, 0.2)';
+    e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.2)' : 'rgba(0, 0, 0, 0.2)';
     e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(147, 51, 234, 0.6), 0 0 20px rgba(147, 51, 234, 0.4)' : 'none';
   }}
               >
@@ -1020,19 +1020,19 @@ return (
   onClick={toggleFavorite}
   className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
   style={{
-    background: isDarkTheme ? 'rgba(239, 1, 203, 0.2)' : 'rgba(201, 198, 176, 0.2)',
-    borderColor: isDarkTheme ? '#ef01cb' : '#c9c6b0',
+    background: isDarkTheme ? 'rgba(239, 1, 203, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    borderColor: isDarkTheme ? '#ef01cb' : '#333333',
     color: '#FFFFFF',
     boxShadow: isDarkTheme ? '0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4)' : 'none',
     backdropFilter: 'blur(10px)',
     animation: isDarkTheme ? 'shimmer-pink 2s ease-in-out infinite' : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.background = isDarkTheme ? 'rgba(239, 1, 203, 0.4)' : 'rgba(201, 198, 176, 0.4)';
+    e.currentTarget.style.background = isDarkTheme ? 'rgba(239, 1, 203, 0.4)' : 'rgba(0, 0, 0, 0.4)';
     e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(239, 1, 203, 0.9), 0 0 30px rgba(239, 1, 203, 0.6)' : '0 0 10px rgba(201, 198, 176, 0.3)';
   }}
   onMouseLeave={(e) => {
-    e.currentTarget.style.background = isDarkTheme ? 'rgba(239, 1, 203, 0.2)' : 'rgba(201, 198, 176, 0.2)';
+    e.currentTarget.style.background = isDarkTheme ? 'rgba(239, 1, 203, 0.2)' : 'rgba(0, 0, 0, 0.2)';
     e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(239, 1, 203, 0.6), 0 0 20px rgba(239, 1, 203, 0.4)' : 'none';
   }}
 >
@@ -1046,22 +1046,22 @@ return (
   href={`/work/${workId}/discussion`}
   className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border-2 transition cursor-pointer"
   style={{
-    background: isDarkTheme ? '#000000' : 'rgba(201, 198, 176, 0.2)',
-    borderColor: isDarkTheme ? '#b3e7ef' : '#c9c6b0',
+    background: isDarkTheme ? '#000000' : 'rgba(0, 0, 0, 0.2)',
+    borderColor: isDarkTheme ? '#b3e7ef' : '#333333',
     color: '#FFFFFF',
     boxShadow: isDarkTheme ? '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)' : 'none',
     animation: isDarkTheme ? 'shimmer-cyan 2s ease-in-out infinite' : 'none'
   }}
   onMouseEnter={(e) => {
-    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6)' : '0 0 10px rgba(201, 198, 176, 0.3)';
+    e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(179, 231, 239, 0.9), 0 0 30px rgba(179, 231, 239, 0.6)' : '0 0 10px rgba(0, 0, 0, 0.3)';
     if (!isDarkTheme) {
-      e.currentTarget.style.background = 'rgba(201, 198, 176, 0.4)';
+      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.4)';
     }
   }}
   onMouseLeave={(e) => {
     e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(179, 231, 239, 0.6), 0 0 20px rgba(179, 231, 239, 0.4)' : 'none';
     if (!isDarkTheme) {
-      e.currentTarget.style.background = 'rgba(201, 198, 176, 0.2)';
+      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.2)';
     }
   }}
 >
@@ -1071,19 +1071,16 @@ return (
   <span>Обсуждение</span>
 </Link>
             </div>
-            {/* ОПИСАНИЕ */}
-<div className="rounded-lg p-4 sm:p-6 border-2 mb-4 sm:mb-6" style={{
+{/* ОПИСАНИЕ */}
+<div className="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 border-2" style={{
   background: 'transparent',
-  borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
-  boxShadow: isDarkTheme 
-    ? '0 0 15px rgba(147, 112, 219, 0.4)' 
-    : 'none'
+  borderColor: isDarkTheme ? '#9333ea' : '#47051e'
 }}>
   <h2 className="font-bold mb-2 sm:mb-3" style={{
   fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
     fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
     color: isDarkTheme ? '#9333ea' : 'transparent',
-    background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #615c4e  100%)' : 'none',
     WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
     WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
     backgroundClip: !isDarkTheme ? 'text' : 'unset'
@@ -1093,18 +1090,15 @@ return (
 
             {/* ПРИМЕЧАНИЕ АВТОРА */}
 {work.author_note && (
-  <div className="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 border-2" style={{
-    background: 'transparent',
-    borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
-    boxShadow: isDarkTheme 
-      ? '0 0 15px rgba(147, 112, 219, 0.4)' 
-      : 'none'
+<div className="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 border-2"  style={{
+  background: 'transparent',
+  borderColor: isDarkTheme ? '#9333ea' : '#47051e'
   }}>
-    <h2 className="font-bold mb-2" style={{
-  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 2rem)' : 'clamp(1rem, 2.5vw, 1.125rem)',
+<h2 className="font-bold mb-2" style={{
+  fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
       fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
       color: isDarkTheme ? '#9333ea' : 'transparent',
-      background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+      background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #615c4e 100%)' : 'none',
       WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
       WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
       backgroundClip: !isDarkTheme ? 'text' : 'unset'
@@ -1116,10 +1110,9 @@ return (
             {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
             {characterImagesArray.length > 0 && (
               <div className="mb-4 sm:mb-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4 flex items-center gap-2">
-                  <ImageIcon size={18} className="sm:w-5 sm:h-5" />
-                  {t.characterImages}
-                </h3>
+<h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4">
+  {t.characterImages}
+</h3>
                 
                 <div className="relative">
                   <div 
@@ -1233,17 +1226,16 @@ return (
 
 {/* СОДЕРЖАНИЕ */}
 <div className="mb-4 sm:mb-6">
- <h2 className="font-bold mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3" style={{
+<h2 className="font-bold mb-3 sm:mb-4 text-center" style={{
   fontSize: isDarkTheme ? 'clamp(1.75rem, 4vw, 3rem)' : 'clamp(1.5rem, 3vw, 1.875rem)',
-    fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-    color: isDarkTheme ? '#D3D3D3' : 'transparent',
-    background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
+    fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif",
+    color: isDarkTheme ? '#591e9c' : '#797874',
+    background: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #646155 100%)' : 'none',
     WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
     WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
     backgroundClip: !isDarkTheme ? 'text' : 'unset',
     fontStyle: !isDarkTheme ? 'italic' : 'normal'
   }}>
-    <BookOpen size={24} className="sm:w-8 sm:h-8" style={{ color: isDarkTheme ? '#D3D3D3' : '#82713a' }} />
     {t.contents}
   </h2>
 </div>
@@ -1252,62 +1244,60 @@ return (
 <style dangerouslySetInnerHTML={{__html: `
   @keyframes shimmer-chapter {
     0% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
-    50% { box-shadow: 0 0 25px rgba(118, 38, 181, 0.8); }
+    50% { box-shadow: 0 0 25px rgba(172, 64, 255, 0.8); }
     100% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
   }
 `}} />
-<div className="rounded-lg p-4 sm:p-6 lg:p-8 border-2" style={{
-  background: 'transparent',
-  borderColor: isDarkTheme ? '#9370db' : '#c9c6bb',
-  boxShadow: isDarkTheme 
-    ? '0 0 25px rgba(147, 51, 234, 0.8), 0 0 50px rgba(147, 51, 234, 0.5)' 
-    : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+<div style={{
+  background: 'transparent'
 }}>
   {chapters.length === 0 ? (
     <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">{t.noChapters}</p>
   ) : (
     <div className="space-y-2 sm:space-y-3">
       {chapters.map((chapter) => (
-        <Link
-          key={chapter.id}
-          href={`/work/${workId}/chapter/${chapter.id}`}
-          className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
-          style={{
-            background: isDarkTheme ? 'transparent' : 'rgba(0, 0, 0, 0.3)',
-            borderColor: isDarkTheme ? '#333' : 'rgba(182, 169, 109, 0.3)',
-            boxShadow: !isDarkTheme ? 'inset 0 0 30px rgba(0, 0, 0, 0.4)' : 'none'
-          }}
-          onMouseEnter={(e) => {
-            if (isDarkTheme) {
-              e.currentTarget.style.backgroundColor = '#2a2a2a';
-              e.currentTarget.style.borderColor = '#7626b5';
-              e.currentTarget.style.animation = 'shimmer-chapter 2s ease-in-out infinite';
-            } else {
-              e.currentTarget.style.background = 'rgba(182, 169, 109, 0.2)';
-              e.currentTarget.style.borderColor = '#65635d';
-              e.currentTarget.style.boxShadow = 'inset 0 0 30px rgba(0, 0, 0, 0.4)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (isDarkTheme) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#333';
-              e.currentTarget.style.animation = 'none';
-              e.currentTarget.style.boxShadow = 'none';
-            } else {
-              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-              e.currentTarget.style.borderColor = 'rgba(182, 169, 109, 0.3)';
-              e.currentTarget.style.boxShadow = 'inset 0 0 30px rgba(0, 0, 0, 0.4)';
-            }
-          }}
-        >
-          <div className="flex justify-between items-start gap-2 sm:gap-4">
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold transition mb-1 sm:mb-2 break-words" style={{
-                color: '#ffffff'
-              }}>
-                {chapter.chapter_number}. {chapter.title}
-              </h3>
+ <Link
+  key={chapter.id}
+  href={`/work/${workId}/chapter/${chapter.id}`}
+  className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
+  style={{
+    background: isDarkTheme ? 'transparent' : 'rgba(0, 0, 0, 0.3)',
+    borderColor: isDarkTheme ? '#9333ea' : '#47051e',
+    boxShadow: !isDarkTheme ? 'inset 0 0 30px rgba(0, 0, 0, 0.4)' : 'none'
+  }}
+  onMouseEnter={(e) => {
+    if (isDarkTheme) {
+      e.currentTarget.style.backgroundColor = '#2700276e';
+      e.currentTarget.style.borderColor = '#9333ea';
+      e.currentTarget.style.animation = 'shimmer-chapter 2s ease-in-out infinite';
+    } else {
+      e.currentTarget.style.background = '#47051e38';
+      e.currentTarget.style.borderColor = '#47051e';
+      e.currentTarget.style.boxShadow = 'inset 0 0 30px rgb(0, 0, 0)';
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (isDarkTheme) {
+      e.currentTarget.style.backgroundColor = 'transparent';
+      e.currentTarget.style.borderColor = '#9333ea';
+      e.currentTarget.style.animation = 'none';
+      e.currentTarget.style.boxShadow = 'none';
+    } else {
+      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
+      e.currentTarget.style.borderColor = 'rgba(83, 3, 36, 0.65)';
+      e.currentTarget.style.boxShadow = 'inset 0 0 30px rgba(0, 0, 0, 0.4)';
+    }
+  }}
+>
+  <div className="flex justify-between items-start gap-2 sm:gap-4">
+    <div className="flex-1 min-w-0">
+<h3 className="font-semibold transition mb-1 sm:mb-2 break-words" style={{
+  color: '#bdb8b8',
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  fontSize: isDarkTheme ? 'clamp(1.125rem, 2.5vw, 1.5rem)' : 'clamp(1rem, 2vw, 1.25rem)'
+}}>
+        {chapter.chapter_number}. {chapter.title}
+      </h3>
               <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm" style={{ color: '#9ca3af' }}>
                 <span className="flex items-center gap-1">
                   <Clock size={12} className="sm:w-4 sm:h-4" />
@@ -1320,7 +1310,7 @@ return (
               </div>
             </div>
             <div className="flex-shrink-0 transition" style={{
-              color: isDarkTheme ? '#9333ea' : '#65635d'
+              color: isDarkTheme ? '#9333ea' : '#49001c'
             }}>
               <ChevronLeft size={20} className="sm:w-6 sm:h-6 rotate-180" />
             </div>
@@ -1577,18 +1567,18 @@ return (
 {showReaderPanel && userProfile && (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
-    {isDarkTheme && (
-       <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
-        borderColor: '#b3e7ef',
-        backgroundImage: 'url(/textures/dark-erys.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-        <div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-          background: 'linear-gradient(135deg, #8b3cc8 0%, #4a1d6e 100%)',
-          borderBottom: '3px solid rgba(147, 112, 219, 0.6)'
-        }}>
+{isDarkTheme && (
+ <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl border-2" style={{
+    background: 'rgba(147, 51, 234, 0.15)',
+    borderColor: '#9333ea',
+    backdropFilter: 'blur(20px)',
+    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  }}>
+<div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
+  background: 'rgba(139, 60, 200, 0.3)',
+  backdropFilter: 'blur(10px)',
+  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
+}}>
       <h2 className="text-2xl sm:text-4xl font-bold" style={{
   color: '#fff',
   textShadow: '0 0 30px rgba(179, 231, 239, 1)',
@@ -1739,21 +1729,21 @@ onClick={() => {
         borderLeft: '12px solid',
         borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
         boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-        backgroundImage: 'url(/textures/darkness.jpg)',
+         background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.25) 0%, rgba(188, 187, 174, 0.15) 100%)',
-borderBottom: '1px solid rgba(188, 187, 174, 0.35)',
-boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
+background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
+borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
+boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
         }}>
 
-<h2 className="text-2xl sm:text-4xl font-bold text-center mb-4" style={{ 
-  color: '#c9c6bb',
-  fontFamily: "'miamanueva', Georgia, serif"
+<h2 className="text-4xl sm:text-5xl font-bold text-center mb-4" style={{
+  color: '#757162',
+  fontFamily: "'sooonsi', Georgia, serif"
 }}>{userProfile.nickname}</h2>
 
           <style dangerouslySetInnerHTML={{__html: `
@@ -1766,7 +1756,7 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
               100% { background-position: 200% center; }
             }
             .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #c9c6bb 50%, #bcbbae 100%);
+              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%;
               background-size: 200% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
@@ -1780,9 +1770,9 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
   onClick={() => setShowReaderPanel(false)}
   className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
             style={{
-              background: 'rgba(188, 187, 174, 0.35)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(188, 187, 174, 0.15)'
+              background: 'rgba(26, 26, 26, 0.35)',
+              backdropFilter: 'blur(1px)',
+              border: '1px solid rgba(10, 10, 10, 0.15)'
             }}
           >
             <X size={20} color="#c9c6bb" />
@@ -1797,23 +1787,23 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
   }}
   className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
   style={{
-    background: siteUpdates.length > 0 ? '#35030e' : 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
-    backdropFilter: 'blur(10px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#62091e"} strokeWidth="2" className="relative z-10">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#61031b"} strokeWidth="2" className="relative z-10">
     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
     <path d="M2 17l10 5 10-5"/>
     <path d="M2 12l10 5 10-5"/>
   </svg>
   <span className="relative z-10" style={{ 
-    color: siteUpdates.length > 0 ? '#e9e6d8' : '#62091e',
+    color: siteUpdates.length > 0 ? '#e9e6d8' : '#68021c',
     fontStyle: 'italic'
   }}>
     Обновления
@@ -1824,19 +1814,19 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
   href="/collection"
   className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
   style={{
-    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <Heart size={20} color="#62091e" className="relative z-10" />
+ <Heart size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -1853,19 +1843,19 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
   href="/my-messages"
   className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
   style={{
-    background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(188, 187, 174, 0.35)',
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
     backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
-  <MessageSquare size={20} color="#62091e" className="relative z-10" />
+  <MessageSquare size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -1882,14 +1872,14 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
   onClick={() => setShowManagementModal(true)}
   className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
   style={{
-              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-              border: '1px solid rgba(188, 187, 174, 0.35)',
-              backdropFilter: 'blur(1px)',
-              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
+    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
   }}
 >
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
   }} />
   
   <style dangerouslySetInnerHTML={{__html: `
@@ -1899,9 +1889,9 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
     }
   `}} />
   
-  <Settings size={20} color="#62091e" className="relative z-10" />
+  <Settings size={20} color="#d8d7d7" className="relative z-10" />
   <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+   background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
     backgroundSize: '200% auto',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -1919,19 +1909,19 @@ boxShadow: '0 8px 32px rgba(188, 187, 174, 0.25)'
     onClick={handleLogout}
     className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
     style={{
-              background: 'linear-gradient(135deg, rgba(188, 187, 174, 0.35), rgba(188, 187, 174, 0.15))',
-              border: '1px solid rgba(188, 187, 174, 0.35)',
-              backdropFilter: 'blur(1px)',
-              boxShadow: '0 4px 15px rgba(188, 187, 174, 0.15)'
-    }}
-  >
-    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-      background: 'radial-gradient(circle at center, rgba(201, 181, 135, 0.3), transparent)'
-    }} />
+   background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
+    border: '1px solid rgba(27, 27, 27, 0.15)',
+    backdropFilter: 'blur(1px)',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
+  }}
+>
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
+  }} />
     
-    <LogOut size={20} color="#62091e" className="relative z-10" />
-    <span className="relative z-10" style={{ 
-      background: 'linear-gradient(90deg, #62091e 0%, #e9e6d8 50%, #62091e 100%)',
+    <LogOut size={20} color="#d8d7d7" className="relative z-10" />
+<span className="relative z-10" style={{ 
+      background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
       backgroundSize: '200% auto',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
