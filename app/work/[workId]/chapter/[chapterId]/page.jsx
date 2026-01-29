@@ -2219,11 +2219,17 @@ style={{
   boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(192, 167, 109, 0.5)'
 }}
           >
-            <img 
+<img 
   src={img} 
   alt={`Image ${index + 1}`} 
   className="w-full h-full object-cover cursor-pointer" 
   loading="lazy"
+  crossOrigin="anonymous"
+  onError={(e) => {
+    console.error('Failed to load image:', img);
+    e.target.style.backgroundColor = '#1a1a1a';
+    e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">Изображение недоступно</div>';
+  }}
   onClick={() => setSelectedImage(img)}
 />
 <button

@@ -1125,12 +1125,23 @@ return (
     key={index} 
     className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative cursor-pointer"
     style={{
-      borderColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
+      borderColor: isDarkTheme ? '#7626b5' : '#414141',
       boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(17, 17, 16, 0.5)'
     }}
     onClick={() => setSelectedImage(img)}
                       >
-                        <img src={img} alt={`Character ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                        <img 
+  src={img} 
+  alt={`Character ${index + 1}`} 
+  className="w-full h-full object-cover" 
+  loading="lazy"
+  crossOrigin="anonymous"
+  onError={(e) => {
+    console.error('Failed to load image:', img);
+    e.target.style.backgroundColor = '#1a1a1a';
+    e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">Изображение недоступно</div>';
+  }}
+/>
   <button
   onClick={(e) => {
     e.stopPropagation();
@@ -1155,8 +1166,8 @@ return (
     viewBox="0 0 24 24" 
     fill={savedImages.includes(img) ? (isDarkTheme ? '#ef01cb' : '#474746') : 'none'}
     stroke={isDarkTheme 
-      ? (savedImages.includes(img) ? '#ffffff' : '#ef01cb')
-      : '#c9c6bb'}
+      ? (savedImages.includes(img) ? '#7a7967' : '#ef01cb')
+      : '#c5c5c5'}
     strokeWidth="2"
   >
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
