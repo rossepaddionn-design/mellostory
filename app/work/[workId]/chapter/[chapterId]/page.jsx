@@ -1,6 +1,6 @@
 'use client';
 import '@/app/fonts.css'; 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -617,22 +617,225 @@ const submitRating = async (rating) => {
   setShowRatingModal(false);
 };
 
+const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const matrixData = useMemo(() => {
+    if (!mounted) return [];
+    return [...Array(20)].map((_, i) => ({
+      i,
+      color: i % 3 === 0 ? '#59adb9' : i % 3 === 1 ? '#9333ea' : '#ef01cb',
+      duration: 3 + Math.random() * 3,
+      delay: Math.random() * 3,
+      chars: Array.from({ length: 15 }, () => String.fromCharCode(0x30A0 + Math.random() * 96))
+    }));
+  }, [mounted]);
+
+  const sparksData = useMemo(() => {
+    if (!mounted) return [];
+    return [...Array(20)].map((_, i) => ({
+      i,
+      duration: 1 + Math.random(),
+      delay: Math.random() * 2,
+      y: 60 + Math.random() * 40
+    }));
+  }, [mounted]);
+
 if (loading) {
   return (
-    <div className="min-h-screen text-white flex items-center justify-center" style={{ 
-      backgroundColor: isDarkTheme ? '#000000' : '#000000'
+    <div className="min-h-screen flex items-center justify-center overflow-hidden relative" style={{ 
+      background: isDarkTheme 
+        ? 'linear-gradient(225deg, #000000 0%, #4d3370 20%, #987caf 40%, #523166 60%, #0d0020 80%, #000000 100%)'
+        : 'radial-gradient(circle at center, #1a0000 0%, #330514 35%, #50061b 65%, #000000 100%)'
     }}>
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 mb-4" style={{ 
-          borderColor: isDarkTheme ? '#c084fc' : '#d8c5a2'
-        }}></div>
-        <p className="text-lg sm:text-xl" style={{ 
-          color: isDarkTheme ? '#9ca3af' : '#9ca3af'
-        }}>{t.loading}</p>
-      </div>
+      {isDarkTheme ? (
+<>
+  <style dangerouslySetInnerHTML={{__html: `
+    @keyframes wormholeZoom {
+      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+    }
+    @keyframes portalSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes portalPulse {
+      0%, 100% { box-shadow: 0 0 40px #9333ea, 0 0 80px #6b21a8, 0 0 120px #4c1d95; }
+      50% { box-shadow: 0 0 60px #a855f7, 0 0 100px #7c3aed, 0 0 160px #5b21b6; }
+    }
+    @keyframes msShimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes msGlow {
+      0%, 100% { text-shadow: 0 0 10px #a855f7, 0 0 30px #7c3aed, 0 0 50px #4c1d95; }
+      50% { text-shadow: 0 0 20px #c084fc, 0 0 50px #a855f7, 0 0 80px #6b21a8; }
+    }
+  `}} />
+
+  {/* Звёзды летящие к центру */}
+  {mounted && [...Array(120)].map((_, i) => {
+    const angle = (i / 120) * Math.PI * 2;
+    const dist = 40 + (i % 5) * 15;
+    const x = 50 + Math.cos(angle) * dist;
+    const y = 50 + Math.sin(angle) * dist;
+    const duration = 1.5 + (i % 4) * 0.6;
+    const delay = (i % 20) * 0.1;
+    const size = 1 + (i % 3);
+    const bright = i % 3 === 0 ? '#a78bfa' : i % 3 === 1 ? '#f0abfc' : '#67e8f9';
+    return (
+      <div key={i} className="absolute" style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        background: bright,
+        borderRadius: '50%',
+        boxShadow: `0 0 ${size * 3}px ${bright}`,
+        animation: `wormholeZoom ${duration}s linear infinite`,
+        animationDelay: `${delay}s`
+      }} />
+    );
+  })}
+
+  {/* Портал в центре */}
+  <div className="absolute" style={{
+    left: '50%',
+    top: '50%',
+    width: '140px',
+    height: '140px',
+    transform: 'translate(-50%, -50%)',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, #0a0015 0%, #0d0020 55%, #1a0033 70%, transparent 100%)',
+    animation: 'portalPulse 3s ease-in-out infinite',
+    zIndex: 2,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}>
+    {/* Вращающееся кольцо внешний */}
+    <div className="absolute inset-0" style={{
+      borderRadius: '50%',
+      border: '3px solid transparent',
+      borderTopColor: '#a855f7',
+      borderRightColor: '#f0abfc',
+      animation: 'portalSpin 2s linear infinite',
+      filter: 'drop-shadow(0 0 8px #a855f7)'
+    }} />
+    {/* Вращающееся кольцо внутренний */}
+    <div className="absolute inset-2" style={{
+      borderRadius: '50%',
+      border: '2px solid transparent',
+      borderBottomColor: '#67e8f9',
+      borderLeftColor: '#7c3aed',
+      animation: 'portalSpin 3s linear infinite reverse',
+      filter: 'drop-shadow(0 0 6px #67e8f9)'
+    }} />
+
+    {/* MS текст внутри сферы */}
+    <div className="relative z-10" style={{
+      fontSize: '42px',
+      fontWeight: '800',
+      fontFamily: "'Arial Black', Arial, sans-serif",
+      letterSpacing: '-2px',
+      background: 'linear-gradient(90deg, #c084fc 0%, #fff 30%, #a855f7 50%, #fff 70%, #c084fc 100%)',
+      backgroundSize: '200% auto',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      animation: 'msShimmer 2.5s linear infinite, msGlow 2s ease-in-out infinite'
+    }}>MS</div>
+  </div>
+</>
+      ) : (
+        <>
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes runeGlow {
+              0%, 100% { opacity: 0.4; filter: brightness(0.8); }
+              50% { opacity: 1; filter: brightness(1.5); }
+            }
+            @keyframes circleRotate {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+            @keyframes pentagramPulse {
+              0%, 100% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.05); opacity: 1; }
+            }
+          `}} />
+          <div className="relative w-80 h-80">
+            <svg className="absolute inset-0 w-full h-full" style={{ animation: 'circleRotate 10s linear infinite' }}>
+              <circle cx="160" cy="160" r="150" fill="none" stroke="#000000" strokeWidth="2" 
+                style={{ filter: 'drop-shadow(0 0 20px rgba(0, 0, 0, 0.6))' }}
+              />
+              <circle cx="160" cy="160" r="140" fill="none" stroke="#000000" strokeWidth="1"
+                style={{ filter: 'drop-shadow(0 0 15px rgba(8, 8, 8, 0.4))' }}
+              />
+              {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
+                <text 
+                  key={i}
+                  x="160" 
+                  y="20" 
+                  textAnchor="middle" 
+                  fontSize="24"
+                  fill="#000000"
+                  transform={`rotate(${i * 45} 160 160)`}
+                  style={{ 
+                    animation: `runeGlow ${2 + i * 0.2}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.3}s`,
+                    filter: 'drop-shadow(0 0 10px currentColor)'
+                  }}
+                >
+                  {['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ'][i]}
+                </text>
+              ))}
+            </svg>
+            
+            <svg className="absolute inset-8 w-64 h-64" style={{ animation: 'circleRotate 8s linear infinite reverse' }}>
+              <circle cx="128" cy="128" r="110" fill="none" stroke="#000000" strokeWidth="1"
+                strokeDasharray="10,5"
+                style={{ filter: 'drop-shadow(0 0 15px rgba(3, 3, 3, 0.6))' }}
+              />
+            </svg>
+            
+            <svg className="absolute inset-0 w-full h-full" style={{ animation: 'pentagramPulse 3s ease-in-out infinite' }} viewBox="0 0 320 320">
+              <path 
+                d="M 160,60 L 185,130 L 260,130 L 200,175 L 225,245 L 160,200 L 95,245 L 120,175 L 60,130 L 135,130 Z" 
+                fill="none" 
+                stroke="#000000" 
+                strokeWidth="4"
+                style={{ 
+                  filter: 'drop-shadow(0 0 30px rgb(0, 0, 0))'
+                }}
+              />
+              
+              <circle cx="160" cy="160" r="45" fill="none" stroke="#000000" strokeWidth="3"
+                style={{ 
+                  filter: 'drop-shadow(0 0 20px rgba(3, 3, 3, 0.8))',
+                  animation: 'runeGlow 2s ease-in-out infinite'
+                }}
+              />
+            </svg>
+            
+            {sparksData.map((spark) => (
+              <div key={spark.i} className="absolute w-2 h-2" style={{
+                left: '50%',
+                top: '50%',
+                background: '#000000',
+                borderRadius: '50%',
+                boxShadow: '0 0 10px rgb(0, 0, 0)',
+                animation: `runeGlow ${spark.duration}s ease-in-out infinite`,
+                animationDelay: `${spark.delay}s`,
+                transform: `translate(-50%, -50%) rotate(${spark.i * 18}deg) translateY(-${spark.y}px)`
+              }} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
 
   if (!chapter) {
     return (
@@ -768,86 +971,278 @@ style={{
   />
 </div>
     
-<header className="border-b py-3 sm:py-4 px-4 sm:px-8 sticky top-0 z-40" style={{
-        backgroundColor: isDarkTheme ? '#000000' : '#eae2d7',
-        borderColor: isDarkTheme ? '#7626b5' : '#2d010a'
-      }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-2 sm:mb-4">
+{isDarkTheme ? (
+  <header className="fixed top-0 left-0 right-0 z-40 border-b" style={{
+    padding: '22px 24px',
+    background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
+    borderColor: '#9333ea'
+  }}>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes particleFloat {
+        0%, 100% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.4;
+        }
+        25% {
+          transform: translate(20px, -15px) scale(1.5);
+          opacity: 1;
+        }
+        50% {
+          transform: translate(-15px, 20px) scale(0.8);
+          opacity: 0.6;
+        }
+        75% {
+          transform: translate(10px, -25px) scale(1.2);
+          opacity: 0.8;
+        }
+      }
+    `}} />
+    
+    {[
+      { left: '5%', top: '20%', delay: '0s' },
+      { left: '15%', top: '60%', delay: '1s' },
+      { left: '25%', top: '40%', delay: '2s' },
+      { left: '35%', top: '70%', delay: '3s' },
+      { left: '45%', top: '30%', delay: '1.5s' },
+      { left: '55%', top: '50%', delay: '2.5s' },
+      { left: '65%', top: '25%', delay: '0.5s' },
+      { left: '75%', top: '65%', delay: '3.5s' },
+      { left: '85%', top: '35%', delay: '1.2s' },
+      { left: '95%', top: '55%', delay: '2.8s' }
+    ].map((particle, i) => (
+      <div key={i} style={{
+        position: 'absolute',
+        width: '3px',
+        height: '3px',
+        background: '#9333ea',
+        borderRadius: '50%',
+        boxShadow: '0 0 10px #9333ea',
+        left: particle.left,
+        top: particle.top,
+        animation: 'particleFloat 8s ease-in-out infinite',
+        animationDelay: particle.delay,
+        pointerEvents: 'none'
+      }} />
+    ))}
+    
+    <div className="max-w-4xl mx-auto" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="flex justify-between items-center mb-2 sm:mb-4">
 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-  <Link href="/" className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap" style={{ color: isDarkTheme ? '#9ca3af' : '#000000' }}>
-    {t.backToMain}
-  </Link>
-  <Link href={`/work/${workId}`} className="hover:text-purple-500 transition text-xs sm:text-sm whitespace-nowrap" style={{ color: isDarkTheme ? '#7626b5' : '#5f1b1e' }}>
-    ← {t.backToWork}
+  <Link href={`/work/${workId}`} className="inline-flex items-center gap-2 transition text-sm sm:text-base relative" style={{
+    color: '#c4b5fd',
+    padding: '8px 0'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.color = '#fff';
+    e.currentTarget.style.textShadow = '0 0 10px rgba(147, 51, 234, 0.8)';
+    const line = e.currentTarget.querySelector('.hover-line');
+    if (line) line.style.width = '120%';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.color = '#c4b5fd';
+    e.currentTarget.style.textShadow = 'none';
+    const line = e.currentTarget.querySelector('.hover-line');
+    if (line) line.style.width = '0';
+  }}>
+    <div 
+      className="hover-line"
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: '50%',
+        width: 0,
+        height: '2px',
+        background: 'linear-gradient(90deg, transparent, #9333ea, #ec4899, #9333ea, transparent)',
+        transform: 'translateX(-50%)',
+        transition: 'width 0.3s ease'
+      }}
+    />
+    <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+    Назад
   </Link>
 </div>
-            
-<div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-<button
-    onClick={() => setShowSidePanel(true)}
-    className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
-    style={{
-      backgroundColor: isDarkTheme ? '#7626b5' : '#2d010a',
-      boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.6)' : '0 0 10px rgba(95, 27, 30, 0.6)',
-      border: isDarkTheme ? '1px solid #7626b5' : '1px solid #2d010a'
-    }}
-onMouseEnter={(e) => {
-  e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b3fd1' : '#2d010a';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 15px rgba(118, 38, 181, 0.8)' : '0 0 15px rgba(95, 27, 30, 0.8)';
-}}
-onMouseLeave={(e) => {
-  e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#2d010a';
-  e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.6)' : '0 0 10px rgba(95, 27, 30, 0.6)';
-}}
-  >
-    <Menu size={16} className="sm:w-4 sm:h-4" />
-    <span className="hidden sm:inline">Меню</span>
-  </button>
+        
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <button
+            onClick={() => setShowSidePanel(true)}
+            className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
+            style={{
+              backgroundColor: '#7626b5',
+              boxShadow: '0 0 10px rgba(118, 38, 181, 0.6)',
+              border: '1px solid #7626b5'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#8b3fd1';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(118, 38, 181, 0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#7626b5';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(118, 38, 181, 0.6)';
+            }}
+          >
+            <Menu size={16} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Меню</span>
+          </button>
 
-<button
-    onClick={saveBookmark}
-    className="p-2 rounded-full flex items-center justify-center transition"
-    style={{
-      backgroundColor: selectedTextForBookmark 
-        ? (isDarkTheme ? '#3fcaaf' : '#5d5846')
-        : 'rgba(118, 38, 181, 0.3)',
-      boxShadow: selectedTextForBookmark 
-        ? (isDarkTheme ? '0 0 15px rgba(63, 202, 175, 0.8)' : '0 0 15px rgba(133, 0, 45, 0.8)')
-        : 'none',
-      border: selectedTextForBookmark 
-        ? (isDarkTheme ? '2px solid #3fcaaf' : '2px solid #5d5846')
-        : '2px solid rgba(118, 38, 181, 0.5)',
-      width: '36px',
-      height: '36px',
-      cursor: 'pointer',
-      opacity: selectedTextForBookmark ? 1 : 0.5
-    }}
-  >
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-    </svg>
-  </button>
-</div>
-          </div>
-
-          {/* СЧЕТЧИК СТРАНИЦ - ВНИЗУ HEADER */}
-          {chapter?.pages > 0 && (
-            <div className="flex justify-center pb-1">
-              <span 
-                className="text-xs px-2 py-0.5 rounded-full"
-style={{
-  color: isDarkTheme ? 'rgba(255, 255, 255, 0.8)' : '#000000',
-  textShadow: isDarkTheme ? '0 0 6px rgba(255, 255, 255, 0.4)' : 'none',
-  backgroundColor: isDarkTheme ? 'rgba(0, 0, 0, 0.6)' : 'rgba(145, 129, 80, 0.2)'
-}}
-              >
-                {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
-              </span>
-            </div>
-          )}
+          <button
+            onClick={saveBookmark}
+            className="p-2 rounded-full flex items-center justify-center transition"
+            style={{
+              backgroundColor: selectedTextForBookmark ? '#3fcaaf' : 'rgba(118, 38, 181, 0.3)',
+              boxShadow: selectedTextForBookmark ? '0 0 15px rgba(63, 202, 175, 0.8)' : 'none',
+              border: selectedTextForBookmark ? '2px solid #3fcaaf' : '2px solid rgba(118, 38, 181, 0.5)',
+              width: '36px',
+              height: '36px',
+              cursor: 'pointer',
+              opacity: selectedTextForBookmark ? 1 : 0.5
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
         </div>
-      </header>
+      </div>
+
+      {chapter?.pages > 0 && (
+        <div className="flex justify-center pb-1">
+          <span 
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              textShadow: '0 0 6px rgba(255, 255, 255, 0.4)',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)'
+            }}
+          >
+            {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
+          </span>
+        </div>
+      )}
+    </div>
+  </header>
+) : (
+  <header className="fixed top-0 left-0 right-0 z-40" style={{
+    padding: '22px 24px',
+    background: '#000000',
+    borderBottom: '3px solid rgba(105, 10, 50, 0.43)'
+  }}>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes flameFlicker {
+        0%, 100% {
+          transform: translateY(0) scaleY(1);
+          opacity: 0.8;
+        }
+        25% {
+          transform: translateY(-5px) scaleY(1.15);
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-2px) scaleY(0.95);
+          opacity: 0.9;
+        }
+        75% {
+          transform: translateY(-7px) scaleY(1.1);
+          opacity: 0.95;
+        }
+      }
+      .flame-light {
+        position: absolute;
+        bottom: -4px;
+        width: 20px;
+        height: 30px;
+        background: linear-gradient(180deg,
+          rgba(109, 5, 31, 0.8) 0%,
+          rgba(150, 15, 30, 0.6) 30%,
+          rgba(150, 15, 30, 0.3) 60%,
+          transparent 100%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        animation: flameFlicker 1.5s ease-in-out infinite;
+        box-shadow: 0 0 20px rgba(150, 15, 30, 0.6);
+        pointer-events: none;
+      }
+    `}} />
+    
+    <div className="flame-light" style={{ left: '20%', animationDelay: '0s' }} />
+    <div className="flame-light" style={{ left: '40%', animationDelay: '0.3s', animationDuration: '1.8s' }} />
+    <div className="flame-light" style={{ left: '60%', animationDelay: '0.6s', animationDuration: '1.6s' }} />
+    <div className="flame-light" style={{ left: '80%', animationDelay: '0.9s', animationDuration: '1.7s' }} />
+    
+    <div className="max-w-4xl mx-auto" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="flex justify-between items-center mb-2 sm:mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+  <Link href={`/work/${workId}`} className="inline-flex items-center gap-2 transition text-sm sm:text-base relative" style={{
+    color: 'rgba(90, 8, 17, 0.9)',
+    padding: '8px 0'
+  }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'rgb(119, 39, 63)';
+            e.currentTarget.style.textShadow = '0 0 8px rgba(126, 9, 44, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'rgba(114, 17, 49, 0.9)';
+            e.currentTarget.style.textShadow = 'none';
+          }}>
+            <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+            Назад
+          </Link>
+        </div>
+        
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <button
+            onClick={() => setShowSidePanel(true)}
+            className="px-2 sm:px-3 py-1 rounded flex items-center gap-1 text-xs sm:text-sm transition"
+            style={{
+              backgroundColor: '#2d010a',
+              boxShadow: '0 0 10px rgba(95, 27, 30, 0.6)',
+              border: '1px solid #2d010a'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(95, 27, 30, 0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(95, 27, 30, 0.6)';
+            }}
+          >
+            <Menu size={16} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Меню</span>
+          </button>
+
+          <button
+            onClick={saveBookmark}
+            className="p-2 rounded-full flex items-center justify-center transition"
+            style={{
+              backgroundColor: selectedTextForBookmark ? '#5d5846' : 'rgba(118, 38, 181, 0.3)',
+              boxShadow: selectedTextForBookmark ? '0 0 15px rgba(133, 0, 45, 0.8)' : 'none',
+              border: selectedTextForBookmark ? '2px solid #5d5846' : '2px solid rgba(118, 38, 181, 0.5)',
+              width: '36px',
+              height: '36px',
+              cursor: 'pointer',
+              opacity: selectedTextForBookmark ? 1 : 0.5
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {chapter?.pages > 0 && (
+        <div className="flex justify-center pb-1">
+          <span 
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{
+              color: '#d8d8d8',
+              backgroundColor: 'rgb(0, 0, 0)'
+            }}
+          >
+            {Math.max(1, Math.round((readProgress / 100) * chapter.pages))} / {chapter.pages} стр.
+          </span>
+        </div>
+      )}
+    </div>
+  </header>
+)}
 
       {showChapterList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
@@ -1971,7 +2366,7 @@ style={{
   </div>
 )}
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+     <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12" style={{ paddingTop: '120px' }}>
         <div className="mb-6 sm:mb-8">
 {work && (
   <>
@@ -2434,34 +2829,41 @@ style={{
 
 {/* КНОПКИ НАВИГАЦИИ И ДЕЙСТВИЯ */}
 <div className="space-y-4 mb-6 sm:mb-8">
-  {/* Оценка и обсуждение */}
+  {/* Количество глав посередине */}
+  <div className="text-center">
+    <span className="text-xs sm:text-sm font-semibold" style={{
+      color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+    }}>
+      Глава {chapter.chapter_number} из {allChapters.length}
+    </span>
+  </div>
+
+  {/* Оценка и обсуждение - только иконки */}
   <div className="flex gap-3 justify-center">
     <button
       onClick={() => setShowRatingModal(true)}
-      className="px-4 sm:px-6 py-2 sm:py-3 transition text-sm sm:text-base flex items-center gap-2"
+      className="p-3 transition"
       style={{
         background: 'transparent',
         color: isDarkTheme ? '#c084fc' : '#c9c6bb'
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke={isDarkTheme ? '#c084fc' : '#c9c6bb'} strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
-      <span>{averageRating > 0 ? averageRating.toFixed(1) : 'Оценить'}</span>
     </button>
 
     <Link
       href={`/work/${workId}/discussion`}
-      className="px-4 sm:px-6 py-2 sm:py-3 transition text-sm sm:text-base flex items-center gap-2"
+      className="p-3 transition"
       style={{
         background: 'transparent',
         color: isDarkTheme ? '#c084fc' : '#c9c6bb'
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme ? '#c084fc' : '#c9c6bb'} strokeWidth="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      <span>Обсуждение</span>
     </Link>
   </div>
 
@@ -2483,12 +2885,6 @@ style={{
     ) : (
       <div className="hidden sm:block"></div>
     )}
-    
-<span className="text-xs sm:text-sm font-semibold" style={{
-  color: isDarkTheme ? '#ffffff' : '#c9c6bb'
-}}>
-  Глава {chapter.chapter_number} из {allChapters.length}
-</span>
 
     {nextChapter ? (
       <button 
@@ -2507,12 +2903,13 @@ style={{
       <div className="hidden sm:block"></div>
     )}
   </div>
+
   {/* Благодарность за прочтение */}
   <p className="text-center text-xs sm:text-sm mt-4" style={{
     color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
     fontStyle: 'italic'
   }}>
-    Спасибо за прочтение!
+    Спасибо за прочтение💜
   </p>
 </div>
 
@@ -2682,59 +3079,71 @@ style={{
             </button>
           )}
 
-          <div className="mt-auto pt-8">
-            <button
-              onClick={toggleTheme}
-              className="w-full relative rounded-full p-1 transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-                boxShadow: '0 0 20px rgba(147, 112, 219, 0.6), 0 0 40px rgba(147, 112, 219, 0.3)',
-                animation: 'pulse-theme 2s ease-in-out infinite',
-                height: '40px'
-              }}
-            >
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes pulse-theme {
-                  0%, 100% { opacity: 1; }
-                  50% { opacity: 0.7; }
-                }
-              `}} />
-              
-              <div 
-                className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-                  boxShadow: '0 2px 8px rgba(255, 255, 255, 0.5)',
-                  transform: 'translateX(0)',
-                }}
-              >
-                <span style={{ fontSize: '16px', filter: 'grayscale(100%) brightness(2)', opacity: 0.6 }}>
-                  🌙
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between px-4 h-full">
-                <span 
-                  className="text-xs font-bold transition-opacity duration-300"
-                  style={{ 
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
-                  }}
-                >
-                </span>
-                <span 
-                  className="text-xs font-bold transition-opacity duration-300"
-                  style={{ 
-                    color: 'rgba(255, 255, 255, 0.3)',
-                    textShadow: 'none'
-                  }}
-                >
-                </span>
-              </div>
-            </button>
-          </div>
+{/* В ТЕМНОЙ ПАНЕЛИ (читательская панель) */}
+<div className="mt-auto pt-8">
+  <button
+    onClick={toggleTheme}
+    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
+    style={{
+      background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
+      border: '2px solid #9333ea',
+      boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes starFloat {
+        0%, 100% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.4;
+        }
+        50% {
+          transform: translate(5px, -5px) scale(1.2);
+          opacity: 1;
+        }
+      }
+    `}} />
+    
+    {/* Звездные частицы */}
+    {[...Array(12)].map((_, i) => (
+      <div key={i} style={{
+        position: 'absolute',
+        width: '2px',
+        height: '2px',
+        background: i % 2 === 0 ? '#9333ea' : '#a855f7',
+        borderRadius: '50%',
+        boxShadow: `0 0 6px ${i % 2 === 0 ? '#9333ea' : '#a855f7'}`,
+        left: `${10 + i * 7}%`,
+        top: `${20 + (i % 3) * 25}%`,
+        animation: 'starFloat 3s ease-in-out infinite',
+        animationDelay: `${i * 0.2}s`,
+        pointerEvents: 'none'
+      }} />
+    ))}
+    
+    <div className="flex items-center justify-between relative z-10">
+      <div className="flex items-center gap-3">
+        {/* Иконка Луны */}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span style={{ color: '#c084fc', fontWeight: '600' }}>HD 189733</span>
+      </div>
+      
+      {/* Иконка Солнца (неактивная) */}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(192, 132, 252, 0.3)" strokeWidth="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </div>
+  </button>
+</div>
         </div>
       </div>
     )}
@@ -2912,59 +3321,116 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         </button>
       )}
 
-          <div className="mt-auto pt-8">
-            <button
-              onClick={toggleTheme}
-              className="w-full relative rounded-full p-1 transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-                boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)',
-                animation: 'pulse-theme 2s ease-in-out infinite',
-                height: '40px'
-              }}
-            >
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes pulse-theme {
-                  0%, 100% { opacity: 1; }
-                  50% { opacity: 0.7; }
-                }
-              `}} />
-              
-              <div 
-                className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  background: 'linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
-                  transform: 'translateX(240px)',
-                }}
-              >
-                <span style={{ fontSize: '16px', filter: 'grayscale(100%) brightness(2)', opacity: 0.6 }}>
-                  ☀️
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between px-4 h-full">
-                <span 
-                  className="text-xs font-bold transition-opacity duration-300"
-                  style={{ 
-                    color: 'rgba(255, 255, 255, 0.3)',
-                    textShadow: 'none'
-                  }}
-                >
-                </span>
-                <span 
-                  className="text-xs font-bold transition-opacity duration-300"
-                  style={{ 
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
-                  }}
-                >
-                </span>
-              </div>
-            </button>
-          </div>
+<div className="mt-auto pt-8">
+  <button
+    onClick={toggleTheme}
+    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
+    style={{
+      background: '#000000',
+      border: '2px solid #65635d',
+      boxShadow: '0 0 15px rgba(101, 99, 93, 0.6)'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes plasmaMove1 {
+        0%, 100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(30px, -20px) scale(1.3);
+        }
+        66% {
+          transform: translate(-25px, 15px) scale(0.9);
+        }
+      }
+      @keyframes plasmaMove2 {
+        0%, 100% {
+          transform: translate(0, 0) scale(1.2);
+        }
+        33% {
+          transform: translate(-35px, 25px) scale(0.8);
+        }
+        66% {
+          transform: translate(20px, -15px) scale(1.4);
+        }
+      }
+      @keyframes plasmaMove3 {
+        0%, 100% {
+          transform: translate(0, 0) scale(0.9);
+        }
+        33% {
+          transform: translate(15px, 30px) scale(1.5);
+        }
+        66% {
+          transform: translate(-30px, -20px) scale(1.1);
+        }
+      }
+    `}} />
+    
+    {/* Плазма крови - капли жидкости */}
+    <div style={{
+      position: 'absolute',
+      width: '120px',
+      height: '120px',
+      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(109, 5, 31, 0.5) 40%, rgba(114, 17, 49, 0.9) 70%, transparent 100%)',
+      borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
+      filter: 'blur(12px)',
+      animation: 'plasmaMove1 7s ease-in-out infinite',
+      pointerEvents: 'none',
+      top: '10%',
+      left: '20%'
+    }} />
+    
+    <div style={{
+      position: 'absolute',
+      width: '100px',
+      height: '100px',
+      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(126, 9, 44, 0.6) 50%, transparent 80%)',
+      borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+      filter: 'blur(10px)',
+      animation: 'plasmaMove2 9s ease-in-out infinite',
+      pointerEvents: 'none',
+      top: '40%',
+      right: '15%'
+    }} />
+    
+    <div style={{
+      position: 'absolute',
+      width: '90px',
+      height: '90px',
+      background: 'radial-gradient(circle, rgba(130, 15, 30, 0.65) 0%, rgba(90, 8, 20, 0.45) 45%, transparent 75%)',
+      borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+      filter: 'blur(14px)',
+      animation: 'plasmaMove3 8s ease-in-out infinite',
+      pointerEvents: 'none',
+      bottom: '15%',
+      left: '30%'
+    }} />
+    
+    <div className="flex items-center justify-between relative z-10">
+      {/* Иконка Луны (неактивная) */}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201, 198, 187, 0.3)" strokeWidth="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      
+      <div className="flex items-center gap-3">
+        <span style={{ color: '#c9c6bb', fontWeight: '600' }}>Лилия и Роза</span>
+        {/* Иконка Солнца */}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </div>
+    </div>
+  </button>
+</div>
         </div>
       </div>
     )}

@@ -3694,32 +3694,68 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
         {/* ТЕМА */}
         <div className="pt-4">
           <p className="text-white mb-2 text-sm shimmer-btn-text">Интерфейс сайта:</p>
-          <button
-            onClick={toggleTheme}
-            className="w-full relative rounded-full p-1 transition-all duration-300"
-            style={{
-              background: isDarkTheme 
-                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-              boxShadow: '0 0 20px rgba(147, 112, 219, 0.6)',
-              height: '40px'
-            }}
-          >
-            <div 
-              className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-                boxShadow: '0 2px 8px rgba(255, 255, 255, 0.5)',
-                transform: isDarkTheme ? 'translateX(0)' : 'translateX(240px)',
-              }}
-            >
-              <span style={{ fontSize: '16px', filter: 'grayscale(100%)' }}>
-                {isDarkTheme ? '🌙' : '☀️'}
-              </span>
-            </div>
-          </button>
+   <button
+    onClick={toggleTheme}
+    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
+    style={{
+      background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
+      border: '2px solid #9333ea',
+      boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes starFloat {
+        0%, 100% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.4;
+        }
+        50% {
+          transform: translate(5px, -5px) scale(1.2);
+          opacity: 1;
+        }
+      }
+    `}} />
+    
+    {/* Звездные частицы */}
+    {[...Array(12)].map((_, i) => (
+      <div key={i} style={{
+        position: 'absolute',
+        width: '2px',
+        height: '2px',
+        background: i % 2 === 0 ? '#9333ea' : '#a855f7',
+        borderRadius: '50%',
+        boxShadow: `0 0 6px ${i % 2 === 0 ? '#9333ea' : '#a855f7'}`,
+        left: `${10 + i * 7}%`,
+        top: `${20 + (i % 3) * 25}%`,
+        animation: 'starFloat 3s ease-in-out infinite',
+        animationDelay: `${i * 0.2}s`,
+        pointerEvents: 'none'
+      }} />
+    ))}
+    
+    <div className="flex items-center justify-between relative z-10">
+      <div className="flex items-center gap-3">
+        {/* Иконка Луны */}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span style={{ color: '#c084fc', fontWeight: '600' }}>HD 189733</span>
+      </div>
+      
+      {/* Иконка Солнца (неактивная) */}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(192, 132, 252, 0.3)" strokeWidth="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </div>
+  </button>
         </div>
       </div>
     </div>
@@ -3891,35 +3927,115 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
         <div className="pt-4">
           <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Интерфейс сайта:</p>
-          <button
-            onClick={toggleTheme}
-            className="w-full relative rounded-full p-1 transition-all duration-300"
-            style={{
-              background: isDarkTheme 
-                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : 'linear-gradient(135deg, #c9c6bb 0%, #65635d 100%)',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 112, 219, 0.6)' 
-                : '0 0 15px rgba(216, 197, 162, 0.4)',
-              height: '40px'
-            }}
-          >
-            <div 
-              className="absolute top-1 left-1 rounded-full transition-all duration-300 flex items-center justify-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                background: 'linear-gradient(135deg, #ffffff 0%, #939085 100%)',
-                boxShadow: '0 2px 8px rgba(255, 255, 255, 0.5)',
-                transform: isDarkTheme ? 'translateX(0)' : 'translateX(240px)',
-              }}
-            >
-              <span style={{ fontSize: '16px', filter: 'grayscale(100%)' }}>
-                {isDarkTheme ? '🌙' : '☀️'}
-              </span>
-            </div>
-          </button>
-        </div>
+  <button
+    onClick={toggleTheme}
+    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
+    style={{
+      background: '#000000',
+      border: '2px solid #65635d',
+      boxShadow: '0 0 15px rgba(101, 99, 93, 0.6)'
+    }}
+  >
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes plasmaMove1 {
+        0%, 100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(30px, -20px) scale(1.3);
+        }
+        66% {
+          transform: translate(-25px, 15px) scale(0.9);
+        }
+      }
+      @keyframes plasmaMove2 {
+        0%, 100% {
+          transform: translate(0, 0) scale(1.2);
+        }
+        33% {
+          transform: translate(-35px, 25px) scale(0.8);
+        }
+        66% {
+          transform: translate(20px, -15px) scale(1.4);
+        }
+      }
+      @keyframes plasmaMove3 {
+        0%, 100% {
+          transform: translate(0, 0) scale(0.9);
+        }
+        33% {
+          transform: translate(15px, 30px) scale(1.5);
+        }
+        66% {
+          transform: translate(-30px, -20px) scale(1.1);
+        }
+      }
+    `}} />
+    
+    {/* Плазма крови - капли жидкости */}
+    <div style={{
+      position: 'absolute',
+      width: '120px',
+      height: '120px',
+      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(109, 5, 31, 0.5) 40%, rgba(114, 17, 49, 0.9) 70%, transparent 100%)',
+      borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
+      filter: 'blur(12px)',
+      animation: 'plasmaMove1 7s ease-in-out infinite',
+      pointerEvents: 'none',
+      top: '10%',
+      left: '20%'
+    }} />
+    
+    <div style={{
+      position: 'absolute',
+      width: '100px',
+      height: '100px',
+      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(126, 9, 44, 0.6) 50%, transparent 80%)',
+      borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+      filter: 'blur(10px)',
+      animation: 'plasmaMove2 9s ease-in-out infinite',
+      pointerEvents: 'none',
+      top: '40%',
+      right: '15%'
+    }} />
+    
+    <div style={{
+      position: 'absolute',
+      width: '90px',
+      height: '90px',
+      background: 'radial-gradient(circle, rgba(130, 15, 30, 0.65) 0%, rgba(90, 8, 20, 0.45) 45%, transparent 75%)',
+      borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+      filter: 'blur(14px)',
+      animation: 'plasmaMove3 8s ease-in-out infinite',
+      pointerEvents: 'none',
+      bottom: '15%',
+      left: '30%'
+    }} />
+    
+    <div className="flex items-center justify-between relative z-10">
+      {/* Иконка Луны (неактивная) */}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201, 198, 187, 0.3)" strokeWidth="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      
+      <div className="flex items-center gap-3">
+        <span style={{ color: '#c9c6bb', fontWeight: '600' }}>Лилия и Роза</span>
+        {/* Иконка Солнца */}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </div>
+    </div>
+  </button>
+</div>
       </div>
     </div>
   </div>
