@@ -3782,6 +3782,7 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
   </div>
 )}
 
+
 {/* ФУТЕР С КОПИРАЙТОМ */}
 <footer className="mt-12 py-6 border-t" style={{
   borderColor: isDarkTheme ? 'rgba(147, 112, 219, 0.3)' : 'rgba(180, 154, 95, 0.3)'

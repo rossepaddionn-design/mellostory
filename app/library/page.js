@@ -450,7 +450,7 @@ style={{
   border: isDarkTheme ? '2px solid #a063cf94' : 'none',
   backdropFilter: isDarkTheme ? 'blur(10px)' : 'none',
   borderRadius: isDarkTheme ? '12px' : '0',
-  clipPath: !isDarkTheme ? 'polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%)' : 'none',
+ borderRadius: '8px',
   color: '#ffffff',
   textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
   padding: isMobile ? '0.25rem 0.5rem' : undefined,
@@ -483,7 +483,7 @@ style={{
       : 'rgba(0, 0, 0, 0.6)',
     border: isDarkTheme ? '1px solid #9370db' : 'none',
     borderRadius: isDarkTheme ? '12px' : '0',
-    clipPath: !isDarkTheme ? 'polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%)' : 'none',
+    borderRadius: '8px',
     color: '#ffffff',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
   }}
@@ -532,7 +532,7 @@ style={{
   )}
 </h1>
 
-<div className="flex gap-2 sm:gap-4 mb-8 justify-center flex-wrap">
+<div className="grid grid-cols-4 sm:flex gap-2 sm:gap-4 mb-8 justify-center">
   {[
     { key: 'novel', label: 'Романы' },
     { key: 'longfic', label: 'Лонгфики' },
@@ -551,18 +551,17 @@ style={{
         borderColor: isDarkTheme ? (category === cat.key ? '#ef01cb85' : '#a063cf94') : 'transparent',
         backdropFilter: isDarkTheme ? 'blur(10px)' : 'none',
         boxShadow: isDarkTheme && category === cat.key ? '0 0 25px rgba(239, 1, 203, 0.44)' : 'none',
-        borderRadius: isDarkTheme ? '12px' : '0',
-padding: isDarkTheme 
-  ? (isMobile ? '0.4rem 0.8rem' : 'clamp(0.5rem, 2vw, 0.8rem) clamp(1rem, 4vw, 2.5rem)')
-  : (isMobile ? '0.4rem 1rem' : '0.5rem 1.5rem'),
-fontSize: isDarkTheme 
-  ? (isMobile ? '0.5rem' : 'clamp(0.5rem, 1.5vw, 0.6875rem)')
-  : (isMobile ? '0.5rem' : '0.6rem'),
+        borderRadius: '8px',
+        padding: isDarkTheme 
+          ? (isMobile ? '0.4rem 0.5rem' : 'clamp(0.5rem, 2vw, 0.8rem) clamp(1rem, 4vw, 2.5rem)')
+          : (isMobile ? '0.4rem 0.6rem' : '0.5rem 1.5rem'),
+        fontSize: isDarkTheme 
+          ? (isMobile ? '0.5rem' : 'clamp(0.5rem, 1.5vw, 0.6875rem)')
+          : (isMobile ? '0.5rem' : '0.6rem'),
         fontWeight: '700',
         letterSpacing: isDarkTheme ? 'clamp(0.1rem, 0.5vw, 0.3rem)' : '0.2rem',
         textTransform: 'uppercase',
         cursor: 'pointer',
-        clipPath: !isDarkTheme ? 'polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%)' : 'none',
         color: '#ffffff',
         textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
       }}

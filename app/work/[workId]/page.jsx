@@ -1218,7 +1218,7 @@ return (
   }
 `}} />
 <h1 className="font-bold mb-3 sm:mb-4 break-words" style={{
-  fontSize: isDarkTheme ? 'clamp(2.75rem, 6vw, 5rem)' : 'clamp(2rem, 3vw, 3rem)',
+  fontSize: isDarkTheme ? 'clamp(2.75rem, 6vw, 5rem)' : 'clamp(1.55rem, 2vw, 2rem)',
   fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif",
   fontStyle: !isDarkTheme ? 'italic' : 'normal',
   color: 'transparent',
@@ -1246,8 +1246,8 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-        }}>Фандом: </span>
-        <span className="text-gray-200 text-xs sm:text-sm break-words">{work.fandom}</span>
+         }}>Фандом: </span>
+        <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.fandom}</span>
       </div>
     )}
     {work.pairing && (
@@ -1259,10 +1259,10 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-        }}>Пейринг: </span>
-        <span className="text-gray-200 text-xs sm:text-sm break-words">{work.pairing}</span>
-      </div>
-    )}
+}}>Пейринг: </span>
+    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.pairing}</span>
+  </div>
+)}
   </div>
 )}
 
@@ -1276,7 +1276,7 @@ return (
         : (isMobile ? '0.955rem' : '1rem'),
       fontWeight: 'bold'
     }}>Слоган: </span>
-    <span className="text-gray-200 text-xs sm:text-sm break-words italic">{work.slogan}</span>
+    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.slogan}</span>
   </div>
 )}
 
@@ -1290,11 +1290,11 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-    }}>Направление: </span>
-    <span className="text-xs sm:text-sm">
-      <GenreTag name={work.direction} />
-    </span>
-  </div>
+ }}>Направление: </span>
+  <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
+    {work.direction}
+  </span>
+</div>
   <div>
     <span className="text-sm sm:text-base" style={{ 
             color: isDarkTheme ? '#670eb1' : '#adaa9c',
@@ -1303,11 +1303,11 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-    }}>Рейтинг: </span>
-    <span className="text-xs sm:text-sm">
-      <GenreTag name={work.rating} />
-    </span>
-  </div>
+  }}>Рейтинг: </span>
+  <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
+    {work.rating}
+  </span>
+</div>
 {work.category && (
   <div>
     <span className="text-sm sm:text-base" style={{ 
@@ -1317,13 +1317,13 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-    }}>Категория: </span>
-    <span className="text-xs sm:text-sm">
-      <GenreTag name={{
+     }}>Категория: </span>
+    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
+      {{
         novel: 'Роман',
         longfic: 'Лонгфик',
         minific: 'Минифик'
-      }[work.category] || work.category} />
+      }[work.category] || work.category}
     </span>
   </div>
 )}
@@ -1336,12 +1336,12 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-    }}>Статус: </span>
-    <span className="text-xs sm:text-sm">
-      <GenreTag name={{
+     }}>Статус: </span>
+    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
+      {{
         completed: 'Завершён',
         ongoing: 'В процессе'
-      }[work.status] || work.status} />
+      }[work.status] || work.status}
     </span>
   </div>
 )}
@@ -1354,10 +1354,10 @@ return (
   ? (isMobile ? '1.30rem' : '1.35rem') 
   : (isMobile ? '0.955rem' : '1rem'),
           fontWeight: 'bold'
-      }}>Всего страниц: </span>
-      <span className="text-gray-200 text-xs sm:text-sm">{work.total_pages.toLocaleString()}</span>
-    </div>
-  )}
+ }}>Всего страниц: </span>
+    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>{work.total_pages.toLocaleString()}</span>
+  </div>
+)}
 
 {/* ЖАНРЫ */}
 {work.genres && (Array.isArray(work.genres) ? work.genres.length > 0 : work.genres.trim().length > 0) && (
@@ -2223,7 +2223,7 @@ return (
                     ))}
                   </div>
 
-{chapter.images.length > 1 && (
+{characterImagesArray.length > 1 && (
   <>
     <button
       onClick={() => scrollCharacterCarousel('left')}
