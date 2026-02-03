@@ -32,6 +32,9 @@ const [workForm, setWorkForm] = useState({
     total_pages: 0,
     fandom: '',
     pairing: '',
+    slogan: '',
+    character_profile_links: [],
+    character_profile_labels: [],
     description: '',
     author_note: '',
     disclaimer: '',
@@ -39,6 +42,7 @@ const [workForm, setWorkForm] = useState({
     tags: '',
     spoiler_tags: '',
     character_images: [],
+    character_image_descriptions: [],
     cover_image: null
   });
 
@@ -126,14 +130,18 @@ const workData = {
   total_pages: parseInt(workForm.total_pages) || 0,
   fandom: workForm.fandom ? workForm.fandom.trim() : null,
   pairing: workForm.pairing ? workForm.pairing.trim() : null,
+  slogan: workForm.slogan ? workForm.slogan.trim() : null,
+  character_profile_links: workForm.character_profile_links || [],
+  character_profile_labels: workForm.character_profile_labels || [],
   description: workForm.description.trim(),
   author_note: workForm.author_note.trim(),
   disclaimer: workForm.disclaimer.trim(),
   genres: workForm.genres ? workForm.genres.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
   tags: workForm.tags ? workForm.tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
   spoiler_tags: workForm.spoiler_tags ? workForm.spoiler_tags.replace(/,\s*$/, '').split(',').map(s => s.trim()).filter(s => s) : [],
-  character_images: workForm.character_images || [],
-  cover_url: workForm.cover_image,
+character_images: workForm.character_images || [],
+character_image_descriptions: workForm.character_image_descriptions || [],
+cover_url: workForm.cover_image,
   is_draft: isDraft
 };
 
@@ -423,12 +431,13 @@ const handleCoverUpload = async (e) => {
 
     files.forEach((file) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (target === 'work') {
-          setWorkForm(prev => ({
-            ...prev,
-            character_images: [...prev.character_images, event.target.result].slice(0, 40)
-          }));
+reader.onload = (event) => {
+  if (target === 'work') {
+    setWorkForm(prev => ({
+      ...prev,
+      character_images: [...prev.character_images, event.target.result].slice(0, 40),
+      character_image_descriptions: [...prev.character_image_descriptions, ''].slice(0, 40)
+    }));
         } else if (target === 'chapter') {
           setChapterForm(prev => ({
             ...prev,
@@ -441,11 +450,12 @@ const handleCoverUpload = async (e) => {
   };
 
   const removeImage = (index, target) => {
-    if (target === 'work') {
-      setWorkForm(prev => ({
-        ...prev,
-        character_images: prev.character_images.filter((_, i) => i !== index)
-      }));
+if (target === 'work') {
+  setWorkForm(prev => ({
+    ...prev,
+    character_images: prev.character_images.filter((_, i) => i !== index),
+    character_image_descriptions: prev.character_image_descriptions.filter((_, i) => i !== index)
+  }));
     } else if (target === 'chapter') {
       setChapterForm(prev => ({
         ...prev,
@@ -609,17 +619,21 @@ setWorkForm({
     category: workToEdit.category || 'minific',
     rating: workToEdit.rating,
     status: workToEdit.status,
-    total_pages: workToEdit.total_pages || 0,  // ← ДОБАВИЛИ!
+    total_pages: workToEdit.total_pages || 0,
     fandom: workToEdit.fandom || '',
     pairing: workToEdit.pairing || '',
+    slogan: workToEdit.slogan || '',
+    character_profile_links: workToEdit.character_profile_links || [],
+    character_profile_labels: workToEdit.character_profile_labels || [],
     description: workToEdit.description || '',
     author_note: workToEdit.author_note || '',
     disclaimer: workToEdit.disclaimer || '',
     genres: workToEdit.genres?.join(', ') || '',
     tags: workToEdit.tags?.join(', ') || '',
     spoiler_tags: workToEdit.spoiler_tags?.join(', ') || '',
-    character_images: workToEdit.character_images || [],
-    cover_image: workToEdit.cover_url || null
+character_images: workToEdit.character_images || [],
+character_image_descriptions: workToEdit.character_image_descriptions || [],
+cover_image: workToEdit.cover_url || null
   });
   
   setSelectedWork(workToEdit);
@@ -738,6 +752,60 @@ setWorkForm({
 
                       <input value={workForm.fandom} onChange={(e) => setWorkForm({...workForm, fandom: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Фандом" />
                       <input value={workForm.pairing} onChange={(e) => setWorkForm({...workForm, pairing: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Пейринг" />
+                      <input value={workForm.slogan} onChange={(e) => setWorkForm({...workForm, slogan: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600" placeholder="Слоган" />
+
+
+{/* ССЫЛКИ НА АНКЕТЫ ПЕРСОНАЖЕЙ */}
+<div className="border-2 border-gray-700 rounded-lg p-4">
+  <label className="block text-sm text-gray-400 mb-2">Ссылки на анкеты персонажей</label>
+  {workForm.character_profile_links.map((link, index) => (
+    <div key={index} className="space-y-2 mb-4 p-3 bg-gray-800 rounded-lg">
+      <div className="flex gap-2">
+        <input
+          value={link}
+          onChange={(e) => {
+            const newLinks = [...workForm.character_profile_links];
+            newLinks[index] = e.target.value;
+            setWorkForm({...workForm, character_profile_links: newLinks});
+          }}
+          className="flex-1 bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-red-600"
+          placeholder="https://example.com/character/name"
+        />
+        <button
+          onClick={() => {
+            const newLinks = workForm.character_profile_links.filter((_, i) => i !== index);
+            const newLabels = workForm.character_profile_labels.filter((_, i) => i !== index);
+            setWorkForm({...workForm, character_profile_links: newLinks, character_profile_labels: newLabels});
+          }}
+          className="bg-red-900 hover:bg-red-800 px-3 py-2 rounded"
+        >
+          <X size={16} />
+        </button>
+      </div>
+      <input
+        value={workForm.character_profile_labels[index] || ''}
+        onChange={(e) => {
+          const newLabels = [...workForm.character_profile_labels];
+          newLabels[index] = e.target.value;
+          setWorkForm({...workForm, character_profile_labels: newLabels});
+        }}
+        className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-xs sm:text-sm focus:outline-none focus:border-purple-600"
+        placeholder="Подпись (например: Алиса, главная героиня)"
+      />
+    </div>
+  ))}
+  <button
+    onClick={() => setWorkForm({
+      ...workForm, 
+      character_profile_links: [...workForm.character_profile_links, ''],
+      character_profile_labels: [...workForm.character_profile_labels, '']
+    })}
+    className="w-full bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded mt-2 text-sm"
+  >
+    + Добавить ссылку
+  </button>
+</div>
+
 <GenreAutocomplete 
   value={workForm.genres} 
   onChange={(val) => setWorkForm({...workForm, genres: val})} 
@@ -784,16 +852,34 @@ setWorkForm({
                     <input type="file" accept="image/*" multiple onChange={(e) => handleImageUpload(e, 'work')} className="hidden" />
                   </label>
 
-                  {workForm.character_images.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-                      {workForm.character_images.map((img, i) => (
-                        <div key={i} className="relative group">
-                          <img src={img} alt={`Character ${i + 1}`} className="w-full h-24 sm:h-32 object-cover rounded-lg border-2 border-gray-700" />
-                          <button onClick={() => removeImage(i, 'work')} className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 p-1 rounded-full opacity-0 group-hover:opacity-100 transition">
-                            <X size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      ))}
+{workForm.character_images.length > 0 && (
+  <div className="space-y-4">
+    {workForm.character_images.map((img, i) => (
+      <div key={i} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <div className="flex gap-4">
+          <div className="relative group flex-shrink-0">
+            <img src={img} alt={`Character ${i + 1}`} className="w-32 h-32 object-cover rounded-lg border-2 border-gray-700" />
+            <button onClick={() => removeImage(i, 'work')} className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 p-1 rounded-full opacity-0 group-hover:opacity-100 transition">
+              <X size={14} />
+            </button>
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm text-gray-400 mb-2">Описание (имя персонажа или текст):</label>
+            <input
+              type="text"
+              value={workForm.character_image_descriptions[i] || ''}
+              onChange={(e) => {
+                const newDescriptions = [...workForm.character_image_descriptions];
+                newDescriptions[i] = e.target.value;
+                setWorkForm({...workForm, character_image_descriptions: newDescriptions});
+              }}
+              placeholder="Например: Алиса, главная героиня"
+              className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-red-600"
+            />
+          </div>
+        </div>
+      </div>
+    ))}
                     </div>
                   )}
                 </div>

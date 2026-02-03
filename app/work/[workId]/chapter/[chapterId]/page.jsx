@@ -3581,124 +3581,203 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 )}
 
 
-{/* МОДАЛЬНОЕ ОКНО КАРТИНКИ */}
+{/* МОДАЛЬНОЕ ОКНО КАРТИНКИ - 3D ВАРИАНТ */}
 {selectedImage && (
   <div 
     className="fixed inset-0 z-[100] flex items-center justify-center p-4"
     style={{
       backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(15px)'
+      backdropFilter: 'blur(8px)',
+      perspective: '1000px'
     }}
     onClick={() => setSelectedImage(null)}
   >
-    <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-      <div style={{
-        borderRadius: '12px',
-        padding: isDarkTheme ? '0' : '3px',
-        background: isDarkTheme 
-          ? 'transparent' 
-          : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)'
-      }}>
+    <div className="relative w-full max-w-6xl h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+      
+      {/* ЛЕВОЕ ПРЕВЬЮ */}
+      {chapter.images.indexOf(selectedImage) > 0 && (
+        <div 
+          className="absolute left-0 cursor-pointer transition-all duration-300"
+          style={{
+            width: '250px',
+            height: '350px',
+            transform: 'rotateY(15deg) scale(0.85)',
+            filter: 'blur(2px)',
+            opacity: 0.5,
+            zIndex: 1
+          }}
+          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) - 1])}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8';
+            e.currentTarget.style.filter = 'blur(1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.5';
+            e.currentTarget.style.filter = 'blur(2px)';
+          }}
+        >
+          <img 
+            src={chapter.images[chapter.images.indexOf(selectedImage) - 1]} 
+            alt="Previous" 
+            className="w-full h-full object-cover rounded-lg"
+            style={{
+              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
+                : '0 0 20px rgba(101, 99, 93, 0.4)'
+            }}
+          />
+        </div>
+      )}
+
+      {/* ЦЕНТРАЛЬНОЕ ИЗОБРАЖЕНИЕ */}
+      <div className="relative z-10" style={{ maxWidth: '600px', maxHeight: '80vh' }}>
         <img 
           src={selectedImage} 
-          alt="Enlarged" 
+          alt="Main" 
           className="rounded-lg"
           style={{
-            border: isDarkTheme ? '2px solid #c9c6bb' : 'none',
-            boxShadow: isDarkTheme 
-              ? '0 0 30px rgba(118, 38, 181, 0.8)' 
-              : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            width: 'auto',
-            height: 'auto',
+            maxWidth: '100%',
+            maxHeight: '70vh',
             objectFit: 'contain',
-            display: 'block'
+            border: isDarkTheme ? '3px solid #ec4899' : '3px solid #c9c6bb',
+            boxShadow: isDarkTheme 
+              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 120px rgba(236, 72, 153, 0.4)' 
+              : '0 0 40px rgba(201, 198, 187, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.3)'
           }}
         />
+
+        {/* КНОПКА СОХРАНЕНИЯ */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSaveImage(selectedImage);
+            }}
+            className="px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
+            style={{
+              background: isDarkTheme 
+                ? (savedImages.includes(selectedImage) ? 'rgba(236, 72, 153, 0.9)' : 'rgba(147, 51, 234, 0.6)')
+                : (savedImages.includes(selectedImage) ? '#65635d' : 'rgba(201, 198, 187, 0.3)'),
+              border: `2px solid ${isDarkTheme 
+                ? (savedImages.includes(selectedImage) ? '#ec4899' : '#9333ea')
+                : (savedImages.includes(selectedImage) ? '#c9c6bb' : '#65635d')}`,
+              boxShadow: savedImages.includes(selectedImage)
+                ? (isDarkTheme 
+                    ? '0 0 25px rgba(236, 72, 153, 0.8)'
+                    : '0 0 15px rgba(101, 99, 93, 0.6)')
+                : 'none',
+              color: '#ffffff'
+            }}
+            onMouseEnter={(e) => {
+              if (!savedImages.includes(selectedImage)) {
+                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.9)' : 'rgba(101, 99, 93, 0.6)';
+                e.currentTarget.style.boxShadow = isDarkTheme 
+                  ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                  : '0 0 15px rgba(101, 99, 93, 0.6)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!savedImages.includes(selectedImage)) {
+                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.6)' : 'rgba(201, 198, 187, 0.3)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
+            }}
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
+              stroke="#ffffff"
+              strokeWidth="2"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
+          </button>
+        </div>
+
+        {/* ПРОГРЕСС-БАР */}
+        <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 w-64 h-1 rounded-full overflow-hidden" style={{
+          background: isDarkTheme ? 'rgba(147, 51, 234, 0.3)' : 'rgba(101, 99, 93, 0.3)'
+        }}>
+          <div 
+            className="h-full"
+            style={{
+              width: `${((chapter.images.indexOf(selectedImage) + 1) / chapter.images.length) * 100}%`,
+              background: isDarkTheme 
+                ? 'linear-gradient(90deg, #9333ea, #ec4899)'
+                : 'linear-gradient(90deg, #c9c6bb, #65635d)',
+              boxShadow: isDarkTheme ? '0 0 10px #ec4899' : '0 0 10px #c9c6bb',
+              transition: 'width 0.3s ease'
+            }}
+          />
+        </div>
       </div>
-      
-      {/* Кнопка закрытия */}
+
+      {/* ПРАВОЕ ПРЕВЬЮ */}
+      {chapter.images.indexOf(selectedImage) < chapter.images.length - 1 && (
+        <div 
+          className="absolute right-0 cursor-pointer transition-all duration-300"
+          style={{
+            width: '250px',
+            height: '350px',
+            transform: 'rotateY(-15deg) scale(0.85)',
+            filter: 'blur(2px)',
+            opacity: 0.5,
+            zIndex: 1
+          }}
+          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) + 1])}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8';
+            e.currentTarget.style.filter = 'blur(1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.5';
+            e.currentTarget.style.filter = 'blur(2px)';
+          }}
+        >
+          <img 
+            src={chapter.images[chapter.images.indexOf(selectedImage) + 1]} 
+            alt="Next" 
+            className="w-full h-full object-cover rounded-lg"
+            style={{
+              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
+                : '0 0 20px rgba(101, 99, 93, 0.4)'
+            }}
+          />
+        </div>
+      )}
+
+      {/* КНОПКА ЗАКРЫТИЯ */}
       <button
         onClick={() => setSelectedImage(null)}
-        className="absolute top-2 right-2 p-2 rounded-full transition-all"
+        className="absolute top-4 right-4 p-3 rounded-full transition-all z-20"
         style={{
-          backgroundColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
+          background: isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)',
+          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
           boxShadow: isDarkTheme 
-            ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-            : 'none'
+            ? '0 0 20px rgba(147, 51, 234, 0.6)'
+            : '0 0 15px rgba(101, 99, 93, 0.4)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#65635d';
           e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-            : 'none';
+            ? '0 0 30px rgba(147, 51, 234, 0.9)'
+            : '0 0 20px rgba(101, 99, 93, 0.6)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c9c6bb';
+          e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)';
           e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-            : 'none';
+            ? '0 0 20px rgba(147, 51, 234, 0.6)'
+            : '0 0 15px rgba(101, 99, 93, 0.4)';
         }}
       >
-        <X size={24} color="#000" />
+        <X size={24} color="#ffffff" />
       </button>
-      
-      {/* Стрелка влево */}
-      {chapter.images.indexOf(selectedImage) > 0 && (
-        <button
-          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) - 1])}
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
-          style={{
-            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-              : 'none';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none';
-          }}
-        >
-          <ChevronLeft size={24} color="#000" />
-        </button>
-      )}
-      
-      {/* Стрелка вправо */}
-      {chapter.images.indexOf(selectedImage) < chapter.images.length - 1 && (
-        <button
-          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) + 1])}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
-          style={{
-            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-              : 'none';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none';
-          }}
-        >
-          <ChevronRight size={24} color="#000" />
-        </button>
-      )}
     </div>
   </div>
 )}

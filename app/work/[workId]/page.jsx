@@ -1266,6 +1266,20 @@ return (
   </div>
 )}
 
+{work.slogan && (
+  <div>
+    <span className="text-sm sm:text-base" style={{ 
+      color: isDarkTheme ? '#670eb1' : '#adaa9c',
+      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+      fontSize: isDarkTheme 
+        ? (isMobile ? '1.30rem' : '1.35rem') 
+        : (isMobile ? '0.955rem' : '1rem'),
+      fontWeight: 'bold'
+    }}>Слоган: </span>
+    <span className="text-gray-200 text-xs sm:text-sm break-words italic">{work.slogan}</span>
+  </div>
+)}
+
 {/* ИНФОРМАЦИЯ О РАБОТЕ */}
 <div className="mb-1 space-y-0.5">
   <div>
@@ -1891,7 +1905,8 @@ return (
   </div>
 </div>
 
-            {/* ПРИМЕЧАНИЕ АВТОРА */}
+{/* ПРИМЕЧАНИЕ АВТОРА */}
+{work.author_note && work.author_note.trim() && (
 <div className="rounded-lg mb-4 sm:mb-6" style={{ position: 'relative' }}>
   {/* Верхняя линия */}
   <div style={{
@@ -1989,10 +2004,159 @@ return (
     }}>{work.author_note}</p>
   </div>
 </div>
+)}
+
+{work.character_profile_links && work.character_profile_links.length > 0 && (
+  <div className="mb-4 sm:mb-6">
+    <h3 className="font-bold mb-3 sm:mb-4" style={{
+      fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
+      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+      color: 'transparent',
+      backgroundImage: isDarkTheme 
+        ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
+        : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
+      backgroundSize: '200% auto',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
+    }}>
+      Анкеты персонажей
+    </h3>
+    
+    <div className="relative">
+      <div 
+        ref={carouselRef}
+        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-10"
+        style={{ scrollbarWidth: 'thin' }}
+      >
+        {work.character_profile_links.map((link, index) => (
+          <div key={index} className="flex flex-col items-center gap-2 snap-start flex-shrink-0">
+            <Link href={link} target="_blank" rel="noopener noreferrer">
+              <div 
+                className="flex items-center justify-center w-16 h-16 rounded-full text-2xl cursor-pointer transition-all duration-300"
+                style={{
+                  background: isDarkTheme 
+                    ? 'radial-gradient(circle at center, #1a0033 0%, #000000 100%)'
+                    : 'rgba(255, 255, 255, 0.1)',
+                  border: isDarkTheme ? '2px solid #9333ea' : 'none',
+                  color: '#FFFFFF',
+                  boxShadow: isDarkTheme 
+                    ? '0 0 30px rgba(147, 51, 234, 0.9), inset 0 0 20px rgba(147, 51, 234, 0.4)' 
+                    : '0 4px 15px rgba(0,0,0,0.2)',
+                  backdropFilter: 'blur(10px)',
+                  clipPath: !isDarkTheme ? 'polygon(5% 0%, 15% 2%, 30% 0%, 45% 3%, 60% 0%, 75% 2%, 90% 0%, 100% 5%, 98% 20%, 100% 35%, 97% 50%, 100% 65%, 98% 80%, 100% 95%, 95% 100%, 85% 98%, 70% 100%, 55% 97%, 40% 100%, 25% 98%, 10% 100%, 0% 95%, 2% 80%, 0% 65%, 3% 50%, 0% 35%, 2% 20%, 0% 5%)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (isDarkTheme) {
+                    e.currentTarget.style.boxShadow = '0 0 40px rgba(147, 51, 234, 1), inset 0 0 30px rgba(147, 51, 234, 0.6)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  } else {
+                    e.currentTarget.style.boxShadow = '0 6px 25px rgba(0,0,0,0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isDarkTheme) {
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(147, 51, 234, 0.9), inset 0 0 20px rgba(147, 51, 234, 0.4)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  } else {
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+                  }
+                }}
+              >
+                {isDarkTheme ? (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                ) : '⚜'}
+              </div>
+            </Link>
+            {work.character_profile_labels && work.character_profile_labels[index] && (
+              <span className="text-xs text-center max-w-[80px] break-words" style={{
+                color: isDarkTheme ? '#c084fc' : '#c9c6bb',
+                fontStyle: 'italic'
+              }}>
+                {work.character_profile_labels[index]}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* СТРЕЛКИ НАВИГАЦИИ */}
+      {work.character_profile_links.length > 3 && (
+        <>
+          <button
+            onClick={() => scrollCharacterCarousel('left')}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: isDarkTheme ? '#9333ea' : '#65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                : '0 0 15px rgba(101, 99, 93, 0.6)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = isDarkTheme ? '#a855f7' : '#c9c6bb';
+              e.currentTarget.style.boxShadow = isDarkTheme 
+                ? '0 0 30px rgba(147, 51, 234, 1)'
+                : '0 0 20px rgba(101, 99, 93, 0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = isDarkTheme ? '#9333ea' : '#65635d';
+              e.currentTarget.style.boxShadow = isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                : '0 0 15px rgba(101, 99, 93, 0.6)';
+            }}
+          >
+            <ChevronLeft size={20} color="#ffffff" />
+          </button>
+          <button
+            onClick={() => scrollCharacterCarousel('right')}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
+            style={{
+              backgroundColor: isDarkTheme ? '#9333ea' : '#65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                : '0 0 15px rgba(101, 99, 93, 0.6)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = isDarkTheme ? '#a855f7' : '#c9c6bb';
+              e.currentTarget.style.boxShadow = isDarkTheme 
+                ? '0 0 30px rgba(147, 51, 234, 1)'
+                : '0 0 20px rgba(101, 99, 93, 0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = isDarkTheme ? '#9333ea' : '#65635d';
+              e.currentTarget.style.boxShadow = isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                : '0 0 15px rgba(101, 99, 93, 0.6)';
+            }}
+          >
+            <ChevronRight size={20} color="#ffffff" />
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
             {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
             {characterImagesArray.length > 0 && (
               <div className="mb-4 sm:mb-6">
-<h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-3 sm:mb-4">
+<h3 className="font-bold mb-3 sm:mb-4" style={{
+  fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
+  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+  color: 'transparent',
+  backgroundImage: isDarkTheme 
+    ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
+    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
+  backgroundSize: '200% auto',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
+}}>
   {t.characterImages}
 </h3>
                 
@@ -2059,58 +2223,59 @@ return (
                     ))}
                   </div>
 
-                  {characterImagesArray.length > 1 && (
-                    <>
- <button
-  onClick={() => scrollCharacterCarousel('left')}
-  className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-  style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#313130',
-    boxShadow: isDarkTheme 
-      ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-      : 'none'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#313130';
-    e.currentTarget.style.boxShadow = isDarkTheme 
-      ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-      : 'none';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#313130';
-    e.currentTarget.style.boxShadow = isDarkTheme 
-      ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-      : 'none';
-  }}
->
-  <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
-</button>
-<button
-  onClick={() => scrollCharacterCarousel('right')}
-  className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-  style={{
-    backgroundColor: isDarkTheme ? '#7626b5' : '#313130',
-    boxShadow: isDarkTheme 
-      ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-      : 'none'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#313130';
-    e.currentTarget.style.boxShadow = isDarkTheme 
-      ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-      : 'none';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#313130';
-    e.currentTarget.style.boxShadow = isDarkTheme 
-      ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-      : 'none';
-  }}
->
-  <ChevronRight size={18} className="sm:w-5 sm:h-5" />
-</button>
-                    </>
-                  )}
+{chapter.images.length > 1 && (
+  <>
+    <button
+      onClick={() => scrollCharacterCarousel('left')}
+      className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10 hidden sm:flex"
+      style={{
+        backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
+        boxShadow: isDarkTheme 
+          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+          : 'none'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+        e.currentTarget.style.boxShadow = isDarkTheme 
+          ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
+          : 'none';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
+        e.currentTarget.style.boxShadow = isDarkTheme 
+          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+          : 'none';
+      }}
+    >
+      <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+    </button>
+
+    <button
+      onClick={() => scrollCharacterCarousel('right')}
+      className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10 hidden sm:flex"
+      style={{
+        backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
+        boxShadow: isDarkTheme 
+          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+          : 'none'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+        e.currentTarget.style.boxShadow = isDarkTheme 
+          ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
+          : 'none';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
+        e.currentTarget.style.boxShadow = isDarkTheme 
+          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
+          : 'none';
+      }}
+    >
+      <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+    </button>
+  </>
+)}
                 </div>
               </div>
             )}
@@ -3315,121 +3480,216 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 )}
 
 
-{/* МОДАЛЬНОЕ ОКНО КАРТИНКИ */}
+{/* МОДАЛЬНОЕ ОКНО КАРТИНКИ - 3D ВАРИАНТ */}
 {selectedImage && (
   <div 
     className="fixed inset-0 z-[100] flex items-center justify-center p-4"
     style={{
       backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(8px)'
+      backdropFilter: 'blur(8px)',
+      perspective: '1000px'
     }}
     onClick={() => setSelectedImage(null)}
   >
-    <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-      <div style={{
-        borderRadius: '12px',
-        padding: isDarkTheme ? '0' : '3px',
-        background: isDarkTheme 
-          ? 'transparent' 
-          : 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)'
-      }}>
+    <div className="relative w-full max-w-6xl h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+      
+      {/* ЛЕВОЕ ПРЕВЬЮ */}
+      {characterImagesArray.indexOf(selectedImage) > 0 && (
+        <div 
+          className="absolute left-0 cursor-pointer transition-all duration-300"
+          style={{
+            width: '250px',
+            height: '350px',
+            transform: 'rotateY(15deg) scale(0.85)',
+            filter: 'blur(2px)',
+            opacity: 0.5,
+            zIndex: 1
+          }}
+          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1])}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8';
+            e.currentTarget.style.filter = 'blur(1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.5';
+            e.currentTarget.style.filter = 'blur(2px)';
+          }}
+        >
+          <img 
+            src={characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1]} 
+            alt="Previous" 
+            className="w-full h-full object-cover rounded-lg"
+            style={{
+              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
+                : '0 0 20px rgba(101, 99, 93, 0.4)'
+            }}
+          />
+        </div>
+      )}
+
+      {/* ЦЕНТРАЛЬНОЕ ИЗОБРАЖЕНИЕ */}
+      <div className="relative z-10" style={{ maxWidth: '600px', maxHeight: '80vh' }}>
         <img 
           src={selectedImage} 
-          alt="Enlarged" 
+          alt="Main" 
           className="rounded-lg"
           style={{
-            border: isDarkTheme ? '2px solid #c9c6bb' : 'none',
-            boxShadow: isDarkTheme 
-              ? '0 0 30px rgba(118, 38, 181, 0.8)' 
-              : 'inset 0 0 50px rgba(0, 0, 0, 0.6)',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            width: 'auto',
-            height: 'auto',
+            maxWidth: '100%',
+            maxHeight: '70vh',
             objectFit: 'contain',
-            display: 'block'
+            border: isDarkTheme ? '3px solid #ec4899' : '3px solid #c9c6bb',
+            boxShadow: isDarkTheme 
+              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 120px rgba(236, 72, 153, 0.4)' 
+              : '0 0 40px rgba(201, 198, 187, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.3)'
           }}
         />
+        
+        {/* ОПИСАНИЕ ПОД КАРТИНКОЙ */}
+        {work.character_image_descriptions && work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)] && (
+          <div className="mt-4 text-center px-4">
+            <p className="text-lg font-semibold" style={{
+              color: isDarkTheme ? '#c084fc' : '#c9c6bb',
+             textShadow: isDarkTheme ? '0 0 10px rgba(192, 132, 252, 0.6)' : 'none',
+      fontStyle: 'italic'
+    }}>
+              {work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)]}
+            </p>
+          </div>
+        )}
+
+        {/* КНОПКА СОХРАНЕНИЯ */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSaveImage(selectedImage);
+            }}
+            className="px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
+            style={{
+              background: isDarkTheme 
+                ? (savedImages.includes(selectedImage) ? 'rgba(236, 72, 153, 0.9)' : 'rgba(147, 51, 234, 0.6)')
+                : (savedImages.includes(selectedImage) ? '#65635d' : 'rgba(201, 198, 187, 0.3)'),
+              border: `2px solid ${isDarkTheme 
+                ? (savedImages.includes(selectedImage) ? '#ec4899' : '#9333ea')
+                : (savedImages.includes(selectedImage) ? '#c9c6bb' : '#65635d')}`,
+              boxShadow: savedImages.includes(selectedImage)
+                ? (isDarkTheme 
+                    ? '0 0 25px rgba(236, 72, 153, 0.8)'
+                    : '0 0 15px rgba(101, 99, 93, 0.6)')
+                : 'none',
+              color: '#ffffff'
+            }}
+            onMouseEnter={(e) => {
+              if (!savedImages.includes(selectedImage)) {
+                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.9)' : 'rgba(101, 99, 93, 0.6)';
+                e.currentTarget.style.boxShadow = isDarkTheme 
+                  ? '0 0 20px rgba(147, 51, 234, 0.8)'
+                  : '0 0 15px rgba(101, 99, 93, 0.6)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!savedImages.includes(selectedImage)) {
+                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.6)' : 'rgba(201, 198, 187, 0.3)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
+            }}
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
+              stroke="#ffffff"
+              strokeWidth="2"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
+          </button>
+        </div>
+
+        {/* ПРОГРЕСС-БАР */}
+        <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 w-64 h-1 rounded-full overflow-hidden" style={{
+          background: isDarkTheme ? 'rgba(147, 51, 234, 0.3)' : 'rgba(101, 99, 93, 0.3)'
+        }}>
+          <div 
+            className="h-full"
+            style={{
+              width: `${((characterImagesArray.indexOf(selectedImage) + 1) / characterImagesArray.length) * 100}%`,
+              background: isDarkTheme 
+                ? 'linear-gradient(90deg, #9333ea, #ec4899)'
+                : 'linear-gradient(90deg, #c9c6bb, #65635d)',
+              boxShadow: isDarkTheme ? '0 0 10px #ec4899' : '0 0 10px #c9c6bb',
+              transition: 'width 0.3s ease'
+            }}
+          />
+        </div>
       </div>
-      
+
+      {/* ПРАВОЕ ПРЕВЬЮ */}
+      {characterImagesArray.indexOf(selectedImage) < characterImagesArray.length - 1 && (
+        <div 
+          className="absolute right-0 cursor-pointer transition-all duration-300"
+          style={{
+            width: '250px',
+            height: '350px',
+            transform: 'rotateY(-15deg) scale(0.85)',
+            filter: 'blur(2px)',
+            opacity: 0.5,
+            zIndex: 1
+          }}
+          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1])}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8';
+            e.currentTarget.style.filter = 'blur(1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.5';
+            e.currentTarget.style.filter = 'blur(2px)';
+          }}
+        >
+          <img 
+            src={characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1]} 
+            alt="Next" 
+            className="w-full h-full object-cover rounded-lg"
+            style={{
+              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
+              boxShadow: isDarkTheme 
+                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
+                : '0 0 20px rgba(101, 99, 93, 0.4)'
+            }}
+          />
+        </div>
+      )}
+
+      {/* КНОПКА ЗАКРЫТИЯ */}
       <button
         onClick={() => setSelectedImage(null)}
-        className="absolute top-2 right-2 p-2 rounded-full transition-all"
+        className="absolute top-4 right-4 p-3 rounded-full transition-all z-20"
         style={{
-          backgroundColor: isDarkTheme ? '#7626b5' : '#c9c6bb',
+          background: isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)',
+          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
           boxShadow: isDarkTheme 
-            ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-            : 'none'
+            ? '0 0 20px rgba(147, 51, 234, 0.6)'
+            : '0 0 15px rgba(101, 99, 93, 0.4)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
+          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#65635d';
           e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-            : 'none';
+            ? '0 0 30px rgba(147, 51, 234, 0.9)'
+            : '0 0 20px rgba(101, 99, 93, 0.6)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#c9c6bb';
+          e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)';
           e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-            : 'none';
+            ? '0 0 20px rgba(147, 51, 234, 0.6)'
+            : '0 0 15px rgba(101, 99, 93, 0.4)';
         }}
       >
-        <X size={24} color="#000" />
+        <X size={24} color="#ffffff" />
       </button>
-      
-      {characterImagesArray.indexOf(selectedImage) > 0 && (
-        <button
-          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1])}
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
-          style={{
-            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-              : 'none';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none';
-          }}
-        >
-          <ChevronLeft size={24} color="#000" />
-        </button>
-      )}
-      
-      {characterImagesArray.indexOf(selectedImage) < characterImagesArray.length - 1 && (
-        <button
-          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1])}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
-          style={{
-            backgroundColor: isDarkTheme ? '#916eb4' : '#c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#65635d';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-              : 'none';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isDarkTheme ? '#916eb4' : '#c9c6bb';
-            e.currentTarget.style.boxShadow = isDarkTheme 
-              ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-              : 'none';
-          }}
-        >
-          <ChevronRight size={24} color="#000" />
-        </button>
-      )}
     </div>
   </div>
 )}
