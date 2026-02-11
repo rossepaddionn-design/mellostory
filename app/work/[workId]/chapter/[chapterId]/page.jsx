@@ -553,8 +553,9 @@ span.style.cssText = 'background: #3fcaaf; color: #000000; padding: 2px 4px; bor
 
 const toggleTheme = () => {
   const newTheme = !isDarkTheme;
-  setIsDarkTheme(newTheme);
   localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  setIsDarkTheme(newTheme);
+  setShowManagementModal(false);
 };
 
 const downloadTrack = async (audioUrl, audioName, index) => {

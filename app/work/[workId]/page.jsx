@@ -182,8 +182,9 @@ const showConfirm = (message, action = null) => {
 
 const toggleTheme = () => {
   const newTheme = !isDarkTheme;
-  setIsDarkTheme(newTheme);
   localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  setIsDarkTheme(newTheme);
+  setShowManagementModal(false);
 };
 
 const loadSiteUpdates = async () => {
@@ -1363,14 +1364,14 @@ return (
 {work.genres && (Array.isArray(work.genres) ? work.genres.length > 0 : work.genres.trim().length > 0) && (
   <div>
     <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
+      color: isDarkTheme ? '#670eb1' : '#adaa9c',
+      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+      fontSize: isDarkTheme 
+        ? (isMobile ? '1.30rem' : '1.35rem') 
+        : (isMobile ? '0.955rem' : '1rem'),
+      fontWeight: 'bold'
     }}>{t.genres}: </span>
-    <span className="text-xs sm:text-sm">
+    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>
       {(Array.isArray(work.genres) ? work.genres : work.genres.split(',')).map((genre, i, arr) => {
         const trimmedGenre = genre.trim();
         if (!trimmedGenre) return null;
@@ -1389,14 +1390,14 @@ return (
 {work.tags && (Array.isArray(work.tags) ? work.tags.length > 0 : work.tags.trim().length > 0) && (
   <div>
     <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
+      color: isDarkTheme ? '#670eb1' : '#adaa9c',
+      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+      fontSize: isDarkTheme 
+        ? (isMobile ? '1.30rem' : '1.35rem') 
+        : (isMobile ? '0.955rem' : '1rem'),
+      fontWeight: 'bold'
     }}>{t.tags}: </span>
-    <span className="text-xs sm:text-sm">
+    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>
       {(Array.isArray(work.tags) ? work.tags : work.tags.split(',')).map((tag, i, arr) => {
         const trimmedTag = tag.trim();
         if (!trimmedTag) return null;
@@ -1416,43 +1417,43 @@ return (
 {spoilerTagsArray.length > 0 && (
   <div className="mb-1">
     <style dangerouslySetInnerHTML={{__html: `
-  @keyframes arrowBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
-  }
-  .arrow-animated {
-    animation: arrowBounce 1.5s ease-in-out infinite;
-  }
+      @keyframes arrowBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(5px); }
+      }
+      .arrow-animated {
+        animation: arrowBounce 1.5s ease-in-out infinite;
+      }
     `}} />
-<button
-  onClick={() => setShowSpoilers(!showSpoilers)}
-  className="flex items-center gap-2 transition text-left mb-1"
-  style={{
-    backgroundColor: 'transparent',
-    padding: 0
-  }}
->
-  <span className="text-sm sm:text-base" style={{ 
-            color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-  }}>
-    {t.spoilerTags}:
-  </span>
-  <div className={!showSpoilers ? 'arrow-animated' : ''} style={{
-    transform: showSpoilers ? 'rotate(180deg)' : 'rotate(0deg)',
-    transition: 'transform 0.3s ease',
-    color: isDarkTheme ? '#670eb1' : '#adaa9c'
-  }}>
-    <ChevronDown size={18} className="sm:w-5 sm:h-5" />
-  </div>
-</button>
+    <button
+      onClick={() => setShowSpoilers(!showSpoilers)}
+      className="flex items-center gap-2 transition text-left mb-1"
+      style={{
+        backgroundColor: 'transparent',
+        padding: 0
+      }}
+    >
+      <span className="text-sm sm:text-base" style={{ 
+        color: isDarkTheme ? '#670eb1' : '#adaa9c',
+        fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+        fontSize: isDarkTheme 
+          ? (isMobile ? '1.30rem' : '1.35rem') 
+          : (isMobile ? '0.955rem' : '1rem'),
+        fontWeight: 'bold'
+      }}>
+        {t.spoilerTags}:
+      </span>
+      <div className={!showSpoilers ? 'arrow-animated' : ''} style={{
+        transform: showSpoilers ? 'rotate(180deg)' : 'rotate(0deg)',
+        transition: 'transform 0.3s ease',
+        color: isDarkTheme ? '#670eb1' : '#adaa9c'
+      }}>
+        <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+      </div>
+    </button>
     
-{showSpoilers && (
-  <div className="text-xs sm:text-sm whitespace-pre-wrap" style={{
+    {showSpoilers && (
+      <div className="text-xs sm:text-sm whitespace-pre-wrap break-words" style={{
         backgroundColor: 'transparent',
         color: '#ffffff'
       }}>
@@ -1474,38 +1475,36 @@ return (
 {/* ДИСКЛЕЙМЕР */}
 {work.disclaimer && work.disclaimer.trim() && (
   <div className="mb-1">
-<button
-  onClick={() => setShowDisclaimer(!showDisclaimer)}
-  className="flex items-center gap-2 transition text-left mb-1"
-  style={{
-    backgroundColor: 'transparent',
-    padding: 0
-  }}
->
-  <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-  }}>Дисклеймер:</span>
-  <div className={!showDisclaimer ? 'arrow-animated' : ''} style={{
-    transform: showDisclaimer ? 'rotate(180deg)' : 'rotate(0deg)',
-    transition: 'transform 0.3s ease',
-    color: isDarkTheme ? '#670eb1' : '#adaa9c'
-  }}>
-    <ChevronDown size={18} className="sm:w-5 sm:h-5" />
-  </div>
-</button>
+    <button
+      onClick={() => setShowDisclaimer(!showDisclaimer)}
+      className="flex items-center gap-2 transition text-left mb-1"
+      style={{
+        backgroundColor: 'transparent',
+        padding: 0
+      }}
+    >
+      <span className="text-sm sm:text-base" style={{ 
+        color: isDarkTheme ? '#670eb1' : '#adaa9c',
+        fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
+        fontSize: isDarkTheme 
+          ? (isMobile ? '1.30rem' : '1.35rem') 
+          : (isMobile ? '0.955rem' : '1rem'),
+        fontWeight: 'bold'
+      }}>Дисклеймер:</span>
+      <div className={!showDisclaimer ? 'arrow-animated' : ''} style={{
+        transform: showDisclaimer ? 'rotate(180deg)' : 'rotate(0deg)',
+        transition: 'transform 0.3s ease',
+        color: isDarkTheme ? '#670eb1' : '#adaa9c'
+      }}>
+        <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+      </div>
+    </button>
     
-{showDisclaimer && (
-  <div className="whitespace-pre-wrap text-xs sm:text-sm"
-        style={{
-          backgroundColor: 'transparent',
-          color: '#ffffff'
-        }}
-      >
+    {showDisclaimer && (
+      <div className="whitespace-pre-wrap text-xs sm:text-sm break-words" style={{
+        backgroundColor: 'transparent',
+        color: '#ffffff'
+      }}>
         {work.disclaimer}
       </div>
     )}
