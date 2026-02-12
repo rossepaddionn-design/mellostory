@@ -1366,12 +1366,13 @@ return (
     <span className="text-sm sm:text-base" style={{ 
       color: isDarkTheme ? '#670eb1' : '#adaa9c',
       fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      fontSize: isDarkTheme 
-        ? (isMobile ? '1.30rem' : '1.35rem') 
-        : (isMobile ? '0.955rem' : '1rem'),
+      fontSize: '0.875rem', // ← ФИКСИРОВАННЫЙ РАЗМЕР 14px
       fontWeight: 'bold'
     }}>{t.genres}: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>
+    <span className="text-xs sm:text-sm break-words" style={{ 
+      color: '#ffffff',
+      fontSize: '0.875rem' // ← ФИКСИРОВАННЫЙ РАЗМЕР 14px
+    }}>
       {(Array.isArray(work.genres) ? work.genres : work.genres.split(',')).map((genre, i, arr) => {
         const trimmedGenre = genre.trim();
         if (!trimmedGenre) return null;
@@ -1392,12 +1393,13 @@ return (
     <span className="text-sm sm:text-base" style={{ 
       color: isDarkTheme ? '#670eb1' : '#adaa9c',
       fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      fontSize: isDarkTheme 
-        ? (isMobile ? '1.30rem' : '1.35rem') 
-        : (isMobile ? '0.955rem' : '1rem'),
+      fontSize: '0.875rem', // ← ФИКСИРОВАННЫЙ РАЗМЕР
       fontWeight: 'bold'
     }}>{t.tags}: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>
+    <span className="text-xs sm:text-sm break-words" style={{ 
+      color: '#ffffff',
+      fontSize: '0.875rem' // ← ФИКСИРОВАННЫЙ РАЗМЕР
+    }}>
       {(Array.isArray(work.tags) ? work.tags : work.tags.split(',')).map((tag, i, arr) => {
         const trimmedTag = tag.trim();
         if (!trimmedTag) return null;
@@ -1455,7 +1457,8 @@ return (
     {showSpoilers && (
       <div className="text-xs sm:text-sm whitespace-pre-wrap break-words" style={{
         backgroundColor: 'transparent',
-        color: '#ffffff'
+    color: '#ffffff',
+    fontSize: '0.875rem'
       }}>
         {spoilerTagsArray.map((spoiler, i, arr) => {
           const trimmedSpoiler = spoiler.trim();
@@ -1503,7 +1506,8 @@ return (
     {showDisclaimer && (
       <div className="whitespace-pre-wrap text-xs sm:text-sm break-words" style={{
         backgroundColor: 'transparent',
-        color: '#ffffff'
+    color: '#ffffff',
+    fontSize: '0.875rem'
       }}>
         {work.disclaimer}
       </div>
