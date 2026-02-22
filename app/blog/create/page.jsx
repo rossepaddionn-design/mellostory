@@ -76,46 +76,47 @@ const fonts = [
     }
   };
 
-  const uploadImage = async (file) => {
-    const fileName = `${Date.now()}_${file.name}`;
-    const { data, error } = await supabaseBlog.storage
-      .from('blog_media')
-      .upload(fileName, file);
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
 
-    if (error) {
-      alert('Ошибка загрузки: ' + error.message);
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    console.log('Upload response:', data); // смотри в консоли браузера F12
+
+    if (data.error) {
+      alert('Ошибка загрузки: ' + data.error);
       return null;
     }
+    return data.url;
+  } catch (err) {
+    alert('Fetch ошибка: ' + err.message);
+    return null;
+  }
+};
 
-    const { data: urlData } = supabaseBlog.storage
-      .from('blog_media')
-      .getPublicUrl(fileName);
+const createPost = async () => {
+  if (!postForm.title || !postForm.content) {
+    alert('Заполните название и текст!');
+    return;
+  }
 
-    return urlData.publicUrl;
-  };
+  const res = await fetch('/api/create-post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: postForm.title,
+      content: postForm.content,
+      desktop_settings: postForm.desktop,
+      mobile_settings: postForm.mobile
+    })
+  });
 
-  const createPost = async () => {
-    if (!postForm.title || !postForm.content) {
-      alert('Заполните название и текст!');
-      return;
-    }
-
-    const { error } = await supabaseBlog
-      .from('blog_posts')
-      .insert({
-        title: postForm.title,
-        content: postForm.content,
-        desktop_settings: postForm.desktop,
-        mobile_settings: postForm.mobile
-      });
-
-    if (error) {
-      alert('Ошибка: ' + error.message);
-    } else {
-      alert('Пост создан!');
-      router.push('/blog');
-    }
-  };
+  const data = await res.json();
+  if (data.error) alert('Ошибка: ' + data.error);
+  else { alert('Пост создан!'); router.push('/blog'); }
+};
 
 const createCharacter = async () => {
   if (!characterForm.name || !characterForm.main_image_url) {
@@ -123,7 +124,6 @@ const createCharacter = async () => {
     return;
   }
 
-  // Преобразуем пустые строки в null для числовых полей
   const dataToInsert = {
     ...characterForm,
     age: characterForm.age ? parseInt(characterForm.age) : null,
@@ -131,12 +131,16 @@ const createCharacter = async () => {
     weight: characterForm.weight || null,
   };
 
-  const { error } = await supabaseBlog
-    .from('character_profiles')
-    .insert(dataToInsert);
+  const res = await fetch('/api/character', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dataToInsert)
+  });
 
-  if (error) {
-    alert('Ошибка: ' + error.message);
+  const data = await res.json();
+
+  if (data.error) {
+    alert('Ошибка: ' + data.error);
   } else {
     alert('Персонаж добавлен!');
     router.push('/blog');
@@ -151,13 +155,9 @@ const createCharacter = async () => {
   return (
     <div className="min-h-screen text-white relative">
       {/* ФОН */}
-      <div className="fixed inset-0 -z-10" style={{
-        backgroundImage: isDarkTheme 
-          ? 'url(/images/darknesas1.webp)' 
-          : 'url(/images/theme.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }} />
+<div className="fixed inset-0 -z-10" style={{
+  background: '#000000'
+}} />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button 
@@ -177,30 +177,38 @@ const createCharacter = async () => {
 
         {/* ВЫБОР ТИПА */}
         <div className="flex gap-4 mb-8">
-          <button
-            onClick={() => setContentType('post')}
-            className="px-6 py-3 rounded-lg font-bold"
-            style={{
-              background: contentType === 'post' 
-                ? isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb'
-                : 'rgba(147, 112, 219, 0.3)',
-              color: contentType === 'post' ? '#ffffff' : '#9370db'
-            }}
-          >
-            Пост
-          </button>
-          <button
-            onClick={() => setContentType('character')}
-            className="px-6 py-3 rounded-lg font-bold"
-            style={{
-              background: contentType === 'character' 
-                ? isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb'
-                : 'rgba(147, 112, 219, 0.3)',
-              color: contentType === 'character' ? '#ffffff' : '#9370db'
-            }}
-          >
-            Персонаж
-          </button>
+<button
+  onClick={() => setContentType('post')}
+  className="px-6 py-3 font-bold"
+  style={{
+    background: 'rgba(111, 53, 156, 0.4)',
+    border: '2px solid',
+    borderColor: contentType === 'post' ? '#ef01cb85' : '#a063cf94',
+    backdropFilter: 'blur(10px)',
+    boxShadow: contentType === 'post' ? '0 0 25px rgba(239, 1, 203, 0.44)' : 'none',
+    borderRadius: '12px',
+    color: '#ffffff',
+    transition: 'all 0.3s ease'
+  }}
+>
+  Пост
+</button>
+     <button
+  onClick={() => setContentType('character')}
+  className="px-6 py-3 font-bold"
+  style={{
+    background: 'rgba(111, 53, 156, 0.4)',
+    border: '2px solid',
+    borderColor: contentType === 'character' ? '#ef01cb85' : '#a063cf94',
+    backdropFilter: 'blur(10px)',
+    boxShadow: contentType === 'character' ? '0 0 25px rgba(239, 1, 203, 0.44)' : 'none',
+    borderRadius: '12px',
+    color: '#ffffff',
+    transition: 'all 0.3s ease'
+  }}
+>
+  Персонаж
+</button>
         </div>
 
         {/* ФОРМА ПОСТА */}
@@ -466,13 +474,19 @@ const createCharacter = async () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const url = await uploadImage(file);
-                    if (url) setCharacterForm({...characterForm, main_image_url: url});
-                  }
-                }}
+onChange={async (e) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    const url = await uploadImage(file);
+    console.log('Got URL:', url); // смотри в консоли
+    if (url) {
+      setCharacterForm(prev => ({...prev, main_image_url: url}));
+      alert('Фото загружено! URL: ' + url); // временный алерт
+    } else {
+      alert('URL не получен, загрузка не удалась');
+    }
+  }
+}}
                 className="w-full px-4 py-3 rounded-lg text-white"
                 style={{
                   background: 'rgba(0, 0, 0, 0.4)',
@@ -502,33 +516,53 @@ const createCharacter = async () => {
             <TextareaField label="Интересный факт" value={characterForm.interesting_fact} onChange={(v) => setCharacterForm({...characterForm, interesting_fact: v})} />
             <TextareaField label="Предыстория" value={characterForm.backstory} onChange={(v) => setCharacterForm({...characterForm, backstory: v})} rows={5} />
 
-            {/* ГАЛЕРЕЯ (до 5 фото) */}
+ {/* ГАЛЕРЕЯ (до 5 фото) */}
             <div>
               <label className="block mb-2 font-bold">Галерея (до 5 фото)</label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={async (e) => {
-                  const files = Array.from(e.target.files || []).slice(0, 5);
-                  const urls = [];
-                  for (const file of files) {
+
+              {characterForm.gallery_images.length > 0 && (
+                <div className="grid grid-cols-5 gap-2 mb-3">
+                  {characterForm.gallery_images.map((url, i) => (
+                    <div key={i} className="relative">
+                      <img src={url} className="w-full h-20 object-cover rounded-lg" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCharacterForm(prev => ({
+                            ...prev,
+                            gallery_images: prev.gallery_images.filter((_, index) => index !== i)
+                          }));
+                        }}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {characterForm.gallery_images.length < 5 && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
                     const url = await uploadImage(file);
-                    if (url) urls.push(url);
-                  }
-                  setCharacterForm({...characterForm, gallery_images: urls});
-                }}
-                className="w-full px-4 py-3 rounded-lg text-white"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  border: '1px solid #9370db'
-                }}
-              />
-              <div className="mt-4 grid grid-cols-5 gap-2">
-                {characterForm.gallery_images.map((url, i) => (
-                  <img key={i} src={url} className="w-full h-20 object-cover rounded-lg" />
-                ))}
-              </div>
+                    if (url) {
+                      setCharacterForm(prev => ({
+                        ...prev,
+                        gallery_images: [...prev.gallery_images, url]
+                      }));
+                    }
+                    e.target.value = '';
+                  }}
+                  className="w-full px-4 py-3 rounded-lg text-white"
+                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid #9370db' }}
+                />
+              )}
+              <p className="text-gray-500 text-xs mt-1">
+                Добавлено: {characterForm.gallery_images.length}/5 — выбирай по одной
+              </p>
             </div>
 
             <button

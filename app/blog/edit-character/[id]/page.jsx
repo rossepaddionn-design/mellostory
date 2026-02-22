@@ -48,49 +48,48 @@ export default function EditCharacter() {
     }
   };
 
-  const uploadImage = async (file) => {
-    const fileName = `${Date.now()}_${file.name}`;
-    const { data, error } = await supabaseBlog.storage
-      .from('blog_media')
-      .upload(fileName, file);
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.error) { alert('Ошибка: ' + data.error); return null; }
+    return data.url;
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+    return null;
+  }
+};
 
-    if (error) {
-      alert('Ошибка загрузки: ' + error.message);
-      return null;
-    }
+const updateCharacter = async () => {
+  if (!characterForm.name || !characterForm.main_image_url) {
+    alert('Укажите имя и главное фото!');
+    return;
+  }
 
-    const { data: urlData } = supabaseBlog.storage
-      .from('blog_media')
-      .getPublicUrl(fileName);
-
-    return urlData.publicUrl;
+  const dataToUpdate = {
+    id: id,
+    ...characterForm,
+    age: characterForm.age ? parseInt(characterForm.age) : null,
+    height: characterForm.height || null,
+    weight: characterForm.weight || null,
   };
 
-  const updateCharacter = async () => {
-    if (!characterForm.name || !characterForm.main_image_url) {
-      alert('Укажите имя и главное фото!');
-      return;
-    }
+  const res = await fetch('/api/update-character', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dataToUpdate)
+  });
 
-    const dataToUpdate = {
-      ...characterForm,
-      age: characterForm.age ? parseInt(characterForm.age) : null,
-      height: characterForm.height || null,
-      weight: characterForm.weight || null,
-    };
-
-    const { error } = await supabaseBlog
-      .from('character_profiles')
-      .update(dataToUpdate)
-      .eq('id', id);
-
-    if (error) {
-      alert('Ошибка: ' + error.message);
-    } else {
-      alert('Персонаж обновлён!');
-      router.push('/blog');
-    }
-  };
+  const data = await res.json();
+  if (data.error) {
+    alert('Ошибка: ' + data.error);
+  } else {
+    alert('Персонаж обновлён!');
+    router.push('/blog');
+  }
+};
 
   if (!isAdmin || !characterForm) {
     return <div className="min-h-screen flex items-center justify-center text-white">Загрузка...</div>;
@@ -98,11 +97,8 @@ export default function EditCharacter() {
 
   return (
     <div className="min-h-screen text-white relative">
-      <div className="fixed inset-0 -z-10" style={{
-        backgroundImage: isDarkTheme ? 'url(/images/darknesas1.webp)' : 'url(/images/theme.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }} />
+<div className="fixed inset-0 -z-10" style={{ background: '#000000' }} />
+  
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <button 

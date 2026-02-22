@@ -1,327 +1,513 @@
 'use client';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 export default function TermsOfService() {
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') setIsDarkTheme(false);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-black text-white">
-      <style jsx global>{`
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        .shimmer-title {
-          background: linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: shimmer 3s linear infinite;
-        }
-        .section-title {
-          color: #b48dc4;
-          text-shadow: 0 0 15px rgba(180, 141, 196, 0.6);
-        }
-      `}</style>
+    <div style={{ minHeight:'100vh', backgroundColor:'#000000', color:'#fff' }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes termsShimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes termsTwinkle { 0%,100% { opacity: 0.15; } 50% { opacity: 0.55; } }
+        @keyframes termsGoldShimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-<button 
-  onClick={() => window.history.back()}
-  className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 sm:mb-8 transition"
->
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="18" y1="6" x2="6" y2="18"/>
-    <line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-  Закрыть
-</button>
+        .terms-stars {
+          background-image:
+            radial-gradient(1px 1px at 4% 10%, rgba(255,255,255,0.45) 0%, transparent 100%),
+            radial-gradient(1px 1px at 93% 6%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 48% 88%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 80% 52%, rgba(255,255,255,0.25) 0%, transparent 100%),
+            radial-gradient(1px 1px at 20% 68%, rgba(255,255,255,0.15) 0%, transparent 100%),
+            radial-gradient(1px 1px at 62% 28%, rgba(255,255,255,0.18) 0%, transparent 100%),
+            radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,0.12) 0%, transparent 100%);
+          animation: termsTwinkle 8s ease-in-out infinite;
+          pointer-events: none;
+        }
 
-        <div 
-          className="rounded-2xl p-6 sm:p-10 border-2"
-          style={{ 
-            backgroundColor: '#000000',
-            borderColor: '#9370db',
-            boxShadow: '0 0 30px rgba(147, 112, 219, 0.3)'
-          }}
+        .terms-dark-scroll::-webkit-scrollbar { width: 4px; }
+        .terms-dark-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terms-dark-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#9370db,#ef01cb,#9370db); border-radius:10px; }
+        .terms-dark-scroll { scrollbar-width: thin; scrollbar-color: #9370db transparent; }
+
+        .terms-light-scroll::-webkit-scrollbar { width: 4px; }
+        .terms-light-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terms-light-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg,transparent,#c9a84c,transparent); border-radius:10px; }
+        .terms-light-scroll { scrollbar-width: thin; scrollbar-color: #c9a84c transparent; }
+
+        /* Ссылки */
+        .terms-link-dark { color: #b3e7ef; text-decoration: underline; transition: color 0.2s; }
+        .terms-link-dark:hover { color: #ef01cb; }
+        .terms-link-light { color: #c9a84c; text-decoration: underline; transition: color 0.2s; }
+        .terms-link-light:hover { color: #f0d080; }
+
+        /* Списки */
+        .terms-list { list-style: none; padding: 0; margin: 0; }
+        .terms-list li { padding: clamp(3px,0.8vw,5px) 0 clamp(3px,0.8vw,5px) 20px; position: relative; }
+        .terms-list-dark li::before { content: '✦'; position: absolute; left: 0; font-size: 0.5rem; color: rgba(239,1,203,0.5); top: 50%; transform: translateY(-50%); }
+        .terms-list-light li::before { content: '⚜'; position: absolute; left: 0; font-size: 0.5rem; color: rgba(201,168,76,0.5); top: 50%; transform: translateY(-50%); }
+
+        /* Параграфы */
+        .terms-p-dark { color: rgba(200,185,230,0.7); font-family: Georgia, serif; line-height: 1.8; font-size: clamp(0.78rem,2vw,0.9rem); }
+        .terms-p-light { color: rgba(201,168,76,0.6); font-family: Georgia, serif; line-height: 1.8; font-size: clamp(0.78rem,2vw,0.9rem); }
+
+        .terms-strong-dark { color: rgba(228,213,255,0.9); }
+        .terms-strong-light { color: rgba(201,168,76,0.9); }
+      `}} />
+
+      {/* Фон */}
+      {isDarkTheme && <div className="terms-stars" style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none'}}/>}
+      {!isDarkTheme && (
+        <div style={{position:'fixed',bottom:'3%',right:'1%',fontFamily:'serif',
+          fontSize:'clamp(14rem,28vw,22rem)',color:'rgba(201,168,76,0.02)',
+          pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+      )}
+
+      <div style={{maxWidth:'860px',margin:'0 auto',padding:'clamp(20px,4vw,48px) clamp(14px,4vw,28px)',position:'relative',zIndex:1}}>
+
+        {/* Кнопка закрыть */}
+        <button onClick={() => window.history.back()} style={{
+          display:'inline-flex',alignItems:'center',gap:'8px',
+          background:'transparent',
+          border: isDarkTheme ? '1px solid rgba(180,100,255,0.25)' : '1px solid rgba(201,168,76,0.2)',
+          borderRadius:'6px',padding:'8px 14px',cursor:'pointer',marginBottom:'clamp(20px,4vw,36px)',
+          color: isDarkTheme ? 'rgba(147,112,219,0.6)' : 'rgba(201,168,76,0.5)',
+          fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'2px',
+          textTransform:'uppercase',transition:'all 0.2s'
+        }}
+          onMouseEnter={e=>{e.currentTarget.style.background=isDarkTheme?'rgba(147,112,219,0.1)':'rgba(201,168,76,0.06)';}}
+          onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}
         >
-          <h1 className="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 shimmer-title">
-            Пользовательское соглашение
-          </h1>
+          <X size={13}/> Закрыть
+        </button>
 
-          <div className="space-y-6 text-gray-300 text-sm sm:text-base leading-relaxed">
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">1. Общие положения</h2>
-              <p>
-                Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует порядок использования веб-сайта <strong>MelloStory</strong> (далее — «Сайт») и определяет права и обязанности пользователей.
-              </p>
-              <p className="mt-2">
-                Сайт управляется из Федеративной Республики Германия и подчиняется законодательству Германии и Российской Федерации в части, применимой к онлайн-платформам и защите авторских прав.
-              </p>
-              <p className="mt-2">
-                Регистрируясь на Сайте или используя его функции, вы подтверждаете, что:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Вам исполнилось 18 лет или вы достигли возраста совершеннолетия в вашей стране.</li>
-                <li>Вы ознакомились с настоящим Соглашением и обязуетесь его соблюдать.</li>
-                <li>Вы предоставили достоверные данные при регистрации.</li>
-                <li>Вы понимаете и принимаете юридические последствия нарушения настоящего Соглашения.</li>
-              </ul>
-            </section>
+        {/* Основной блок */}
+        <div style={{
+          background: isDarkTheme ? 'radial-gradient(ellipse at top,#0d0518 0%,#050008 95%)' : '#080808',
+          border: isDarkTheme ? '1px solid rgba(147,112,219,0.3)' : '1px solid rgba(201,168,76,0.2)',
+          borderRadius: isDarkTheme ? '14px' : '4px',
+          padding:'clamp(20px,5vw,48px) clamp(18px,5vw,44px)',
+          position:'relative',overflow:'hidden',
+          boxShadow: isDarkTheme ? '0 0 60px rgba(147,50,255,0.08)' : 'none'
+        }}>
+          {/* Тёмная — верхняя линия */}
+          {isDarkTheme && (
+            <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',
+              background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)'}}/>
+          )}
+          {/* Светлая — левая полоска */}
+          {!isDarkTheme && (
+            <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+              background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)'}}/>
+          )}
 
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">2. Возрастное ограничение (18+)</h2>
-              <p>
-                Сайт содержит контент для взрослых (18+), включая сцены насилия, откровенные сексуальные описания и другие материалы, не предназначенные для несовершеннолетних.
-              </p>
-              <p className="mt-2">
-                <strong>Строго запрещается использование Сайта лицами младше 18 лет.</strong>
-              </p>
-              <p className="mt-2">
-                В соответствии с:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li><strong>Законодательством РФ:</strong> Федеральный закон №436-ФЗ «О защите детей от информации, причиняющей вред их здоровью и развитию»</li>
-                <li><strong>Законодательством Германии:</strong> §184 StGB (Strafgesetzbuch) — Распространение порнографических материалов несовершеннолетним; Jugendschutzgesetz (JuSchG) — Закон о защите молодёжи</li>
-              </ul>
-              <p className="mt-2">
-                Администрация не несёт ответственности за последствия доступа к контенту со стороны несовершеннолетних. Ответственность за контроль доступа детей к Сайту лежит на родителях/законных представителях.
-              </p>
-            </section>
+          {/* ══ ЗАГОЛОВОК ══ */}
+          <div style={{textAlign:'center',marginBottom:'clamp(24px,5vw,44px)'}}>
+            {isDarkTheme ? (
+              <>
+                <div style={{fontSize:'clamp(1rem,3vw,1.5rem)',color:'rgba(180,100,255,0.35)',marginBottom:'10px'}}>✦</div>
+                <h1 style={{
+                  fontFamily:'Cinzel,serif',fontSize:'clamp(1rem,4vw,1.6rem)',
+                  letterSpacing:'clamp(3px,1.5vw,7px)',
+                  background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',backgroundSize:'200% auto',
+                  WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+                  animation:'termsShimmer 4s linear infinite',margin:0,marginBottom:'14px'
+                }}>Пользовательское соглашение</h1>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'}}>
+                  <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+                  <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'5px'}}>✦ · · · ✦</span>
+                  <div style={{height:'1px',width:'60px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 style={{
+                  fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.6rem,6vw,2.8rem)',
+                  backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+                  backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+                  animation:'termsGoldShimmer 4s linear infinite',letterSpacing:'4px',margin:0,marginBottom:'12px'
+                }}>Пользовательское соглашение</h1>
+                <div style={{display:'flex',alignItems:'center',gap:'12px',justifyContent:'center'}}>
+                  <div style={{height:'1px',width:'80px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+                  <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+                  <div style={{height:'1px',width:'80px',background:'linear-gradient(270deg,rgba(201,168,76,0.5),transparent)'}}/>
+                </div>
+              </>
+            )}
+          </div>
 
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">3. Характер контента и художественный вымысел</h2>
-              <p>
-                <strong>Все материалы, размещённые на Сайте, являются художественным вымыслом и не преследуют целей пропаганды.</strong>
-              </p>
-              
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.1. Художественная литература</h3>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Все произведения на Сайте являются <strong>художественным вымыслом</strong> и созданы исключительно в развлекательных и творческих целях.</li>
-                <li>Сайт <strong>не пропагандирует</strong> насилие, противоправное поведение, употребление наркотиков, алкоголя или какие-либо иные действия, запрещённые законодательством РФ или Германии.</li>
-                <li>Описание персонажей, событий и действий в произведениях <strong>не является призывом к их воспроизведению в реальной жизни</strong>.</li>
-                <li>Сайт не содержит инструкций, руководств или материалов, направленных на совершение противоправных действий.</li>
-              </ul>
+          {/* ══ КОНТЕНТ ══ */}
+          <div style={{display:'flex',flexDirection:'column',gap:'clamp(24px,4vw,36px)'}}>
 
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.2. Возраст персонажей</h3>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li><strong>Все персонажи, участвующие в сексуальных, романтических или откровенных сценах, являются совершеннолетними (18+).</strong></li>
-                <li>Произведения не содержат описаний сексуального характера с участием несовершеннолетних лиц.</li>
-                <li>В случаях, когда персонажи изначально являются несовершеннолетними в исходном произведении (канон), в текстах на данном Сайте они изображаются взрослыми (возраст 18+).</li>
-              </ul>
+            {[
+              {
+                num:'1', title:'Общие положения',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует порядок использования веб-сайта <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>MelloStory</strong> (далее — «Сайт») и определяет права и обязанности пользователей.
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      Сайт управляется с территории Федеративной Республики Германия. К отношениям, регулируемым настоящим Соглашением, применяется законодательство Германии, а в части авторских прав — также международные конвенции, участниками которых является Германия.
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      Регистрируясь на Сайте или используя его функции, вы подтверждаете, что:
+                    </p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Вам исполнилось 18 лет или вы достигли возраста совершеннолетия в вашей стране.',
+                        'Вы ознакомились с настоящим Соглашением и обязуетесь его соблюдать.',
+                        'Вы предоставили достоверные данные при регистрации.',
+                        'Вы понимаете и принимаете юридические последствия нарушения настоящего Соглашения.'
+                      ].map((item,i) => (
+                        <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              },
+              {
+                num:'2', title:'Возрастное ограничение (18+)',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      Сайт содержит контент для взрослых (18+), включая сцены насилия, откровенные сексуальные описания и другие материалы, не предназначенные для несовершеннолетних.
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>Строго запрещается использование Сайта лицами младше 18 лет.</strong>
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>В соответствии с:</p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Законодательством Германии: §184 StGB — распространение порнографических материалов несовершеннолетним; Jugendschutzgesetz (JuSchG) — Закон о защите молодёжи.',
+                        'Международными стандартами защиты несовершеннолетних в сети (COPPA, DSA).'
+                      ].map((item,i) => (
+                        <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>
+                      ))}
+                    </ul>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      Администрация не несёт ответственности за последствия доступа к контенту со стороны несовершеннолетних. Ответственность за контроль доступа детей к Сайту лежит на родителях и законных представителях.
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'3', title:'Характер контента и художественный вымысел',
+                content: (
+                  <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>Все материалы, размещённые на Сайте, являются художественным вымыслом и не преследуют целей пропаганды.</strong>
+                    </p>
 
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.3. Тематика произведений</h3>
-              <p>
-                Произведения на Сайте могут содержать описания:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Романтических и сексуальных отношений между совершеннолетними персонажами (гетеросексуальные, гомосексуальные, бисексуальные)</li>
-                <li>Сцен насилия, конфликтов, психологической драмы в контексте художественного повествования</li>
-                <li>Фантастических, мистических и вымышленных миров, не существующих в реальности</li>
-              </ul>
-              <p className="mt-2">
-                <strong>Важно:</strong> Все вышеперечисленные элементы представлены исключительно как часть художественного вымысла и не являются призывом к действию, идеологией или формой пропаганды.
-              </p>
+                    {[
+                      { sub:'3.1. Художественная литература', items:[
+                        'Все произведения на Сайте являются художественным вымыслом и созданы исключительно в развлекательных и творческих целях.',
+                        'Сайт не пропагандирует насилие, противоправное поведение, употребление наркотиков, алкоголя или какие-либо иные действия, запрещённые законодательством.',
+                        'Описание персонажей, событий и действий в произведениях не является призывом к их воспроизведению в реальной жизни.',
+                        'Сайт не содержит инструкций или материалов, направленных на совершение противоправных действий.'
+                      ]},
+                      { sub:'3.2. Возраст персонажей', items:[
+                        'Все персонажи, участвующие в сексуальных, романтических или откровенных сценах, являются совершеннолетними (18+).',
+                        'Произведения не содержат описаний сексуального характера с участием несовершеннолетних.',
+                        'В случаях, когда персонажи в исходном произведении являются несовершеннолетними, на данном Сайте они изображаются взрослыми (18+).'
+                      ]},
+                      { sub:'3.3. Тематика произведений', items:[
+                        'Романтических и сексуальных отношений между совершеннолетними персонажами.',
+                        'Сцен насилия, конфликтов и психологической драмы в контексте художественного повествования.',
+                        'Фантастических, мистических и вымышленных миров.',
+                        'Все вышеперечисленные элементы представлены исключительно как часть художественного вымысла.'
+                      ]},
+                      { sub:'3.4. Отсутствие пропаганды', items:[
+                        'Экстремизма, терроризма, национальной, расовой или религиозной розни.',
+                        'Насилия, жестокости или противоправного поведения.',
+                        'Употребления наркотических средств, психотропных веществ, алкоголя.',
+                        'Суицида или причинения вреда здоровью.',
+                        'Любые упоминания вышеперечисленного в текстах произведений являются частью художественного сюжета и не носят пропагандистского характера.'
+                      ]}
+                    ].map(({sub, items}) => (
+                      <div key={sub}>
+                        <SubTitle text={sub} isDarkTheme={isDarkTheme}/>
+                        <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                          {items.map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )
+              },
+              {
+                num:'4', title:'Права и обязанности пользователей',
+                content: (
+                  <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+                    <div>
+                      <SubTitle text="4.1. Пользователь имеет право:" isDarkTheme={isDarkTheme}/>
+                      <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        {['Читать литературные произведения, размещённые на Сайте.',
+                          'Оценивать работы (ставить оценки от 1 до 10).',
+                          'Отправлять сообщения администрации Сайта.',
+                          'Добавлять произведения в избранное и сохранять изображения в личную галерею.',
+                          'Удалить свою учётную запись в любой момент.'
+                        ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <SubTitle text="4.2. Пользователь обязуется:" isDarkTheme={isDarkTheme}/>
+                      <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        {['Не использовать Сайт в незаконных целях.',
+                          'Не размещать спам, рекламу или ссылки на сторонние ресурсы без разрешения администрации.',
+                          'Не пытаться получить несанкционированный доступ к данным других пользователей или системам Сайта.',
+                          'Не использовать автоматизированные средства (боты, скрипты) без разрешения.',
+                          'Соблюдать нормы этики в общении с администрацией.',
+                          'Не нарушать авторские права, изложенные в разделе 7 настоящего Соглашения.'
+                        ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )
+              },
+              {
+                num:'5', title:'Запрещённые действия',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>Пользователю строго запрещается:</p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Публиковать контент, содержащий материалы сексуального насилия над несовершеннолетними, экстремизм, терроризм, пропаганду насилия или разжигание ненависти.',
+                        'Выдавать себя за другого пользователя или администрацию Сайта.',
+                        'Использовать уязвимости Сайта для получения несанкционированного доступа.',
+                        'Копировать, воспроизводить, распространять или публиковать произведения без письменного разрешения правообладателя.',
+                        'Преследовать, угрожать или запугивать других пользователей.',
+                        'Нарушать работу Сайта путём DDoS-атак, внедрения вредоносного кода или иных деструктивных действий.'
+                      ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                    </ul>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'12px'}}>
+                      <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>Нарушение данных правил влечёт немедленную блокировку учётной записи и возможное привлечение к ответственности в соответствии с применимым законодательством.</strong>
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'6', title:'Права администрации',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>Администрация Сайта оставляет за собой право:</p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Заблокировать или удалить учётную запись пользователя при нарушении правил без предварительного уведомления.',
+                        'Изменять функциональность, дизайн и структуру Сайта.',
+                        'Приостановить работу Сайта для проведения технических работ или обновлений.',
+                        'Изменять настоящее Соглашение. Новая версия вступает в силу с момента публикации на Сайте.'
+                      ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                    </ul>
+                  </div>
+                )
+              },
+              {
+                num:'7', title:'Интеллектуальная собственность и авторские права',
+                content: (
+                  <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+                    <div>
+                      <SubTitle text="7.1. Правообладание" isDarkTheme={isDarkTheme}/>
+                      <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        Все литературные произведения, тексты, обложки, изображения персонажей, графический контент и иные материалы, размещённые на Сайте, являются объектами авторского права и принадлежат исключительно администрации Сайта <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>MelloStory</strong>.
+                      </p>
+                    </div>
+                    <div>
+                      <SubTitle text="7.2. Строго запрещается без письменного согласия:" isDarkTheme={isDarkTheme}/>
+                      <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        {['Копировать тексты, обложки, изображения или иной контент полностью или частично.',
+                          'Размещать произведения, обложки, иллюстрации или цитаты в социальных сетях (ВКонтакте, Telegram, Instagram, TikTok, YouTube, Twitter/X и др.).',
+                          'Использовать тексты, обложки или изображения в видеороликах, стримах, подкастах или иных мультимедийных материалах.',
+                          'Использовать произведения в коммерческих целях, включая продажу, перевод, публикацию в печатных изданиях, создание аудиокниг.',
+                          'Создавать адаптации, переработки, ремиксы или иные производные произведения на основе контента Сайта.'
+                        ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                      </ul>
+                    </div>
+                    <div>
+                      <SubTitle text="7.3. Получение разрешения" isDarkTheme={isDarkTheme}/>
+                      <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        Для получения разрешения на использование контента направьте запрос на:{' '}
+                        <a href="mailto:mellostory@protonmail.com" className={`terms-link-${isDarkTheme?'dark':'light'}`}>mellostory@protonmail.com</a>
+                      </p>
+                      <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>В запросе укажите: ваши контактные данные, название произведения, цель и способ использования. Администрация рассматривает запросы в течение 14 рабочих дней. Отсутствие ответа <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>не является</strong> разрешением.</p>
+                    </div>
+                    <div>
+                      <SubTitle text="7.4. Юридическая ответственность" isDarkTheme={isDarkTheme}/>
+                      <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                        Несанкционированное использование контента влечёт ответственность в соответствии с: Законодательством Германии (Urheberrechtsgesetz, UrhG), Бернской конвенцией об охране литературных и художественных произведений, а также иными применимыми международными нормами. Администрация оставляет за собой право обращаться в суд для защиты авторских прав.
+                      </p>
+                    </div>
+                  </div>
+                )
+              },
+              {
+                num:'8', title:'Ограничение ответственности',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>Администрация Сайта не несёт ответственности за:</p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Моральный или иной ущерб, причинённый использованием или невозможностью использования Сайта.',
+                        'Точность, актуальность и полноту информации, размещённой пользователями.',
+                        'Технические сбои, перебои в работе Сайта или потерю данных вследствие форс-мажорных обстоятельств.'
+                      ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                    </ul>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'12px'}}>
+                      <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>Сайт предоставляется «как есть» (as is) без каких-либо явных или подразумеваемых гарантий.</strong>
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'9', title:'Блокировка пользователей',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>Учётная запись может быть заблокирована без предупреждения в следующих случаях:</p>
+                    <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`} style={{marginTop:'8px'}}>
+                      {['Нарушение правил, указанных в разделе 5.',
+                        'Нарушение авторских прав (раздел 7).',
+                        'Систематические оскорбления других пользователей или администрации.',
+                        'Попытки взлома, DDoS-атак или иного вредоносного воздействия.',
+                        'Использование нескольких аккаунтов для обхода блокировки (мультиаккаунтинг).',
+                        'Распространение спама, рекламы или вредоносных ссылок.',
+                        'Предоставление заведомо ложных данных при регистрации.'
+                      ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                    </ul>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'12px'}}>
+                      Заблокированный пользователь может обратиться к администрации для уточнения причин по адресу{' '}
+                      <a href="mailto:mellostory@protonmail.com" className={`terms-link-${isDarkTheme?'dark':'light'}`}>mellostory@protonmail.com</a>,{' '}
+                      однако восстановление доступа не гарантируется и остаётся на усмотрение администрации.
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'10', title:'Применимое право и разрешение споров',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      Настоящее Соглашение регулируется и толкуется в соответствии с законодательством Федеративной Республики Германия. В вопросах авторских прав применяется также Бернская конвенция и иные международные соглашения.
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      Все споры, возникающие из настоящего Соглашения, подлежат разрешению путём переговоров. В случае невозможности достичь согласия — в компетентном суде по месту нахождения администрации Сайта (Германия).
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'11', title:'Изменения в Соглашении',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      Администрация оставляет за собой право вносить изменения в настоящее Соглашение в любое время. Новая версия вступает в силу с момента публикации на Сайте. Продолжая использовать Сайт после внесения изменений, вы принимаете новую версию Соглашения.
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      Дата вступления в силу настоящей редакции: <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>30 ноября 2025 года</strong>
+                    </p>
+                  </div>
+                )
+              },
+              {
+                num:'12', title:'Контактная информация',
+                content: (
+                  <div>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`}>
+                      По всем вопросам, связанным с использованием Сайта, авторскими правами, блокировкой учётных записей или получением разрешений на использование контента:
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'10px'}}>
+                      <strong className={`terms-strong-${isDarkTheme?'dark':'light'}`}>Email:</strong>{' '}
+                      <a href="mailto:mellostory@protonmail.com" className={`terms-link-${isDarkTheme?'dark':'light'}`}>mellostory@protonmail.com</a>
+                    </p>
+                    <p className={`terms-p-${isDarkTheme?'dark':'light'}`} style={{marginTop:'6px'}}>
+                      Ответы предоставляются в течение 14 рабочих дней.
+                    </p>
+                  </div>
+                )
+              }
+            ].map(({ num, title, content }) => (
+              <Section key={num} num={num} title={title} isDarkTheme={isDarkTheme}>
+                {content}
+              </Section>
+            ))}
 
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">3.4. Отсутствие пропаганды</h3>
-              <p>
-                Сайт <strong>не осуществляет пропаганду</strong> следующего:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Нетрадиционных сексуальных отношений среди несовершеннолетних (в соответствии с законодательством РФ)</li>
-                <li>Экстремизма, терроризма, национальной, расовой или религиозной розни</li>
-                <li>Насилия, жестокости, противоправного поведения</li>
-                <li>Употребления наркотических средств, психотропных веществ, алкоголя</li>
-                <li>Суицида или причинения вреда здоровью</li>
-              </ul>
-              <p className="mt-2">
-                Любые упоминания вышеперечисленного в текстах произведений являются частью художественного сюжета и не носят пропагандистского характера.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">4. Права и обязанности пользователей</h2>
-              
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">4.1. Пользователь имеет право:</h3>
-              <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>Читать литературные произведения, размещённые на Сайте.</li>
-                <li>Оценивать работы (ставить оценки от 1 до 10).</li>
-                <li>Отправлять сообщения администрации Сайта.</li>
-                <li>Удалить свою учётную запись в любой момент.</li>
-              </ul>
-
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">4.2. Пользователь обязуется:</h3>
-              <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>Не использовать Сайт в незаконных целях.</li>
-                <li>Не размещать спам, рекламу, ссылки на сторонние ресурсы без разрешения администрации.</li>
-                <li>Не пытаться получить несанкционированный доступ к данным других пользователей или системам Сайта.</li>
-                <li>Не использовать автоматизированные средства (боты, скрипты) для взаимодействия с Сайтом без разрешения.</li>
-                <li>Соблюдать нормы этики и уважительно относиться к другим пользователям и администрации.</li>
-                <li>Не нарушать авторские права, изложенные в разделе 7 настоящего Соглашения.</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">5. Запрещённые действия</h2>
-              <p>Пользователю строго запрещается:</p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Публиковать контент, содержащий детскую порнографию, экстремизм, терроризм, пропаганду насилия, разжигание национальной, расовой или религиозной розни.</li>
-                <li>Выдавать себя за другого пользователя или администрацию Сайта.</li>
-                <li>Использовать уязвимости Сайта для получения доступа к чужим аккаунтам или серверам.</li>
-                <li>Копировать, воспроизводить, распространять, переводить, публиковать произведения, размещённые на Сайте, без письменного разрешения правообладателя (администрации).</li>
-                <li>Преследовать, угрожать или запугивать других пользователей.</li>
-                <li>Нарушать работу Сайта путём DDoS-атак, внедрения вредоносного кода или иных деструктивных действий.</li>
-              </ul>
-              <p className="mt-2">
-                <strong>Нарушение данных правил влечёт немедленную блокировку учётной записи без предупреждения и возможность привлечения к ответственности в соответствии с законодательством РФ и Германии.</strong>
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">6. Права администрации</h2>
-              <p>Администрация Сайта оставляет за собой право:</p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Заблокировать или удалить учётную запись пользователя при нарушении правил без предварительного уведомления.</li>
-                <li>Изменять функциональность, дизайн и структуру Сайта без предварительного уведомления.</li>
-                <li>Приостановить работу Сайта для проведения технических работ, обновлений или по иным причинам.</li>
-                <li>Изменять настоящее Соглашение. Новая версия вступает в силу с момента публикации на Сайте.</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">7. Интеллектуальная собственность и авторские права</h2>
-              
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.1. Правообладание</h3>
-              <p>
-                Все литературные произведения, тексты, обложки, изображения персонажей, графический контент, аудиоматериалы и иные материалы, размещённые на Сайте, являются объектами авторского права и принадлежат исключительно администрации Сайта <strong>MelloStory</strong>.
-              </p>
-              
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.2. Строго запрещается без письменного согласия правообладателя:</h3>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li><strong>Копирование и воспроизведение:</strong> Копировать тексты, обложки, изображения или иной контент Сайта полностью или частично.</li>
-                <li><strong>Публикация в социальных сетях:</strong> Размещать произведения, обложки, иллюстрации или цитаты из произведений в социальных сетях (включая, но не ограничиваясь: ВКонтакте, Telegram, Instagram, TikTok, YouTube, Twitter/X, Facebook).</li>
-                <li><strong>Использование в видеоконтенте:</strong> Использовать тексты, обложки или изображения в видеороликах, стримах, подкастах или иных мультимедийных материалах.</li>
-                <li><strong>Коммерческое использование:</strong> Использовать произведения в коммерческих целях, включая продажу, перевод на другие языки, публикацию в печатных изданиях, создание аудиокниг.</li>
-                <li><strong>Распространение ссылок:</strong> Публиковать прямые ссылки на произведения с целью их массового распространения без согласия администрации.</li>
-                <li><strong>Создание производных работ:</strong> Создавать адаптации, переработки, ремиксы или иные производные произведения на основе контента Сайта.</li>
-              </ul>
-
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.3. Получение разрешения</h3>
-              <p>
-                Для получения письменного разрешения на использование любого контента Сайта необходимо направить официальный запрос на электронный адрес: <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>
-              </p>
-              <p className="mt-2">
-                В запросе необходимо указать:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Ваши контактные данные (имя и email)</li>
-                <li>Название произведения или конкретного контента</li>
-                <li>Цель и способ использования (социальная сеть, видео, статья и т.д.)</li>
-                <li>Планируемые сроки использования</li>
-              </ul>
-              <p className="mt-2">
-                Администрация рассматривает запросы в течение 14 рабочих дней. Отсутствие ответа <strong>не является</strong> разрешением на использование.
-              </p>
-
-              <h3 className="text-lg font-semibold section-title mt-4 mb-2">7.4. Юридическая ответственность за нарушение авторских прав</h3>
-              <p>
-                Несанкционированное использование контента Сайта является нарушением авторских прав и влечёт ответственность в соответствии с:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li><strong>Гражданским кодексом РФ</strong> (статьи 1252-1253) — защита исключительных прав и взыскание компенсации</li>
-                <li><strong>Законодательством Германии</strong> (Urheberrechtsgesetz) — возмещение убытков и запретительные меры</li>
-                <li><strong>Международными соглашениями</strong> — Бернская конвенция об охране литературных и художественных произведений</li>
-              </ul>
-              <p className="mt-2">
-                Администрация оставляет за собой право обращаться в суд для защиты авторских прав и взыскания причинённого ущерба.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">8. Ограничение ответственности</h2>
-              <p>
-                Администрация Сайта не несёт ответственности за:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Моральный или иной ущерб, причинённый использованием или невозможностью использования Сайта.</li>
-                <li>Точность, актуальность и полноту информации, размещённой пользователями.</li>
-              </ul>
-              <p className="mt-2">
-                <strong>Сайт предоставляется «как есть» (as is) без каких-либо явных или подразумеваемых гарантий.</strong>
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">9. Блокировка пользователей</h2>
-              <p>
-                Учётная запись пользователя может быть заблокирована без предварительного предупреждения в следующих случаях:
-              </p>
-              <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                <li>Нарушение правил, указанных в разделе 5 (Запрещённые действия).</li>
-                <li>Нарушение авторских прав (раздел 7).</li>
-                <li>Систематические оскорбления других пользователей или администрации.</li>
-                <li>Попытки взлома, DDoS-атак или иного вредоносного воздействия на Сайт.</li>
-                <li>Использование нескольких аккаунтов для обхода блокировки (мультиаккаунтинг).</li>
-                <li>Распространение спама, рекламы или вредоносных ссылок.</li>
-                <li>Предоставление заведомо ложных данных при регистрации.</li>
-              </ul>
-              <p className="mt-2">
-                Заблокированный пользователь может обратиться к администрации для уточнения причин блокировки по адресу <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>, однако восстановление доступа не гарантируется и остаётся на усмотрение администрации.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">10. Применимое право и разрешение споров</h2>
-              <p>
-                Настоящее Соглашение регулируется и толкуется в соответствии с законодательством Федеративной Республики Германия.
-              </p>
-              <p className="mt-2">
-                В вопросах, касающихся авторских прав и интеллектуальной собственности, также применяются нормы законодательства Российской Федерации.
-              </p>
-              <p className="mt-2">
-                Все споры, возникающие из настоящего Соглашения или в связи с ним, подлежат разрешению путём переговоров. В случае невозможности достижения согласия спор подлежит рассмотрению в компетентном суде Германии.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">11. Изменения в Соглашении</h2>
-              <p>
-                Администрация оставляет за собой право вносить изменения в настоящее Соглашение в любое время. Новая версия вступает в силу с момента её публикации на Сайте.
-              </p>
-              <p className="mt-2">
-                Продолжая использовать Сайт после внесения изменений, вы соглашаетесь с новой версией Соглашения.
-              </p>
-              <p className="mt-2">
-                Дата вступления в силу настоящей редакции: <strong>30 ноября 2025 года</strong>
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl sm:text-2xl font-bold section-title mb-3">12. Контактная информация</h2>
-              <p>
-                По всем вопросам, связанным с использованием Сайта, авторскими правами, блокировкой учётных записей или получением разрешений на использование контента, вы можете связаться с администрацией:
-              </p>
-              <p className="mt-2">
-                <strong>Email:</strong> <a href="mailto:mellostory@protonmail.com" className="text-purple-400 hover:text-purple-300 underline">mellostory@protonmail.com</a>
-              </p>
-              <p className="mt-2">
-                Ответы на запросы предоставляются в течение 14 рабочих дней.
-              </p>
-            </section>
-
-            <div className="mt-8 pt-6 border-t border-gray-700">
-              <p className="text-sm text-gray-400 text-center">
-                Используя Сайт, вы подтверждаете, что:
-              </p>
-              <ul className="list-disc list-inside text-sm text-gray-400 text-center mt-2 space-y-1">
-                <li>Вам исполнилось 18 лет</li>
-                <li>Вы ознакомились с настоящим Пользовательским соглашением</li>
-                <li>Вы понимаете и принимаете все условия и правовые последствия</li>
-                <li>Вы обязуетесь соблюдать данное Соглашение</li>
-              </ul>
+            {/* Итоговый блок */}
+            <div style={{
+              borderTop: isDarkTheme ? '1px solid rgba(147,112,219,0.2)' : '1px solid rgba(201,168,76,0.15)',
+              paddingTop:'clamp(20px,4vw,32px)',marginTop:'8px'
+            }}>
+              <div style={{
+                background: isDarkTheme ? 'rgba(147,112,219,0.06)' : 'rgba(201,168,76,0.05)',
+                border: isDarkTheme ? '1px solid rgba(147,112,219,0.2)' : '1px solid rgba(201,168,76,0.15)',
+                borderRadius: isDarkTheme ? '8px' : '2px',
+                padding:'clamp(14px,3vw,22px)',textAlign:'center'
+              }}>
+                <p style={{
+                  fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',
+                  color: isDarkTheme ? 'rgba(180,100,255,0.5)' : 'rgba(201,168,76,0.45)',
+                  textTransform:'uppercase',marginBottom:'12px'
+                }}>
+                  {isDarkTheme ? '✦ Используя Сайт, вы подтверждаете ✦' : '⚜ Используя Сайт, вы подтверждаете ⚜'}
+                </p>
+                <ul className={`terms-list terms-list-${isDarkTheme?'dark':'light'}`}
+                  style={{display:'inline-block',textAlign:'left'}}>
+                  {['Вам исполнилось 18 лет',
+                    'Вы ознакомились с настоящим Соглашением',
+                    'Вы понимаете и принимаете все условия и правовые последствия',
+                    'Вы обязуетесь соблюдать данное Соглашение'
+                  ].map((item,i) => <li key={i} className={`terms-p-${isDarkTheme?'dark':'light'}`}>{item}</li>)}
+                </ul>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ─── Вспомогательные компоненты ─── */
+
+function Section({ num, title, isDarkTheme, children }) {
+  return (
+    <section>
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'clamp(12px,2.5vw,18px)'}}>
+        <div style={{
+          fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'2px',
+          color: isDarkTheme ? 'rgba(239,1,203,0.5)' : 'rgba(201,168,76,0.4)',
+          flexShrink:0
+        }}>{num}</div>
+        <div style={{height:'1px',flex:1,background: isDarkTheme
+          ? 'linear-gradient(90deg,rgba(239,1,203,0.3),rgba(147,112,219,0.15),transparent)'
+          : 'linear-gradient(90deg,rgba(201,168,76,0.3),transparent)'}}/>
+      </div>
+
+      {/* Заголовок секции */}
+      <h2 style={{
+        fontFamily:'Cinzel,serif',fontSize:'clamp(0.8rem,2.5vw,1rem)',
+        letterSpacing:'clamp(2px,0.8vw,4px)',textTransform:'uppercase',
+        marginBottom:'clamp(10px,2vw,16px)',
+ backgroundImage: isDarkTheme
+  ? 'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)'
+  : 'linear-gradient(90deg,#c9a84c 0%,#f0d080 60%,#c9a84c 100%)',
+backgroundSize: '200% auto',
+WebkitBackgroundClip: 'text',
+WebkitTextFillColor: 'transparent',
+animation: isDarkTheme ? 'termsShimmer 5s linear infinite' : 'termsGoldShimmer 5s linear infinite',
+      }}>{title}</h2>
+
+      {children}
+    </section>
+  );
+}
+
+function SubTitle({ text, isDarkTheme }) {
+  return (
+    <h3 style={{
+      fontFamily:'Cinzel,serif',fontSize:'clamp(0.65rem,1.8vw,0.78rem)',
+      letterSpacing:'2px',textTransform:'uppercase',marginBottom:'6px',
+      color: isDarkTheme ? 'rgba(179,231,239,0.6)' : 'rgba(201,168,76,0.5)'
+    }}>{text}</h3>
   );
 }

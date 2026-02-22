@@ -88,29 +88,32 @@ const fonts = [
     }
   };
 
-  const updatePost = async () => {
-    if (!postForm.title || !postForm.content) {
-      alert('Заполните название и текст!');
-      return;
-    }
+const updatePost = async () => {
+  if (!postForm.title || !postForm.content) {
+    alert('Заполните название и текст!');
+    return;
+  }
 
-    const { error } = await supabaseBlog
-      .from('blog_posts')
-      .update({
-        title: postForm.title,
-        content: postForm.content,
-        desktop_settings: postForm.desktop,
-        mobile_settings: postForm.mobile
-      })
-      .eq('id', params.id);
+  const res = await fetch('/api/update-post', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: params.id,
+      title: postForm.title,
+      content: postForm.content,
+      desktop_settings: postForm.desktop,
+      mobile_settings: postForm.mobile
+    })
+  });
 
-    if (error) {
-      alert('Ошибка: ' + error.message);
-    } else {
-      alert('Пост обновлён!');
-      router.push('/blog');
-    }
-  };
+  const data = await res.json();
+  if (data.error) {
+    alert('Ошибка: ' + data.error);
+  } else {
+    alert('Пост обновлён!');
+    router.push('/blog');
+  }
+};
 
   const currentSettings = postForm[previewDevice];
 
@@ -119,13 +122,9 @@ const fonts = [
   return (
     <div className="min-h-screen text-white relative">
       {/* ФОН */}
-      <div className="fixed inset-0 -z-10" style={{
-        backgroundImage: isDarkTheme 
-          ? 'url(/images/darknesas1.webp)' 
-          : 'url(/images/theme.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }} />
+<div className="fixed inset-0 -z-10" style={{
+  background: '#000000'
+}} />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button 

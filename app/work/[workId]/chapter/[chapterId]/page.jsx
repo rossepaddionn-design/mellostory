@@ -555,7 +555,6 @@ const toggleTheme = () => {
   const newTheme = !isDarkTheme;
   localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   setIsDarkTheme(newTheme);
-  setShowManagementModal(false);
 };
 
 const downloadTrack = async (audioUrl, audioName, index) => {
@@ -620,6 +619,14 @@ const submitRating = async (rating) => {
 
 const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const matrixData = useMemo(() => {
     if (!mounted) return [];
@@ -1211,10 +1218,10 @@ style={{
           <button
             onClick={saveBookmark}
             className="p-2 rounded-full flex items-center justify-center transition"
-            style={{
-              backgroundColor: selectedTextForBookmark ? '#5d5846' : 'rgba(118, 38, 181, 0.3)',
-              boxShadow: selectedTextForBookmark ? '0 0 15px rgba(133, 0, 45, 0.8)' : 'none',
-              border: selectedTextForBookmark ? '2px solid #5d5846' : '2px solid rgba(118, 38, 181, 0.5)',
+   style={{
+  backgroundColor: selectedTextForBookmark ? '#4a0010' : 'rgba(201,168,76,0.15)',
+  boxShadow: selectedTextForBookmark ? '0 0 15px rgba(133, 0, 45, 0.8)' : 'none',
+  border: selectedTextForBookmark ? '2px solid #7a001a' : '2px solid rgba(201,168,76,0.4)',
               width: '36px',
               height: '36px',
               cursor: 'pointer',
@@ -1245,249 +1252,270 @@ style={{
   </header>
 )}
 
-      {showChapterList && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-            background: 'rgba(147, 51, 234, 0.15)',
-            border: '2px solid #9333ea',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
-          }}>
-<div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-  borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
-}}>
-  <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
-    background: 'linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'chapterTitleShimmer 3s linear infinite',
-    fontFamily: "'ppelganger', Georgia, serif"
+ {showChapterList && isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
   }}>
-    Содержание
-  </h2>
-              <button 
-                onClick={() => setShowChapterList(false)} 
-                className="transition rounded-full p-2 absolute right-4"
-                style={{
-                  color: '#ffffff',
-                  backgroundColor: 'rgba(147, 51, 234, 0.3)',
-                  border: '2px solid rgba(255, 255, 255, 0.5)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.5)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-                }}
-              >
-                <X size={24} />
-              </button>
-            </div>
-<div className="flex-1 overflow-y-auto p-4 sm:p-6">
-  <style dangerouslySetInnerHTML={{__html: `
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
-    box-shadow: 0 0 15px rgba(180, 141, 196, 1);
-  }
-`}} />
-              <div className="space-y-2">
-                {allChapters.map((ch) => {
-                  const isActive = String(ch.id) === String(chapterId);
-                  return (
- <button
-  key={ch.id}
-  onClick={() => handleChapterSelect(ch.id)}
-  className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
-  style={{
-    background: '#000000',
-    position: 'relative',
-    borderRadius: '12px'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.boxShadow = 'none';
-  }}
->
-  <div style={{
-    position: 'absolute',
-    inset: '-2px',
-    borderRadius: '12px',
-    padding: '2px',
-    background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
-    backgroundSize: '200% 100%',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1,
-    animation: 'neonBorderFlow 3s linear infinite'
-  }} />
-  <div className="flex items-center gap-3">
-    <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
-      color: '#c084fc',
-      minWidth: '30px'
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes chapterModalGlow {
+        0%,100% { box-shadow: 0 0 60px rgba(147,50,255,0.15), inset 0 0 60px rgba(0,0,0,0.5); }
+        50% { box-shadow: 0 0 100px rgba(147,50,255,0.25), inset 0 0 80px rgba(0,0,0,0.6); }
+      }
+      @keyframes chapterStarTwinkle { 0%,100%{opacity:0.1;} 50%{opacity:0.5;} }
+      @keyframes chapterLineFlow {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+      }
+    `}}/>
+
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.2)',
+      borderRadius:'20px',
+      animation:'chapterModalGlow 4s ease-in-out infinite',
+      position:'relative'
     }}>
-      {ch.chapter_number}.
-    </span>
-    <span className="text-sm sm:text-base break-words flex-1" style={{
-      color: '#c084fc',
-      fontWeight: isActive ? '600' : '400'
-    }}>
-      {ch.title}
-    </span>
-  </div>
-</button>
-                  );
-                })}
-              </div>
-            </div>
+      {/* Верхняя градиентная линия */}
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'20px 20px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,#3fcaaf,transparent)'}}/>
+
+      {/* Звёзды фон */}
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'20px',
+        backgroundImage:`
+          radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.4) 0%, transparent 100%),
+          radial-gradient(1px 1px at 85% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 45% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1px 1px at 15% 88%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 70% 35%, rgba(255,255,255,0.15) 0%, transparent 100%)`,
+        animation:'chapterStarTwinkle 6s ease-in-out infinite'}}/>
+
+      {/* Шапка */}
+      <div style={{
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(147,112,219,0.15)',
+        position:'relative',zIndex:2,
+        background:'rgba(147,50,255,0.06)'
+      }}>
+        <button onClick={()=>setShowChapterList(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',
+            fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',
+            textTransform:'uppercase',
+            backgroundImage:'linear-gradient(90deg,#b3e7ef,#c084fc,#ef01cb,#c084fc,#b3e7ef)',
+            backgroundSize:'200% auto',
+            WebkitBackgroundClip:'text',
+            WebkitTextFillColor:'transparent',
+            backgroundClip:'text',
+            color:'transparent',
+            animation:'chapterLineFlow 4s linear infinite',
+            margin:0
+          }}>Содержание</h2>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))'}}/>
+            <span style={{color:'rgba(147,112,219,0.25)',fontSize:'0.45rem',letterSpacing:'6px'}}>· · · · · · ·</span>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))'}}/>
           </div>
         </div>
-      )}
-
-{showChapterList && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-      background: 'rgba(0, 0, 0, 0.3)',
-      border: '3px solid transparent',
-      borderRadius: '16px',
-      backgroundClip: 'padding-box',
-      position: 'relative',
-      boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '16px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-        borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
-      }}>
-        <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
-          color: '#c9c6bb',
-          fontFamily: "'miamanueva', Georgia, serif",
-          fontStyle: 'italic',
-          textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
-        }}>
-          Содержание
-        </h2>
-        <button 
-          onClick={() => setShowChapterList(false)} 
-          className="transition rounded-full p-2 absolute right-4"
-          style={{
-            color: '#65635d',
-            backgroundColor: 'rgba(180, 154, 95, 0.15)',
-            border: '1px solid rgba(180, 154, 95, 0.3)'
-          }}
-        >
-          <X size={24} />
-        </button>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <style dangerouslySetInnerHTML={{__html: `
-          .overflow-y-auto::-webkit-scrollbar {
-            width: 8px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
-            box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
-          }
-        `}} />
-        <div className="space-y-2">
+
+      {/* Список */}
+      <div className="flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
+<style dangerouslySetInnerHTML={{__html:`
+  .ch-scroll::-webkit-scrollbar { width: 6px; }
+  .ch-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); border-radius:10px; }
+  .ch-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9370db, #ef01cb, #3fcaaf);
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(147,112,219,0.6);
+  }
+  .ch-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #c084fc, #f472b6, #3fcaaf);
+    box-shadow: 0 0 12px rgba(192,132,252,0.8);
+  }
+  @keyframes neonBorderFlow { 0%{background-position:0% center;} 100%{background-position:200% center;} }
+`}}/>
+        <div className="ch-scroll space-y-2">
           {allChapters.map((ch) => {
             const isActive = String(ch.id) === String(chapterId);
             return (
-              <button
-                key={ch.id}
-                onClick={() => handleChapterSelect(ch.id)}
-                className="w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300"
+              <button key={ch.id} onClick={()=>handleChapterSelect(ch.id)}
+                className="w-full text-left"
                 style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  position: 'relative',
-                  borderRadius: '12px'
+                  background: isActive ? 'rgba(147,112,219,0.15)' : 'rgba(255,255,255,0.02)',
+                  border: isActive ? '1px solid rgba(180,100,255,0.5)' : '1px solid rgba(147,112,219,0.1)',
+                  borderRadius:'10px',
+                  padding:'12px 16px',
+                  cursor:'pointer',
+                  transition:'all 0.2s',
+                  boxShadow: isActive ? '0 0 20px rgba(147,112,219,0.2)' : 'none'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 154, 95, 0.4)';
+                onMouseEnter={e=>{
+                  if(!isActive){
+                    e.currentTarget.style.background='rgba(147,112,219,0.08)';
+                    e.currentTarget.style.borderColor='rgba(180,100,255,0.3)';
+                    e.currentTarget.style.boxShadow='0 0 15px rgba(147,112,219,0.15)';
+                  }
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  inset: '-2px',
-                  borderRadius: '12px',
-                  padding: '2px',
-                  background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
-                  backgroundSize: '200% 100%',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                  pointerEvents: 'none',
-                  zIndex: -1,
-                  animation: 'gothicBorderFlow 3s linear infinite'
-                }} />
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-base sm:text-lg flex-shrink-0" style={{
-                    color: '#c9c6bb',
-                    minWidth: '30px'
-                  }}>
-                    {ch.chapter_number}.
-                  </span>
-                  <span className="text-sm sm:text-base break-words flex-1" style={{
-                    color: '#c9c6bb',
-                    fontWeight: isActive ? '600' : '400'
-                  }}>
-                    {ch.title}
-                  </span>
+                onMouseLeave={e=>{
+                  if(!isActive){
+                    e.currentTarget.style.background='rgba(255,255,255,0.02)';
+                    e.currentTarget.style.borderColor='rgba(147,112,219,0.1)';
+                    e.currentTarget.style.boxShadow='none';
+                  }
+                }}>
+                <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                  <span style={{
+                    fontFamily:'Cinzel,serif',fontSize:'0.7rem',letterSpacing:'2px',
+                    color: isActive ? '#c084fc' : 'rgba(147,112,219,0.5)',
+                    minWidth:'28px',flexShrink:0
+                  }}>{ch.chapter_number}.</span>
+                  <span style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem',
+                    color: isActive ? '#e8d5ff' : 'rgba(200,185,230,0.6)',
+                    fontWeight: isActive ? '400' : '300'
+                  }}>{ch.title}</span>
+                  {isActive && <span style={{marginLeft:'auto',color:'rgba(180,100,255,0.6)',fontSize:'0.6rem',letterSpacing:'3px'}}>✦</span>}
                 </div>
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Нижняя линия */}
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.2),transparent)'}}/>
+    </div>
+  </div>
+)}
+
+{showChapterList && !isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
+  }}>
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'#080808',
+      borderRadius:'4px',
+      position:'relative',
+      border:'1px solid #1a1510',
+      boxShadow:'0 0 80px rgba(0,0,0,0.8)'
+    }}>
+      {/* Левая золотая полоса */}
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)'}}/>
+      {/* Правая тонкая */}
+      <div style={{position:'absolute',right:0,top:0,bottom:0,width:'1px',
+        background:'linear-gradient(180deg,transparent,rgba(201,168,76,0.2),transparent)'}}/>
+      {/* Большой фоновый символ */}
+      <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
+        fontFamily:'serif',fontSize:'20rem',color:'rgba(201,168,76,0.02)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+      {/* Шапка */}
+      <div style={{
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(201,168,76,0.1)',
+        position:'relative',zIndex:2
+      }}>
+        <button onClick={()=>setShowChapterList(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,rgba(201,168,76,0.4),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,rgba(201,168,76,0.4),transparent)'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',
+            fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',
+            textTransform:'uppercase',
+            color:'rgba(201,168,76,0.7)',
+            margin:0
+          }}>Содержание</h2>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(90deg,rgba(201,168,76,0.3),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'5px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(270deg,rgba(201,168,76,0.3),transparent)'}}/>
+          </div>
+        </div>
+      </div>
+
+      {/* Список */}
+      <div className="flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
+        <style dangerouslySetInnerHTML={{__html:`
+          .ch-scroll-light::-webkit-scrollbar { width: 4px; }
+          .ch-scroll-light::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius:10px; }
+          .ch-scroll-light::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#c9a84c,#65635d); border-radius:10px; }
+        `}}/>
+        <div className="ch-scroll-light space-y-2">
+          {allChapters.map((ch) => {
+            const isActive = String(ch.id) === String(chapterId);
+            return (
+              <button key={ch.id} onClick={()=>handleChapterSelect(ch.id)}
+                className="w-full text-left"
+                style={{
+                  background: isActive ? 'rgba(201,168,76,0.08)' : 'transparent',
+                  border: isActive ? '1px solid rgba(201,168,76,0.4)' : '1px solid rgba(201,168,76,0.08)',
+                  borderRadius:'2px',
+                  padding:'12px 16px',
+                  cursor:'pointer',
+                  transition:'all 0.2s'
+                }}
+                onMouseEnter={e=>{
+                  if(!isActive){
+                    e.currentTarget.style.background='rgba(201,168,76,0.05)';
+                    e.currentTarget.style.borderColor='rgba(201,168,76,0.25)';
+                  }
+                }}
+                onMouseLeave={e=>{
+                  if(!isActive){
+                    e.currentTarget.style.background='transparent';
+                    e.currentTarget.style.borderColor='rgba(201,168,76,0.08)';
+                  }
+                }}>
+                <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                  <span style={{
+                    fontFamily:'Cinzel,serif',fontSize:'0.65rem',letterSpacing:'2px',
+                    color: isActive ? '#c9a84c' : 'rgba(201,168,76,0.35)',
+                    minWidth:'28px',flexShrink:0
+                  }}>{ch.chapter_number}.</span>
+                  <span style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem',
+                    color: isActive ? '#d0c8b8' : 'rgba(201,168,76,0.45)',
+                    fontWeight:'300'
+                  }}>{ch.title}</span>
+                  {isActive && <span style={{marginLeft:'auto',color:'rgba(201,168,76,0.5)',fontFamily:'serif'}}>⚜</span>}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent)'}}/>
     </div>
   </div>
 )}
@@ -1714,179 +1742,167 @@ style={{
         </div>
       )}
 
-{showPlaylist && chapter?.audio_url && (
+{showPlaylist && isDarkTheme && chapter?.audio_url && (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
   }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      border: '2px solid #9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes plStarTwinkle { 0%,100%{opacity:0.1;} 50%{opacity:0.5;} }
+      @keyframes plLineFlow { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+      @keyframes bar1 { 0%,100%{height:30%;} 50%{height:65%;} }
+      @keyframes bar2 { 0%,100%{height:50%;} 50%{height:85%;} }
+      @keyframes bar3 { 0%,100%{height:40%;} 50%{height:75%;} }
+      @keyframes cosmicSpin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+      @keyframes cosmicPulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+      @keyframes plBorderFlow { 0%{background-position:0% center;} 100%{background-position:200% center;} }
+      .pl-scroll::-webkit-scrollbar { width: 6px; }
+      .pl-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); border-radius:10px; }
+      .pl-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #9370db, #ef01cb, #3fcaaf);
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(147,112,219,0.6);
+      }
+      .pl-scroll::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #c084fc, #f472b6, #3fcaaf);
+        box-shadow: 0 0 12px rgba(192,132,252,0.8);
+      }
+    `}}/>
+
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.2)',
+      borderRadius:'20px',
+      boxShadow:'0 0 80px rgba(147,50,255,0.2), inset 0 0 60px rgba(0,0,0,0.5)',
+      position:'relative'
     }}>
-      <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-        borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'20px 20px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,#3fcaaf,transparent)'}}/>
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'20px',
+        backgroundImage:`
+          radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.4) 0%, transparent 100%),
+          radial-gradient(1px 1px at 85% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 45% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,0.25) 0%, transparent 100%)`,
+        animation:'plStarTwinkle 6s ease-in-out infinite'}}/>
+
+      {/* Шапка */}
+      <div style={{
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(147,112,219,0.15)',
+        position:'relative',zIndex:2,
+        background:'rgba(147,50,255,0.06)'
       }}>
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes playlistTitleShimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-          }
-          .playlist-title-shimmer {
-            background: linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: playlistTitleShimmer 3s linear infinite;
-          }
-        `}} />
-        <h2 className="text-xl sm:text-2xl font-bold playlist-title-shimmer">
-          Плейлист
-        </h2>
-        <button 
-          onClick={() => setShowPlaylist(false)} 
-          className="transition rounded-full p-2 absolute right-4"
-          style={{
-            color: '#ffffff',
-            backgroundColor: 'rgba(147, 51, 234, 0.3)',
-            border: '2px solid rgba(255, 255, 255, 0.5)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.5)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(147, 51, 234, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-          }}
-        >
-          <X size={24} />
-        </button>
+        <button onClick={()=>setShowPlaylist(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',
+            fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',
+            textTransform:'uppercase',
+            backgroundImage:'linear-gradient(90deg,#b3e7ef,#c084fc,#ef01cb,#c084fc,#b3e7ef)',
+            backgroundSize:'200% auto',
+            WebkitBackgroundClip:'text',
+            WebkitTextFillColor:'transparent',
+            backgroundClip:'text',
+            color:'transparent',
+            animation:'plLineFlow 4s linear infinite',
+            margin:0
+          }}>Плейлист</h2>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))'}}/>
+            <span style={{color:'rgba(147,112,219,0.25)',fontSize:'0.45rem',letterSpacing:'6px'}}>· · · · · · ·</span>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))'}}/>
+          </div>
+        </div>
       </div>
-      
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <style dangerouslySetInnerHTML={{__html: `
-          .overflow-y-auto::-webkit-scrollbar {
-            width: 8px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
-            box-shadow: 0 0 15px rgba(180, 141, 196, 1);
-          }
-          @keyframes neonBorderFlow {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-          }
-        `}} />
-        
+
+      {/* Треки */}
+      <div className="pl-scroll flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
         <div className="space-y-3">
           {JSON.parse(chapter.audio_url).map((audio, i) => {
             const isPlaying = currentTrack === i;
             const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
-            
             return (
-              <div 
-                key={i} 
-                className="rounded-lg p-4 transition-all"
+              <div key={i}
                 style={{
-                  background: '#000000',
-                  position: 'relative',
-                  borderRadius: '12px',
-                  overflow: 'visible'
+                  background: isPlaying ? 'rgba(147,112,219,0.12)' : 'rgba(255,255,255,0.02)',
+                  border: isPlaying ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(147,112,219,0.1)',
+                  borderRadius:'10px',
+                  padding:'14px 16px 14px 52px',
+                  cursor:'pointer',
+                  position:'relative',
+                  transition:'all 0.2s',
+                  boxShadow: isPlaying ? '0 0 20px rgba(147,112,219,0.2)' : 'none'
                 }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  inset: '-2px',
-                  borderRadius: '12px',
-                  padding: '2px',
-                  background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
-                  backgroundSize: '200% 100%',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                  pointerEvents: 'none',
-                  zIndex: -1,
-                  animation: 'neonBorderFlow 3s linear infinite'
-                }} />
+                onClick={()=>{
+                  if(audioElement){
+                    if(audioElement.paused){
+                      document.querySelectorAll('[id^="audio-track-"]').forEach(a=>a.pause());
+                      audioElement.play();
+                    } else { audioElement.pause(); }
+                  }
+                }}
+                onMouseEnter={e=>{
+                  if(!isPlaying){
+                    e.currentTarget.style.background='rgba(147,112,219,0.07)';
+                    e.currentTarget.style.borderColor='rgba(180,100,255,0.25)';
+                  }
+                }}
+                onMouseLeave={e=>{
+                  if(!isPlaying){
+                    e.currentTarget.style.background='rgba(255,255,255,0.02)';
+                    e.currentTarget.style.borderColor='rgba(147,112,219,0.1)';
+                  }
+                }}>
 
-                <div className="flex items-center justify-between gap-3">
-                  {/* НАЗВАНИЕ ТРЕКА */}
-                  <p className="text-xs font-semibold line-clamp-1 flex-1" style={{ color: '#c084fc' }}>
-                    {audio.name}
-                  </p>
+                {/* Эквалайзер или номер */}
+                <div style={{position:'absolute',left:'16px',top:'50%',transform:'translateY(-50%)',
+                  display:'flex',alignItems:'flex-end',gap:'3px',height:'20px'}}>
+                  {isPlaying ? (
+                    <>
+                      <span style={{width:'4px',background:'#3fcaaf',borderRadius:'2px',animation:'bar1 0.6s ease-in-out infinite'}}/>
+                      <span style={{width:'4px',background:'#ef01cb',borderRadius:'2px',animation:'bar2 0.6s ease-in-out infinite 0.15s'}}/>
+                      <span style={{width:'4px',background:'#9370db',borderRadius:'2px',animation:'bar3 0.6s ease-in-out infinite 0.3s'}}/>
+                    </>
+                  ) : (
+                    <span style={{fontFamily:'Cinzel,serif',fontSize:'0.65rem',color:'rgba(147,112,219,0.4)',letterSpacing:'1px'}}>{i+1}</span>
+                  )}
+                </div>
 
-                  {/* КНОПКИ */}
-                  <div className="flex items-center gap-2">
-                    {/* ВОСПРОИЗВЕДЕНИЕ/ПАУЗА */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (audioElement) {
-                          if (audioElement.paused) {
-                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
-                            audioElement.play();
-                          } else {
-                            audioElement.pause();
-                          }
-                        }
-                      }}
-                      className="p-2 rounded-full transition-all flex-shrink-0"
-                      style={{
-                        background: isPlaying ? 'rgba(239, 1, 203, 0.3)' : 'rgba(147, 51, 234, 0.3)',
-                        border: '1px solid ' + (isPlaying ? '#ef01cb' : '#9333ea')
-                      }}
-                    >
-                      {isPlaying ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef01cb" stroke="#ef01cb" strokeWidth="2">
-                          <rect x="6" y="4" width="4" height="16"/>
-                          <rect x="14" y="4" width="4" height="16"/>
-                        </svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
-                          <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                      )}
-                    </button>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px'}}>
+                  <p style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem',
+                    color: isPlaying ? '#e8d5ff' : 'rgba(200,185,230,0.6)',
+                    fontWeight:'300',flex:1,margin:0,
+                    overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'
+                  }}>{audio.name}</p>
 
-                    {/* СКАЧИВАНИЕ */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downloadTrack(audio.url || audio.data, audio.name, i);
-                      }}
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
+                    <button onClick={e=>{e.stopPropagation();downloadTrack(audio.url||audio.data,audio.name,i);}}
                       disabled={downloadingTracks.includes(i)}
-                      className="p-2 rounded-full transition-all flex-shrink-0"
                       style={{
-                        background: downloadingTracks.includes(i) 
-                          ? 'rgba(63, 202, 175, 0.3)' 
-                          : 'rgba(147, 51, 234, 0.3)',
-                        border: '1px solid ' + (downloadingTracks.includes(i) ? '#3fcaaf' : '#9333ea')
-                      }}
-                    >
+                        padding:'6px',borderRadius:'50%',cursor:'pointer',
+                        background: downloadingTracks.includes(i) ? 'rgba(63,202,175,0.2)' : 'rgba(147,112,219,0.1)',
+                        border: '1px solid ' + (downloadingTracks.includes(i) ? 'rgba(63,202,175,0.5)' : 'rgba(147,112,219,0.25)')
+                      }}>
                       {downloadingTracks.includes(i) ? (
-                        <div style={{
-                          width: '16px',
-                          height: '16px',
-                          border: '2px solid transparent',
-                          borderTopColor: '#3fcaaf',
-                          borderRightColor: '#ef01cb',
-                          borderRadius: '50%',
-                          animation: 'cosmicSpin 0.8s linear infinite, cosmicPulse 2s ease-in-out infinite'
-                        }} />
+                        <div style={{width:'14px',height:'14px',border:'2px solid transparent',
+                          borderTopColor:'#3fcaaf',borderRightColor:'#ef01cb',borderRadius:'50%',
+                          animation:'cosmicSpin 0.8s linear infinite'}}/>
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(192,132,252,0.7)" strokeWidth="2">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                           <polyline points="7 10 12 15 17 10"/>
                           <line x1="12" y1="15" x2="12" y2="3"/>
@@ -1900,180 +1916,145 @@ style={{
           })}
         </div>
       </div>
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.2),transparent)'}}/>
     </div>
   </div>
 )}
 
 {showPlaylist && !isDarkTheme && chapter?.audio_url && (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
   }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-      background: 'rgba(0, 0, 0, 0.3)',
-      border: '3px solid transparent',
-      borderRadius: '16px',
-      backgroundClip: 'padding-box',
-      position: 'relative',
-      boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes cosmicSpin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+      .pl-scroll-light::-webkit-scrollbar { width: 6px; }
+      .pl-scroll-light::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius:10px; }
+      .pl-scroll-light::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #c9a84c, #8a6a2a, #c9a84c);
+        border-radius: 10px;
+        box-shadow: 0 0 6px rgba(201,168,76,0.4);
+      }
+      .pl-scroll-light::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #f0d080, #c9a84c);
+        box-shadow: 0 0 10px rgba(240,208,128,0.6);
+      }
+    `}}/>
+
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'#080808',
+      borderRadius:'4px',
+      position:'relative',
+      border:'1px solid #1a1510',
+      boxShadow:'0 0 80px rgba(0,0,0,0.8)'
     }}>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)'}}/>
+<div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
+  fontFamily:'serif',fontSize:'18rem',color:'rgba(201,168,76,0.025)',
+  pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+      {/* Шапка */}
       <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '16px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-        borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(201,168,76,0.1)',
+        position:'relative',zIndex:2
       }}>
-        <h2 className="text-xl sm:text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'miamanueva', Georgia, serif",
-          fontStyle: 'italic'
-        }}>
-          Плейлист
-        </h2>
-        <button 
-          onClick={() => setShowPlaylist(false)} 
-          className="transition rounded-full p-2 absolute right-4"
-          style={{
-            color: '#65635d',
-            backgroundColor: 'rgba(180, 154, 95, 0.15)',
-            border: '1px solid rgba(180, 154, 95, 0.3)'
-          }}
-        >
-          <X size={24} />
-        </button>
+        <button onClick={()=>setShowPlaylist(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,rgba(201,168,76,0.4),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,rgba(201,168,76,0.4),transparent)'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',textTransform:'uppercase',
+            color:'rgba(201,168,76,0.7)',margin:0
+          }}>Плейлист</h2>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(90deg,rgba(201,168,76,0.3),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'5px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(270deg,rgba(201,168,76,0.3),transparent)'}}/>
+          </div>
+        </div>
       </div>
-      
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <style dangerouslySetInnerHTML={{__html: `
-          .overflow-y-auto::-webkit-scrollbar {
-            width: 8px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(188, 187, 174, 0.25);
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
-            box-shadow: 0 0 15px rgba(188, 187, 174, 0.05);
-          }
-          @keyframes gothicBorderFlow {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-          }
-        `}} />
-        
+
+      {/* Треки */}
+      <div className="pl-scroll-light flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
         <div className="space-y-3">
           {JSON.parse(chapter.audio_url).map((audio, i) => {
             const isPlaying = currentTrack === i;
             const audioElement = typeof document !== 'undefined' ? document.getElementById(`audio-track-${i}`) : null;
-            
             return (
-              <div 
-                key={i} 
-                className="rounded-lg p-4 transition-all"
+              <div key={i}
                 style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  position: 'relative',
-                  borderRadius: '12px',
-                  overflow: 'visible'
+                  background: isPlaying ? 'rgba(201,168,76,0.07)' : 'transparent',
+                  border: isPlaying ? '1px solid rgba(201,168,76,0.35)' : '1px solid rgba(201,168,76,0.1)',
+                  borderRadius:'2px',
+                  padding:'14px 16px',
+                  cursor:'pointer',
+                  position:'relative',
+                  transition:'all 0.2s'
                 }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  inset: '-2px',
-                  borderRadius: '12px',
-                  padding: '2px',
-                  background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
-                  backgroundSize: '200% 100%',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                  pointerEvents: 'none',
-                  zIndex: -1,
-                  animation: 'gothicBorderFlow 3s linear infinite'
-                }} />
+                onClick={()=>{
+                  if(audioElement){
+                    if(audioElement.paused){
+                      document.querySelectorAll('[id^="audio-track-"]').forEach(a=>a.pause());
+                      audioElement.play();
+                    } else { audioElement.pause(); }
+                  }
+                }}
+                onMouseEnter={e=>{
+                  if(!isPlaying){
+                    e.currentTarget.style.background='rgba(201,168,76,0.04)';
+                    e.currentTarget.style.borderColor='rgba(201,168,76,0.25)';
+                  }
+                }}
+                onMouseLeave={e=>{
+                  if(!isPlaying){
+                    e.currentTarget.style.background='transparent';
+                    e.currentTarget.style.borderColor='rgba(201,168,76,0.1)';
+                  }
+                }}>
+                {/* Левая полоска активного */}
+                {isPlaying && <div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',
+                  background:'linear-gradient(180deg,transparent,#c9a84c,transparent)'}}/>}
 
-                <div className="flex items-center justify-between gap-3">
-                  {/* НАЗВАНИЕ ТРЕКА */}
-                  <p className="text-xs font-semibold line-clamp-1 flex-1" style={{ color: '#c9c6bb' }}>
-                    {audio.name}
-                  </p>
+                <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                  {/* Символ перед треком */}
+                  <span style={{
+                    fontFamily:'serif',fontSize:'1rem',flexShrink:0,
+                    color: isPlaying ? 'rgba(201,168,76,0.8)' : 'rgba(201,168,76,0.3)'
+                  }}>{isPlaying ? '⚜' : '♪'}</span>
 
-                  {/* КНОПКИ */}
-                  <div className="flex items-center gap-2">
-                    {/* ВОСПРОИЗВЕДЕНИЕ/ПАУЗА */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (audioElement) {
-                          if (audioElement.paused) {
-                            document.querySelectorAll('[id^="audio-track-"]').forEach(a => a.pause());
-                            audioElement.play();
-                          } else {
-                            audioElement.pause();
-                          }
-                        }
-                      }}
-                      className="p-2 rounded-full transition-all flex-shrink-0"
-                      style={{
-                        background: isPlaying ? 'rgba(180, 154, 95, 0.5)' : 'rgba(0, 0, 0, 0.3)',
-                        border: '1px solid ' + (isPlaying ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
-                      }}
-                    >
-                      {isPlaying ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#c9c6bb" stroke="#c9c6bb" strokeWidth="2">
-                          <rect x="6" y="4" width="4" height="16"/>
-                          <rect x="14" y="4" width="4" height="16"/>
-                        </svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
-                          <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                      )}
-                    </button>
+                  <p style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem',
+                    color: isPlaying ? '#d0c8b8' : 'rgba(201,168,76,0.45)',
+                    fontWeight:'300',flex:1,margin:0,
+                    overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'
+                  }}>{audio.name}</p>
 
-                    {/* СКАЧИВАНИЕ */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downloadTrack(audio.url || audio.data, audio.name, i);
-                      }}
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
+                    <button onClick={e=>{e.stopPropagation();downloadTrack(audio.url||audio.data,audio.name,i);}}
                       disabled={downloadingTracks.includes(i)}
-                      className="p-2 rounded-full transition-all flex-shrink-0"
                       style={{
-                        background: downloadingTracks.includes(i) 
-                          ? 'rgba(180, 154, 95, 0.3)' 
-                          : 'rgba(0, 0, 0, 0.3)',
-                        border: '1px solid ' + (downloadingTracks.includes(i) ? '#b49a5f' : 'rgba(180, 154, 95, 0.4)')
-                      }}
-                    >
+                        padding:'6px',borderRadius:'2px',cursor:'pointer',
+                        background:'transparent',
+                        border:'1px solid ' + (downloadingTracks.includes(i) ? 'rgba(201,168,76,0.5)' : 'rgba(201,168,76,0.2)')
+                      }}>
                       {downloadingTracks.includes(i) ? (
-                        <div style={{
-                          width: '16px',
-                          height: '16px',
-                          border: '2px solid transparent',
-                          borderTopColor: '#c9c6bb',
-                          borderRightColor: '#65635d',
-                          borderRadius: '50%',
-                          animation: 'cosmicSpin 0.8s linear infinite'
-                        }} />
+                        <div style={{width:'14px',height:'14px',border:'2px solid transparent',
+                          borderTopColor:'#c9a84c',borderRadius:'50%',
+                          animation:'cosmicSpin 0.8s linear infinite'}}/>
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                           <polyline points="7 10 12 15 17 10"/>
                           <line x1="12" y1="15" x2="12" y2="3"/>
@@ -2087,282 +2068,288 @@ style={{
           })}
         </div>
       </div>
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.1),transparent)'}}/>
     </div>
   </div>
 )}
 
       {/* МОДАЛЬНОЕ ОКНО ЗАКЛАДОК */}
-      {showBookmarksModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-            background: 'rgba(147, 51, 234, 0.15)',
-            border: '2px solid #9333ea',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
-          }}>
- <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-  borderBottom: '2px solid rgba(147, 51, 234, 0.4)'
-}}>
-  <h2 className="text-xl sm:text-2xl font-bold text-center" style={{
-    background: 'linear-gradient(90deg, #9370db 0%, #3fcaaf 50%, #9370db 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'bookmarksTitleShimmer 3s linear infinite',
-    fontFamily: "'ppelganger', Georgia, serif"
+ {showBookmarksModal && isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
   }}>
-    Закладки главы
-  </h2>
-              <button 
-                onClick={() => setShowBookmarksModal(false)} 
-                className="transition rounded-full p-2 absolute right-4"
-                style={{
-                  color: '#ffffff',
-                  backgroundColor: 'rgba(147, 51, 234, 0.3)',
-                  border: '2px solid rgba(255, 255, 255, 0.5)'
-                }}
-              >
-                <X size={24} />
-              </button>
-            </div>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes bmStarTwinkle { 0%,100%{opacity:0.1;} 50%{opacity:0.5;} }
+      @keyframes bmLineFlow { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+      .bm-scroll::-webkit-scrollbar { width: 6px; }
+      .bm-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); border-radius:10px; }
+      .bm-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #9370db, #ef01cb, #3fcaaf);
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(147,112,219,0.6);
+      }
+      .bm-scroll::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #c084fc, #f472b6, #9370db);
+        box-shadow: 0 0 12px rgba(192,132,252,0.8);
+      }
+    `}}/>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <style dangerouslySetInnerHTML={{__html: `
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #9370db 0%, #67327b 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(147, 112, 219, 0.8);
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #b48dc4 0%, #9370db 100%);
-    box-shadow: 0 0 15px rgba(180, 141, 196, 1);
-  }
-`}} />
-              {userBookmarks.length === 0 ? (
-                <div className="text-center py-12">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(147, 51, 234, 0.5)" strokeWidth="2" className="mx-auto mb-4">
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                  </svg>
-                  <p className="text-gray-500">В этой главе нет закладок</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {userBookmarks.map((bookmark) => (
-<div 
-  key={bookmark.id}
-  className="rounded-lg p-4 transition-all cursor-pointer"
-  style={{
-    background: '#000000',
-    position: 'relative',
-    borderRadius: '12px'
-  }}
-  onClick={() => jumpToBookmark(bookmark.selected_text)}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.boxShadow = '0 0 15px rgba(63, 202, 175, 0.6)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.boxShadow = 'none';
-  }}
->
-  <div style={{
-    position: 'absolute',
-    inset: '-2px',
-    borderRadius: '12px',
-    padding: '2px',
-    background: 'linear-gradient(90deg, #ef01cb 0%, #9370db 33%, #3fcaaf 66%, #ef01cb 100%)',
-    backgroundSize: '200% 100%',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1,
-    animation: 'neonBorderFlow 3s linear infinite'
-  }} />
-                      <div className="flex justify-between items-start mb-2">
-                        <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#3fcaaf' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#3fcaaf" stroke="#3fcaaf" strokeWidth="2">
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                          </svg>
-                          Закладка
-                        </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteBookmark(bookmark.id);
-                          }}
-                          className="text-red-500 hover:text-red-400 transition"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                      <div className="bg-gray-900 rounded p-3 mb-2">
-                        <p className="text-gray-300 text-sm line-clamp-3">
-                          &quot;{bookmark.selected_text}&quot;
-                        </p>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.2)',
+      borderRadius:'20px',
+      boxShadow:'0 0 80px rgba(147,50,255,0.2), inset 0 0 60px rgba(0,0,0,0.5)',
+      position:'relative'
+    }}>
+      {/* Верхняя линия */}
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'20px 20px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,#3fcaaf,transparent)'}}/>
+      {/* Звёзды */}
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'20px',
+        backgroundImage:`
+          radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.4) 0%, transparent 100%),
+          radial-gradient(1px 1px at 85% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 45% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1px 1px at 15% 88%, rgba(255,255,255,0.2) 0%, transparent 100%)`,
+        animation:'bmStarTwinkle 6s ease-in-out infinite'}}/>
+
+      {/* Шапка */}
+      <div style={{
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(147,112,219,0.15)',
+        position:'relative',zIndex:2,
+        background:'rgba(147,50,255,0.06)'
+      }}>
+        <button onClick={()=>setShowBookmarksModal(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',
+            fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',
+            textTransform:'uppercase',
+            backgroundImage:'linear-gradient(90deg,#b3e7ef,#c084fc,#ef01cb,#c084fc,#b3e7ef)',
+            backgroundSize:'200% auto',
+            WebkitBackgroundClip:'text',
+            WebkitTextFillColor:'transparent',
+            backgroundClip:'text',
+            color:'transparent',
+            animation:'bmLineFlow 4s linear infinite',
+            margin:0
+          }}>Закладки главы</h2>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))'}}/>
+            <span style={{color:'rgba(147,112,219,0.25)',fontSize:'0.45rem',letterSpacing:'6px'}}>· · · · · · ·</span>
+            <div style={{height:'1px',width:'40px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))'}}/>
           </div>
         </div>
-      )}
-
-      {showBookmarksModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-<div className="rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
-  background: 'rgba(0, 0, 0, 0.3)',
-  border: '3px solid transparent',
-  borderRadius: '16px',
-  backgroundClip: 'padding-box',
-  position: 'relative',
-  boxShadow: '0 0 0 3px #65635d, 0 0 0 6px transparent, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-}}>
-  <div style={{
-    position: 'absolute',
-    inset: '-3px',
-    borderRadius: '16px',
-    padding: '3px',
-    background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1
-  }} />
-      <div className="flex justify-center items-center p-5 sm:p-6 relative" style={{
-        borderBottom: '1px solid rgba(180, 154, 95, 0.2)'
-      }}>
-<h2 className="text-xl sm:text-2xl font-bold text-center" style={{
-  color: '#c9c6bb',
-  fontFamily: "'miamanueva', Georgia, serif",
-  fontStyle: 'italic',
-  textShadow: '0 0 8px rgba(194, 171, 117, 0.3)'
-}}>
-  Закладки главы
-</h2>
-        <button 
-          onClick={() => setShowBookmarksModal(false)} 
-          className="transition rounded-full p-2 absolute right-4"
-          style={{
-            color: '#c9c6bb',
-            backgroundColor: 'rgba(180, 154, 95, 0.15)',
-            border: '1px solid rgba(180, 154, 70, 0.0)'
-          }}
-        >
-          <X size={24} />
-        </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <style dangerouslySetInnerHTML={{__html: `
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #5d5846 0%, #c9c6bb 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(194, 171, 117, 0.6);
-  }
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #c9c6bb 0%, #5d5846 100%);
-    box-shadow: 0 0 15px rgba(216, 197, 162, 0.8);
-  }
-`}} />
+      {/* Контент */}
+      <div className="bm-scroll flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
         {userBookmarks.length === 0 ? (
-          <div className="text-center py-12">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(194, 171, 117, 0.5)" strokeWidth="2" className="mx-auto mb-4">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-            </svg>
-            <p style={{ color: '#c9c6bb' }}>В этой главе нет закладок</p>
+          <div style={{textAlign:'center',padding:'40px 0'}}>
+            <div style={{fontSize:'2rem',marginBottom:'12px',color:'rgba(147,112,219,0.3)'}}>✦</div>
+            <p style={{color:'rgba(200,185,230,0.3)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem',letterSpacing:'1px'}}>
+              В этой главе нет закладок
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
             {userBookmarks.map((bookmark) => (
-      <div 
-  key={bookmark.id}
-  className="rounded-lg p-4 transition-all cursor-pointer"
-  style={{
-    background: 'rgba(0, 0, 0, 0.3)',
-    position: 'relative',
-    borderRadius: '12px'
-  }}
-  onClick={() => jumpToBookmark(bookmark.selected_text)}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = 'radial-gradient(circle at center, rgba(180, 154, 95, 0.25), rgba(0, 0, 0, 0.3))';
-    e.currentTarget.style.boxShadow = '0 0 15px rgba(180, 154, 95, 0.4)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-    e.currentTarget.style.boxShadow = 'none';
-  }}
->
-  <div style={{
-    position: 'absolute',
-    inset: '-2px',
-    borderRadius: '12px',
-    padding: '2px',
-    background: 'linear-gradient(90deg, #c9c6bb 0%, #000000 50%, #c9c6bb 100%)',
-    backgroundSize: '200% 100%',
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    pointerEvents: 'none',
-    zIndex: -1,
-    animation: 'gothicBorderFlow 3s linear infinite'
-  }} />
-                <div className="flex justify-between items-start mb-2">
-                  <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#c9c6bb' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#c9c6bb" stroke="#c9c6bb" strokeWidth="2">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    Закладка
-                  </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteBookmark(bookmark.id);
-                    }}
-                    className="text-red-500 hover:text-red-400 transition"
-                  >
-                    <X size={16} />
-                  </button>
+              <div key={bookmark.id}
+                style={{
+                  background:'rgba(147,112,219,0.05)',
+                  border:'1px solid rgba(147,112,219,0.12)',
+                  borderRadius:'10px',
+                  padding:'16px',
+                  cursor:'pointer',
+                  transition:'all 0.2s'
+                }}
+                onClick={()=>jumpToBookmark(bookmark.selected_text)}
+                onMouseEnter={e=>{
+                  e.currentTarget.style.background='rgba(147,112,219,0.1)';
+                  e.currentTarget.style.borderColor='rgba(180,100,255,0.3)';
+                  e.currentTarget.style.boxShadow='0 0 20px rgba(147,112,219,0.15)';
+                }}
+                onMouseLeave={e=>{
+                  e.currentTarget.style.background='rgba(147,112,219,0.05)';
+                  e.currentTarget.style.borderColor='rgba(147,112,219,0.12)';
+                  e.currentTarget.style.boxShadow='none';
+                }}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                  <span style={{fontFamily:'Cinzel,serif',fontSize:'0.6rem',letterSpacing:'3px',
+                    color:'rgba(192,132,252,0.5)',textTransform:'uppercase'}}>
+                    ✦ Закладка
+                  </span>
+                  <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <span style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.65rem',
+                      color:'rgba(147,112,219,0.35)'}}>
+                      {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+                    </span>
+                    <button onClick={e=>{e.stopPropagation();deleteBookmark(bookmark.id);}} style={{
+                      background:'transparent',border:'none',cursor:'pointer',
+                      color:'rgba(239,1,203,0.4)',fontSize:'16px',padding:'0',lineHeight:1
+                    }}>✕</button>
+                  </div>
                 </div>
-                <div className="rounded p-3 mb-2" style={{ background: 'rgba(0, 0, 0, 0.4)' }}>
-                  <p className="text-sm line-clamp-3" style={{ color: '#c9c6bb' }}>
-                    &quot;{bookmark.selected_text}&quot;
-                  </p>
+                <div style={{borderLeft:'2px solid rgba(147,112,219,0.3)',paddingLeft:'12px'}}>
+                  <p style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem',
+                    color:'rgba(200,185,230,0.55)',lineHeight:'1.6',margin:0,
+                    display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'
+                  }}>«{bookmark.selected_text}»</p>
                 </div>
-                <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
-                  {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
-                </p>
               </div>
             ))}
           </div>
         )}
       </div>
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.2),transparent)'}}/>
+    </div>
+  </div>
+)}
+
+ {showBookmarksModal && !isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor:'rgba(0,0,0,0.92)',
+    backdropFilter:'blur(20px)'
+  }}>
+    <style dangerouslySetInnerHTML={{__html:`
+      .bm-scroll-light::-webkit-scrollbar { width: 6px; }
+      .bm-scroll-light::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius:10px; }
+      .bm-scroll-light::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #c9a84c, #8a6a2a, #c9a84c);
+        border-radius: 10px;
+        box-shadow: 0 0 6px rgba(201,168,76,0.4);
+      }
+      .bm-scroll-light::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #f0d080, #c9a84c);
+        box-shadow: 0 0 10px rgba(240,208,128,0.6);
+      }
+    `}}/>
+
+    <div className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={{
+      background:'#080808',
+      borderRadius:'4px',
+      position:'relative',
+      border:'1px solid #1a1510',
+      boxShadow:'0 0 80px rgba(0,0,0,0.8)'
+    }}>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)'}}/>
+      {/* Фоновый символ */}
+      <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
+        fontFamily:'serif',fontSize:'18rem',color:'rgba(201,168,76,0.025)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+      {/* Шапка */}
+      <div style={{
+        padding:'24px 28px 20px',
+        borderBottom:'1px solid rgba(201,168,76,0.1)',
+        position:'relative',zIndex:2
+      }}>
+        <button onClick={()=>setShowBookmarksModal(false)} style={{
+          position:'absolute',top:'14px',right:'14px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'32px',height:'32px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'16px'
+        }}>✕</button>
+        <div style={{textAlign:'center',paddingRight:'20px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px'}}>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(90deg,rgba(201,168,76,0.4),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+            <div style={{height:'1px',flex:1,background:'linear-gradient(270deg,rgba(201,168,76,0.4),transparent)'}}/>
+          </div>
+          <h2 style={{
+            fontFamily:'Cinzel,serif',fontSize:'clamp(0.8rem,2vw,1rem)',
+            letterSpacing:'8px',textTransform:'uppercase',
+            color:'rgba(201,168,76,0.7)',margin:0
+          }}>Закладки главы</h2>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'10px'}}>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(90deg,rgba(201,168,76,0.3),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'5px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(270deg,rgba(201,168,76,0.3),transparent)'}}/>
+          </div>
+        </div>
+      </div>
+
+      {/* Контент */}
+      <div className="bm-scroll-light flex-1 overflow-y-auto p-5" style={{position:'relative',zIndex:1}}>
+        {userBookmarks.length === 0 ? (
+          <div style={{textAlign:'center',padding:'40px 0'}}>
+            <div style={{fontSize:'2rem',marginBottom:'12px',color:'rgba(201,168,76,0.3)',fontFamily:'serif'}}>⚜</div>
+            <p style={{color:'rgba(201,168,76,0.3)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.9rem'}}>
+              В этой главе нет закладок
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {userBookmarks.map((bookmark) => (
+              <div key={bookmark.id}
+                style={{
+                  background:'transparent',
+                  border:'1px solid rgba(201,168,76,0.1)',
+                  borderRadius:'2px',
+                  padding:'16px',
+                  cursor:'pointer',
+                  transition:'all 0.2s',
+                  position:'relative'
+                }}
+                onClick={()=>jumpToBookmark(bookmark.selected_text)}
+                onMouseEnter={e=>{
+                  e.currentTarget.style.background='rgba(201,168,76,0.04)';
+                  e.currentTarget.style.borderColor='rgba(201,168,76,0.3)';
+                }}
+                onMouseLeave={e=>{
+                  e.currentTarget.style.background='transparent';
+                  e.currentTarget.style.borderColor='rgba(201,168,76,0.1)';
+                }}>
+                <div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',
+                  background:'linear-gradient(180deg,transparent,rgba(201,168,76,0.4),transparent)'}}/>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',
+                  marginBottom:'10px',paddingLeft:'8px'}}>
+                  <span style={{fontFamily:'Cinzel,serif',fontSize:'0.6rem',letterSpacing:'3px',
+                    color:'rgba(201,168,76,0.4)',textTransform:'uppercase'}}>
+                    ⚜ Закладка
+                  </span>
+                  <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <span style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.65rem',
+                      color:'rgba(201,168,76,0.3)'}}>
+                      {new Date(bookmark.created_at).toLocaleDateString('ru-RU')}
+                    </span>
+                    <button onClick={e=>{e.stopPropagation();deleteBookmark(bookmark.id);}} style={{
+                      background:'transparent',border:'none',cursor:'pointer',
+                      color:'rgba(150,20,40,0.5)',fontSize:'16px',padding:'0',lineHeight:1
+                    }}>✕</button>
+                  </div>
+                </div>
+                <div style={{borderLeft:'2px solid rgba(201,168,76,0.25)',paddingLeft:'12px'}}>
+                  <p style={{
+                    fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem',
+                    color:'rgba(201,168,76,0.45)',lineHeight:'1.6',margin:0,
+                    display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'
+                  }}>«{bookmark.selected_text}»</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.1),transparent)'}}/>
     </div>
   </div>
 )}
@@ -2376,37 +2363,78 @@ style={{
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
   }
-.work-title-shimmer {
-  background: ${isDarkTheme 
-    ? 'linear-gradient(90deg, #9370db 0%, #ffffff 50%, #9370db 100%)' 
-    : 'linear-gradient(90deg, #65635d 0%, #d6c79e 50%, #65635d 100%)'};
-  background-size: ${isDarkTheme ? '200% auto' : '200% auto'};
-    background-size: ${isDarkTheme ? '200% auto' : '100% auto'};
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    ${isDarkTheme ? 'animation: workTitleShimmer 3s linear infinite;' : ''}
-    font-family: 'Playfair Display', Georgia, serif;
-  }
 `}} />
-<p className="mb-3 break-words font-bold text-center work-title-shimmer" style={{ 
-  fontSize: isDarkTheme ? 'clamp(2rem, 5vw, 3.5rem)' : 'clamp(1.25rem, 3vw, 2rem)',
-  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif", 
-  fontStyle: isDarkTheme ? 'normal' : 'italic' 
+{isDarkTheme ? (
+ <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:'12px',marginTop:'16px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'10px'}}>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.4))'}}/>
+      <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.6rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.4))'}}/>
+    </div>
+<p className="break-words text-center" style={{
+  fontFamily:"'plommir', Georgia, serif",
+  fontWeight:'300',
+  fontSize:'clamp(1.8rem,5vw,3.5rem)',
+  backgroundImage:'linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #68d3f3 66%, #a855f7 100%)',
+  WebkitBackgroundClip:'text',
+  WebkitTextFillColor:'transparent',
+  backgroundClip:'text',
+  color:'transparent',
+  lineHeight:1.2
 }}>
-  {work.title}
-</p>
+      {work.title}
+    </p>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'8px'}}>
+      <div style={{width:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.25))'}}/>
+      <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.5rem',letterSpacing:'10px'}}>· · · · · · ·</span>
+      <div style={{width:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.25))'}}/>
+    </div>
+  </div>
+) : (
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:'12px',marginTop:'16px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'10px'}}>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.5))'}}/>
+      <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.75rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.5))'}}/>
+    </div>
+<p className="break-words text-center" style={{
+  fontFamily:"'victiriya', Georgia, serif",
+  fontWeight:'400',
+  fontSize:'clamp(1.8rem,5vw,3.5rem)',
+  backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+  WebkitBackgroundClip:'text',
+  WebkitTextFillColor:'transparent',
+  backgroundClip:'text',
+  color:'transparent',
+  lineHeight:1.2
+}}>
+      {work.title}
+    </p>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'8px'}}>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.3))'}}/>
+      <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.3))'}}/>
+    </div>
+  </div>
+)}
   </>
 )}
-<h1 className="font-bold mb-2 break-words" style={{
-  fontSize: isDarkTheme ? 'clamp(1.25rem, 3vw, 2rem)' : 'clamp(1rem, 2.5vw, 1.25rem)',
+<div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'8px'}}>
+  <div style={{flex:1,height:'1px',backgroundImage:isDarkTheme?'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(90deg,transparent,rgba(201,168,76,0.3))'}}/>
+<h1 className="break-words" style={{
+  fontSize: 'clamp(0.9rem,2vw,1.2rem)',
   color: isDarkTheme ? '#c6abda' : '#807f7c',
-  textShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.8)' : 'none',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-  fontStyle: isDarkTheme ? 'normal' : 'italic'
+  fontFamily: 'Georgia, serif',
+  fontStyle: 'italic',
+  fontWeight: '200',
+  textAlign: 'center',
+  letterSpacing: '1px',
+  margin: 0
 }}>
   {chapter.chapter_number}. {chapter.title}
 </h1>
+  <div style={{flex:1,height:'1px',backgroundImage:isDarkTheme?'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(270deg,transparent,rgba(201,168,76,0.3))'}}/>
+</div>
         </div>
 
 <div className="rounded-lg p-4 sm:p-6 md:p-8 border-2 mb-6 sm:mb-8" style={{
@@ -2720,99 +2748,137 @@ style={{
 {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
 {showConfirmModal && (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0,0,0,0.92)',
     backdropFilter: 'blur(10px)'
   }}>
-    <div className="rounded-2xl w-full max-w-md p-6" style={{
-      background: isDarkTheme 
-        ? 'rgba(147, 51, 234, 0.15)' 
-        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: isDarkTheme 
-        ? '2px solid #9333ea' 
-        : '3px solid transparent',
-      borderRadius: '16px',
-      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
-      position: 'relative',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.6)' 
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-    }}>
-      {!isDarkTheme && (
-        <div style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: '16px',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          pointerEvents: 'none',
-          zIndex: -1
-        }} />
-      )}
-      <p className="text-center text-base sm:text-lg mb-6 whitespace-pre-wrap" style={{
-        color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes confirmTwinkle { 0%,100% { opacity:0.15; } 50% { opacity:0.6; } }
+      @keyframes confirmGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    `}} />
+    {isDarkTheme ? (
+      <div style={{
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 80%)',
+        border: '1px solid rgba(180,100,255,0.25)',
+        boxShadow: '0 0 60px rgba(147,50,255,0.2)',
+        borderRadius: '12px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
       }}>
-        {confirmMessage}
-      </p>
-      
-<div className="flex gap-3">
-        {confirmAction ? (
-          <>
-            <button
-              onClick={() => {
-                confirmAction();
-                setShowConfirmModal(false);
-              }}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: isDarkTheme 
-                  ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                  : '#c9c6bb',
-                color: isDarkTheme ? '#ffffff' : '#000000',
-                boxShadow: isDarkTheme 
-                  ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                  : '0 0 15px rgba(216, 197, 162, 0.4)',
-                border: 'none'
-              }}
-            >
-              Да
-            </button>
-            <button
-              onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: isDarkTheme ? 'transparent' : 'rgba(216, 197, 162, 0.15)',
-                borderColor: isDarkTheme ? '#9370db' : '#65635d',
-                border: isDarkTheme ? '2px solid #9370db' : '2px solid #c9c6bb',
-                color: isDarkTheme ? '#9370db' : '#c9c6bb'
-              }}
-            >
-              Отмена
-            </button>
-          </>
-) : (
-          <button
-            onClick={() => setShowConfirmModal(false)}
-            className="w-full py-3 rounded-lg font-bold transition"
-            style={{
-              background: isDarkTheme 
-                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : '#c9c6bb',
-              color: isDarkTheme ? '#ffffff' : '#000000',
-              boxShadow: isDarkTheme 
-                ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                : '0 0 15px rgba(216, 197, 162, 0.4)',
-              border: 'none'
-            }}
-          >
-            ОК
-          </button>
-        )}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px',
+          background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)' }}/>
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 75% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 75%, rgba(255,255,255,0.15) 0%, transparent 100%)`,
+          animation:'confirmTwinkle 4s ease-in-out infinite' }}/>
+
+        <div style={{ fontSize:'1.5rem', marginBottom:'8px', color:'rgba(180,100,255,0.5)' }}>✦</div>
+        <p style={{ color:'#e8d5ff', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+          <span style={{ color:'rgba(180,100,255,0.3)', fontSize:'0.6rem', letterSpacing:'4px' }}>· · ·</span>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'rgba(147,112,219,0.2)',
+                border:'1px solid rgba(147,112,219,0.6)',
+                color:'#d8b4fe',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px',
+                boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+              }}>✦ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(147,112,219,0.25)',
+                color:'rgba(180,100,255,0.5)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'rgba(147,112,219,0.15)',
+              border:'1px solid rgba(147,112,219,0.5)',
+              color:'#d8b4fe',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'4px',
+              boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+            }}>✦ ОК ✦</button>
+          )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <div style={{
+        background: '#080808',
+        border: '1px solid #2a2218',
+        borderRadius: '2px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
+      }}>
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+          background:'linear-gradient(180deg, transparent, #c9a84c, transparent)' }}/>
+        <div style={{ position:'absolute', top:'50%', right:'20px', transform:'translateY(-50%)',
+          fontFamily:'serif', fontSize:'8rem', color:'rgba(201,168,76,0.04)',
+          pointerEvents:'none', userSelect:'none', lineHeight:1 }}>⚜</div>
+
+        <div style={{ fontSize:'1.2rem', marginBottom:'8px', color:'rgba(201,168,76,0.5)', fontFamily:'serif' }}>⚜</div>
+        <p style={{ color:'#d0c8b8', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+          <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.7rem', letterSpacing:'4px', fontFamily:'serif' }}>· ⚜ ·</span>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.6)',
+                color:'#c9a84c',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>⚜ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.2)',
+                color:'rgba(201,168,76,0.4)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'transparent',
+              border:'1px solid rgba(201,168,76,0.5)',
+              color:'#c9a84c',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'1px'
+            }}>⚜ ОК ⚜</button>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
 
@@ -2829,609 +2895,409 @@ style={{
         )}
 
 {/* КНОПКИ НАВИГАЦИИ И ДЕЙСТВИЯ */}
-<div className="space-y-4 mb-6 sm:mb-8">
-  {/* Количество глав посередине */}
-  <div className="text-center">
-    <span className="text-xs sm:text-sm font-semibold" style={{
-      color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+<div className="mb-6 sm:mb-8" style={{
+  borderTop: `1px solid ${isDarkTheme ? 'rgba(147,112,219,0.2)' : 'rgba(201,168,76,0.2)'}`,
+  paddingTop: '24px'
+}}>
+
+  {/* Навигация между главами */}
+  <div className="flex justify-between items-center mb-6">
+    {prevChapter ? (
+      <button onClick={handlePrevClick} style={{
+        display:'flex', alignItems:'center', gap:'6px',
+        background:'transparent', border:`1px solid ${isDarkTheme ? 'rgba(147,112,219,0.3)' : 'rgba(201,168,76,0.3)'}`,
+        borderRadius: isDarkTheme ? '50px' : '2px',
+        padding:'8px 16px', cursor:'pointer',
+        color: isDarkTheme ? '#c084fc' : '#c9a84c',
+        fontFamily: isDarkTheme ? 'Cinzel, serif' : 'Cinzel, serif',
+        fontSize:'0.7rem', letterSpacing:'2px', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}
+      onMouseEnter={e=>{e.currentTarget.style.borderColor=isDarkTheme?'rgba(192,132,252,0.7)':'rgba(201,168,76,0.7)';e.currentTarget.style.boxShadow=isDarkTheme?'0 0 15px rgba(147,112,219,0.3)':'none';}}
+      onMouseLeave={e=>{e.currentTarget.style.borderColor=isDarkTheme?'rgba(147,112,219,0.3)':'rgba(201,168,76,0.3)';e.currentTarget.style.boxShadow='none';}}>
+        <ChevronLeft size={14}/> Пред.
+      </button>
+    ) : <div/>}
+
+    {/* Счётчик глав по центру */}
+    <span style={{
+      color: isDarkTheme ? 'rgba(200,185,230,0.5)' : 'rgba(201,168,76,0.5)',
+      fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px'
     }}>
-      Глава {chapter.chapter_number} из {allChapters.length}
+      {chapter.chapter_number} / {allChapters.length}
     </span>
+
+    {nextChapter ? (
+      <button onClick={handleNextClick} style={{
+        display:'flex', alignItems:'center', gap:'6px',
+        background:'transparent', border:`1px solid ${isDarkTheme ? 'rgba(147,112,219,0.3)' : 'rgba(201,168,76,0.3)'}`,
+        borderRadius: isDarkTheme ? '50px' : '2px',
+        padding:'8px 16px', cursor:'pointer',
+        color: isDarkTheme ? '#c084fc' : '#c9a84c',
+        fontFamily:'Cinzel, serif',
+        fontSize:'0.7rem', letterSpacing:'2px', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}
+      onMouseEnter={e=>{e.currentTarget.style.borderColor=isDarkTheme?'rgba(192,132,252,0.7)':'rgba(201,168,76,0.7)';e.currentTarget.style.boxShadow=isDarkTheme?'0 0 15px rgba(147,112,219,0.3)':'none';}}
+      onMouseLeave={e=>{e.currentTarget.style.borderColor=isDarkTheme?'rgba(147,112,219,0.3)':'rgba(201,168,76,0.3)';e.currentTarget.style.boxShadow='none';}}>
+        След. <ChevronRight size={14}/>
+      </button>
+    ) : <div/>}
   </div>
 
-  {/* Оценка и обсуждение - только иконки */}
-  <div className="flex gap-3 justify-center">
-    <button
-      onClick={() => setShowRatingModal(true)}
-      className="p-3 transition"
-      style={{
-        background: 'transparent',
-        color: isDarkTheme ? '#c084fc' : '#c9c6bb'
-      }}
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill={userRating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+  {/* Разделитель */}
+  <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+    <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))':'linear-gradient(90deg,transparent,rgba(201,168,76,0.3))'}}/>
+    <span style={{color:isDarkTheme?'rgba(180,100,255,0.3)':'rgba(201,168,76,0.3)',fontSize:'0.6rem',letterSpacing:'5px',fontFamily:'serif'}}>
+      {isDarkTheme ? '✦ · · · ✦' : '⚜ · · ⚜'}
+    </span>
+    <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))':'linear-gradient(270deg,transparent,rgba(201,168,76,0.3))'}}/>
+  </div>
+
+  {/* Оценка и обсуждение */}
+  <div style={{display:'flex',justifyContent:'center',gap:'16px',marginBottom:'24px'}}>
+    <button onClick={() => setShowRatingModal(true)} style={{
+      display:'flex',alignItems:'center',gap:'8px',
+      background:'transparent',
+      border:`1px solid ${isDarkTheme?'rgba(147,112,219,0.3)':'rgba(201,168,76,0.3)'}`,
+      borderRadius: isDarkTheme?'50px':'2px',
+      padding:'8px 20px',cursor:'pointer',
+      color:isDarkTheme?'#c084fc':'#c9a84c',
+      fontFamily:'Cinzel,serif',fontSize:'0.65rem',letterSpacing:'2px',textTransform:'uppercase'
+    }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill={userRating?'currentColor':'none'} stroke="currentColor" strokeWidth="2">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
+      Оценить
     </button>
 
-    <Link
-      href={`/work/${workId}/discussion`}
-      className="p-3 transition"
-      style={{
-        background: 'transparent',
-        color: isDarkTheme ? '#c084fc' : '#c9c6bb'
-      }}
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <Link href={`/work/${workId}/discussion`} style={{
+      display:'flex',alignItems:'center',gap:'8px',
+      background:'transparent',
+      border:`1px solid ${isDarkTheme?'rgba(147,112,219,0.3)':'rgba(201,168,76,0.3)'}`,
+      borderRadius: isDarkTheme?'50px':'2px',
+      padding:'8px 20px',cursor:'pointer',
+      color:isDarkTheme?'#c084fc':'#c9a84c',
+      fontFamily:'Cinzel,serif',fontSize:'0.65rem',letterSpacing:'2px',textTransform:'uppercase',
+      textDecoration:'none'
+    }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
+      Обсуждение
     </Link>
   </div>
 
-  {/* Навигация между главами */}
-  <div className="flex flex-row justify-between items-center gap-3 sm:gap-4">
-    {prevChapter ? (
-      <button 
-        onClick={handlePrevClick}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 transition text-sm sm:text-base"
-        style={{
-          background: 'transparent',
-          color: isDarkTheme ? '#c084fc' : '#c9c6bb'
-        }}
-      >
-        <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
-        <span className="hidden sm:inline">{t.previousChapter}</span>
-        <span className="sm:hidden">Пред.</span>
-      </button>
-    ) : (
-      <div className="hidden sm:block"></div>
-    )}
-
-    {nextChapter ? (
-      <button 
-        onClick={handleNextClick}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 transition text-sm sm:text-base"
-        style={{
-          background: 'transparent',
-          color: isDarkTheme ? '#c084fc' : '#c9c6bb'
-        }}
-      >
-        <span className="hidden sm:inline">{t.nextChapter}</span>
-        <span className="sm:hidden">След.</span>
-        <ChevronRight size={18} className="sm:w-5 sm:h-5" />
-      </button>
-    ) : (
-      <div className="hidden sm:block"></div>
-    )}
-  </div>
-
-  {/* Благодарность за прочтение */}
-  <p className="text-center text-xs sm:text-sm mt-4" style={{
-    color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
-    fontStyle: 'italic'
-  }}>
-    Спасибо за прочтение💜
-  </p>
+  {/* Благодарность */}
+  {isDarkTheme ? (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+        <div style={{width:'40px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.3))'}}/>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.55rem',letterSpacing:'6px'}}>✦ · · ✦</span>
+        <div style={{width:'40px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.3))'}}/>
+      </div>
+      <p style={{fontFamily:"'plommir', Georgia, serif",fontWeight:'300',fontSize:'clamp(0.9rem,2vw,1.1rem)',color:'rgba(179,231,239,0.5)',fontStyle:'italic',letterSpacing:'2px'}}>
+        Спасибо за прочтение ✦
+      </p>
+    </div>
+  ) : (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+        <div style={{width:'40px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+        <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · ⚜</span>
+        <div style={{width:'40px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+      </div>
+      <p style={{fontFamily:"'victiriya', Georgia, serif",fontWeight:'400',fontSize:'clamp(0.9rem,2vw,1.1rem)',color:'rgba(201,168,76,0.5)',fontStyle:'italic',letterSpacing:'2px'}}>
+        Спасибо за прочтение ⚜
+      </p>
+    </div>
+  )}
 </div>
 
-{/* БОКОВАЯ ПАНЕЛЬ МЕНЮ */}
 {showSidePanel && (
   <>
-    {/* ТЕМНАЯ ПАНЕЛЬ */}
-  {isDarkTheme && (
-    <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-2xl border-2" style={{
-    background: 'rgba(147, 51, 234, 0.15)',
-    borderColor: '#9333ea',
-    backdropFilter: 'blur(20px)',
-    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-}}>
-<div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-  background: 'rgba(139, 60, 200, 0.3)',
-  backdropFilter: 'blur(10px)',
-  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
+    {/* ТЁМНАЯ ПАНЕЛЬ */}
+    {isDarkTheme && (
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-2xl" style={{
+        background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+        borderLeft:'1px solid rgba(180,100,255,0.25)',
+        boxShadow:'-5px 0 60px rgba(147,50,255,0.15)'
+      }}>
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.55;}}
+          @keyframes rpShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          @keyframes starFloat{0%,100%{opacity:0.1;}50%{opacity:0.5;}}
+          .rp-btn-dark{transition:all 0.2s;}
+          .rp-btn-dark:hover{border-color:rgba(179,231,239,0.8)!important;box-shadow:0 0 20px rgba(179,231,239,0.4)!important;transform:translateY(-2px);}
+        `}}/>
+
+        {/* Верхняя линия */}
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',
+          background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+
+        {/* Звёзды */}
+        <div style={{position:'fixed',top:0,right:0,width:'inherit',height:'100%',pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,0.35) 0%,transparent 100%),
+            radial-gradient(1px 1px at 80% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 55% 70%,rgba(255,255,255,0.2) 0%,transparent 100%),
+            radial-gradient(1px 1px at 90% 55%,rgba(255,255,255,0.15) 0%,transparent 100%),
+            radial-gradient(1px 1px at 20% 90%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'rpTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+
+        {/* Шапка */}
+        <div style={{
+          padding:'clamp(16px,3vw,24px) clamp(14px,3vw,22px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(147,112,219,0.15)',
+          position:'relative',zIndex:2,
+          background:'rgba(147,50,255,0.08)'
         }}>
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes shineHeader {
-              0% { left: -100%; }
-              100% { left: 200%; }
-            }
-            .shimmer-panel-text {
-              background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmer-btn 3s linear infinite;
-            }
-          `}} />
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '100%',
-            height: '100%',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-            animation: 'shineHeader 3s infinite'
-          }}></div>
-<style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPulse {
-    0%, 100% { 
-      text-shadow: 0 0 10px #e8d3e9, 0 0 20px #e8d3e9, 0 0 30px #e8d3e9;
-    }
-    50% { 
-      text-shadow: 0 0 20px #e8d3e9, 0 0 40px #e8d3e9, 0 0 60px #e8d3e9;
-    }
-  }
-`}} />
-          <button 
-            onClick={() => setShowSidePanel(false)} 
-            className="text-gray-400 hover:text-white absolute right-3 sm:right-4" 
-            style={{ zIndex: 2 }}
-          >
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+          <button onClick={()=>setShowSidePanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',paddingRight:'28px'}}>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
         </div>
 
-        <div className="p-3 sm:p-4 space-y-4 sm:space-y-6 flex flex-col h-[calc(100vh-120px)]">
-          <button
-            onClick={() => {
-              setShowChapterList(true);
-              setShowSidePanel(false);
-            }}
-            className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
-style={{
-  background: 'rgba(160, 99, 207, 0.4)',
-  border: '2px solid #a063cf',
-  borderRadius: '12px',
-  backdropFilter: 'blur(10px)'
-}}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#fff';
-              e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#a063cf';
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5" style={{ filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' }}>
+        {/* Кнопки */}
+        <div style={{padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
+
+          {/* Главы */}
+          <button onClick={()=>{setShowChapterList(true);setShowSidePanel(false);}} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
             </svg>
-            <span style={{ 
-  color: '#ffffff', 
-  textShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(179, 231, 239, 0.8)',
-  fontWeight: 'bold',
-  animation: 'textNeonPulse 2s ease-in-out infinite'
-}}>Главы</span>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(200,185,230,0.7)'}}>Главы</span>
           </button>
 
-          <button
-            onClick={() => {
-              setShowBookmarksModal(true);
-              loadChapterBookmarks();
-              setShowSidePanel(false);
-            }}
-            className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
-style={{
-  background: 'rgba(160, 99, 207, 0.4)',
-  border: '2px solid #a063cf',
-  borderRadius: '12px',
-  backdropFilter: 'blur(10px)'
-}}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#fff';
-              e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#a063cf';
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5" style={{ filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' }}>
+          {/* Закладки */}
+          <button onClick={()=>{setShowBookmarksModal(true);loadChapterBookmarks();setShowSidePanel(false);}} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
             </svg>
-            <span style={{ 
-  color: '#ffffff', 
-  textShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(179, 231, 239, 0.8)',
-  fontWeight: 'bold',
-  animation: 'textNeonPulse 2s ease-in-out infinite'
-}}>Закладки</span>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(200,185,230,0.7)'}}>Закладки</span>
           </button>
 
+          {/* Плейлист */}
           {chapter?.audio_url && (
-            <button
-              onClick={() => {
-                setShowPlaylist(true);
-                setShowSidePanel(false);
-              }}
-              className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
-style={{
-  background: 'rgba(160, 99, 207, 0.4)',
-  border: '2px solid #a063cf',
-  borderRadius: '12px',
-  backdropFilter: 'blur(10px)'
-}}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#fff';
-                e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#a063cf';
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5" style={{ filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' }}>
+            <button onClick={()=>{setShowPlaylist(true);setShowSidePanel(false);}} className="rp-btn-dark" style={{
+              width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+              background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+              borderRadius:'6px',cursor:'pointer',
+              display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/>
                 <polygon points="10 8 16 12 10 16 10 8"/>
               </svg>
-              <span style={{ 
-  color: '#ffffff', 
-  textShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(179, 231, 239, 0.8)',
-  fontWeight: 'bold',
-  animation: 'textNeonPulse 2s ease-in-out infinite'
-}}>Плейлист</span>
+              <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(200,185,230,0.7)'}}>Плейлист</span>
             </button>
           )}
 
-{/* В ТЕМНОЙ ПАНЕЛИ (читательская панель) */}
-<div className="mt-auto pt-8">
-  <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
-      border: '2px solid #9333ea',
-      boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes starFloat {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-          opacity: 0.4;
-        }
-        50% {
-          transform: translate(5px, -5px) scale(1.2);
-          opacity: 1;
-        }
-      }
-    `}} />
-    
-    {/* Звездные частицы */}
-    {[...Array(12)].map((_, i) => (
-      <div key={i} style={{
-        position: 'absolute',
-        width: '2px',
-        height: '2px',
-        background: i % 2 === 0 ? '#9333ea' : '#a855f7',
-        borderRadius: '50%',
-        boxShadow: `0 0 6px ${i % 2 === 0 ? '#9333ea' : '#a855f7'}`,
-        left: `${10 + i * 7}%`,
-        top: `${20 + (i % 3) * 25}%`,
-        animation: 'starFloat 3s ease-in-out infinite',
-        animationDelay: `${i * 0.2}s`,
-        pointerEvents: 'none'
-      }} />
-    ))}
-    
-    <div className="flex items-center justify-between relative z-10">
-      <div className="flex items-center gap-3">
-        {/* Иконка Луны */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <span style={{ color: '#c084fc', fontWeight: '600' }}>HD 189733</span>
-      </div>
-      
-      {/* Иконка Солнца (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(192, 132, 252, 0.3)" strokeWidth="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </div>
-  </button>
-</div>
+          {/* Разделитель */}
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+            <span style={{color:'rgba(180,100,255,0.25)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+          </div>
+
+          {/* Капсула смены темы — фиолетовая овальная */}
+          <button onClick={toggleTheme} style={{
+            width:'100%',position:'relative',
+            background:'radial-gradient(ellipse at center,#1a0033 0%,#000000 100%)',
+            border:'1px solid rgba(147,51,234,0.5)',
+            borderRadius:'50px',
+            boxShadow:'0 0 20px rgba(147,51,234,0.15)',
+            padding:'clamp(8px,2vw,14px) 16px',
+            overflow:'hidden',cursor:'pointer'
+          }}>
+            {[...Array(10)].map((_,i)=>(
+              <div key={i} style={{
+                position:'absolute',width:'2px',height:'2px',
+                background:i%2===0?'#9333ea':'#a855f7',borderRadius:'50%',
+                boxShadow:`0 0 5px ${i%2===0?'#9333ea':'#a855f7'}`,
+                left:`${10+i*8}%`,top:`${20+(i%3)*25}%`,
+                animation:'starFloat 3s ease-in-out infinite',
+                animationDelay:`${i*0.2}s`,pointerEvents:'none'
+              }}/>
+            ))}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',position:'relative',zIndex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                <span style={{color:'#c084fc',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.7rem)',letterSpacing:'2px'}}>HD 189733</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(192,132,252,0.2)" strokeWidth="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
+            </div>
+          </button>
+
         </div>
       </div>
     )}
 
-    {/* СВЕТЛАЯ ТЕМА - ЗОЛОТАЯ (НОВАЯ) */}
+    {/* СВЕТЛАЯ ПАНЕЛЬ */}
     {!isDarkTheme && (
-  <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-3xl" style={{
-    borderLeft: '12px solid',
-   borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
-        boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-    background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat'
-  }}>
-        <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
-borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
-boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-50 overflow-y-auto shadow-2xl" style={{
+        background:'#080808',
+        borderLeft:'1px solid #2a2218',
+        boxShadow:'-5px 0 40px rgba(0,0,0,0.8)'
+      }}>
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          @keyframes plasmaMove1{0%,100%{transform:translate(0,0) rotate(0deg);}33%{transform:translate(30px,-20px) rotate(120deg);}66%{transform:translate(-25px,15px) rotate(240deg);}}
+          @keyframes plasmaMove2{0%,100%{transform:translate(0,0) rotate(0deg);}33%{transform:translate(-35px,25px) rotate(-90deg);}66%{transform:translate(20px,-15px) rotate(-180deg);}}
+          @keyframes plasmaMove3{0%,100%{transform:translate(0,0);}33%{transform:translate(15px,30px);}66%{transform:translate(-30px,-20px);}}
+          .rp-btn-light{transition:all 0.2s;}
+          .rp-btn-light:hover{border-color:rgba(201,168,76,0.5)!important;background:rgba(201,168,76,0.06)!important;}
+        `}}/>
 
+        {/* Левая золотая линия */}
+        <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+          background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+
+        {/* Фоновый символ */}
+        <div style={{position:'fixed',top:'50%',right:'5px',transform:'translateY(-50%)',
+          fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+          pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+        {/* Шапка */}
+        <div style={{
+          padding:'clamp(16px,3vw,26px) clamp(18px,4vw,28px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(201,168,76,0.1)',
+          position:'relative',zIndex:2
         }}>
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes champagneBubbles {
-              0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-              50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-            }
-            @keyframes shimmerGold {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%);
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmerGold 3s linear infinite;
-              font-family: 'Playfair Display', Georgia, serif;
-            }
-          `}} />
-      
-          
-      <style dangerouslySetInnerHTML={{__html: `
-  @keyframes menuShimmer {
-    0% { background-position: 0% center; }
-    100% { background-position: 200% center; }
-  }
-`}} />
-          
-          <button 
-            onClick={() => setShowSidePanel(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all z-20"
-            style={{
-              background: 'rgba(26, 26, 26, 0.35)',
-              backdropFilter: 'blur(1px)',
-              border: '1px solid rgba(10, 10, 10, 0.15)'
-            }}
-          >
-            <X size={20} color="#c9c6bb" />
-          </button>
+          <button onClick={()=>setShowSidePanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',paddingRight:'28px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
         </div>
 
-    <div className="p-6 space-y-4 flex flex-col h-[calc(100vh-120px)]">
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes shimmerGoldBtn {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-      `}} />
-      
-      <button
-        onClick={() => {
-          setShowChapterList(true);
-          setShowSidePanel(false);
-        }}
-        className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-        style={{
-          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-        }}
-      >
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-          background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-        }} />
-        
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-        </svg>
-        <span className="relative z-10 text-center" style={{ 
-          background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-          backgroundSize: '200% auto',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          animation: 'shimmerGoldBtn 3s linear infinite',
-          fontStyle: 'normal',
-          fontWeight: '600'
-        }}>
-          Главы
-        </span>
-      </button>
+        {/* Кнопки */}
+        <div style={{padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
 
-      <button
-        onClick={() => {
-          setShowBookmarksModal(true);
-          loadChapterBookmarks();
-          setShowSidePanel(false);
-        }}
-        className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-        style={{
-          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-        }}
-      >
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-          background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-        }} />
-        
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span className="relative z-10 text-center" style={{ 
-          background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-          backgroundSize: '200% auto',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          animation: 'shimmerGoldBtn 3s linear infinite',
-          fontStyle: 'normal',
-          fontWeight: '600'
-        }}>
-          Закладки
-        </span>
-      </button>
-
-      {chapter?.audio_url && (
-        <button
-          onClick={() => {
-            setShowPlaylist(true);
-            setShowSidePanel(false);
-          }}
-          className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-          style={{
-          background: 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
- border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-          }}
-        >
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-           background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-          }} />
-          
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8d7d7" strokeWidth="2" className="relative z-10">
-            <circle cx="12" cy="12" r="10"/>
-            <polygon points="10 8 16 12 10 16 10 8"/>
-          </svg>
-          <span className="relative z-10 text-center" style={{  
-            background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-            backgroundSize: '200% auto',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'shimmerGoldBtn 3s linear infinite',
-            fontStyle: 'normal',
-            fontWeight: '600'
+          {/* Главы */}
+          <button onClick={()=>{setShowChapterList(true);setShowSidePanel(false);}} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
           }}>
-            Плейлист
-          </span>
-        </button>
-      )}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.5)'}}>Главы</span>
+          </button>
 
-<div className="mt-auto pt-8">
-  <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: '#000000',
-      border: '2px solid #65635d',
-      boxShadow: '0 0 15px rgba(101, 99, 93, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes plasmaMove1 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-        }
-        33% {
-          transform: translate(30px, -20px) scale(1.3);
-        }
-        66% {
-          transform: translate(-25px, 15px) scale(0.9);
-        }
-      }
-      @keyframes plasmaMove2 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1.2);
-        }
-        33% {
-          transform: translate(-35px, 25px) scale(0.8);
-        }
-        66% {
-          transform: translate(20px, -15px) scale(1.4);
-        }
-      }
-      @keyframes plasmaMove3 {
-        0%, 100% {
-          transform: translate(0, 0) scale(0.9);
-        }
-        33% {
-          transform: translate(15px, 30px) scale(1.5);
-        }
-        66% {
-          transform: translate(-30px, -20px) scale(1.1);
-        }
-      }
-    `}} />
-    
-    {/* Плазма крови - капли жидкости */}
-    <div style={{
-      position: 'absolute',
-      width: '120px',
-      height: '120px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(109, 5, 31, 0.5) 40%, rgba(114, 17, 49, 0.9) 70%, transparent 100%)',
-      borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
-      filter: 'blur(12px)',
-      animation: 'plasmaMove1 7s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '10%',
-      left: '20%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '100px',
-      height: '100px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(126, 9, 44, 0.6) 50%, transparent 80%)',
-      borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-      filter: 'blur(10px)',
-      animation: 'plasmaMove2 9s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '40%',
-      right: '15%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '90px',
-      height: '90px',
-      background: 'radial-gradient(circle, rgba(130, 15, 30, 0.65) 0%, rgba(90, 8, 20, 0.45) 45%, transparent 75%)',
-      borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-      filter: 'blur(14px)',
-      animation: 'plasmaMove3 8s ease-in-out infinite',
-      pointerEvents: 'none',
-      bottom: '15%',
-      left: '30%'
-    }} />
-    
-    <div className="flex items-center justify-between relative z-10">
-      {/* Иконка Луны (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201, 198, 187, 0.3)" strokeWidth="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      
-      <div className="flex items-center gap-3">
-        <span style={{ color: '#c9c6bb', fontWeight: '600' }}>Лилия и Роза</span>
-        {/* Иконка Солнца */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-      </div>
-    </div>
-  </button>
-</div>
+          {/* Закладки */}
+          <button onClick={()=>{setShowBookmarksModal(true);loadChapterBookmarks();setShowSidePanel(false);}} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.5)'}}>Закладки</span>
+          </button>
+
+          {/* Плейлист */}
+          {chapter?.audio_url && (
+            <button onClick={()=>{setShowPlaylist(true);setShowSidePanel(false);}} className="rp-btn-light" style={{
+              width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+              background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+              borderRadius:'2px',cursor:'pointer',
+              display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+            }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="10 8 16 12 10 16 10 8"/>
+              </svg>
+              <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.5)'}}>Плейлист</span>
+            </button>
+          )}
+
+          {/* Разделитель */}
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+            <span style={{color:'rgba(201,168,76,0.25)',fontSize:'0.55rem',letterSpacing:'3px',fontFamily:'serif'}}>· ⚜ ·</span>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+          </div>
+
+          {/* Капсула смены темы — острые углы, плазма, без неона */}
+          <button onClick={toggleTheme} style={{
+            width:'100%',position:'relative',
+            background:'#000000',
+            border:'1px solid rgba(201,168,76,0.3)',
+            borderRadius:'2px',
+            boxShadow:'none',
+            padding:'clamp(8px,2vw,14px) 16px',
+            overflow:'hidden',cursor:'pointer'
+          }}>
+            <div style={{position:'absolute',width:'120px',height:'120px',
+              background:'radial-gradient(circle,rgba(114,17,49,0.9) 0%,rgba(109,5,31,0.5) 40%,transparent 70%)',
+              borderRadius:'40% 60% 70% 30%',filter:'blur(12px)',
+              animation:'plasmaMove1 7s ease-in-out infinite',
+              pointerEvents:'none',top:'10%',left:'20%'}}/>
+            <div style={{position:'absolute',width:'100px',height:'100px',
+              background:'radial-gradient(circle,rgba(114,17,49,0.9) 0%,rgba(126,9,44,0.6) 50%,transparent 80%)',
+              borderRadius:'60% 40% 30% 70%',filter:'blur(10px)',
+              animation:'plasmaMove2 9s ease-in-out infinite',
+              pointerEvents:'none',top:'40%',right:'15%'}}/>
+            <div style={{position:'absolute',width:'90px',height:'90px',
+              background:'radial-gradient(circle,rgba(130,15,30,0.65) 0%,rgba(90,8,20,0.45) 45%,transparent 75%)',
+              borderRadius:'30% 70% 70% 30%',filter:'blur(14px)',
+              animation:'plasmaMove3 8s ease-in-out infinite',
+              pointerEvents:'none',bottom:'15%',left:'30%'}}/>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',position:'relative',zIndex:1}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.2)" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <span style={{color:'rgba(201,168,76,0.7)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px'}}>Лилия и Роза</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                </svg>
+              </div>
+            </div>
+          </button>
+
         </div>
       </div>
     )}
@@ -3440,368 +3306,448 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 
 {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
 {showRatingModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="rounded-xl p-6 sm:p-8 max-w-md w-full relative" style={{
-      background: isDarkTheme 
-        ? 'rgba(147, 51, 234, 0.15)'
-        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: isDarkTheme 
-        ? '2px solid #9333ea'
-        : '3px solid transparent',
-      borderRadius: isDarkTheme ? '12px' : '16px',
-      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-    }}>
-      {!isDarkTheme && (
-        <div style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: '16px',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          pointerEvents: 'none',
-          zIndex: -1
-        }} />
-      )}
-
-      <button
-        onClick={() => setShowRatingModal(false)}
-        className="absolute top-4 right-4 transition"
-        style={{
-          color: isDarkTheme ? '#c084fc' : '#65635d'
-        }}
-      >
-        <X size={24} />
-      </button>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes shimmerRating {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-      `}} />
-      
-      <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center" style={{
-        color: isDarkTheme ? '#c084fc' : 'transparent',
-        textShadow: isDarkTheme ? '0 0 15px rgba(192, 132, 252, 0.8)' : 'none',
-        background: !isDarkTheme ? 'linear-gradient(90deg, #65635d 0%, #ffffff 50%, #65635d 100%)' : 'none',
-        backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-        backgroundClip: !isDarkTheme ? 'text' : 'unset',
-        animation: !isDarkTheme ? 'shimmerRating 3s linear infinite' : 'none'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    backdropFilter: 'blur(10px)'
+  }}>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes ratingTwinkle { 0%,100% { opacity:0.15; } 50% { opacity:0.6; } }
+      @keyframes ratingGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    `}} />
+    {isDarkTheme ? (
+      /* ТЁМНАЯ — МИСТИКА */
+      <div style={{
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 80%)',
+        border: '1px solid rgba(180,100,255,0.25)',
+        boxShadow: '0 0 80px rgba(147,50,255,0.15), inset 0 0 80px rgba(0,0,0,0.5)',
+        borderRadius: '16px',
+        width: '100%', maxWidth: '480px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden'
       }}>
-        Оцените работу
-      </h3>
-      
-      {!currentUser ? (
-        <p className="text-center py-4" style={{ 
-          color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
-        }}>
-          Войдите, чтобы оставить оценку
-        </p>
-      ) : (
-        <>
-          <p className="mb-6 text-sm sm:text-base" style={{ 
-            color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
-          }}>
-            {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+        {/* Верхняя линия */}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px',
+          background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)' }}/>
+        {/* Звёзды */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+            radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.25) 0%, transparent 100%)`,
+          animation:'ratingTwinkle 4s ease-in-out infinite' }}/>
+
+        {/* Кнопка закрыть */}
+        <button onClick={() => setShowRatingModal(false)} style={{
+          position:'absolute', top:'14px', right:'14px',
+          background:'rgba(180,100,255,0.1)', border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%', width:'32px', height:'32px', cursor:'pointer',
+          color:'rgba(180,100,255,0.8)', display:'flex', alignItems:'center', justifyContent:'center'
+        }}>✕</button>
+
+        {/* Заголовок */}
+        <div style={{ textAlign:'center', marginBottom:'20px', position:'relative', zIndex:1 }}>
+          <div style={{ fontSize:'1.5rem', color:'rgba(180,100,255,0.5)', marginBottom:'8px' }}>✦</div>
+          <div style={{ fontFamily:'Cinzel, serif', fontSize:'1.2rem',
+            background:'linear-gradient(90deg, #b3e7ef, #ef01cb, #9370db)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+            letterSpacing:'5px', marginBottom:'12px' }}>Оценить работу</div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
+            <div style={{ height:'1px', width:'50px', background:'linear-gradient(90deg, transparent, rgba(147,112,219,0.5))' }}/>
+            <span style={{ color:'rgba(180,100,255,0.4)', fontSize:'0.6rem', letterSpacing:'5px' }}>✦ · · · ✦</span>
+            <div style={{ height:'1px', width:'50px', background:'linear-gradient(270deg, transparent, rgba(147,112,219,0.5))' }}/>
+          </div>
+        </div>
+
+        {!currentUser ? (
+          <p style={{ textAlign:'center', color:'rgba(200,185,230,0.7)', fontFamily:'Georgia, serif',
+            fontStyle:'italic', padding:'16px 0', position:'relative', zIndex:1 }}>
+            Войдите, чтобы оставить оценку
           </p>
-          
-          <div className="grid grid-cols-5 gap-2 sm:gap-3">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-              <button
-                key={num}
-                onClick={() => submitRating(num)}
-                className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
-                  userRating === num
-                    ? 'bg-purple-600 text-white'
-                    : 'text-purple-200 hover:text-white'
-                }`}
-                style={userRating === num ? (
-                  isDarkTheme ? {
-                    background: 'rgba(147, 51, 234, 0.8)',
-                    boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
-                  } : {
-                    background: '#65635d',
-                    color: '#ffffff'
-                  }
-                ) : (
-                  isDarkTheme ? {
-                    background: 'rgba(147, 51, 234, 0.2)',
-                    border: '1px solid rgba(147, 51, 234, 0.4)'
-                  } : {
-                    background: 'rgba(101, 99, 93, 0.2)',
-                    border: '1px solid rgba(101, 99, 93, 0.4)',
-                    color: '#c9c6bb'
-                  }
-                )}
+        ) : (
+          <div style={{ position:'relative', zIndex:1 }}>
+            <p style={{ textAlign:'center', color:'rgba(200,185,230,0.6)', fontSize:'0.8rem',
+              fontFamily:'Georgia, serif', fontStyle:'italic', marginBottom:'20px', letterSpacing:'1px' }}>
+              {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+            </p>
+
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'8px', marginBottom:'20px' }}>
+              {[1,2,3,4,5,6,7,8,9,10].map((num) => (
+                <button key={num} onClick={() => submitRating(num)} style={{
+                  padding:'12px 4px',
+                  background: userRating === num ? 'rgba(147,112,219,0.5)' : 'rgba(147,112,219,0.08)',
+                  border: userRating === num ? '1px solid rgba(180,100,255,0.8)' : '1px solid rgba(147,112,219,0.2)',
+                  color: userRating === num ? '#e8d5ff' : 'rgba(200,185,230,0.5)',
+                  borderRadius:'4px', cursor:'pointer',
+                  fontFamily:'Cinzel, serif', fontSize:'0.85rem',
+                  boxShadow: userRating === num ? '0 0 15px rgba(147,112,219,0.4)' : 'none',
+                  transition:'all 0.2s'
+                }}
                 onMouseEnter={(e) => {
                   if (userRating !== num) {
-                    if (isDarkTheme) {
-                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
-                      e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
-                    } else {
-                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.4)';
-                    }
+                    e.currentTarget.style.background = 'rgba(147,112,219,0.2)';
+                    e.currentTarget.style.color = '#d8b4fe';
+                    e.currentTarget.style.borderColor = 'rgba(180,100,255,0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (userRating !== num) {
-                    if (isDarkTheme) {
-                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    } else {
-                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.2)';
-                    }
+                    e.currentTarget.style.background = 'rgba(147,112,219,0.08)';
+                    e.currentTarget.style.color = 'rgba(200,185,230,0.5)';
+                    e.currentTarget.style.borderColor = 'rgba(147,112,219,0.2)';
                   }
-                }}
-              >
-                {num}
-              </button>
-            ))}
+                }}>
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            {totalRatings > 0 && (
+              <div style={{ textAlign:'center', borderTop:'1px solid rgba(147,112,219,0.15)', paddingTop:'14px' }}>
+                <span style={{ color:'rgba(180,100,255,0.4)', fontSize:'0.7rem',
+                  fontFamily:'Georgia, serif', fontStyle:'italic', letterSpacing:'1px' }}>
+                  Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+                </span>
+              </div>
+            )}
           </div>
-          
-          {totalRatings > 0 && (
-            <p className="text-center mt-4 text-xs sm:text-sm" style={{ 
-              color: isDarkTheme ? '#d8b4fe' : '#c9c6bb'
-            }}>
-              Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+        )}
+      </div>
+    ) : (
+      /* СВЕТЛАЯ — ЗОЛОТО */
+      <div style={{
+        background: '#080808',
+        border: '1px solid #2a2218',
+        borderRadius: '4px',
+        width: '100%', maxWidth: '480px',
+        position: 'relative', overflow: 'hidden'
+      }}>
+        {/* Левая золотая полоса */}
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+          background:'linear-gradient(180deg, transparent, #c9a84c, transparent)' }}/>
+        {/* ⚜ фоном */}
+        <div style={{ position:'absolute', top:'50%', right:'20px',
+          transform:'translateY(-50%)', fontFamily:'serif', fontSize:'12rem',
+          color:'rgba(201,168,76,0.04)', pointerEvents:'none', userSelect:'none', lineHeight:1 }}>⚜</div>
+
+        <div style={{ padding:'32px 36px', position:'relative', zIndex:1 }}>
+          {/* Кнопка закрыть */}
+          <button onClick={() => setShowRatingModal(false)} style={{
+            position:'absolute', top:'16px', right:'16px',
+            background:'transparent', border:'1px solid rgba(201,168,76,0.3)',
+            borderRadius:'50%', width:'32px', height:'32px', cursor:'pointer',
+            color:'rgba(201,168,76,0.7)', display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:'14px'
+          }}>✕</button>
+
+          {/* Заголовок */}
+          <div style={{ marginBottom:'20px' }}>
+            <div style={{ fontFamily:"'victiriya', Georgia, serif", fontSize:'2rem',
+              backgroundImage:'linear-gradient(90deg, #c9a84c 0%, #f0d080 40%, #c9a84c 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+              animation:'ratingGoldShimmer 4s linear infinite',
+              letterSpacing:'4px', fontWeight:400, marginBottom:'10px' }}>Оценить работу</div>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+              <div style={{ height:'1px', width:'80px', background:'linear-gradient(90deg, rgba(201,168,76,0.5), transparent)' }}/>
+              <span style={{ color:'rgba(201,168,76,0.5)', fontSize:'0.8rem', letterSpacing:'5px', fontFamily:'serif' }}>⚜ · · ⚜</span>
+            </div>
+          </div>
+
+          {!currentUser ? (
+            <p style={{ color:'#d0c8b8', fontFamily:'Georgia, serif', fontStyle:'italic', padding:'16px 0' }}>
+              Войдите, чтобы оставить оценку
             </p>
+          ) : (
+            <div>
+              <p style={{ color:'rgba(201,168,76,0.5)', fontSize:'0.8rem',
+                fontFamily:'Georgia, serif', fontStyle:'italic', marginBottom:'20px', letterSpacing:'1px' }}>
+                {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+              </p>
+
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'8px', marginBottom:'20px' }}>
+                {[1,2,3,4,5,6,7,8,9,10].map((num) => (
+                  <button key={num} onClick={() => submitRating(num)} style={{
+                    padding:'12px 4px',
+                    background: userRating === num ? 'rgba(201,168,76,0.2)' : 'transparent',
+                    border: userRating === num ? '1px solid rgba(201,168,76,0.8)' : '1px solid rgba(201,168,76,0.2)',
+                    color: userRating === num ? '#c9a84c' : 'rgba(201,168,76,0.4)',
+                    borderRadius:'1px', cursor:'pointer',
+                    fontFamily:'Cinzel, serif', fontSize:'0.85rem',
+                    transition:'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (userRating !== num) {
+                      e.currentTarget.style.background = 'rgba(201,168,76,0.1)';
+                      e.currentTarget.style.color = '#c9a84c';
+                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (userRating !== num) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'rgba(201,168,76,0.4)';
+                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.2)';
+                    }
+                  }}>
+                    {num}
+                  </button>
+                ))}
+              </div>
+
+              {totalRatings > 0 && (
+                <div style={{ borderTop:'1px solid rgba(201,168,76,0.15)', paddingTop:'14px', textAlign:'center' }}>
+                  <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.7rem',
+                    fontFamily:'Georgia, serif', fontStyle:'italic' }}>
+                    Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+                  </span>
+                </div>
+              )}
+            </div>
           )}
-        </>
-      )}
-    </div>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
 
 {/* МОДАЛЬНОЕ ОКНО КАРТИНКИ - 3D ВАРИАНТ */}
 {selectedImage && (
-  <div 
-    className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style={{
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(8px)',
-      perspective: '1000px'
-    }}
+  <div className="fixed inset-0 z-[100] flex items-center justify-center"
+    style={{ background: 'rgba(0,0,0,0.97)', backdropFilter: 'blur(6px)' }}
     onClick={() => setSelectedImage(null)}
-  >
-    <div className="relative w-full max-w-6xl h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-      
-      {/* ЛЕВОЕ ПРЕВЬЮ */}
-      {chapter.images.indexOf(selectedImage) > 0 && (
-        <div 
-          className="absolute left-0 cursor-pointer transition-all duration-300"
-          style={{
-            width: '250px',
-            height: '350px',
-            transform: 'rotateY(15deg) scale(0.85)',
-            filter: 'blur(2px)',
-            opacity: 0.5,
-            zIndex: 1
-          }}
-          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) - 1])}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8';
-            e.currentTarget.style.filter = 'blur(1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.5';
-            e.currentTarget.style.filter = 'blur(2px)';
-          }}
-        >
-          <img 
-            src={chapter.images[chapter.images.indexOf(selectedImage) - 1]} 
-            alt="Previous" 
-            className="w-full h-full object-cover rounded-lg"
-            style={{
-              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
-                : '0 0 20px rgba(101, 99, 93, 0.4)'
-            }}
-          />
-        </div>
-      )}
+    onTouchStart={(e) => { window._tX = e.touches[0].clientX; }}
+    onTouchEnd={(e) => {
+      const diff = window._tX - e.changedTouches[0].clientX;
+      const idx = chapter.images.indexOf(selectedImage);
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && idx < chapter.images.length - 1) setSelectedImage(chapter.images[idx + 1]);
+        if (diff < 0 && idx > 0) setSelectedImage(chapter.images[idx - 1]);
+      }
+    }}>
+  <div className="flex flex-col items-center w-full max-w-2xl px-12"
+      onClick={e => e.stopPropagation()}>
 
-      {/* ЦЕНТРАЛЬНОЕ ИЗОБРАЖЕНИЕ */}
-      <div className="relative z-10" style={{ maxWidth: '600px', maxHeight: '80vh' }}>
-        <img 
-          src={selectedImage} 
-          alt="Main" 
-          className="rounded-lg"
-          style={{
-            maxWidth: '100%',
-            maxHeight: '70vh',
-            objectFit: 'contain',
-            border: isDarkTheme ? '3px solid #ec4899' : '3px solid #c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 120px rgba(236, 72, 153, 0.4)' 
-              : '0 0 40px rgba(201, 198, 187, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.3)'
-          }}
-        />
-
-        {/* КНОПКА СОХРАНЕНИЯ */}
-        <div className="flex justify-center mt-4">
+      <div className="relative flex items-center justify-center w-full">
+        {!isMobile && chapter.images.indexOf(selectedImage) > 0 && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSaveImage(selectedImage);
-            }}
-            className="px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
-            style={{
-              background: isDarkTheme 
-                ? (savedImages.includes(selectedImage) ? 'rgba(236, 72, 153, 0.9)' : 'rgba(147, 51, 234, 0.6)')
-                : (savedImages.includes(selectedImage) ? '#65635d' : 'rgba(201, 198, 187, 0.3)'),
-              border: `2px solid ${isDarkTheme 
-                ? (savedImages.includes(selectedImage) ? '#ec4899' : '#9333ea')
-                : (savedImages.includes(selectedImage) ? '#c9c6bb' : '#65635d')}`,
-              boxShadow: savedImages.includes(selectedImage)
-                ? (isDarkTheme 
-                    ? '0 0 25px rgba(236, 72, 153, 0.8)'
-                    : '0 0 15px rgba(101, 99, 93, 0.6)')
-                : 'none',
-              color: '#ffffff'
-            }}
-            onMouseEnter={(e) => {
-              if (!savedImages.includes(selectedImage)) {
-                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.9)' : 'rgba(101, 99, 93, 0.6)';
-                e.currentTarget.style.boxShadow = isDarkTheme 
-                  ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                  : '0 0 15px rgba(101, 99, 93, 0.6)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!savedImages.includes(selectedImage)) {
-                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.6)' : 'rgba(201, 198, 187, 0.3)';
-                e.currentTarget.style.boxShadow = 'none';
-              }
-            }}
-          >
-            <svg 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
-              stroke="#ffffff"
-              strokeWidth="2"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) - 1])}
+            style={{ position:'absolute', left:0, background:'none', border:'none', cursor:'pointer', zIndex:10,
+              color: isDarkTheme ? 'rgba(180,100,255,0.7)' : 'rgba(201,168,76,0.7)' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6"/>
             </svg>
-            {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
+          </button>
+        )}
+
+        <div style={{
+          position:'relative',
+          width: isMobile ? '85vw' : '360px',
+          height: isMobile ? '127vw' : '520px',
+          borderRadius:'8px', overflow:'hidden',
+          border: isDarkTheme ? '2px solid rgba(180,100,255,0.4)' : '2px solid rgba(201,168,76,0.4)',
+          boxShadow: isDarkTheme ? '0 0 60px rgba(147,50,255,0.3)' : '0 0 60px rgba(201,168,76,0.2)'
+        }}>
+          <img src={selectedImage} alt=""
+            style={{ width:'100%', height:'100%', objectFit:'cover' }}
+          />
+
+          <button onClick={() => setSelectedImage(null)}
+            style={{ position:'absolute', top:'8px', right:'8px', zIndex:20,
+              background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%',
+              padding:'4px', cursor:'pointer',
+              color: isDarkTheme ? '#dccbe2' : '#c9c3b2' }}>
+            <X size={22}/>
           </button>
         </div>
 
-        {/* ПРОГРЕСС-БАР */}
-        <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 w-64 h-1 rounded-full overflow-hidden" style={{
-          background: isDarkTheme ? 'rgba(147, 51, 234, 0.3)' : 'rgba(101, 99, 93, 0.3)'
-        }}>
-          <div 
-            className="h-full"
-            style={{
-              width: `${((chapter.images.indexOf(selectedImage) + 1) / chapter.images.length) * 100}%`,
-              background: isDarkTheme 
-                ? 'linear-gradient(90deg, #9333ea, #ec4899)'
-                : 'linear-gradient(90deg, #c9c6bb, #65635d)',
-              boxShadow: isDarkTheme ? '0 0 10px #ec4899' : '0 0 10px #c9c6bb',
-              transition: 'width 0.3s ease'
-            }}
-          />
-        </div>
+        {!isMobile && chapter.images.indexOf(selectedImage) < chapter.images.length - 1 && (
+          <button
+            onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) + 1])}
+            style={{ position:'absolute', right:0, background:'none', border:'none', cursor:'pointer', zIndex:10,
+              color: isDarkTheme ? 'rgba(180,100,255,0.7)' : 'rgba(201,168,76,0.7)' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        )}
       </div>
 
-      {/* ПРАВОЕ ПРЕВЬЮ */}
-      {chapter.images.indexOf(selectedImage) < chapter.images.length - 1 && (
-        <div 
-          className="absolute right-0 cursor-pointer transition-all duration-300"
-          style={{
-            width: '250px',
-            height: '350px',
-            transform: 'rotateY(-15deg) scale(0.85)',
-            filter: 'blur(2px)',
-            opacity: 0.5,
-            zIndex: 1
-          }}
-          onClick={() => setSelectedImage(chapter.images[chapter.images.indexOf(selectedImage) + 1])}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8';
-            e.currentTarget.style.filter = 'blur(1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.5';
-            e.currentTarget.style.filter = 'blur(2px)';
-          }}
-        >
-          <img 
-            src={chapter.images[chapter.images.indexOf(selectedImage) + 1]} 
-            alt="Next" 
-            className="w-full h-full object-cover rounded-lg"
-            style={{
-              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
-                : '0 0 20px rgba(101, 99, 93, 0.4)'
-            }}
-          />
+      {chapter.images.length > 1 && (
+        <div style={{ display:'flex', gap:'6px', marginTop:'12px' }}>
+          {chapter.images.map((img, i) => (
+            <div key={i} onClick={() => setSelectedImage(chapter.images[i])}
+              style={{
+                width: chapter.images.indexOf(selectedImage) === i ? '18px' : '7px',
+                height:'7px', borderRadius:'4px', cursor:'pointer',
+                background: chapter.images.indexOf(selectedImage) === i
+                  ? (isDarkTheme ? 'rgba(180,100,255,0.9)' : 'rgba(201,168,76,0.9)')
+                  : (isDarkTheme ? 'rgba(180,100,255,0.3)' : 'rgba(201,168,76,0.25)'),
+                transition:'all 0.3s'
+              }}
+            />
+          ))}
         </div>
       )}
 
-      {/* КНОПКА ЗАКРЫТИЯ */}
-      <button
-        onClick={() => setSelectedImage(null)}
-        className="absolute top-4 right-4 p-3 rounded-full transition-all z-20"
+      <button onClick={(e) => { e.stopPropagation(); toggleSaveImage(selectedImage); }}
         style={{
-          background: isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)',
-          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
-          boxShadow: isDarkTheme 
-            ? '0 0 20px rgba(147, 51, 234, 0.6)'
-            : '0 0 15px rgba(101, 99, 93, 0.4)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#65635d';
-          e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 30px rgba(147, 51, 234, 0.9)'
-            : '0 0 20px rgba(101, 99, 93, 0.6)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)';
-          e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 20px rgba(147, 51, 234, 0.6)'
-            : '0 0 15px rgba(101, 99, 93, 0.4)';
-        }}
-      >
-        <X size={24} color="#ffffff" />
+          marginTop:'14px', padding:'8px 24px', borderRadius:'50px', cursor:'pointer',
+          display:'flex', alignItems:'center', gap:'8px', fontWeight:'600',
+          background: savedImages.includes(selectedImage)
+            ? (isDarkTheme ? 'rgba(236,72,153,0.9)' : 'rgba(201,168,76,0.9)')
+            : 'rgba(0,0,0,0.5)',
+          border: isDarkTheme
+            ? `2px solid ${savedImages.includes(selectedImage) ? '#ec4899' : 'rgba(180,100,255,0.5)'}`
+            : `2px solid ${savedImages.includes(selectedImage) ? '#c9a84c' : 'rgba(201,168,76,0.4)'}`,
+          boxShadow: savedImages.includes(selectedImage)
+            ? (isDarkTheme ? '0 0 25px rgba(236,72,153,0.8)' : '0 0 25px rgba(201,168,76,0.6)')
+            : 'none',
+          color: '#ffffff'
+        }}>
+        <svg width="18" height="18" viewBox="0 0 24 24"
+          fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
+          stroke="#ffffff" strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
       </button>
     </div>
   </div>
 )}
-
-
-{/* ФУТЕР С КОПИРАЙТОМ */}
-<footer className="mt-12 py-6 border-t" style={{
-  borderColor: isDarkTheme ? 'rgba(147, 112, 219, 0.3)' : 'rgba(180, 154, 95, 0.3)'
-}}>
-  <div className="text-center">
-    <p className="text-xs sm:text-sm mb-2" style={{
-      color: isDarkTheme ? '#9ca3af' : '#c9c6bb'
-    }}>
-      © {new Date().getFullYear()} MelloStory. Все права защищены.
-    </p>
-    <p className="text-xs" style={{
-      color: isDarkTheme ? '#6b7280' : '#a89f8f'
-    }}>
-      Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
-    </p>
-  </div>
-</footer>
       </main>
+      {/* ФУТЕР */}
+<footer className="py-8 sm:py-12 text-center relative z-[5]" style={{
+  background: isDarkTheme ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.35)',
+  backdropFilter: 'blur(10px)',
+  borderTop: 'none',
+  position: 'relative'
+}}>
+  {/* Градиентная линия сверху */}
+  <div style={{
+    position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+    background: isDarkTheme
+      ? 'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)'
+      : 'linear-gradient(90deg, transparent, #c9a84c, #f0d080, transparent)'
+  }}/>
+  {isDarkTheme ? (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.3))'}}/>
+        <span style={{color:'rgba(179,231,239,0.25)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.3))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(179,231,239,0.35)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(147,112,219,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.25))'}}/>
+        <span style={{color:'rgba(147,112,219,0.2)',fontSize:'0.5rem',letterSpacing:'6px'}}>· · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.25))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15))'}}/>
+        <span style={{color:'rgba(147,112,219,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.15))'}}/>
+      </div>
+    </div>
+  ) : (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+        <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(201,168,76,0.45)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(201,168,76,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.2))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.6rem',letterSpacing:'5px',fontFamily:'serif'}}>· ⚜ ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.2))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15))'}}/>
+        <span style={{color:'rgba(201,168,76,0.15)',fontSize:'0.6rem',letterSpacing:'6px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.15))'}}/>
+      </div>
+    </div>
+  )}
+</footer>
     </div>
   );
 }

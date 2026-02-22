@@ -1379,6 +1379,12 @@ return (
     background: linear-gradient(135deg, #c9c6bb 0%, #65635d 100%);
     box-shadow: 0 0 15px rgba(78, 77, 76, 0.8);
   }
+    @media (max-width: 640px) {
+  .group span {
+    display: none !important;
+    max-width: 0 !important;
+    opacity: 0 !important;
+  }
   `}
 `}} />
       
@@ -1397,8 +1403,8 @@ return (
         ? 'url(/images/darnesthemepc.webp)' 
         : 'url(/images/darknesas1.webp)'
       : isMobile
-        ? 'url(/images/111.webp)'
-        : 'url(/images/alllisender.webp)',
+        ? 'url(/images/mobail.webp)'
+        : 'url(/images/descort.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat'
@@ -1443,6 +1449,30 @@ return (
       </div>
       
  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+
+{/* СМЕНА ТЕМЫ */}
+<div className="relative">
+  <button
+    onClick={toggleTheme}
+    className="p-2 transition relative flex items-center group"
+    style={{ background: 'transparent', border: 'none', overflow: 'hidden' }}
+  >
+    {isDarkTheme ? (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    ) : (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    )}
+    <span className="ml-2 whitespace-nowrap text-sm font-medium">Тема</span>
+  </button>
+</div>
 
 {/* РАССЫЛКА */}
 <div className="relative">
@@ -1803,85 +1833,83 @@ return (
     </div>
   </div>
 <div className="flex-1 flex items-center justify-center px-8 pb-20 sm:pb-0" style={{ overflow: 'visible' }}>
-  <h1
-    className={isDarkTheme 
-      ? "font-bold tracking-widest whitespace-nowrap"
-      : "font-bold tracking-widest whitespace-nowrap"
+<h1 style={{ lineHeight: '1', overflow: 'visible', display: 'block', textAlign: 'center' }}>
+  <style dangerouslySetInnerHTML={{__html:`
+    @keyframes shimmer { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+    @keyframes hgold { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+    .mello-dark {
+      background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #68d3f3 66%, #a855f7 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
     }
-    style={{
-      fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'victiriya', Georgia, serif",
-      lineHeight: '1',
-      overflow: 'visible',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      transform: !isDarkTheme && isMobile ? 'scale(0.9)' : 'none',
-      transformOrigin: 'center'
-    }}
-  >
-    <style
-      dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-          }
-          .mello-shimmer {
-            ${isDarkTheme 
-              ? `background: linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #68d3f3 66%, #a855f7 100%);
-                 background-size: 200% auto;
-                 -webkit-background-clip: text;
-                 -webkit-text-fill-color: transparent;
-                 background-clip: text;
-                 animation: shimmer 3s linear infinite;`
-              : `background-image: linear-gradient(to bottom, #690615 0%, #000000 100%);
-                 -webkit-background-clip: text;
-                 -webkit-text-fill-color: transparent;
-                 background-clip: text;`
-            }
-          }
-        `
-      }}
-    />
-    <span 
-  className="mello-shimmer" 
-  style={{ 
-    fontSize: 'clamp(5rem, 15vw, 14rem)',
-    marginBottom: '-0.15em'
-  }}
->
-  Mello
-</span>
-{isDarkTheme ? (
-<span style={{ 
-  fontSize: 'clamp(5rem, 15vw, 14rem)',
-  paddingLeft: '1.7em',
-  transform: 'translateY(-0.10em)',
-  color: '#a4d9f1'
-}}>
-  Story
-</span>
-) : (
-  <span style={{ 
-    fontSize: 'clamp(5rem, 14vw, 12rem)',
-paddingLeft: '1.7em',
-transform: 'translateY(-0.18em)'
-  }}>
-    {'Story'.split('').map((char, index) => (
-      <span
-        key={`story-${index}`}
-        style={{
-          display: 'inline-block',
-          animation: `letterWave 8s ease-in-out infinite`,
-          animationDelay: `${(5 + index) * 0.9}s`
-        }}
-      >
-        {char}
-      </span>
-    ))}
-  </span>
-)}
-  </h1>
+    .mello-light {
+      background: linear-gradient(135deg, #1a0000 0%, #6b0d1a 50%, #3a0008 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 400;
+    }
+  `}}/>
+
+  {isDarkTheme ? (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+      {/* Верхний разделитель */}
+      <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'12px'}}>
+        <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.4))'}}/>
+        <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.6rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.4))'}}/>
+      </div>
+      {/* Название */}
+      <div style={{display:'flex',alignItems:'baseline',gap:'0.2em',flexWrap:'nowrap'}}>
+        <span className="mello-dark" style={{fontSize:'clamp(3.5rem,12vw,11rem)',fontFamily:"'plommir', Georgia, serif"}}>
+          Mello
+        </span>
+        <span style={{fontSize:'clamp(3.5rem,12vw,11rem)',fontFamily:"'plommir', Georgia, serif",color:'#a4d9f1',
+          textShadow:'0 0 30px rgba(164,217,241,0.5)'}}>
+          Story
+        </span>
+      </div>
+      {/* Нижний разделитель */}
+      <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'8px'}}>
+        <div style={{width:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.25))'}}/>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.5rem',letterSpacing:'10px'}}>· · · · · · ·</span>
+        <div style={{width:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.25))'}}/>
+      </div>
+    </div>
+  ) : (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+      {/* Верхний разделитель */}
+      <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'12px'}}>
+        <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.5))'}}/>
+        <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.75rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.5))'}}/>
+      </div>
+      {/* Название */}
+      <div style={{display:'flex',alignItems:'baseline',gap:'0.15em',flexWrap:'nowrap'}}>
+        <span className="mello-light" style={{fontSize:'clamp(3.5rem,12vw,11rem)',fontFamily:"'victiriya', Georgia, serif"}}>
+          Mello
+        </span>
+        <span style={{fontSize:'clamp(2rem,6vw,5rem)',color:'rgba(201,168,76,0.6)',fontFamily:'serif',
+          alignSelf:'center',margin:'0 0.1em'}}>⚜</span>
+        <span style={{fontSize:'clamp(3.5rem,12vw,11rem)',fontFamily:"'victiriya', Georgia, serif",
+          backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+          backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+          animation:'hgold 4s linear infinite',fontWeight:'400'}}>
+          Story
+        </span>
+      </div>
+      {/* Нижний разделитель */}
+      <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'8px'}}>
+        <div style={{width:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.3))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'10px',fontFamily:'serif'}}>· · · · · · ·</span>
+        <div style={{width:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.3))'}}/>
+      </div>
+    </div>
+  )}
+</h1>
 </div>
 </div>
         </div>
@@ -1893,21 +1921,45 @@ transform: 'translateY(-0.18em)'
 
 {/* ПОПУЛЯРНЫЕ РАБОТЫ */}
 <div className="max-w-5xl mx-auto mt-12 sm:mt-16 relative z-0 px-2 sm:px-4" style={{ marginTop: isDarkTheme ? '3rem' : '2rem' }}>
-<h2 className="text-center mb-6 sm:mb-8 mt-6 sm:mt-0" style={{
-    fontWeight: 'bold',
-    fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
-    color: isDarkTheme ? '#b3e7ef' : 'transparent',
-    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8), 0 0 40px rgba(179, 231, 239, 0.5)' : 'none',
-    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
-    fontStyle: !isDarkTheme ? 'italic' : 'normal',
-    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-    backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-    backgroundClip: !isDarkTheme ? 'text' : 'unset'
-  }}>
-   {t.popularWorks}
-  </h2>
+<div className="text-center mb-6 sm:mb-8 mt-6 sm:mt-0">
+  {isDarkTheme ? (
+    <div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'10px'}}>
+        <div style={{flex:1,maxWidth:'100px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.4))'}}/>
+        <span style={{color:'rgba(179,231,239,0.35)',fontSize:'0.6rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'100px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.4))'}}/>
+      </div>
+<div style={{fontFamily:'plommir, Georgia, serif',fontSize:'clamp(2rem,6vw,6rem)',fontWeight:'normal',
+  color:'#b3e7ef',textShadow:'0 0 20px rgba(179,231,239,0.8),0 0 40px rgba(179,231,239,0.4)'}}>
+  {t.popularWorks}
+      </div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'10px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.2))'}}/>
+        <span style={{color:'rgba(179,231,239,0.15)',fontSize:'0.5rem',letterSpacing:'10px'}}>· · · · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.2))'}}/>
+      </div>
+    </div>
+  ) : (
+    <div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'10px'}}>
+        <div style={{flex:1,maxWidth:'100px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.5))'}}/>
+        <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.75rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'100px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.5))'}}/>
+      </div>
+      <div style={{fontFamily:"'victiriya', Georgia, serif",fontSize:'clamp(1.5rem,4vw,4rem)',
+        backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+        backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+        animation:'hgold 4s linear infinite',letterSpacing:'3px',fontWeight:'400'}}>
+        {t.popularWorks}
+      </div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'10px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.3))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'10px',fontFamily:'serif'}}>· · · · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.3))'}}/>
+      </div>
+    </div>
+  )}
+</div>
   
 <div className="grid grid-cols-3 gap-2 sm:gap-6">
 {popularWorks.map((work, index) => (
@@ -2024,11 +2076,14 @@ transform: 'translateY(-0.18em)'
   </div>
   
     {/* НОВЫЙ ТЕКСТ ДОБАВЛЯЕТСЯ ЗДЕСЬ */}
-  <p className="text-center mt-6 opacity-70" style={{
-  fontSize: 'clamp(0.65rem, 1.5vw, 0.875rem)',
-    color: isDarkTheme ? '#b3e7ef' : '#c8c0c2',
-    fontFamily: "'Playfair Display', Georgia, serif"
-  }}>
+<p style={{
+  textAlign: 'center', marginTop: '24px',
+  fontSize: 'clamp(0.6rem, 1.2vw, 0.72rem)',
+  color: isDarkTheme ? 'rgba(179,231,239,0.45)' : 'rgba(201,168,76,0.45)',
+  fontFamily: 'Georgia, serif', fontStyle: 'italic',
+  letterSpacing: isDarkTheme ? '0px' : '1px',
+  lineHeight: '1.7', padding: '0 8px'
+}}>
     Обновление рейтинга и статистики просмотров производится один раз в три дня на основе суммарных пользовательских оценок. Раздел «Популярные работы» обновляется еженедельно.
   </p>
 
@@ -2045,33 +2100,54 @@ transform: 'translateY(-0.18em)'
     border: 'none'
   }}
 >
-  <span style={{
-    fontSize: isDarkTheme ? 'clamp(3rem, 8vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
-    color: isDarkTheme ? '#b3e7ef' : 'transparent',
-    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
-    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
-    fontStyle: !isDarkTheme ? 'italic' : 'normal',
-    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
+{isDarkTheme ? (
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.4))'}}/>
+      <span style={{color:'rgba(179,231,239,0.35)',fontSize:'0.6rem',letterSpacing:'6px'}}>✦ · ✦</span>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.4))'}}/>
+    </div>
+<span style={{fontSize:'clamp(2rem,6vw,6rem)',color:'#b3e7ef',fontFamily:'plommir, Georgia, serif',fontWeight:'normal',
+  textShadow:'0 0 20px rgba(179,231,239,0.8)'}}>
+  {t.schedule}
+    </span>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.2))'}}/>
+      <span style={{color:'rgba(179,231,239,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · ·</span>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.2))'}}/>
+    </div>
+  </div>
+) : (
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.45))'}}/>
+      <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · ⚜</span>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.45))'}}/>
+    </div>
+    <span style={{fontFamily:"'victiriya', Georgia, serif",fontSize:'clamp(1.5rem,4vw,4rem)',
+      backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+      backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+      animation:'hgold 4s linear infinite',letterSpacing:'2px',fontWeight:'400'}}>
+      {t.schedule}
+    </span>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.25))'}}/>
+      <span style={{color:'rgba(201,168,76,0.15)',fontSize:'0.5rem',letterSpacing:'8px',fontFamily:'serif'}}>· · · · ·</span>
+      <div style={{width:'50px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.25))'}}/>
+    </div>
+  </div>
+)}
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+  stroke={isDarkTheme ? '#b3e7ef' : '#c9a84c'} strokeWidth="1.2"
+  strokeLinecap="round" strokeLinejoin="round"
+  style={{
+    filter: isDarkTheme
+      ? 'drop-shadow(0 0 14px rgba(179,231,239,1)) drop-shadow(0 0 6px rgba(239,1,203,0.5))'
+      : 'drop-shadow(0 0 10px rgba(201,168,76,0.8))',
+    animation: 'bounce 2s infinite'
   }}>
-   {t.schedule}
-  </span>
-<svg 
-  width="24" 
-  height="24" 
-  viewBox="0 0 24 24" 
-  fill="none" 
-  stroke={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
-  strokeWidth="2"
-  className="sm:w-10 sm:h-10"
-  style={{ 
-    animation: 'bounce 2s infinite',
-    filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
-  }}
->
-    <polyline points="6 9 12 15 18 9"></polyline>
-  </svg>
+  <polyline points="6 9 12 15 18 9"/>
+</svg>
   <style dangerouslySetInnerHTML={{__html: `
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
@@ -2086,18 +2162,41 @@ transform: 'translateY(-0.18em)'
 {newsPosts.length > 0 && (
 <div className="max-w-7xl mt-1 sm:mt-14 relative z-0 px-4 sm:px-8">
 <div className="mb-8 mt-9 sm:mt-12">
-<h2 className="font-bold text-left mb-4 mt-6 sm:mt-0" style={{
-     fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
-    color: isDarkTheme ? '#b3e7ef' : 'transparent',
-    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
-    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
-        fontStyle: !isDarkTheme ? 'italic' : 'normal',
-        backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
-      }}>
-       {t.news}
-      </h2>
+<div className="mb-4 mt-6 sm:mt-0">
+  {isDarkTheme ? (
+    <div>
+      <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+        <span style={{color:'rgba(179,231,239,0.35)',fontSize:'0.6rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'140px',height:'1px',background:'linear-gradient(90deg,rgba(179,231,239,0.4),transparent)'}}/>
+      </div>
+<div style={{fontFamily:'plommir, Georgia, serif',fontSize:'clamp(2rem,6vw,6rem)',fontWeight:'normal',
+  color:'#b3e7ef',textShadow:'0 0 20px rgba(179,231,239,0.8)'}}>
+  {t.news}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:'10px',marginTop:'10px'}}>
+        <div style={{width:'120px',height:'1px',background:'linear-gradient(90deg,rgba(179,231,239,0.3),transparent)'}}/>
+        <span style={{color:'rgba(179,231,239,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+      </div>
+    </div>
+  ) : (
+    <div>
+      <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+        <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.75rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'140px',height:'1px',background:'linear-gradient(90deg,rgba(201,168,76,0.4),transparent)'}}/>
+      </div>
+      <div style={{fontFamily:"'victiriya', Georgia, serif",fontSize:'clamp(1.5rem,4vw,4rem)',
+        backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+        backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+        animation:'hgold 4s linear infinite',letterSpacing:'2px',fontWeight:'400'}}>
+        {t.news}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:'10px',marginTop:'10px'}}>
+        <div style={{width:'120px',height:'1px',background:'linear-gradient(90deg,rgba(201,168,76,0.35),transparent)'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'8px',fontFamily:'serif'}}>· · · · · · ·</span>
+      </div>
+    </div>
+  )}
+</div>
       
 {isAdmin && (
         <button
@@ -2122,14 +2221,17 @@ transform: 'translateY(-0.18em)'
     className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
   >
     <div className="flex items-center justify-center transition-all group-hover:scale-125">
-      <ChevronLeft 
-        size={24} 
-        color={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
-        style={{ 
-          animation: 'bounce 2s infinite',
-          filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
-        }}
-      />
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+        stroke={isDarkTheme ? '#b3e7ef' : '#c9a84c'} strokeWidth="1.2"
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{
+          filter: isDarkTheme
+            ? 'drop-shadow(0 0 12px rgba(179,231,239,1)) drop-shadow(0 0 4px rgba(147,112,219,0.8))'
+            : 'drop-shadow(0 0 8px rgba(201,168,76,0.7))',
+          animation: 'bounce 2s infinite'
+        }}>
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
     </div>
   </button>
 )}
@@ -2152,29 +2254,30 @@ transform: 'translateY(-0.18em)'
       background: 'transparent'
     }}
   >
-    <h3 
-      className="font-bold text-base sm:text-lg mb-2 line-clamp-2 transition-colors duration-300 hover-news-title"
-      style={{
-        color: isDarkTheme ? '#b3e7ef' : '#c9c6bb'
-      }}
-    >
-      <style dangerouslySetInnerHTML={{__html: `
-        .hover-news-title:hover {
-          color: ${isDarkTheme ? '#ba0db3 !important' : '#6b1429 !important'};
-        }
-      `}} />
-      {news.title}
-    </h3>
-    <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{
-      color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
-      opacity: 0.8
-    }}>
-      {new Date(news.created_at).toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })}
-    </p>
+{/* ЗАГОЛОВОК новости */}
+<h3
+  className="text-base sm:text-lg mb-2 line-clamp-2 transition-colors duration-300 hover-news-title"
+  style={{
+    color: isDarkTheme ? '#b3e7ef' : '#c9c6bb',
+    fontWeight: '300',
+    fontStyle: 'italic',
+    fontFamily: 'Georgia, serif'
+  }}
+>
+  {news.title}
+</h3>
+
+{/* ДАТА новости */}
+<p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{
+  color: isDarkTheme ? '#9ca3af' : '#c9c6bb',
+  opacity: 0.8,
+  fontWeight: '300',
+  fontStyle: 'italic'
+}}>
+  {new Date(news.created_at).toLocaleDateString('ru-RU', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })}
+</p>
 <div className="flex items-center gap-2">
   <style dangerouslySetInnerHTML={{__html: `
     @keyframes slideRight {
@@ -2208,14 +2311,17 @@ transform: 'translateY(-0.18em)'
     className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full px-1 sm:px-3 flex items-center justify-center transition group"
   >
     <div className="flex items-center justify-center transition-all group-hover:scale-125">
-      <ChevronRight 
-        size={24} 
-        color={isDarkTheme ? '#b3e7ef' : '#7c7b76'}
-        style={{ 
-          animation: 'bounce 2s infinite',
-          filter: isDarkTheme ? 'drop-shadow(0 0 10px rgba(179, 231, 239, 0.8))' : 'none'
-        }}
-      />
+ <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+        stroke={isDarkTheme ? '#b3e7ef' : '#c9a84c'} strokeWidth="1.2"
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{
+          filter: isDarkTheme
+            ? 'drop-shadow(0 0 12px rgba(179,231,239,1)) drop-shadow(0 0 4px rgba(147,112,219,0.8))'
+            : 'drop-shadow(0 0 8px rgba(201,168,76,0.7))',
+          animation: 'bounce 2s infinite'
+        }}>
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
     </div>
   </button>
 )}
@@ -2227,45 +2333,50 @@ transform: 'translateY(-0.18em)'
 <div className="max-w-7xl mx-auto mt-12 sm:mt-20 relative z-0 px-4 sm:px-8">
 <div className="max-w-2xl sm:ml-auto">
 
- {isAdmin && (
-  <button
-    onClick={() => {
-      setEditingSection('about');
-      const alignMatch = aboutText.match(/^\[ALIGN:(left|center|right)\]/);
-      const align = alignMatch ? alignMatch[1] : 'left';
-      const cleanText = aboutText.replace(/^\[ALIGN:(left|center|right)\]/, '');
-      
-      setEditText(cleanText);
-      setTextFormatState({ ...textFormatState, align });
-      setShowEditModal(true);
-    }}
-    className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center transition"
-    title="Редактировать информацию"
-  >
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  </button>
-)}
+
 <div className="text-left leading-relaxed">
-<h2 className="font-bold mb-8 mt-6 sm:mt-0" style={{
-    fontSize: isDarkTheme ? 'clamp(2rem, 6vw, 6rem)' : 'clamp(1.5rem, 4vw, 4rem)',
-    color: isDarkTheme ? '#b3e7ef' : 'transparent',
-    textShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.8)' : 'none',
-    fontFamily: isDarkTheme ? 'ppelganger, Georgia, serif' : 'miamanueva, Georgia, serif',
-    fontStyle: !isDarkTheme ? 'italic' : 'normal',
-    backgroundImage: !isDarkTheme ? 'radial-gradient(ellipse at top left, #c8c0c2 0%, #82713a 100%)' : 'none',
-    WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-    WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset'
-  }}>
-   {t.information}
-  </h2>
- <div className="text-white text-base sm:text-lg mb-8 max-w-xl">
-    {renderFormattedText(aboutText)}
-  </div>
-  <div className="mt-8 text-white text-base sm:text-lg max-w-xl">
-    <p className="mb-2">Если у вас возникнут трудности или вопросы при регистрации и отсутствует возможность написать из личного кабинета, вы можете связаться со мной по электронной почте:</p>
+<div className="mb-8 mt-6 sm:mt-0">
+  {isDarkTheme ? (
+    <div>
+      <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+        <span style={{color:'rgba(179,231,239,0.35)',fontSize:'0.6rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'140px',height:'1px',background:'linear-gradient(90deg,rgba(179,231,239,0.4),transparent)'}}/>
+      </div>
+<div style={{fontFamily:'plommir, Georgia, serif',fontSize:'clamp(2rem,6vw,6rem)',fontWeight:'normal',
+  color:'#b3e7ef',textShadow:'0 0 20px rgba(179,231,239,0.8)'}}>
+  {t.information}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:'10px',marginTop:'10px'}}>
+        <div style={{width:'120px',height:'1px',background:'linear-gradient(90deg,rgba(179,231,239,0.3),transparent)'}}/>
+        <span style={{color:'rgba(179,231,239,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+      </div>
+    </div>
+  ) : (
+    <div>
+      <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+        <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.75rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'140px',height:'1px',background:'linear-gradient(90deg,rgba(201,168,76,0.4),transparent)'}}/>
+      </div>
+      <div style={{fontFamily:"'victiriya', Georgia, serif",fontSize:'clamp(1.5rem,4vw,4rem)',
+        backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+        backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+        animation:'hgold 4s linear infinite',letterSpacing:'2px',fontWeight:'400'}}>
+        {t.information}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:'10px',marginTop:'10px'}}>
+        <div style={{width:'120px',height:'1px',background:'linear-gradient(90deg,rgba(201,168,76,0.35),transparent)'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'8px',fontFamily:'serif'}}>· · · · · · ·</span>
+      </div>
+    </div>
+  )}
+</div>
+<div className="mt-8 max-w-xl" style={{
+  fontFamily:'Georgia,serif', fontStyle:'italic', lineHeight:'1.9',
+  color: isDarkTheme ? 'rgba(200,185,230,0.78)' : 'rgba(255, 255, 255, 0.88)',
+  borderLeft: isDarkTheme ? '2px solid rgba(147,112,219,0.35)' : '2px solid rgba(201,168,76,0.28)',
+  paddingLeft: '1.2rem'
+}}>
+  <p className="mb-2">Если у вас возникнут трудности или вопросы при регистрации и отсутствует возможность написать из личного кабинета, вы можете связаться со мной по электронной почте:</p>
     <a 
       href="mailto:mellostory@protonmail.com"
       className="inline-block font-bold underline transition"
@@ -2653,108 +2764,71 @@ transform: 'translateY(-0.18em)'
 )}
 
 {/* DELETE ACCOUNT MODAL */}
-{showDeleteAccountModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+{showDeleteAccountModal && !isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes delGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .del-light-scroll::-webkit-scrollbar{width:3px;}
+      .del-light-scroll::-webkit-scrollbar-track{background:transparent;}
+      .del-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .del-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'360px',
+      maxHeight:'min(85vh,580px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Удаление аккаунта</h2>
-        <button onClick={() => {
-          setShowDeleteAccountModal(false);
-          setDeleteReason('');
-          setDeletePassword('');
-        }} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',top:'50%',right:'5px',transform:'translateY(-50%)',
+        fontFamily:'serif',fontSize:'clamp(6rem,15vw,10rem)',color:'rgba(201,168,76,0.03)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      <div className="rounded-lg p-4 mb-6" style={{ 
-        background: 'rgba(147, 112, 219, 0.3)',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <p className="text-sm text-white">
-          Это действие необратимо! Все ваши данные будут удалены навсегда.
-        </p>
-      </div>
+      <div className="del-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(14px,4vw,28px)',paddingTop:'clamp(16px,4vw,26px)',position:'relative',zIndex:1}}>
+        <button onClick={()=>{setShowDeleteAccountModal(false);setDeleteReason('');setDeletePassword('');}} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">
-            Причина удаления <span className="text-gray-500">(необязательно)</span>
-          </label>
-          <textarea
-            value={deleteReason}
-            onChange={(e) => setDeleteReason(e.target.value)}
-            rows={3}
-            placeholder="Расскажите, почему вы решили удалить аккаунт..."
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white resize-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+        <div style={{marginBottom:'clamp(12px,3vw,18px)'}}>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.2rem,5vw,1.8rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'delGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Удаление профиля</div>
+          <div style={{height:'1px',width:'80px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
         </div>
 
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">
-            Введите пароль для подтверждения <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="password"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-            placeholder="Ваш пароль"
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+        <div style={{background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'10px 12px',marginBottom:'14px'}}>
+          <p style={{color:'rgba(201,168,76,0.5)',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.6'}}>
+            Это действие необратимо. Все данные будут удалены навсегда.
+          </p>
         </div>
 
-        <button
-          onClick={handleDeleteAccount}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
-            color: '#ffffff'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 25px rgba(147, 112, 219, 0.9)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(147, 112, 219, 0.6)';
-          }}
-        >
-          Удалить
-        </button>
-
-        <button
-          onClick={() => {
-            setShowDeleteAccountModal(false);
-            setDeleteReason('');
-            setDeletePassword('');
-          }}
-          className="w-full py-3 rounded-lg font-bold transition border-2"
-          style={{
-            background: 'transparent',
-            borderColor: '#9333ea',
-            color: '#9370db'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#b48dc4';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = '#9333ea';
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)'}}>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>
+              Причина <span style={{opacity:0.6,textTransform:'none',fontSize:'0.9em'}}>(необязательно)</span>
+            </label>
+            <textarea value={deleteReason} onChange={e=>setDeleteReason(e.target.value)} rows={2} placeholder="Расскажите почему..."
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.7)',fontSize:'clamp(0.72rem,2vw,0.82rem)',outline:'none',resize:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Пароль *</label>
+            <input type="password" value={deletePassword} onChange={e=>setDeletePassword(e.target.value)} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleDeleteAccount} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.5)',borderRadius:'2px',cursor:'pointer',color:'#c9a84c',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',marginTop:'4px'}}>
+            ⚜ Удалить
+          </button>
+          <button onClick={()=>{setShowDeleteAccountModal(false);setDeleteReason('');setDeletePassword('');}} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.12)',borderRadius:'2px',cursor:'pointer',color:'rgba(201,168,76,0.3)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2762,216 +2836,175 @@ transform: 'translateY(-0.18em)'
 
 {/* DELETE ACCOUNT MODAL - СВЕТЛАЯ ТЕМА */}
 {showDeleteAccountModal && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes delGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .del-light-scroll::-webkit-scrollbar{width:3px;}
+      .del-light-scroll::-webkit-scrollbar-track{background:transparent;}
+      .del-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .del-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'360px',
+      maxHeight:'min(85vh,580px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Удаление аккаунта</h2>
-        <button onClick={() => {
-          setShowDeleteAccountModal(false);
-          setDeleteReason('');
-          setDeletePassword('');
-        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',top:'50%',right:'5px',transform:'translateY(-50%)',
+        fontFamily:'serif',fontSize:'clamp(6rem,15vw,10rem)',color:'rgba(201,168,76,0.03)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      <div className="rounded-lg p-4 mb-6" style={{ 
-        background: 'rgba(180, 154, 95, 0.15)',
-        border: '1px solid rgba(180, 154, 95, 0.3)'
-      }}>
-        <p className="text-sm" style={{ color: '#c9c6bb' }}>
-          Это действие необратимо! Все ваши данные будут удалены навсегда.
-        </p>
-      </div>
+      <div className="del-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(14px,4vw,28px)',paddingTop:'clamp(16px,4vw,26px)',position:'relative',zIndex:1}}>
+        <button onClick={()=>{setShowDeleteAccountModal(false);setDeleteReason('');setDeletePassword('');}} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>
-            Причина удаления <span style={{ color: '#c9c6bb', opacity: 0.7 }}>(необязательно)</span>
-          </label>
-          <textarea
-            value={deleteReason}
-            onChange={(e) => setDeleteReason(e.target.value)}
-            rows={3}
-            placeholder="Расскажите, почему вы решили удалить аккаунт..."
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none resize-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+        <div style={{marginBottom:'clamp(12px,3vw,18px)'}}>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.2rem,5vw,1.8rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'delGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Удаление профиля</div>
+          <div style={{height:'1px',width:'80px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
         </div>
 
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>
-            Введите пароль для подтверждения <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="password"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-            placeholder="Ваш пароль"
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+        <div style={{background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'10px 12px',marginBottom:'14px'}}>
+          <p style={{color:'rgba(201,168,76,0.5)',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.6'}}>
+            Это действие необратимо. Все данные будут удалены навсегда.
+          </p>
         </div>
 
-        <button
-          onClick={handleDeleteAccount}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: '#c9c6bb',
-            color: '#000000'
-          }}
-        >
-          Удалить
-        </button>
-
-        <button
-          onClick={() => {
-            setShowDeleteAccountModal(false);
-            setDeleteReason('');
-            setDeletePassword('');
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'transparent',
-            border: '2px solid #c9c6bb',
-            color: '#c9c6bb'
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)'}}>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>
+              Причина <span style={{opacity:0.6,textTransform:'none',fontSize:'0.9em'}}>(необязательно)</span>
+            </label>
+            <textarea value={deleteReason} onChange={e=>setDeleteReason(e.target.value)} rows={2} placeholder="Расскажите почему..."
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.7)',fontSize:'clamp(0.72rem,2vw,0.82rem)',outline:'none',resize:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Пароль *</label>
+            <input type="password" value={deletePassword} onChange={e=>setDeletePassword(e.target.value)} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleDeleteAccount} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.5)',borderRadius:'2px',cursor:'pointer',color:'#c9a84c',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',marginTop:'4px'}}>
+            ⚜ Удалить
+          </button>
+          <button onClick={()=>{setShowDeleteAccountModal(false);setDeleteReason('');setDeletePassword('');}} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.12)',borderRadius:'2px',cursor:'pointer',color:'rgba(201,168,76,0.3)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
 )}
 
 {/* UPDATES MODAL */}
-{showUpdatesModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+{showUpdatesModal && isDarkTheme && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes updTwinkle{0%,100%{opacity:0.1;}50%{opacity:0.5;}}
+      .upd-dark-scroll::-webkit-scrollbar{width:4px;}
+      .upd-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .upd-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .upd-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+      .upd-card:hover{border-color:#ef01cb !important;box-shadow:0 0 20px rgba(239,1,203,0.4) !important;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw',maxWidth:'560px',
+      maxHeight:'min(88vh,640px)',
+      display:'flex',flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Обновления</h2>
-        <button onClick={() => setShowUpdatesModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3,flexShrink:0}}/>
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'14px',
+        backgroundImage:`radial-gradient(1px 1px at 5% 10%,rgba(255,255,255,0.3) 0%,transparent 100%),
+          radial-gradient(1px 1px at 90% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+          radial-gradient(1px 1px at 70% 90%,rgba(255,255,255,0.2) 0%,transparent 100%),
+          radial-gradient(1px 1px at 15% 85%,rgba(255,255,255,0.15) 0%,transparent 100%)`,
+        animation:'updTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+
+      {/* Шапка — фиксированная */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(14px,3vw,24px)',paddingBottom:'clamp(10px,2vw,16px)',borderBottom:'1px solid rgba(147,112,219,0.15)',position:'relative',zIndex:2,flexShrink:0}}>
+        <button onClick={()=>setShowUpdatesModal(false)} style={{
+          position:'absolute',top:'12px',right:'12px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        <div style={{textAlign:'center'}}>
+          <div style={{fontSize:'clamp(0.9rem,2.5vw,1.2rem)',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+          <div style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.85rem,2.5vw,1.05rem)',letterSpacing:'clamp(3px,1vw,6px)',
+            background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Обновления</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      {/* Список — скроллируемый */}
+      <div className="upd-dark-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',position:'relative',zIndex:1,flex:1}}>
         {siteUpdates.length === 0 ? (
-          <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-            <p className="text-gray-500">Пока нет обновлений</p>
+          <div style={{textAlign:'center',padding:'40px 20px',background:'rgba(147,112,219,0.05)',border:'1px solid rgba(147,112,219,0.15)',borderRadius:'8px'}}>
+            <div style={{fontSize:'2rem',marginBottom:'8px',opacity:0.3}}>✦</div>
+            <p style={{color:'rgba(180,100,255,0.4)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem'}}>Пока нет обновлений</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)'}}>
             {siteUpdates.map((update) => (
-<div 
-  key={update.id}
-  className="rounded-lg p-4 border-2 transition cursor-pointer bg-black"
-  style={{
-    borderColor: update.type === 'new_work' ? '#ef01cb' : '#9370db',
-    boxShadow: update.type === 'new_work' ? '0 0 15px rgba(239, 1, 203, 0.4)' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#ef01cb';
-    e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 1, 203, 0.6)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = update.type === 'new_work' ? '#ef01cb' : '#9370db';
-    e.currentTarget.style.boxShadow = update.type === 'new_work' ? '0 0 15px rgba(239, 1, 203, 0.4)' : 'none';
-  }}
-                onClick={async () => {
-
-                  loadSiteUpdates();
-                  window.location.href = `/work/${update.work_id}`;
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ 
-  color: '#ef01cb',
-  filter: 'drop-shadow(0 0 5px rgba(239, 1, 203, 0.6))'
-}}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+              <div key={update.id} className="upd-card"
+                onClick={async()=>{loadSiteUpdates();window.location.href=`/work/${update.work_id}`;}}
+                style={{
+                  background:'rgba(0,0,0,0.4)',
+                  border: update.type==='new_work' ? '1px solid rgba(239,1,203,0.4)' : '1px solid rgba(147,112,219,0.2)',
+                  borderRadius:'8px',padding:'clamp(10px,2vw,14px)',cursor:'pointer',
+                  boxShadow: update.type==='new_work' ? '0 0 12px rgba(239,1,203,0.15)' : 'none',
+                  transition:'all 0.2s'
+                }}>
+                <div style={{display:'flex',alignItems:'flex-start',gap:'12px'}}>
+                  <div style={{flexShrink:0,marginTop:'2px'}}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={update.type==='new_work'?'#ef01cb':'#9370db'} style={{filter:`drop-shadow(0 0 4px ${update.type==='new_work'?'rgba(239,1,203,0.6)':'rgba(147,112,219,0.5)'})`}}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    {update.type === 'new_work' ? (
+                  <div style={{flex:1,minWidth:0}}>
+                    {update.type==='new_work' ? (
                       <>
-           <span className="inline-block text-xs font-bold px-2 py-1 rounded mb-2" style={{
-  background: 'linear-gradient(135deg, #ef01cb 0%, #bc0897 100%)',
-  boxShadow: '0 0 15px rgba(239, 1, 203, 0.8)',
-  color: '#ffffff'
-}}>
-  НОВАЯ РАБОТА
-</span>
-                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
-                          {update.work_title}
-                        </h3>
-                        <p className="text-gray-400 text-sm">
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
+                        <span style={{display:'inline-block',background:'linear-gradient(135deg,#ef01cb,#bc0897)',color:'#fff',fontSize:'clamp(0.45rem,1.2vw,0.55rem)',fontFamily:'Cinzel,serif',letterSpacing:'2px',padding:'2px 8px',borderRadius:'2px',marginBottom:'6px',boxShadow:'0 0 10px rgba(239,1,203,0.6)'}}>НОВАЯ РАБОТА</span>
+                        <p style={{color:'#e8d5ff',fontFamily:'Georgia,serif',fontSize:'clamp(0.8rem,2vw,0.95rem)',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                        <p style={{color:'rgba(180,100,255,0.4)',fontSize:'clamp(0.6rem,1.5vw,0.7rem)',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}
                         </p>
                       </>
                     ) : (
                       <>
-                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
-                          {update.work_title}
-                        </h3>
-                        <p className="text-gray-300 text-sm mb-1">
-                          {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
+                        <p style={{color:'rgba(200,185,230,0.8)',fontFamily:'Georgia,serif',fontSize:'clamp(0.8rem,2vw,0.92rem)',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                        <p style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.65rem,1.5vw,0.75rem)',marginBottom:'4px',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {update.chapter_number} глава{update.chapter_title&&` · ${update.chapter_title}`}
                         </p>
-                        <p className="text-gray-400 text-xs">
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long'
-                          })}
+                        <p style={{color:'rgba(147,112,219,0.35)',fontSize:'clamp(0.58rem,1.3vw,0.65rem)',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}
                         </p>
                       </>
                     )}
                   </div>
+                  <div style={{flexShrink:0,color:'rgba(180,100,255,0.3)',fontSize:'0.7rem',alignSelf:'center'}}>→</div>
                 </div>
               </div>
             ))}
@@ -2984,111 +3017,100 @@ transform: 'translateY(-0.18em)'
 
 {/* UPDATES MODAL - СВЕТЛАЯ ТЕМА */}
 {showUpdatesModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes updGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .upd-light-scroll::-webkit-scrollbar{width:4px;}
+      .upd-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .upd-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .upd-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+      .upd-card-light:hover{border-color:rgba(201,168,76,0.5) !important;background:rgba(201,168,76,0.06) !important;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'560px',
+      maxHeight:'min(88vh,640px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Обновления</h2>
-        <button onClick={() => setShowUpdatesModal(false)} className="absolute right-0" style={{ color: '#c2ab75' }}>
-          <X size={24} />
-        </button>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',bottom:'20px',right:'10px',
+        fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+      {/* Шапка */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(18px,4vw,28px)',paddingBottom:'clamp(10px,2vw,14px)',borderBottom:'1px solid rgba(201,168,76,0.1)',position:'relative',zIndex:2,flexShrink:0}}>
+        <button onClick={()=>setShowUpdatesModal(false)} style={{
+          position:'absolute',top:'12px',right:'12px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        <div>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.4rem,5vw,2rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'updGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Обновления</div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      {/* Список */}
+      <div className="upd-light-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',position:'relative',zIndex:1,flex:1}}>
         {siteUpdates.length === 0 ? (
-          <div className="text-center py-12 rounded-lg" style={{
-            background: 'rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(180, 154, 95, 0.3)'
-          }}>
-            <p style={{ color: '#c9c6bb' }}>Пока нет обновлений</p>
+          <div style={{textAlign:'center',padding:'40px 20px',background:'rgba(201,168,76,0.03)',border:'1px solid rgba(201,168,76,0.12)',borderRadius:'2px'}}>
+            <div style={{fontSize:'2rem',marginBottom:'8px',color:'rgba(201,168,76,0.2)',fontFamily:'serif'}}>⚜</div>
+            <p style={{color:'rgba(201,168,76,0.35)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem'}}>Пока нет обновлений</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)'}}>
             {siteUpdates.map((update) => (
-              <div 
-                key={update.id}
-                className="rounded-lg p-4 transition cursor-pointer"
+              <div key={update.id} className="upd-card-light"
+                onClick={async()=>{loadSiteUpdates();window.location.href=`/work/${update.work_id}`;}}
                 style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: update.type === 'new_work' ? '2px solid #c9c6bb' : '1px solid rgba(180, 154, 95, 0.3)'
-                }}
-                onClick={async () => {
-                  loadSiteUpdates();
-                  window.location.href = `/work/${update.work_id}`;
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c9c6bb" style={{ 
-                      filter: 'drop-shadow(0 0 5px rgba(194, 171, 117, 0.4))'
-                    }}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+                  background:'rgba(201,168,76,0.03)',
+                  border: update.type==='new_work' ? '1px solid rgba(201,168,76,0.35)' : '1px solid rgba(201,168,76,0.12)',
+                  borderRadius:'2px',padding:'clamp(10px,2vw,14px)',cursor:'pointer',
+                  transition:'all 0.2s',position:'relative'
+                }}>
+                {/* Левая метка для новой работы */}
+                {update.type==='new_work' && (
+                  <div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',background:'linear-gradient(180deg,transparent,#c9a84c,transparent)'}}/>
+                )}
+                <div style={{display:'flex',alignItems:'flex-start',gap:'12px',paddingLeft: update.type==='new_work' ? '8px' : '0'}}>
+                  <div style={{flexShrink:0,marginTop:'2px'}}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(201,168,76,0.6)" style={{filter:'drop-shadow(0 0 3px rgba(201,168,76,0.3))'}}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    {update.type === 'new_work' ? (
+                  <div style={{flex:1,minWidth:0}}>
+                    {update.type==='new_work' ? (
                       <>
-                        <span className="inline-block text-xs font-bold px-2 py-1 rounded mb-2" style={{
-                          background: '#c9c6bb',
-                          color: '#000000'
-                        }}>
-                          НОВАЯ РАБОТА
-                        </span>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.work_title}
-                        </h3>
-                        <p className="text-sm" style={{ color: '#c9c6bb', opacity: 0.8 }}>
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
+                        <span style={{display:'inline-block',background:'rgba(201,168,76,0.15)',border:'1px solid rgba(201,168,76,0.4)',color:'#c9a84c',fontSize:'clamp(0.45rem,1.2vw,0.55rem)',fontFamily:'Cinzel,serif',letterSpacing:'2px',padding:'2px 8px',borderRadius:'1px',marginBottom:'6px'}}>НОВАЯ РАБОТА</span>
+                        <p style={{color:'rgba(201,168,76,0.85)',fontFamily:'Georgia,serif',fontSize:'clamp(0.8rem,2vw,0.92rem)',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                        <p style={{color:'rgba(201,168,76,0.35)',fontSize:'clamp(0.6rem,1.5vw,0.68rem)',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}
                         </p>
                       </>
                     ) : (
                       <>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.work_title}
-                        </h3>
-                        <p className="text-sm mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
+                        <p style={{color:'rgba(201,168,76,0.7)',fontFamily:'Georgia,serif',fontSize:'clamp(0.8rem,2vw,0.92rem)',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                        <p style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.65rem,1.5vw,0.72rem)',marginBottom:'4px',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {update.chapter_number} глава{update.chapter_title&&` · ${update.chapter_title}`}
                         </p>
-                        <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long'
-                          })}
+                        <p style={{color:'rgba(201,168,76,0.25)',fontSize:'clamp(0.58rem,1.3vw,0.63rem)',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+                          {new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}
                         </p>
                       </>
                     )}
                   </div>
+                  <div style={{flexShrink:0,color:'rgba(201,168,76,0.25)',fontSize:'0.7rem',alignSelf:'center'}}>→</div>
                 </div>
               </div>
             ))}
@@ -3103,439 +3125,295 @@ transform: 'translateY(-0.18em)'
 {showReaderPanel && userProfile && (
   <>
     {/* ТЕМНАЯ ПАНЕЛЬ */}
-{isDarkTheme && (
- <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl border-2" style={{
-    background: 'rgba(147, 51, 234, 0.15)',
-    borderColor: '#9333ea',
-    backdropFilter: 'blur(20px)',
-    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-  }}>
-<div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-  background: 'rgba(139, 60, 200, 0.3)',
-  backdropFilter: 'blur(10px)',
-  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
-}}>
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes shineHeader {
-              0% { left: -100%; }
-              100% { left: 200%; }
-            }
-            @keyframes shimmer-btn {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .shimmer-btn-text {
-              background: linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%);
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmer-btn 3s linear infinite;
-            }
-          `}} />
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '100%',
-            height: '100%',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-            animation: 'shineHeader 3s infinite'
-          }}></div>
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes neonPulse {
-              0%, 100% { 
-                text-shadow: 0 0 10px #e8d3e9, 0 0 20px #e8d3e9, 0 0 30px #e8d3e9;
-              }
-              50% { 
-                text-shadow: 0 0 20px #e8d3e9, 0 0 40px #e8d3e9, 0 0 60px #e8d3e9;
-              }
-            }
-          `}} />
-      <h2 className="text-2xl sm:text-4xl font-bold" style={{
-  color: '#fff',
-  textShadow: '0 0 30px rgba(179, 231, 239, 1)',
-  position: 'relative',
-  zIndex: 1,
-  fontFamily: "'ppelganger', Georgia, serif"
-}}>{userProfile.nickname}</h2>
-          <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4" style={{ zIndex: 2 }}>
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+    {isDarkTheme && (
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl" style={{
+        background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+        borderLeft:'1px solid rgba(180,100,255,0.25)',
+        boxShadow:'-5px 0 60px rgba(147,50,255,0.15)'
+      }}>
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.55;}}
+          @keyframes rpShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          .rp-dark-scroll::-webkit-scrollbar{width:4px;}
+          .rp-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+          .rp-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+          .rp-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+          .rp-btn-dark{transition:all 0.2s;}
+          .rp-btn-dark:hover{border-color:rgba(179,231,239,0.8)!important;box-shadow:0 0 20px rgba(179,231,239,0.4)!important;transform:translateY(-2px);}
+        `}}/>
+
+        {/* Верхняя линия */}
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',
+          background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+
+        {/* Звёзды */}
+        <div style={{position:'fixed',top:0,right:0,width:'inherit',height:'100%',pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,0.35) 0%,transparent 100%),
+            radial-gradient(1px 1px at 80% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 55% 70%,rgba(255,255,255,0.2) 0%,transparent 100%),
+            radial-gradient(1px 1px at 90% 55%,rgba(255,255,255,0.15) 0%,transparent 100%),
+            radial-gradient(1px 1px at 20% 90%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'rpTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+
+        {/* Шапка */}
+        <div style={{
+          padding:'clamp(16px,3vw,24px) clamp(14px,3vw,22px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(147,112,219,0.15)',
+          position:'relative',zIndex:2,flexShrink:0,
+          background:'rgba(147,50,255,0.08)'
+        }}>
+          <button onClick={()=>setShowReaderPanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
+
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:'clamp(0.8rem,2vw,1rem)',color:'rgba(180,100,255,0.4)',marginBottom:'8px'}}>✦</div>
+            <div style={{
+              fontFamily:'ppelganger, Georgia, serif',
+              fontSize:'clamp(1.6rem,5vw,2.8rem)',
+              background:'linear-gradient(90deg,#b3e7ef 0%,#ef01cb 50%,#9370db 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+              animation:'rpShimmer 3s linear infinite',
+              marginBottom:'10px',lineHeight:'1.2'
+            }}>{userProfile.nickname}</div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+              <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+            </div>
+          </div>
         </div>
 
-        <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
-<button
-  onClick={() => {
-    setShowUpdatesModal(true);
-    loadSiteUpdates();
-  }}
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid',
-    borderColor: siteUpdates.length > 0 ? '#ef01cb' : '#a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)',
-    boxShadow: siteUpdates.length > 0 ? '0 0 25px rgba(239, 1, 203, 0.8)' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    if (siteUpdates.length === 0) {
-      e.currentTarget.style.borderColor = '#fff';
-      e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    }
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = siteUpdates.length > 0 ? '#ef01cb' : '#a063cf';
-    e.currentTarget.style.boxShadow = siteUpdates.length > 0 ? '0 0 25px rgba(239, 1, 203, 0.8)' : 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
-    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-    <path d="M2 17l10 5 10-5"/>
-    <path d="M2 12l10 5 10-5"/>
-  </svg>
-  <span style={{ 
-    color: '#ffffff',
-  }}>
-   {t.updates}
-  </span>
-</button>
+        {/* Кнопки */}
+        <div className="rp-dark-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
 
-<Link
-  href="/collection"
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden block"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid #a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#fff';
-    e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = '#a063cf';
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <Heart size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>
-    {t.myCollection}
-  </span>
-</Link>
+          {/* Обновления */}
+          <button onClick={()=>{setShowUpdatesModal(true);loadSiteUpdates();}} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:siteUpdates.length>0?'rgba(239,1,203,0.12)':'rgba(147,112,219,0.08)',
+            border:siteUpdates.length>0?'1px solid rgba(239,1,203,0.5)':'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',
+            boxShadow:siteUpdates.length>0?'0 0 15px rgba(239,1,203,0.2)':'none'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length>0?'#ef01cb':'#9370db'} strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:siteUpdates.length>0?'#ef01cb':'rgba(200,185,230,0.7)'}}>
+              {t.updates}
+            </span>
+          </button>
 
-<Link
-  href="/my-messages"
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden block"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid #a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#fff';
-    e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = '#a063cf';
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <MessageSquare size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>
-    {t.myMessages}
-    </span>
-</Link>
+          {/* Моя коллекция */}
+          <Link href="/collection" className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <Heart size={16} style={{color:'#9370db',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>
+              {t.myCollection}
+            </span>
+          </Link>
 
- <button
-  onClick={() => setShowManagementModal(true)}
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid #a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#fff';
-    e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = '#a063cf';
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <Settings size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>
-    {t.settings}
-  </span>
-</button>
+          {/* Мои сообщения */}
+          <Link href="/my-messages" className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <MessageSquare size={16} style={{color:'#9370db',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>
+              {t.myMessages}
+            </span>
+          </Link>
 
-<div className="mt-4">
-  <button
-    onClick={handleLogout}
-    className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden"
-    style={{
-      background: 'rgba(160, 99, 207, 0.4)',
-      border: '2px solid #a063cf',
-      borderRadius: '12px',
-      backdropFilter: 'blur(10px)'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.borderColor = '#fff';
-      e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-      e.currentTarget.style.transform = 'translateY(-2px)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.borderColor = '#a063cf';
-      e.currentTarget.style.boxShadow = 'none';
-      e.currentTarget.style.transform = 'translateY(0)';
-    }}
-  >
-    <LogOut size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-    <span style={{ 
-      color: '#ffffff',
-      textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-    }}>
-     {t.logout}
-    </span>
-  </button>
-</div>
+          {/* Настройки */}
+          <button onClick={()=>setShowManagementModal(true)} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <Settings size={16} style={{color:'#9370db',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>
+              {t.settings}
+            </span>
+          </button>
+
+          {/* Разделитель */}
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+            <span style={{color:'rgba(180,100,255,0.25)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+          </div>
+
+          {/* Выход */}
+          <button onClick={handleLogout} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.05)',border:'1px solid rgba(147,112,219,0.15)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <LogOut size={16} style={{color:'rgba(147,112,219,0.5)',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(180,100,255,0.4)'}}>
+              {t.logout}
+            </span>
+          </button>
+
         </div>
       </div>
     )}
 
     {/* СВЕТЛАЯ ПАНЕЛЬ */}
-{!isDarkTheme && (
-      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
-        borderLeft: '12px solid',
-        borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
-        boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-        background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+    {!isDarkTheme && (
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl" style={{
+        background:'#080808',
+        borderLeft:'1px solid #2a2218',
+        boxShadow:'-5px 0 40px rgba(0,0,0,0.8)'
       }}>
-        <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
-borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
-boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          .rp-light-scroll::-webkit-scrollbar{width:4px;}
+          .rp-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+          .rp-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+          .rp-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+          .rp-btn-light{transition:all 0.2s;}
+          .rp-btn-light:hover{border-color:rgba(201,168,76,0.5)!important;background:rgba(201,168,76,0.06)!important;}
+        `}}/>
 
+        {/* Левая золотая линия */}
+        <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+          background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+
+        {/* Фоновый символ */}
+        <div style={{position:'fixed',top:'50%',right:'5px',transform:'translateY(-50%)',
+          fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+          pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+        {/* Шапка */}
+        <div style={{
+          padding:'clamp(16px,3vw,26px) clamp(18px,4vw,28px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(201,168,76,0.1)',
+          position:'relative',zIndex:2,flexShrink:0
         }}>
+          <button onClick={()=>setShowReaderPanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
 
-<h2 className="text-4xl sm:text-5xl font-bold text-center mb-4" style={{
-  color: '#757162',
-  fontFamily: "'sooonsi', Georgia, serif"
-}}>{userProfile.nickname}</h2>
-
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes champagneBubbles {
-              0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-              50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-            }
-            @keyframes shimmerGold {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%);
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmerGold 3s linear infinite;
-              font-family: 'Playfair Display', Georgia, serif;
-            }
-          `}} />
-          
-<button 
-  onClick={() => setShowReaderPanel(false)}
-  className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
-            style={{
-              background: 'rgba(26, 26, 26, 0.35)',
-              backdropFilter: 'blur(1px)',
-              border: '1px solid rgba(10, 10, 10, 0.15)'
-            }}
-          >
-            <X size={20} color="#c9c6bb" />
-          </button>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.6rem,5vw,2.8rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'rpGold 4s linear infinite',letterSpacing:'3px',marginBottom:'10px',lineHeight:'1.2'}}>
+            {userProfile.nickname}
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
         </div>
 
-        <div className="p-6 space-y-4 flex flex-col h-[calc(100vh-120px)]">
-<button
-  onClick={() => {
-    setShowUpdatesModal(true);
-    loadSiteUpdates();
-  }}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#61031b"} strokeWidth="2" className="relative z-10">
-    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-    <path d="M2 17l10 5 10-5"/>
-    <path d="M2 12l10 5 10-5"/>
-  </svg>
-  <span className="relative z-10" style={{ 
-    color: siteUpdates.length > 0 ? '#e9e6d8' : '#68021c',
-    fontStyle: 'italic'
-  }}>
-    {t.updates}
-  </span>
-</button>
+        {/* Кнопки */}
+        <div className="rp-light-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
 
-<Link
-  href="/collection"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <Heart size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    {t.myCollection}
-  </span>
-</Link>
+          {/* Обновления */}
+          <button onClick={()=>{setShowUpdatesModal(true);loadSiteUpdates();}} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:siteUpdates.length>0?'rgba(201,168,76,0.1)':'transparent',
+            border:siteUpdates.length>0?'1px solid rgba(201,168,76,0.55)':'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length>0?'#c9a84c':'rgba(201,168,76,0.45)'} strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:siteUpdates.length>0?'#c9a84c':'rgba(201,168,76,0.5)'}}>
+              {t.updates}
+            </span>
+          </button>
 
-<Link
-  href="/my-messages"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <MessageSquare size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    {t.myMessages}
-  </span>
-</Link>
+          {/* Моя коллекция */}
+          <Link href="/collection" className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <Heart size={15} style={{color:'rgba(201,168,76,0.5)',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>
+              {t.myCollection}
+            </span>
+          </Link>
 
- <button
-  onClick={() => setShowManagementModal(true)}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes shimmerGoldBtn {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-  `}} />
-  
-  <Settings size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-   background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    {t.settings}
-  </span>
-</button>
+          {/* Мои сообщения */}
+          <Link href="/my-messages" className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <MessageSquare size={15} style={{color:'rgba(201,168,76,0.5)',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>
+              {t.myMessages}
+            </span>
+          </Link>
 
-<div className="mt-4">
-  <button
-    onClick={handleLogout}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-    
-    <LogOut size={20} color="#d8d7d7" className="relative z-10" />
-<span className="relative z-10" style={{ 
-      background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-      backgroundSize: '200% auto',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      animation: 'shimmerGoldBtn 3s linear infinite',
-      fontStyle: 'normal',
-      fontWeight: '600'
-    }}>
-      {t.logout}
-    </span>
-  </button>
-</div>
+          {/* Настройки */}
+          <button onClick={()=>setShowManagementModal(true)} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <Settings size={15} style={{color:'rgba(201,168,76,0.5)',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>
+              {t.settings}
+            </span>
+          </button>
+
+          {/* Разделитель */}
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+            <span style={{color:'rgba(201,168,76,0.25)',fontSize:'0.55rem',letterSpacing:'3px',fontFamily:'serif'}}>· ⚜ ·</span>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+          </div>
+
+          {/* Выход */}
+          <button onClick={handleLogout} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.1)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <LogOut size={15} style={{color:'rgba(201,168,76,0.3)',flexShrink:0}}/>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.3)'}}>
+              {t.logout}
+            </span>
+          </button>
+
         </div>
       </div>
     )}
@@ -3543,501 +3421,332 @@ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
 )}
 
 {/* МОДАЛЬНОЕ ОКНО НАСТРОЕК (ДЛЯ ЧИТАТЕЛЕЙ) */}
-{showManagementModal && !isAdmin && isDarkTheme && (
+{showManagementModal && !isAdmin && (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backgroundColor: 'rgba(0,0,0,0.92)',
     backdropFilter: 'blur(10px)'
   }}>
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Настройки</h2>
-        <button onClick={() => setShowManagementModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+ <style dangerouslySetInnerHTML={{__html:`
+  @keyframes settingsTwinkle { 0%,100% { opacity:0.12; } 50% { opacity:0.55; } }
+  @keyframes settingsGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
 
-      <div className="space-y-3">
+  .settings-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .settings-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .settings-scroll-dark::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9370db, #ef01cb, #9370db);
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(147,112,219,0.8);
+  }
+  .settings-scroll-dark::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #b48dc4, #ef01cb, #b48dc4);
+    box-shadow: 0 0 12px rgba(180,100,255,1);
+  }
+  .settings-scroll-light::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, transparent, #c9a84c, transparent);
+    border-radius: 10px;
+    box-shadow: 0 0 6px rgba(201,168,76,0.5);
+  }
+  .settings-scroll-light::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, transparent, #f0d080, transparent);
+    box-shadow: 0 0 10px rgba(201,168,76,0.8);
+  }
+  /* Firefox */
+  .settings-scroll-dark { scrollbar-width: thin; scrollbar-color: #9370db transparent; }
+  .settings-scroll-light { scrollbar-width: thin; scrollbar-color: #c9a84c transparent; }
+`}}/>
 
-{/* КНОПКА РАССЫЛКИ */}
-<button
-  onClick={() => {
-    setShowNewsletterModal(true);
-    setShowManagementModal(false);
-  }}
-  className="w-full py-3 rounded-lg font-bold transition relative overflow-hidden"
-  style={{
-    background: isSubscribed 
-      ? 'rgba(179, 231, 239, 0.2)' 
-      : 'rgba(147, 112, 219, 0.3)',
-    backdropFilter: 'blur(10px)',
-    border: isSubscribed 
-      ? '2px solid #b3e7ef' 
-      : '1px solid rgba(147, 112, 219, 0.5)',
-    color: '#ffffff',
-    boxShadow: isSubscribed 
-      ? '0 0 20px rgba(179, 231, 239, 0.6)' 
-      : 'none'
-  }}
->
- {isSubscribed && (
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes neonPulseSubscribed {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(179, 231, 239, 0.6), 0 0 10px rgba(179, 231, 239, 0.4);
-        border-color: #b3e7ef;
-      }
-      50% { 
-        box-shadow: 0 0 40px rgba(179, 231, 239, 1), 0 0 20px rgba(179, 231, 239, 0.8);
-        border-color: #68d3f3;
-      }
-    }
-    button[style*="rgba(179, 231, 239, 0.2)"] {
-      animation: neonPulseSubscribed 2s ease-in-out infinite !important;
-    }
-  `}} />
-)}
-  <div className="flex items-center justify-center gap-2">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-      <polyline points="22,6 12,13 2,6"/>
-    </svg>
-    <span>{isSubscribed ? 'Рассылка активна' : 'Подписаться на рассылку'}</span>
-  </div>
-</button>
+    {isDarkTheme ? (
+      /* ═══════ ТЁМНАЯ ТЕМА — МИСТИКА ═══════ */
+ <div style={{
+  background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 85%)',
+  border: '1px solid rgba(180,100,255,0.25)',
+  boxShadow: '0 0 60px rgba(147,50,255,0.15)',
+  borderRadius: '14px',
+  width: '92vw',
+  maxWidth: '360px',
+  maxHeight: 'min(85vh, 640px)',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative'
+}}>
+  {/* Верхняя линия */}
+  <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', borderRadius:'14px 14px 0 0',
+    background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)', zIndex:3, flexShrink:0 }}/>
+  
+  {/* Скроллируемое содержимое */}
+  <div className="settings-scroll settings-scroll-dark" style={{ overflowY:'auto', padding:'clamp(14px,4vw,28px) clamp(12px,4vw,24px)', paddingTop:'clamp(18px,4vw,32px)' }}>
+    {/* Звёзды */}
+    <div style={{ position:'absolute', inset:0, pointerEvents:'none', zIndex:0,
+      backgroundImage:`radial-gradient(1px 1px at 8% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 10%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 80%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 65%, rgba(255,255,255,0.25) 0%, transparent 100%)`,
+      animation:'settingsTwinkle 5s ease-in-out infinite' }}/>
 
-        {/* КНОПКА СМЕНЫ EMAIL */}
-        <button
-          onClick={() => {
-            setShowChangeEmailModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(147, 112, 219, 0.3)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(147, 112, 219, 0.5)',
-            color: '#ffffff'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
-            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
-          }}
-        >
-          Сменить email
-        </button>
-        <p className="text-xs text-gray-400 text-center mt-2">
-  Для подтверждения аккаунта проверьте письмо от Supabase на электронной почте.
-</p>
+    {/* Закрыть */}
+    <button onClick={() => setShowManagementModal(false)} style={{
+      position:'absolute', top:'10px', right:'10px',
+      background:'rgba(180,100,255,0.1)', border:'1px solid rgba(180,100,255,0.3)',
+      borderRadius:'50%', width:'26px', height:'26px', cursor:'pointer',
+      color:'rgba(180,100,255,0.8)', display:'flex', alignItems:'center', justifyContent:'center',
+      fontSize:'13px', zIndex:10, flexShrink:0
+    }}>✕</button>
 
-        {/* КНОПКА СМЕНЫ ПАРОЛЯ */}
-        <button
-          onClick={() => {
-            setShowChangePasswordModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(147, 112, 219, 0.3)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(147, 112, 219, 0.5)',
-            color: '#ffffff'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
-            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
-          }}
-        >
-          Сменить пароль
-        </button>
-
-        <p className="text-xs text-gray-400 text-center mt-2">
-  Изменение пароля через личный кабинет производится без дополнительного подтверждения по электронной почте.
-</p>
-        {/* КНОПКА УДАЛЕНИЯ */}
-        <button
-          onClick={() => {
-            setShowDeleteAccountModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(147, 112, 219, 0.3)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(147, 112, 219, 0.5)',
-            color: '#ffffff'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(180, 141, 196, 0.4)';
-            e.currentTarget.style.borderColor = 'rgba(180, 141, 196, 0.7)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(147, 112, 219, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(147, 112, 219, 0.5)';
-          }}
-        >
-          Удалить профиль
-        </button>
-
-        {/* ТЕМА */}
-        <div className="pt-4">
-          <p className="text-white mb-2 text-sm shimmer-btn-text">Интерфейс сайта:</p>
-   <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
-      border: '2px solid #9333ea',
-      boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes starFloat {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-          opacity: 0.4;
-        }
-        50% {
-          transform: translate(5px, -5px) scale(1.2);
-          opacity: 1;
-        }
-      }
-    `}} />
-    
-    {/* Звездные частицы */}
-    {[...Array(12)].map((_, i) => (
-      <div key={i} style={{
-        position: 'absolute',
-        width: '2px',
-        height: '2px',
-        background: i % 2 === 0 ? '#9333ea' : '#a855f7',
-        borderRadius: '50%',
-        boxShadow: `0 0 6px ${i % 2 === 0 ? '#9333ea' : '#a855f7'}`,
-        left: `${10 + i * 7}%`,
-        top: `${20 + (i % 3) * 25}%`,
-        animation: 'starFloat 3s ease-in-out infinite',
-        animationDelay: `${i * 0.2}s`,
-        pointerEvents: 'none'
-      }} />
-    ))}
-    
-    <div className="flex items-center justify-between relative z-10">
-      <div className="flex items-center gap-3">
-        {/* Иконка Луны */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <span style={{ color: '#c084fc', fontWeight: '600' }}>HD 189733</span>
-      </div>
-      
-      {/* Иконка Солнца (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(192, 132, 252, 0.3)" strokeWidth="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </div>
-  </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* МОДАЛЬНОЕ ОКНО НАСТРОЕК - СВЕТЛАЯ ТЕМА */}
-{showManagementModal && !isAdmin && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
+    {/* Заголовок */}
+    <div style={{ textAlign:'center', marginBottom:'clamp(14px,3vw,24px)', position:'relative', zIndex:1 }}>
+      <div style={{ fontSize:'clamp(1rem,3vw,1.4rem)', color:'rgba(180,100,255,0.4)', marginBottom:'4px' }}>✦</div>
       <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Настройки</h2>
-        <button onClick={() => setShowManagementModal(false)} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.85rem,3vw,1.1rem)', letterSpacing:'clamp(3px,1vw,6px)',
+        background:'linear-gradient(90deg, #b3e7ef, #ef01cb, #9370db)',
+        WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'
+      }}>Настройки</div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginTop:'6px' }}>
+        <div style={{ height:'1px', width:'35px', background:'linear-gradient(90deg, transparent, rgba(147,112,219,0.4))' }}/>
+        <span style={{ color:'rgba(180,100,255,0.3)', fontSize:'0.5rem', letterSpacing:'4px' }}>✦ · · · ✦</span>
+        <div style={{ height:'1px', width:'35px', background:'linear-gradient(270deg, transparent, rgba(147,112,219,0.4))' }}/>
+      </div>
+    </div>
+
+    <div style={{ display:'flex', flexDirection:'column', gap:'clamp(6px,1.5vw,10px)', position:'relative', zIndex:1 }}>
+
+      {/* Рассылка */}
+      <button onClick={() => { setShowNewsletterModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,13px) 12px',
+        background: isSubscribed ? 'rgba(179,231,239,0.12)' : 'rgba(147,112,219,0.1)',
+        border: isSubscribed ? '1px solid rgba(179,231,239,0.5)' : '1px solid rgba(147,112,219,0.3)',
+        borderRadius:'5px', cursor:'pointer', color:'#e8d5ff',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.7rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        boxShadow: isSubscribed ? '0 0 15px rgba(179,231,239,0.2)' : 'none', transition:'all 0.2s'
+      }}>
+        {isSubscribed ? '✦ Рассылка активна' : 'Подписка на рассылку'}
+      </button>
+
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', margin:'2px 0' }}>
+        <div style={{ flex:1, height:'1px', background:'rgba(147,112,219,0.15)' }}/>
+        <span style={{ color:'rgba(180,100,255,0.25)', fontSize:'0.5rem', letterSpacing:'3px' }}>· · ·</span>
+        <div style={{ flex:1, height:'1px', background:'rgba(147,112,219,0.15)' }}/>
+      </div>
+
+      {/* Сменить email */}
+      <button onClick={() => { setShowChangeEmailModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,13px) 12px',
+        background:'rgba(147,112,219,0.08)', border:'1px solid rgba(147,112,219,0.2)',
+        borderRadius:'5px', cursor:'pointer', color:'rgba(200,185,230,0.7)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.7rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Сменить email</button>
+
+      {/* Сменить пароль */}
+      <button onClick={() => { setShowChangePasswordModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,13px) 12px',
+        background:'rgba(147,112,219,0.08)', border:'1px solid rgba(147,112,219,0.2)',
+        borderRadius:'5px', cursor:'pointer', color:'rgba(200,185,230,0.7)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.7rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Сменить пароль</button>
+
+      {/* Удалить */}
+      <button onClick={() => { setShowDeleteAccountModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,13px) 12px',
+        background:'rgba(147,112,219,0.05)', border:'1px solid rgba(147,112,219,0.15)',
+        borderRadius:'5px', cursor:'pointer', color:'rgba(200,185,230,0.45)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.7rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Удалить профиль</button>
+
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', margin:'2px 0' }}>
+        <div style={{ flex:1, height:'1px', background:'rgba(147,112,219,0.15)' }}/>
+        <span style={{ color:'rgba(180,100,255,0.25)', fontSize:'0.5rem', letterSpacing:'3px' }}>✦ · · · ✦</span>
+        <div style={{ flex:1, height:'1px', background:'rgba(147,112,219,0.15)' }}/>
+      </div>
+
+      {/* Тема */}
+      <div>
+        <p style={{ color:'rgba(180,100,255,0.4)', fontSize:'clamp(0.5rem,1.3vw,0.6rem)', letterSpacing:'3px',
+          textTransform:'uppercase', fontFamily:'Cinzel, serif', textAlign:'center', marginBottom:'8px' }}>
+          Интерфейс сайта
+        </p>
+        <button onClick={toggleTheme} className="w-full relative rounded-full overflow-hidden transition-all duration-300" style={{
+          background:'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
+          border:'1px solid rgba(147,51,234,0.5)',
+          boxShadow:'0 0 20px rgba(147,51,234,0.15)',
+          padding:'clamp(8px,2vw,14px) 16px'
+        }}>
+          {[...Array(10)].map((_,i) => (
+            <div key={i} style={{
+              position:'absolute', width:'2px', height:'2px',
+              background: i%2===0 ? '#9333ea' : '#a855f7', borderRadius:'50%',
+              boxShadow:`0 0 5px ${i%2===0 ? '#9333ea' : '#a855f7'}`,
+              left:`${10+i*8}%`, top:`${20+(i%3)*25}%`,
+              animation:'settingsTwinkle 3s ease-in-out infinite',
+              animationDelay:`${i*0.2}s`, pointerEvents:'none'
+            }}/>
+          ))}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative', zIndex:1 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <span style={{ color:'#c084fc', fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.7rem)', letterSpacing:'2px' }}>HD 189733</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(192,132,252,0.2)" strokeWidth="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            </svg>
+          </div>
         </button>
       </div>
 
-      <div className="space-y-3">
-
-{/* КНОПКА РАССЫЛКИ */}
-<button
-  onClick={() => {
-    setShowNewsletterModal(true);
-    setShowManagementModal(false);
-  }}
-  className="w-full py-3 rounded-lg font-bold transition relative overflow-hidden"
-  style={{
-    background: isSubscribed 
-      ? 'rgba(98, 9, 30, 0.3)' 
-      : 'rgba(201, 198, 187, 0.2)',
-    backdropFilter: 'blur(10px)',
-    border: isSubscribed 
-      ? '2px solid #62091e' 
-      : '1px solid rgba(201, 198, 187, 0.4)',
-    color: '#c9c6bb',
-    boxShadow: isSubscribed 
-      ? '0 0 20px rgba(98, 9, 30, 0.6)' 
-      : 'none'
-  }}
->
-{isSubscribed && (
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes burgundyPulseSubscribed {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(98, 9, 30, 0.8), 0 0 10px rgba(0, 0, 0, 0.9);
-        border-color: #62091e;
-      }
-      50% { 
-        box-shadow: 0 0 40px rgba(98, 9, 30, 1), 0 0 25px rgba(0, 0, 0, 1);
-        border-color: #3b0512;
-      }
-    }
-    button[style*="rgba(98, 9, 30, 0.3)"] {
-      animation: burgundyPulseSubscribed 2s ease-in-out infinite !important;
-    }
-  `}} />
-)}
-  <div className="flex items-center justify-center gap-2">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-      <polyline points="22,6 12,13 2,6"/>
-    </svg>
-    <span>{isSubscribed ? 'Рассылка активна' : 'Подписаться на рассылку'}</span>
+    </div>
   </div>
-</button>
-
-        <button
-          onClick={() => {
-            setShowChangeEmailModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(201, 198, 187, 0.2)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(201, 198, 187, 0.4)',
-            color: '#c9c6bb'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
-          }}
-        >
-          Сменить email
-        </button>
-<p className="text-xs text-center mt-2" style={{ color: '#c9c6bb' }}>
-  Для подтверждения аккаунта проверьте письмо от Supabase на электронной почте.
-</p>
-
-        <button
-          onClick={() => {
-            setShowChangePasswordModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(201, 198, 187, 0.2)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(201, 198, 187, 0.4)',
-            color: '#c9c6bb'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
-          }}
-        >
-          Сменить пароль
-        </button>
-<p className="text-xs text-center mt-2" style={{ color: '#c9c6bb' }}>
-  Изменение пароля через личный кабинет производится без дополнительного подтверждения по электронной почте.
-</p>
-        <button
-          onClick={() => {
-            setShowDeleteAccountModal(true);
-            setShowManagementModal(false);
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'rgba(201, 198, 187, 0.2)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(201, 198, 187, 0.4)',
-            color: '#c9c6bb'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.3)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(201, 198, 187, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(201, 198, 187, 0.4)';
-          }}
-        >
-          Удалить профиль
-        </button>
-
-        <div className="pt-4">
-          <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Интерфейс сайта:</p>
-  <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: '#000000',
-      border: '2px solid #65635d',
-      boxShadow: '0 0 15px rgba(101, 99, 93, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes plasmaMove1 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-        }
-        33% {
-          transform: translate(30px, -20px) scale(1.3);
-        }
-        66% {
-          transform: translate(-25px, 15px) scale(0.9);
-        }
-      }
-      @keyframes plasmaMove2 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1.2);
-        }
-        33% {
-          transform: translate(-35px, 25px) scale(0.8);
-        }
-        66% {
-          transform: translate(20px, -15px) scale(1.4);
-        }
-      }
-      @keyframes plasmaMove3 {
-        0%, 100% {
-          transform: translate(0, 0) scale(0.9);
-        }
-        33% {
-          transform: translate(15px, 30px) scale(1.5);
-        }
-        66% {
-          transform: translate(-30px, -20px) scale(1.1);
-        }
-      }
-    `}} />
-    
-    {/* Плазма крови - капли жидкости */}
-    <div style={{
-      position: 'absolute',
-      width: '120px',
-      height: '120px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(109, 5, 31, 0.5) 40%, rgba(114, 17, 49, 0.9) 70%, transparent 100%)',
-      borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
-      filter: 'blur(12px)',
-      animation: 'plasmaMove1 7s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '10%',
-      left: '20%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '100px',
-      height: '100px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(126, 9, 44, 0.6) 50%, transparent 80%)',
-      borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-      filter: 'blur(10px)',
-      animation: 'plasmaMove2 9s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '40%',
-      right: '15%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '90px',
-      height: '90px',
-      background: 'radial-gradient(circle, rgba(130, 15, 30, 0.65) 0%, rgba(90, 8, 20, 0.45) 45%, transparent 75%)',
-      borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-      filter: 'blur(14px)',
-      animation: 'plasmaMove3 8s ease-in-out infinite',
-      pointerEvents: 'none',
-      bottom: '15%',
-      left: '30%'
-    }} />
-    
-    <div className="flex items-center justify-between relative z-10">
-      {/* Иконка Луны (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201, 198, 187, 0.3)" strokeWidth="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      
-      <div className="flex items-center gap-3">
-        <span style={{ color: '#c9c6bb', fontWeight: '600' }}>Лилия и Роза</span>
-        {/* Иконка Солнца */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-      </div>
-    </div>
-  </button>
 </div>
+
+    ) : (
+      /* ═══════ СВЕТЛАЯ ТЕМА — ЗОЛОТО ═══════ */
+<div style={{
+  background: '#080808',
+  border: '1px solid #2a2218',
+  borderRadius: '4px',
+  width: '92vw',
+  maxWidth: '360px',
+ maxHeight: 'min(85vh, 640px)',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  overflow: 'hidden'
+}}>
+  <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+    background:'linear-gradient(180deg, transparent, #c9a84c, transparent)', zIndex:2 }}/>
+  <div style={{ position:'absolute', top:'50%', right:'5px', transform:'translateY(-50%)',
+    fontFamily:'serif', fontSize:'clamp(6rem,15vw,12rem)', color:'rgba(201,168,76,0.03)',
+    pointerEvents:'none', userSelect:'none', lineHeight:1, zIndex:0 }}>⚜</div>
+
+  <div className="settings-scroll settings-scroll-light" style={{ overflowY:'auto', padding:'clamp(14px,4vw,28px) clamp(14px,4vw,32px)', paddingTop:'clamp(16px,4vw,28px)', position:'relative', zIndex:1 }}>
+
+    <button onClick={() => setShowManagementModal(false)} style={{
+      position:'absolute', top:'10px', right:'10px',
+      background:'transparent', border:'1px solid rgba(201,168,76,0.25)',
+      borderRadius:'50%', width:'26px', height:'26px', cursor:'pointer',
+      color:'rgba(201,168,76,0.6)', display:'flex', alignItems:'center', justifyContent:'center',
+      fontSize:'13px', zIndex:10
+    }}>✕</button>
+
+    {/* Заголовок */}
+    <div style={{ marginBottom:'clamp(14px,3vw,22px)' }}>
+      <div style={{
+        fontFamily:"'victiriya', Georgia, serif", fontSize:'clamp(1.3rem,5vw,2rem)',
+        backgroundImage:'linear-gradient(90deg, #c9a84c 0%, #f0d080 40%, #c9a84c 100%)',
+        backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+        animation:'settingsGoldShimmer 4s linear infinite', letterSpacing:'3px', marginBottom:'8px'
+      }}>Настройки</div>
+      <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+        <div style={{ height:'1px', flex:1, background:'linear-gradient(90deg, rgba(201,168,76,0.5), transparent)' }}/>
+        <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.65rem', letterSpacing:'4px', fontFamily:'serif' }}>⚜ · · ⚜</span>
       </div>
     </div>
+
+    <div style={{ display:'flex', flexDirection:'column', gap:'clamp(6px,1.5vw,10px)' }}>
+
+      {/* Рассылка */}
+      <button onClick={() => { setShowNewsletterModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,12px) 12px',
+        background: isSubscribed ? 'rgba(201,168,76,0.12)' : 'transparent',
+        border: isSubscribed ? '1px solid rgba(201,168,76,0.6)' : '1px solid rgba(201,168,76,0.25)',
+        borderRadius:'2px', cursor:'pointer',
+        color: isSubscribed ? '#c9a84c' : 'rgba(201,168,76,0.55)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.68rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>
+        {isSubscribed ? '⚜ Рассылка активна' : 'Подписка на рассылку'}
+      </button>
+
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', margin:'2px 0' }}>
+        <div style={{ flex:1, height:'1px', background:'rgba(201,168,76,0.12)' }}/>
+        <span style={{ color:'rgba(201,168,76,0.25)', fontSize:'0.55rem', letterSpacing:'3px', fontFamily:'serif' }}>· ⚜ ·</span>
+        <div style={{ flex:1, height:'1px', background:'rgba(201,168,76,0.12)' }}/>
+      </div>
+
+      {/* Сменить email */}
+      <button onClick={() => { setShowChangeEmailModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,12px) 12px',
+        background:'transparent', border:'1px solid rgba(201,168,76,0.2)',
+        borderRadius:'2px', cursor:'pointer', color:'rgba(201,168,76,0.5)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.68rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Сменить email</button>
+
+      {/* Сменить пароль */}
+      <button onClick={() => { setShowChangePasswordModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,12px) 12px',
+        background:'transparent', border:'1px solid rgba(201,168,76,0.2)',
+        borderRadius:'2px', cursor:'pointer', color:'rgba(201,168,76,0.5)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.68rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Сменить пароль</button>
+
+      {/* Удалить */}
+      <button onClick={() => { setShowDeleteAccountModal(true); setShowManagementModal(false); }} style={{
+        width:'100%', padding:'clamp(9px,2vw,12px) 12px',
+        background:'transparent', border:'1px solid rgba(201,168,76,0.1)',
+        borderRadius:'2px', cursor:'pointer', color:'rgba(201,168,76,0.3)',
+        fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.68rem)', letterSpacing:'clamp(1px,0.5vw,3px)', textTransform:'uppercase',
+        transition:'all 0.2s'
+      }}>Удалить профиль</button>
+
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', margin:'2px 0' }}>
+        <div style={{ flex:1, height:'1px', background:'rgba(201,168,76,0.12)' }}/>
+        <span style={{ color:'rgba(201,168,76,0.2)', fontSize:'0.55rem', letterSpacing:'3px', fontFamily:'serif' }}>· ⚜ ·</span>
+        <div style={{ flex:1, height:'1px', background:'rgba(201,168,76,0.12)' }}/>
+      </div>
+
+      {/* Тема */}
+      <div>
+        <p style={{ color:'rgba(201,168,76,0.35)', fontSize:'clamp(0.5rem,1.3vw,0.6rem)', letterSpacing:'3px',
+          textTransform:'uppercase', fontFamily:'Cinzel, serif', marginBottom:'8px' }}>
+          Интерфейс сайта
+        </p>
+        <button onClick={toggleTheme} style={{
+          width:'100%', position:'relative', padding:'clamp(8px,2vw,14px) 16px',
+          background:'#000000', border:'1px solid rgba(201,168,76,0.3)',
+          borderRadius:'2px', overflow:'hidden', cursor:'pointer',
+          boxShadow:'0 0 10px rgba(201,168,76,0.06)'
+        }}>
+          {[1,2,3].map((_,i) => (
+            <div key={i} style={{
+              position:'absolute', width:`${80+i*20}px`, height:`${80+i*20}px`,
+              background:`radial-gradient(circle, rgba(114,17,49,${0.5+i*0.1}) 0%, transparent 70%)`,
+              borderRadius:'40% 60% 70% 30%', filter:'blur(10px)',
+              animation:`plasmaMove${i+1} ${7+i*2}s ease-in-out infinite`,
+              pointerEvents:'none', top:`${10+i*15}%`, left:`${15+i*20}%`
+            }}/>
+          ))}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative', zIndex:1 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.2)" strokeWidth="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+              <span style={{ color:'rgba(201,168,76,0.7)', fontFamily:'Cinzel, serif', fontSize:'clamp(0.55rem,1.5vw,0.68rem)', letterSpacing:'2px' }}>Лилия и Роза</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>
+            </div>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+    )}
   </div>
 )}
 
@@ -4525,224 +4234,217 @@ onClick={async () => {
   </div>
 )}
 
-{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ - ТЕМНАЯ ТЕМА */}
-{showConfirmModal && isDarkTheme && (
+{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
+{showConfirmModal && (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0,0,0,0.92)',
     backdropFilter: 'blur(10px)'
   }}>
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-      <p className="text-white text-center text-base sm:text-lg mb-6 whitespace-pre-wrap">
-        {confirmMessage}
-      </p>
-      
-      <div className="flex gap-3">
-        {confirmAction ? (
-          <>
-            <button
-              onClick={() => {
-                confirmAction();
-                setShowConfirmModal(false);
-              }}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-                boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
-              }}
-            >
-              Да
-            </button>
-            <button
-              onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition border-2"
-              style={{
-                background: 'transparent',
-                borderColor: '#9370db',
-                color: '#9370db'
-              }}
-            >
-              Отмена
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setShowConfirmModal(false)}
-            className="w-full py-3 rounded-lg font-bold transition"
-            style={{
-              background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-              boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)'
-            }}
-          >
-            ОК
-          </button>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-{/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ - СВЕТЛАЯ ТЕМА */}
-{showConfirmModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '16px',
-      backgroundClip: 'padding-box',
-      boxShadow: 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-    }}>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes confirmTwinkle { 0%,100% { opacity:0.15; } 50% { opacity:0.6; } }
+      @keyframes confirmGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    `}} />
+    {isDarkTheme ? (
       <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '16px',
-        padding: '3px',
-       background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <p className="text-center text-base sm:text-lg mb-6 whitespace-pre-wrap" style={{
-        color: '#d8c5a2'
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 80%)',
+        border: '1px solid rgba(180,100,255,0.25)',
+        boxShadow: '0 0 60px rgba(147,50,255,0.2)',
+        borderRadius: '12px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
       }}>
-        {confirmMessage}
-      </p>
-      
-      <div className="flex gap-3">
-        {confirmAction ? (
-          <>
-            <button
-              onClick={() => {
-                confirmAction();
-                setShowConfirmModal(false);
-              }}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: '#d8c5a2',
-                color: '#000000',
-                boxShadow: '0 0 15px rgba(216, 197, 162, 0.4)'
-              }}
-            >
-              Да
-            </button>
-            <button
-              onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: 'rgba(216, 197, 162, 0.15)',
-                border: '2px solid #d8c5a2',
-                color: '#d8c5a2'
-              }}
-            >
-              Отмена
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setShowConfirmModal(false)}
-            className="w-full py-3 rounded-lg font-bold transition"
-            style={{
-              background: '#d8c5a2',
-              color: '#000000',
-              boxShadow: '0 0 15px rgba(216, 197, 162, 0.4)'
-            }}
-          >
-            ОК
-          </button>
-        )}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px',
+          background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)' }}/>
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 75% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 75%, rgba(255,255,255,0.15) 0%, transparent 100%)`,
+          animation:'confirmTwinkle 4s ease-in-out infinite' }}/>
+
+        <div style={{ fontSize:'1.5rem', marginBottom:'8px', color:'rgba(180,100,255,0.5)' }}>✦</div>
+        <p style={{ color:'#e8d5ff', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+          <span style={{ color:'rgba(180,100,255,0.3)', fontSize:'0.6rem', letterSpacing:'4px' }}>· · ·</span>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'rgba(147,112,219,0.2)',
+                border:'1px solid rgba(147,112,219,0.6)',
+                color:'#d8b4fe',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px',
+                boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+              }}>✦ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(147,112,219,0.25)',
+                color:'rgba(180,100,255,0.5)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'rgba(147,112,219,0.15)',
+              border:'1px solid rgba(147,112,219,0.5)',
+              color:'#d8b4fe',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'4px',
+              boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+            }}>✦ ОК ✦</button>
+          )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <div style={{
+        background: '#080808',
+        border: '1px solid #2a2218',
+        borderRadius: '2px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
+      }}>
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+          background:'linear-gradient(180deg, transparent, #c9a84c, transparent)' }}/>
+        <div style={{ position:'absolute', top:'50%', right:'20px', transform:'translateY(-50%)',
+          fontFamily:'serif', fontSize:'8rem', color:'rgba(201,168,76,0.04)',
+          pointerEvents:'none', userSelect:'none', lineHeight:1 }}>⚜</div>
+
+        <div style={{ fontSize:'1.2rem', marginBottom:'8px', color:'rgba(201,168,76,0.5)', fontFamily:'serif' }}>⚜</div>
+        <p style={{ color:'#d0c8b8', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+          <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.7rem', letterSpacing:'4px', fontFamily:'serif' }}>· ⚜ ·</span>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.6)',
+                color:'#c9a84c',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>⚜ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.2)',
+                color:'rgba(201,168,76,0.4)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'transparent',
+              border:'1px solid rgba(201,168,76,0.5)',
+              color:'#c9a84c',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'1px'
+            }}>⚜ ОК ⚜</button>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
 
 {/* CHANGE EMAIL MODAL - ТЕМНАЯ ТЕМА */}
 {showChangeEmailModal && isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes ceTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.5;}}
+      .ce-dark-scroll::-webkit-scrollbar{width:3px;}
+      .ce-dark-scroll::-webkit-scrollbar-track{background:transparent;}
+      .ce-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .ce-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw', maxWidth:'360px',
+      maxHeight:'min(85vh,520px)',
+      display:'flex', flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Смена email</h2>
-        <button onClick={() => {
-          setShowChangeEmailModal(false);
-          setChangeEmailForm({ newEmail: '', password: '' });
-        }} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">Новый email</label>
-          <input
-            type="email"
-            value={changeEmailForm.newEmail}
-            onChange={(e) => setChangeEmailForm({...changeEmailForm, newEmail: e.target.value})}
-            placeholder="Новый email"
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+      <div className="ce-dark-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(12px,4vw,22px)',paddingTop:'clamp(16px,4vw,28px)',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,0.3) 0%,transparent 100%),radial-gradient(1px 1px at 80% 70%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'ceTwinkle 5s ease-in-out infinite',zIndex:0}}/>
+
+        <button onClick={()=>{setShowChangeEmailModal(false);setChangeEmailForm({newEmail:'',password:''}); }} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        {/* Заголовок */}
+        <div style={{textAlign:'center',marginBottom:'clamp(12px,3vw,20px)',position:'relative',zIndex:1}}>
+          <div style={{fontSize:'clamp(1rem,3vw,1.3rem)',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+          <div style={{fontFamily:'Cinzel, serif',fontSize:'clamp(0.8rem,3vw,1rem)',letterSpacing:'clamp(3px,1vw,5px)',
+            background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Смена email</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">
-            Текущий пароль <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="password"
-            value={changeEmailForm.password}
-            onChange={(e) => setChangeEmailForm({...changeEmailForm, password: e.target.value})}
-            placeholder="Ваш пароль"
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+        {/* Подписка-примечание */}
+        <div style={{background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.15)',borderRadius:'4px',padding:'10px 12px',marginBottom:'16px',position:'relative',zIndex:1}}>
+          <p style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.6',textAlign:'center'}}>
+            Смена почты проходит без дополнительного подтверждения.
+          </p>
         </div>
 
-        <button
-          onClick={handleChangeEmail}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
-            color: '#ffffff'
-          }}
-        >
-          Сменить email
-        </button>
-
-        <button
-          onClick={() => {
-            setShowChangeEmailModal(false);
-            setChangeEmailForm({ newEmail: '', password: '' });
-          }}
-          className="w-full py-3 rounded-lg font-bold transition border-2"
-          style={{
-            background: 'transparent',
-            borderColor: '#9333ea',
-            color: '#9370db'
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)',position:'relative',zIndex:1}}>
+          <div>
+            <label style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Новый email</label>
+            <input type="email" value={changeEmailForm.newEmail} onChange={e=>setChangeEmailForm({...changeEmailForm,newEmail:e.target.value})} placeholder="новый@email.com"
+              style={{width:'100%',background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.25)',borderRadius:'4px',padding:'clamp(8px,2vw,10px) 12px',color:'#e8d5ff',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Текущий пароль</label>
+            <input type="password" value={changeEmailForm.password} onChange={e=>setChangeEmailForm({...changeEmailForm,password:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.25)',borderRadius:'4px',padding:'clamp(8px,2vw,10px) 12px',color:'#e8d5ff',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleChangeEmail} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'rgba(147,112,219,0.18)',border:'1px solid rgba(147,112,219,0.6)',borderRadius:'4px',cursor:'pointer',color:'#d8b4fe',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',boxShadow:'0 0 12px rgba(147,112,219,0.2)',marginTop:'4px'}}>
+            ✦ Сменить email
+          </button>
+          <button onClick={()=>{setShowChangeEmailModal(false);setChangeEmailForm({newEmail:'',password:''}); }} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(147,112,219,0.2)',borderRadius:'4px',cursor:'pointer',color:'rgba(180,100,255,0.4)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -4750,101 +4452,69 @@ onClick={async () => {
 
 {/* CHANGE EMAIL MODAL - СВЕТЛАЯ ТЕМА */}
 {showChangeEmailModal && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes ceGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .ce-light-scroll::-webkit-scrollbar{width:3px;}
+      .ce-light-scroll::-webkit-scrollbar-track{background:transparent;}
+      .ce-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .ce-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'360px',
+      maxHeight:'min(85vh,520px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Смена email</h2>
-        <button onClick={() => {
-          setShowChangeEmailModal(false);
-          setChangeEmailForm({ newEmail: '', password: '' });
-        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',top:'50%',right:'5px',transform:'translateY(-50%)',
+        fontFamily:'serif',fontSize:'clamp(6rem,15vw,10rem)',color:'rgba(201,168,76,0.03)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Новый email</label>
-          <input
-            type="email"
-            value={changeEmailForm.newEmail}
-            onChange={(e) => setChangeEmailForm({...changeEmailForm, newEmail: e.target.value})}
-            placeholder="Новый email"
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+      <div className="ce-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(14px,4vw,28px)',paddingTop:'clamp(16px,4vw,26px)',position:'relative',zIndex:1}}>
+        <button onClick={()=>{setShowChangeEmailModal(false);setChangeEmailForm({newEmail:'',password:''}); }} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        <div style={{marginBottom:'clamp(12px,3vw,20px)'}}>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.3rem,5vw,1.9rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'ceGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Смена email</div>
+          <div style={{height:'1px',width:'80px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
         </div>
 
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>
-            Текущий пароль <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="password"
-            value={changeEmailForm.password}
-            onChange={(e) => setChangeEmailForm({...changeEmailForm, password: e.target.value})}
-            placeholder="Ваш пароль"
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+        {/* Примечание */}
+        <div style={{background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'10px 12px',marginBottom:'16px'}}>
+          <p style={{color:'rgba(201,168,76,0.5)',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.6'}}>
+            Смена почты проходит без дополнительного подтверждения.
+          </p>
         </div>
 
-        <button
-          onClick={handleChangeEmail}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: '#c9c6bb',
-            color: '#000000'
-          }}
-        >
-          Сменить email
-        </button>
-
-        <button
-          onClick={() => {
-            setShowChangeEmailModal(false);
-            setChangeEmailForm({ newEmail: '', password: '' });
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'transparent',
-            border: '2px solid #c9c6bb',
-            color: '#c9c6bb'
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)'}}>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Новый email</label>
+            <input type="email" value={changeEmailForm.newEmail} onChange={e=>setChangeEmailForm({...changeEmailForm,newEmail:e.target.value})} placeholder="новый@email.com"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Текущий пароль</label>
+            <input type="password" value={changeEmailForm.password} onChange={e=>setChangeEmailForm({...changeEmailForm,password:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleChangeEmail} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.6)',borderRadius:'2px',cursor:'pointer',color:'#c9a84c',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',marginTop:'4px'}}>
+            ⚜ Сменить email
+          </button>
+          <button onClick={()=>{setShowChangeEmailModal(false);setChangeEmailForm({newEmail:'',password:''}); }} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',cursor:'pointer',color:'rgba(201,168,76,0.35)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -4852,80 +4522,83 @@ onClick={async () => {
 
 {/* CHANGE PASSWORD MODAL - ТЕМНАЯ ТЕМА */}
 {showChangePasswordModal && isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes cpTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.5;}}
+      .cp-dark-scroll::-webkit-scrollbar{width:3px;}
+      .cp-dark-scroll::-webkit-scrollbar-track{background:transparent;}
+      .cp-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .cp-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw',maxWidth:'360px',
+      maxHeight:'min(85vh,560px)',
+      display:'flex',flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Смена пароля</h2>
-        <button onClick={() => {
-          setShowChangePasswordModal(false);
-          setChangePasswordForm({ currentPassword: '', newPassword: '' });
-        }} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">Текущий пароль</label>
-          <input
-            type="password"
-            value={changePasswordForm.currentPassword}
-            onChange={(e) => setChangePasswordForm({...changePasswordForm, currentPassword: e.target.value})}
-            placeholder="Текущий пароль"
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+      <div className="cp-dark-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(12px,4vw,22px)',paddingTop:'clamp(16px,4vw,28px)',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,0.3) 0%,transparent 100%),radial-gradient(1px 1px at 80% 70%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'cpTwinkle 5s ease-in-out infinite',zIndex:0}}/>
+
+        <button onClick={()=>{setShowChangePasswordModal(false);setChangePasswordForm({currentPassword:'',newPassword:''}); }} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        <div style={{textAlign:'center',marginBottom:'clamp(12px,3vw,20px)',position:'relative',zIndex:1}}>
+          <div style={{fontSize:'clamp(1rem,3vw,1.3rem)',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+          <div style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.8rem,3vw,1rem)',letterSpacing:'clamp(3px,1vw,5px)',
+            background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Смена пароля</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-gray-300 text-sm mb-2">Новый пароль</label>
-          <input
-            type="password"
-            value={changePasswordForm.newPassword}
-            onChange={(e) => setChangePasswordForm({...changePasswordForm, newPassword: e.target.value})}
-            placeholder="Новый пароль"
-            className="w-full border rounded px-3 py-2 text-sm focus:outline-none text-white"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderColor: '#9333ea'
-            }}
-          />
+        {/* Примечание */}
+        <div style={{background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.15)',borderRadius:'4px',padding:'10px 12px',marginBottom:'16px',position:'relative',zIndex:1}}>
+          <p style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.52rem,1.2vw,0.62rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.7',textAlign:'center'}}>
+            Смена пароля проходит без подтверждения по почте.
+            <br/>
+            <span style={{color:'rgba(180,100,255,0.35)',fontSize:'clamp(0.5rem,1.1vw,0.58rem)'}}>
+              Если вы потеряли доступ к почте — напишите на{' '}
+              <span style={{color:'#b3e7ef',textDecoration:'underline'}}>mellostory@protonmail.com</span>{' '}
+              и я помогу вернуть доступ.
+            </span>
+          </p>
         </div>
 
-        <button
-          onClick={handleChangePassword}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
-            color: '#ffffff'
-          }}
-        >
-          Сменить пароль
-        </button>
-
-        <button
-          onClick={() => {
-            setShowChangePasswordModal(false);
-            setChangePasswordForm({ currentPassword: '', newPassword: '' });
-          }}
-          className="w-full py-3 rounded-lg font-bold transition border-2"
-          style={{
-            background: 'transparent',
-            borderColor: '#9333ea',
-            color: '#9370db'
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)',position:'relative',zIndex:1}}>
+          <div>
+            <label style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Текущий пароль</label>
+            <input type="password" value={changePasswordForm.currentPassword} onChange={e=>setChangePasswordForm({...changePasswordForm,currentPassword:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.25)',borderRadius:'4px',padding:'clamp(8px,2vw,10px) 12px',color:'#e8d5ff',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(180,100,255,0.5)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Новый пароль</label>
+            <input type="password" value={changePasswordForm.newPassword} onChange={e=>setChangePasswordForm({...changePasswordForm,newPassword:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.25)',borderRadius:'4px',padding:'clamp(8px,2vw,10px) 12px',color:'#e8d5ff',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleChangePassword} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'rgba(147,112,219,0.18)',border:'1px solid rgba(147,112,219,0.6)',borderRadius:'4px',cursor:'pointer',color:'#d8b4fe',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',boxShadow:'0 0 12px rgba(147,112,219,0.2)',marginTop:'4px'}}>
+            ✦ Сменить пароль
+          </button>
+          <button onClick={()=>{setShowChangePasswordModal(false);setChangePasswordForm({currentPassword:'',newPassword:''}); }} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(147,112,219,0.2)',borderRadius:'4px',cursor:'pointer',color:'rgba(180,100,255,0.4)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -4933,99 +4606,75 @@ onClick={async () => {
 
 {/* CHANGE PASSWORD MODAL - СВЕТЛАЯ ТЕМА */}
 {showChangePasswordModal && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 sm:p-8">
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes cpGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .cp-light-scroll::-webkit-scrollbar{width:3px;}
+      .cp-light-scroll::-webkit-scrollbar-track{background:transparent;}
+      .cp-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .cp-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'360px',
+      maxHeight:'min(85vh,560px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Смена пароля</h2>
-        <button onClick={() => {
-          setShowChangePasswordModal(false);
-          setChangePasswordForm({ currentPassword: '', newPassword: '' });
-        }} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',top:'50%',right:'5px',transform:'translateY(-50%)',
+        fontFamily:'serif',fontSize:'clamp(6rem,15vw,10rem)',color:'rgba(201,168,76,0.03)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Текущий пароль</label>
-          <input
-            type="password"
-            value={changePasswordForm.currentPassword}
-            onChange={(e) => setChangePasswordForm({...changePasswordForm, currentPassword: e.target.value})}
-            placeholder="Текущий пароль"
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+      <div className="cp-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,26px) clamp(14px,4vw,28px)',paddingTop:'clamp(16px,4vw,26px)',position:'relative',zIndex:1}}>
+        <button onClick={()=>{setShowChangePasswordModal(false);setChangePasswordForm({currentPassword:'',newPassword:''}); }} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+
+        <div style={{marginBottom:'clamp(12px,3vw,18px)'}}>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.3rem,5vw,1.9rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'cpGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Смена пароля</div>
+          <div style={{height:'1px',width:'80px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
         </div>
 
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#c9c6bb' }}>Новый пароль</label>
-          <input
-            type="password"
-            value={changePasswordForm.newPassword}
-            onChange={(e) => setChangePasswordForm({...changePasswordForm, newPassword: e.target.value})}
-            placeholder="Новый пароль"
-            className="w-full rounded px-3 py-2 text-sm focus:outline-none"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid rgba(180, 154, 95, 0.4)',
-              color: '#c9c6bb'
-            }}
-          />
+        {/* Примечание */}
+        <div style={{background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'10px 12px',marginBottom:'16px'}}>
+          <p style={{color:'rgba(201,168,76,0.5)',fontSize:'clamp(0.52rem,1.2vw,0.62rem)',fontFamily:'Georgia,serif',fontStyle:'italic',lineHeight:'1.7'}}>
+            Смена пароля проходит без подтверждения по почте.
+            <br/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'clamp(0.5rem,1.1vw,0.58rem)'}}>
+              Если вы потеряли доступ к почте — напишите на{' '}
+              <span style={{color:'#c9a84c',textDecoration:'underline'}}>mellostory@protonmail.com</span>{' '}
+              и я помогу вернуть доступ.
+            </span>
+          </p>
         </div>
 
-        <button
-          onClick={handleChangePassword}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: '#c9c6bb',
-            color: '#000000'
-          }}
-        >
-          Сменить пароль
-        </button>
-
-        <button
-          onClick={() => {
-            setShowChangePasswordModal(false);
-            setChangePasswordForm({ currentPassword: '', newPassword: '' });
-          }}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'transparent',
-            border: '2px solid #c9c6bb',
-            color: '#c9c6bb'
-          }}
-        >
-          Отмена
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,12px)'}}>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Текущий пароль</label>
+            <input type="password" value={changePasswordForm.currentPassword} onChange={e=>setChangePasswordForm({...changePasswordForm,currentPassword:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <div>
+            <label style={{color:'rgba(201,168,76,0.4)',fontSize:'clamp(0.5rem,1.3vw,0.6rem)',letterSpacing:'2px',fontFamily:'Cinzel,serif',textTransform:'uppercase',display:'block',marginBottom:'5px'}}>Новый пароль</label>
+            <input type="password" value={changePasswordForm.newPassword} onChange={e=>setChangePasswordForm({...changePasswordForm,newPassword:e.target.value})} placeholder="••••••••"
+              style={{width:'100%',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.2)',borderRadius:'2px',padding:'clamp(8px,2vw,10px) 12px',color:'rgba(201,168,76,0.8)',fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={handleChangePassword} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.6)',borderRadius:'2px',cursor:'pointer',color:'#c9a84c',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',marginTop:'4px'}}>
+            ⚜ Сменить пароль
+          </button>
+          <button onClick={()=>{setShowChangePasswordModal(false);setChangePasswordForm({currentPassword:'',newPassword:''}); }} style={{width:'100%',padding:'clamp(9px,2vw,11px)',background:'transparent',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',cursor:'pointer',color:'rgba(201,168,76,0.35)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -5033,332 +4682,572 @@ onClick={async () => {
 
 {/* CALENDAR MODAL - ТЕМНАЯ ТЕМА */}
 {showCalendarModal && isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-3xl p-6 border-2 max-h-[90vh] overflow-y-auto" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes calTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.55;}}
+      .cal-dark-scroll::-webkit-scrollbar{width:4px;}
+      .cal-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .cal-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .cal-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+      .cal-day-btn:hover{border-color:#ef01cb !important;box-shadow:0 0 12px rgba(239,1,203,0.4) !important;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw',maxWidth:'600px',
+      maxHeight:'min(88vh,640px)',
+      display:'flex',flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Расписание обновлений</h2>
-        <button onClick={() => setShowCalendarModal(false)} className="text-gray-400 hover:text-white">
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3,flexShrink:0}}/>
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'14px',
+        backgroundImage:`radial-gradient(1px 1px at 5% 10%,rgba(255,255,255,0.3) 0%,transparent 100%),
+          radial-gradient(1px 1px at 90% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+          radial-gradient(1px 1px at 70% 90%,rgba(255,255,255,0.2) 0%,transparent 100%),
+          radial-gradient(1px 1px at 15% 85%,rgba(255,255,255,0.15) 0%,transparent 100%)`,
+        animation:'calTwinkle 6s ease-in-out infinite',zIndex:0}}/>
 
-      <div className="flex justify-between items-center mb-4">
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 hover:bg-purple-500/20 rounded">
-          ←
-        </button>
-        <span className="text-lg font-bold" style={{ color: '#b3e7ef' }}>
-          {currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
-        </span>
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 hover:bg-purple-500/20 rounded">
-          →
-        </button>
-      </div>
-
-      <div className="grid grid-cols-7 gap-2">
-        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
-          <div key={day} className="text-center font-bold text-sm" style={{ color: '#9370db' }}>{day}</div>
-        ))}
-        
-        {(() => {
-          const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
-          const days = [];
-          
-          for (let i = 0; i < (startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1); i++) {
-            days.push(<div key={`empty-${i}`} />);
-          }
-          
-          for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-            const dateKey = date.toISOString().split('T')[0];
-            const hasEvents = calendarEvents[dateKey]?.length > 0;
-            
-            days.push(
-              <button
-                key={day}
-onClick={() => {
-  setSelectedDate(date);
-  setShowEventModal(true); // ← убрали проверку isAdmin
-}}
-                className="aspect-square rounded-lg flex items-center justify-center text-sm transition"
-                style={{
-                  background: hasEvents ? 'rgba(91, 1, 32, 0.5)' : 'rgba(147, 112, 219, 0.1)',
-                  border: hasEvents ? '2px solid #5b0120' : '1px solid rgba(147, 112, 219, 0.3)',
-                  boxShadow: hasEvents ? '0 0 15px rgba(91, 1, 32, 0.6)' : 'none',
-                  color: '#ffffff'
-                }}
-              >
-                {day}
-              </button>
-            );
-          }
-          
-          return days;
-        })()}
-      </div>
-
-      {!isAdmin && (
-        <div className="mt-6 p-4 rounded-lg" style={{ background: 'rgba(147, 112, 219, 0.2)' }}>
-          <p className="text-sm text-gray-300">Нажмите на дату, чтобы увидеть запланированные события</p>
+      {/* Шапка */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(14px,3vw,24px)',paddingBottom:'clamp(10px,2vw,16px)',borderBottom:'1px solid rgba(147,112,219,0.15)',position:'relative',zIndex:2,flexShrink:0}}>
+        <button onClick={()=>setShowCalendarModal(false)} style={{
+          position:'absolute',top:'12px',right:'12px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+        <div style={{textAlign:'center'}}>
+          <div style={{fontSize:'clamp(0.9rem,2.5vw,1.2rem)',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+          <div style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.85rem,2.5vw,1.05rem)',letterSpacing:'clamp(3px,1vw,6px)',
+            background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Расписание обновлений</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Контент */}
+      <div className="cal-dark-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',position:'relative',zIndex:1,flex:1}}>
+        {/* Навигация по месяцу */}
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
+          <button onClick={()=>setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth()-1)))} style={{
+            background:'rgba(147,112,219,0.15)',border:'1px solid rgba(147,112,219,0.3)',borderRadius:'6px',
+            padding:'6px 12px',cursor:'pointer',color:'#b3e7ef',fontFamily:'Cinzel,serif',fontSize:'0.7rem',letterSpacing:'2px'
+          }}>←</button>
+          <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.75rem,2vw,0.9rem)',letterSpacing:'3px',
+            background:'linear-gradient(90deg,#b3e7ef,#9370db)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+            {currentMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'})}
+          </span>
+          <button onClick={()=>setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth()+1)))} style={{
+            background:'rgba(147,112,219,0.15)',border:'1px solid rgba(147,112,219,0.3)',borderRadius:'6px',
+            padding:'6px 12px',cursor:'pointer',color:'#b3e7ef',fontFamily:'Cinzel,serif',fontSize:'0.7rem',letterSpacing:'2px'
+          }}>→</button>
+        </div>
+
+        {/* Дни недели */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'6px',marginBottom:'8px'}}>
+          {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(day=>(
+            <div key={day} style={{textAlign:'center',fontFamily:'Cinzel,serif',fontSize:'0.6rem',letterSpacing:'1px',color:'rgba(147,112,219,0.6)',padding:'4px 0'}}>{day}</div>
+          ))}
+        </div>
+
+        {/* Календарная сетка */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'6px'}}>
+          {(()=>{
+            const {daysInMonth,startingDayOfWeek}=getDaysInMonth(currentMonth);
+            const days=[];
+            for(let i=0;i<(startingDayOfWeek===0?6:startingDayOfWeek-1);i++){days.push(<div key={`e-${i}`}/>);}
+            for(let day=1;day<=daysInMonth;day++){
+              const date=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),day);
+              const dateKey=date.toISOString().split('T')[0];
+              const hasEvents=calendarEvents[dateKey]?.length>0;
+              days.push(
+                <button key={day} className="cal-day-btn"
+                  onClick={()=>{setSelectedDate(date);setShowEventModal(true);}}
+                  style={{
+                    aspectRatio:'1',borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center',
+                    fontSize:'clamp(0.65rem,1.8vw,0.8rem)',fontFamily:'Georgia,serif',
+                    background:hasEvents?'rgba(239,1,203,0.2)':'rgba(147,112,219,0.08)',
+                    border:hasEvents?'1px solid rgba(239,1,203,0.6)':'1px solid rgba(147,112,219,0.2)',
+                    boxShadow:hasEvents?'0 0 12px rgba(239,1,203,0.3)':'none',
+                    color:hasEvents?'#ef01cb':'rgba(200,185,230,0.7)',
+                    cursor:'pointer',transition:'all 0.2s'
+                  }}
+                >{day}</button>
+              );
+            }
+            return days;
+          })()}
+        </div>
+
+        {!isAdmin&&(
+          <div style={{marginTop:'16px',background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.15)',borderRadius:'6px',padding:'10px 14px',textAlign:'center'}}>
+            <p style={{color:'rgba(180,100,255,0.5)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.65rem,1.5vw,0.75rem)'}}>
+              ✦ Нажмите на дату, чтобы увидеть запланированные события
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   </div>
 )}
 
 {/* CALENDAR MODAL - СВЕТЛАЯ ТЕМА */}
 {showCalendarModal && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto overflow-x-hidden" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '1px solid #acaca8',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes calGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .cal-light-scroll::-webkit-scrollbar{width:4px;}
+      .cal-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .cal-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .cal-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+      .cal-day-light:hover{border-color:rgba(201,168,76,0.5)!important;background:rgba(201,168,76,0.08)!important;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'600px',
+      maxHeight:'min(88vh,640px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',bottom:'20px',right:'10px',
+        fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Расписание обновлений</h2>
-        <button onClick={() => setShowCalendarModal(false)} style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
+      {/* Шапка */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(18px,4vw,28px)',paddingBottom:'clamp(10px,2vw,14px)',borderBottom:'1px solid rgba(201,168,76,0.1)',position:'relative',zIndex:2,flexShrink:0}}>
+        <button onClick={()=>setShowCalendarModal(false)} style={{
+          position:'absolute',top:'12px',right:'12px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
+        <div>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.4rem,5vw,2rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'calGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Расписание обновлений</div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 rounded" style={{ color: '#c9c6bb' }}>
-          ←
-        </button>
-        <span className="text-lg font-bold" style={{ color: '#c9c6bb' }}>
-          {currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
-        </span>
-        <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 rounded" style={{ color: '#c9c6bb' }}>
-          →
-        </button>
-      </div>
+      {/* Контент */}
+      <div className="cal-light-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',position:'relative',zIndex:1,flex:1}}>
+        {/* Навигация */}
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
+          <button onClick={()=>setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth()-1)))} style={{
+            background:'transparent',border:'1px solid rgba(201,168,76,0.3)',borderRadius:'2px',
+            padding:'6px 12px',cursor:'pointer',color:'rgba(201,168,76,0.7)',fontFamily:'Cinzel,serif',fontSize:'0.7rem',letterSpacing:'2px'
+          }}>←</button>
+          <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.75rem,2vw,0.9rem)',letterSpacing:'3px',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 50%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'calGold 4s linear infinite'}}>
+            {currentMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'})}
+          </span>
+          <button onClick={()=>setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth()+1)))} style={{
+            background:'transparent',border:'1px solid rgba(201,168,76,0.3)',borderRadius:'2px',
+            padding:'6px 12px',cursor:'pointer',color:'rgba(201,168,76,0.7)',fontFamily:'Cinzel,serif',fontSize:'0.7rem',letterSpacing:'2px'
+          }}>→</button>
+        </div>
 
-      <div className="grid grid-cols-7 gap-2">
-        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
-          <div key={day} className="text-center font-bold text-sm" style={{ color: '#c9c6bb' }}>{day}</div>
-        ))}
-        
-        {(() => {
-          const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
-          const days = [];
-          
-          for (let i = 0; i < (startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1); i++) {
-            days.push(<div key={`empty-${i}`} />);
-          }
-          
-          for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-            const dateKey = date.toISOString().split('T')[0];
-            const hasEvents = calendarEvents[dateKey]?.length > 0;
-            
-            days.push(
-              <button
-                key={day}
-onClick={() => {
-  setSelectedDate(date);
-  setShowEventModal(true); // ← убрали проверку isAdmin
-                }}
-                className="aspect-square rounded-lg flex items-center justify-center text-sm transition"
-                style={{
-                  background: hasEvents ? 'rgba(91, 1, 32, 0.5)' : 'rgba(201, 198, 187, 0.1)',
-                  border: hasEvents ? '2px solid #5b0120' : '1px solid rgba(201, 198, 187, 0.3)',
-                  boxShadow: hasEvents ? '0 0 15px rgba(91, 1, 32, 0.6)' : 'none',
-                  color: '#c9c6bb'
-                }}
-              >
-                {day}
-              </button>
-            );
-          }
-          
-          return days;
-        })()}
-      </div>
+        {/* Дни недели */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'6px',marginBottom:'8px'}}>
+          {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(day=>(
+            <div key={day} style={{textAlign:'center',fontFamily:'Cinzel,serif',fontSize:'0.6rem',letterSpacing:'1px',color:'rgba(201,168,76,0.4)',padding:'4px 0'}}>{day}</div>
+          ))}
+        </div>
 
-      {!isAdmin && (
-<div className="mt-6 p-4 rounded-lg" style={{ 
-  background: 'rgba(201, 198, 187, 0.2)',
-  border: '1px solid rgba(201, 198, 187, 0.3)'
-}}>
-  <p className="text-sm" style={{ color: '#c9c6bb' }}>
-    Нажмите на дату, чтобы увидеть запланированные события
-  </p>
-</div>
-      )}
+        {/* Сетка */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'6px'}}>
+          {(()=>{
+            const {daysInMonth,startingDayOfWeek}=getDaysInMonth(currentMonth);
+            const days=[];
+            for(let i=0;i<(startingDayOfWeek===0?6:startingDayOfWeek-1);i++){days.push(<div key={`e-${i}`}/>);}
+            for(let day=1;day<=daysInMonth;day++){
+              const date=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),day);
+              const dateKey=date.toISOString().split('T')[0];
+              const hasEvents=calendarEvents[dateKey]?.length>0;
+              days.push(
+                <button key={day} className="cal-day-light"
+                  onClick={()=>{setSelectedDate(date);setShowEventModal(true);}}
+                  style={{
+                    aspectRatio:'1',borderRadius:'2px',display:'flex',alignItems:'center',justifyContent:'center',
+                    fontSize:'clamp(0.65rem,1.8vw,0.8rem)',fontFamily:'Georgia,serif',
+                    background:hasEvents?'rgba(201,168,76,0.12)':'rgba(201,168,76,0.03)',
+                    border:hasEvents?'1px solid rgba(201,168,76,0.55)':'1px solid rgba(201,168,76,0.12)',
+                    boxShadow:hasEvents?'0 0 8px rgba(201,168,76,0.2)':'none',
+                    color:hasEvents?'#c9a84c':'rgba(201,168,76,0.45)',
+                    cursor:'pointer',transition:'all 0.2s',position:'relative'
+                  }}
+                >
+                  {hasEvents&&<div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',background:'linear-gradient(180deg,transparent,#c9a84c,transparent)'}}/>}
+                  {day}
+                </button>
+              );
+            }
+            return days;
+          })()}
+        </div>
+
+        {!isAdmin&&(
+          <div style={{marginTop:'16px',background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',padding:'10px 14px',textAlign:'center'}}>
+            <p style={{color:'rgba(201,168,76,0.4)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.65rem,1.5vw,0.75rem)'}}>
+              ⚜ Нажмите на дату, чтобы увидеть запланированные события
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   </div>
 )}
 
 {/* EVENT MODAL - для всех пользователей */}
 {showEventModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-[60] flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: isDarkTheme ? 'rgba(147, 51, 234, 0.15)' : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      borderColor: isDarkTheme ? '#9333ea' : '#c9c6bb',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme ? '0 0 30px rgba(147, 51, 234, 0.6)' : 'inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold" style={{ 
-          color: isDarkTheme ? '#b3e7ef' : '#c9c6bb' 
-        }}>
-          {selectedDate?.toLocaleDateString('ru-RU')}
-        </h3>
-        <button onClick={() => setShowEventModal(false)} style={{ color: isDarkTheme ? '#ffffff' : '#c9c6bb' }}>
-          <X size={20} />
-        </button>
-      </div>
+  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes evTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.5;}}
+      @keyframes evGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .ev-scroll::-webkit-scrollbar{width:3px;}
+      .ev-scroll::-webkit-scrollbar-track{background:transparent;}
+      .ev-scroll-dark::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .ev-scroll-light::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;}
+      .ev-scroll-dark{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+      .ev-scroll-light{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
 
-      {/* СПИСОК СОБЫТИЙ - ВИДЯТ ВСЕ */}
- <div className="space-y-3 mb-4">
-  {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length > 0 ? (
-    calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event, idx) => (
-      <div key={idx} className="flex justify-between items-start p-2 rounded" style={{
-        background: 'rgba(91, 1, 32, 0.3)',
-        border: '1px solid #5b0120'
+    {isDarkTheme ? (
+      <div style={{
+        background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+        border:'1px solid rgba(180,100,255,0.25)',
+        boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+        borderRadius:'14px',
+        width:'92vw',maxWidth:'460px',
+        maxHeight:'min(85vh,600px)',
+        display:'flex',flexDirection:'column',
+        position:'relative'
       }}>
-        <div className="text-sm flex-1" style={{ color: '#ffffff' }}>
-          {renderFormattedText(event)}
-        </div>
-        {isAdmin && (
-                <button onClick={() => deleteEvent(idx)} className="text-red-500 hover:text-red-400">
-                  <Trash2 size={16} />
-                </button>
-              )}
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+          background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'14px',
+          backgroundImage:`radial-gradient(1px 1px at 8% 15%,rgba(255,255,255,0.35) 0%,transparent 100%),
+            radial-gradient(1px 1px at 85% 10%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 50% 80%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'evTwinkle 5s ease-in-out infinite',zIndex:0}}/>
+
+        {/* Шапка */}
+        <div style={{padding:'clamp(14px,3vw,22px) clamp(14px,3vw,24px)',paddingBottom:'clamp(10px,2vw,14px)',borderBottom:'1px solid rgba(147,112,219,0.15)',position:'relative',zIndex:2,flexShrink:0}}>
+          <button onClick={()=>setShowEventModal(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+            borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+            color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'13px',zIndex:10
+          }}>✕</button>
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:'clamp(0.8rem,2vw,1rem)',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+            <div style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.8rem,2.5vw,1rem)',letterSpacing:'clamp(2px,1vw,5px)',
+              background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+              {selectedDate?.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}
             </div>
-          ))
-        ) : (
-          <p className="text-center text-sm" style={{ color: isDarkTheme ? '#9ca3af' : '#c9c6bb' }}>
-            На эту дату событий нет
-          </p>
-        )}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+              <div style={{height:'1px',width:'25px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+              <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+              <div style={{height:'1px',width:'25px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+            </div>
+          </div>
+        </div>
+
+        {/* Контент */}
+        <div className="ev-scroll ev-scroll-dark" style={{overflowY:'auto',padding:'clamp(12px,3vw,18px)',position:'relative',zIndex:1,flex:1}}>
+          {/* Список событий */}
+          <div style={{display:'flex',flexDirection:'column',gap:'8px',marginBottom:'14px'}}>
+            {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length>0 ? (
+              calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event,idx)=>(
+                <div key={idx} style={{
+                  background:'rgba(239,1,203,0.08)',
+                  border:'1px solid rgba(239,1,203,0.3)',
+                  borderRadius:'6px',padding:'10px 12px',
+                  display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'8px',
+                  boxShadow:'0 0 10px rgba(239,1,203,0.1)'
+                }}>
+                  <div style={{flex:1,color:'rgba(200,185,230,0.85)',fontSize:'clamp(0.75rem,2vw,0.85rem)',fontFamily:'Georgia,serif',lineHeight:'1.6'}}>
+                    {renderFormattedText(event)}
+                  </div>
+                  {isAdmin&&(
+                    <button onClick={()=>deleteEvent(idx)} style={{
+                      background:'transparent',border:'none',cursor:'pointer',
+                      color:'rgba(239,1,203,0.5)',flexShrink:0,padding:'2px'
+                    }}>
+                      <Trash2 size={14}/>
+                    </button>
+                  )}
+                </div>
+              ))
+            ):(
+              <div style={{textAlign:'center',padding:'20px',background:'rgba(147,112,219,0.05)',border:'1px solid rgba(147,112,219,0.12)',borderRadius:'6px'}}>
+                <div style={{fontSize:'1.2rem',color:'rgba(180,100,255,0.25)',marginBottom:'6px'}}>✦</div>
+                <p style={{color:'rgba(180,100,255,0.4)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.65rem,1.5vw,0.75rem)'}}>
+                  На эту дату событий нет
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Форма добавления — только для админа */}
+          {isAdmin&&(
+            <>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'10px 0'}}>
+                <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+                <span style={{color:'rgba(180,100,255,0.25)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+                <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+              </div>
+              <div style={{display:'flex',gap:'6px',marginBottom:'8px',flexWrap:'wrap'}}>
+                {[['bold','B','font-bold'],['italic','I','italic'],['underline','U','underline']].map(([f,l,cls])=>(
+                  <button key={f} onClick={()=>applyFormat(f)} className={cls} style={{
+                    padding:'5px 10px',borderRadius:'4px',fontSize:'0.75rem',cursor:'pointer',color:'#d8b4fe',
+                    background:formatState[f]?'rgba(239,1,203,0.3)':'rgba(147,112,219,0.12)',
+                    border:`1px solid ${formatState[f]?'rgba(239,1,203,0.6)':'rgba(147,112,219,0.3)'}`
+                  }}>{l}</button>
+                ))}
+                <div style={{flex:1}}/>
+                {[['left','⬅'],['center','↕'],['right','➡']].map(([a,icon])=>(
+                  <button key={a} onClick={()=>setAlignment(a)} style={{
+                    padding:'5px 8px',borderRadius:'4px',fontSize:'0.75rem',cursor:'pointer',color:'#d8b4fe',
+                    background:formatState.align===a?'rgba(239,1,203,0.3)':'rgba(147,112,219,0.12)',
+                    border:'1px solid rgba(147,112,219,0.3)'
+                  }}>{icon}</button>
+                ))}
+              </div>
+              <textarea id="event-textarea" value={eventText} onChange={e=>setEventText(e.target.value)}
+                placeholder="Введите событие..." rows={4}
+                className="w-full" style={{
+                  background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.3)',
+                  borderRadius:'4px',padding:'10px 12px',color:'#e8d5ff',
+                  fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',resize:'none',
+                  width:'100%',boxSizing:'border-box',marginBottom:'10px',
+                  textAlign:formatState.align,fontFamily:'Georgia,serif'
+                }}/>
+              <button onClick={saveEvent} style={{
+                width:'100%',padding:'clamp(9px,2vw,11px)',
+                background:'rgba(147,112,219,0.18)',border:'1px solid rgba(147,112,219,0.6)',
+                borderRadius:'4px',cursor:'pointer',color:'#d8b4fe',
+                fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',
+                letterSpacing:'3px',textTransform:'uppercase',
+                boxShadow:'0 0 12px rgba(147,112,219,0.2)'
+              }}>✦ Сохранить событие</button>
+            </>
+          )}
+        </div>
       </div>
+    ) : (
+      /* СВЕТЛАЯ ТЕМА */
+      <div style={{
+        background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+        width:'92vw',maxWidth:'460px',
+        maxHeight:'min(85vh,600px)',
+        display:'flex',flexDirection:'column',
+        position:'relative',overflow:'hidden'
+      }}>
+        <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+          background:'linear-gradient(180deg,transparent,#c9a84c,transparent)',zIndex:2}}/>
+        <div style={{position:'absolute',top:'50%',right:'8px',transform:'translateY(-50%)',
+          fontFamily:'serif',fontSize:'clamp(6rem,15vw,10rem)',color:'rgba(201,168,76,0.03)',
+          pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      {/* ФОРМА ДОБАВЛЕНИЯ - ТОЛЬКО ДЛЯ АДМИНА */}
-      {isAdmin && (
-  <>
-    <div className="flex gap-2 mb-2">
-      <button
-        onClick={() => applyFormat('bold')}
-        className="px-3 py-1 rounded font-bold"
-        style={{
-          background: formatState.bold ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
-          border: '1px solid #9333ea'
-        }}
-      >
-        B
-      </button>
-      <button
-        onClick={() => applyFormat('italic')}
-        className="px-3 py-1 rounded italic"
-        style={{
-          background: formatState.italic ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
-          border: '1px solid #9333ea'
-        }}
-      >
-        I
-      </button>
-      <button
-        onClick={() => applyFormat('underline')}
-        className="px-3 py-1 rounded underline"
-        style={{
-          background: formatState.underline ? '#5b0120' : 'rgba(147, 112, 219, 0.3)',
-          border: '1px solid #9333ea'
-        }}
-      >
-        U
-      </button>
-      <div className="flex-1" />
-      <button onClick={() => setAlignment('left')} className="px-2 py-1" style={{ background: formatState.align === 'left' ? '#5b0120' : 'transparent' }}>⬅</button>
-      <button onClick={() => setAlignment('center')} className="px-2 py-1" style={{ background: formatState.align === 'center' ? '#5b0120' : 'transparent' }}>↕</button>
-      <button onClick={() => setAlignment('right')} className="px-2 py-1" style={{ background: formatState.align === 'right' ? '#5b0120' : 'transparent' }}>➡</button>
-    </div>
-    
-<textarea
-  id="event-textarea"
-  value={eventText}
-  onChange={(e) => setEventText(e.target.value)}
-  placeholder="Введите событие..."
-  rows={5}
-  className="w-full rounded px-3 py-2 mb-4 text-sm resize-none"
-  style={{
-    background: 'rgba(0, 0, 0, 0.4)',
-    border: isDarkTheme ? '1px solid #9333ea' : '1px solid #c9c6bb',
-    color: '#ffffff',
-    textAlign: formatState.align,
-    whiteSpace: 'pre-wrap'
-  }}
-/>
+        {/* Шапка */}
+        <div style={{padding:'clamp(14px,3vw,20px) clamp(18px,4vw,26px)',paddingBottom:'clamp(10px,2vw,12px)',borderBottom:'1px solid rgba(201,168,76,0.1)',position:'relative',zIndex:2,flexShrink:0}}>
+          <button onClick={()=>setShowEventModal(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+            borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+            color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'13px',zIndex:10
+          }}>✕</button>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.2rem,4vw,1.7rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'evGold 4s linear infinite',letterSpacing:'2px',marginBottom:'8px'}}>
+            {selectedDate?.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'50px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
+        </div>
 
-<button
-  onClick={saveEvent}
-  className="w-full py-2 rounded font-bold"
-  style={{
-    background: isDarkTheme ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' : '#c9c6bb',
-    color: isDarkTheme ? '#ffffff' : '#000000'
-  }}
->
-  Сохранить событие
-</button>
-        </>
-      )}
-    </div>
+        {/* Контент */}
+        <div className="ev-scroll ev-scroll-light" style={{overflowY:'auto',padding:'clamp(12px,3vw,18px)',position:'relative',zIndex:1,flex:1}}>
+          <div style={{display:'flex',flexDirection:'column',gap:'8px',marginBottom:'14px'}}>
+            {calendarEvents[selectedDate?.toISOString().split('T')[0]]?.length>0 ? (
+              calendarEvents[selectedDate?.toISOString().split('T')[0]].map((event,idx)=>(
+                <div key={idx} style={{
+                  background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.25)',
+                  borderRadius:'2px',padding:'10px 12px',
+                  display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'8px',
+                  position:'relative'
+                }}>
+                  <div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',background:'linear-gradient(180deg,transparent,#c9a84c,transparent)'}}/>
+                  <div style={{flex:1,color:'rgba(201,168,76,0.75)',fontSize:'clamp(0.75rem,2vw,0.85rem)',fontFamily:'Georgia,serif',lineHeight:'1.6',paddingLeft:'8px'}}>
+                    {renderFormattedText(event)}
+                  </div>
+                  {isAdmin&&(
+                    <button onClick={()=>deleteEvent(idx)} style={{
+                      background:'transparent',border:'none',cursor:'pointer',
+                      color:'rgba(201,168,76,0.4)',flexShrink:0,padding:'2px'
+                    }}>
+                      <Trash2 size={14}/>
+                    </button>
+                  )}
+                </div>
+              ))
+            ):(
+              <div style={{textAlign:'center',padding:'20px',background:'rgba(201,168,76,0.03)',border:'1px solid rgba(201,168,76,0.1)',borderRadius:'2px'}}>
+                <div style={{fontSize:'1.2rem',color:'rgba(201,168,76,0.2)',marginBottom:'6px',fontFamily:'serif'}}>⚜</div>
+                <p style={{color:'rgba(201,168,76,0.35)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.65rem,1.5vw,0.75rem)'}}>
+                  На эту дату событий нет
+                </p>
+              </div>
+            )}
+          </div>
+
+          {isAdmin&&(
+            <>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'10px 0'}}>
+                <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+                <span style={{color:'rgba(201,168,76,0.25)',fontSize:'0.55rem',letterSpacing:'3px',fontFamily:'serif'}}>· ⚜ ·</span>
+                <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+              </div>
+              <div style={{display:'flex',gap:'6px',marginBottom:'8px',flexWrap:'wrap'}}>
+                {[['bold','B','font-bold'],['italic','I','italic'],['underline','U','underline']].map(([f,l,cls])=>(
+                  <button key={f} onClick={()=>applyFormat(f)} className={cls} style={{
+                    padding:'5px 10px',borderRadius:'2px',fontSize:'0.75rem',cursor:'pointer',
+                    color:formatState[f]?'#c9a84c':'rgba(201,168,76,0.5)',
+                    background:'transparent',
+                    border:`1px solid ${formatState[f]?'rgba(201,168,76,0.6)':'rgba(201,168,76,0.2)'}`
+                  }}>{l}</button>
+                ))}
+                <div style={{flex:1}}/>
+                {[['left','⬅'],['center','↕'],['right','➡']].map(([a,icon])=>(
+                  <button key={a} onClick={()=>setAlignment(a)} style={{
+                    padding:'5px 8px',borderRadius:'2px',fontSize:'0.75rem',cursor:'pointer',
+                    color:formatState.align===a?'#c9a84c':'rgba(201,168,76,0.4)',
+                    background:'transparent',border:'1px solid rgba(201,168,76,0.2)'
+                  }}>{icon}</button>
+                ))}
+              </div>
+              <textarea id="event-textarea" value={eventText} onChange={e=>setEventText(e.target.value)}
+                placeholder="Введите событие..." rows={4}
+                style={{
+                  background:'rgba(201,168,76,0.04)',border:'1px solid rgba(201,168,76,0.25)',
+                  borderRadius:'2px',padding:'10px 12px',color:'rgba(201,168,76,0.8)',
+                  fontSize:'clamp(0.75rem,2vw,0.85rem)',outline:'none',resize:'none',
+                  width:'100%',boxSizing:'border-box',marginBottom:'10px',
+                  textAlign:formatState.align,fontFamily:'Georgia,serif'
+                }}/>
+              <button onClick={saveEvent} style={{
+                width:'100%',padding:'clamp(9px,2vw,11px)',
+                background:'transparent',border:'1px solid rgba(201,168,76,0.55)',
+                borderRadius:'2px',cursor:'pointer',color:'#c9a84c',
+                fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',
+                letterSpacing:'3px',textTransform:'uppercase'
+              }}>⚜ Сохранить событие</button>
+            </>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
 
 {/* МОДАЛЬНОЕ ОКНО ЧТЕНИЯ НОВОСТИ - ТЕМНАЯ ТЕМА */}
 {showNewsModal && selectedNews && isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-2xl p-6 border-2 max-h-[80vh] overflow-y-auto" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes newsTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.5;}}
+      @keyframes newsShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .news-dark-scroll::-webkit-scrollbar{width:4px;}
+      .news-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .news-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .news-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw',maxWidth:'620px',
+      maxHeight:'min(88vh,700px)',
+      display:'flex',flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold shimmer-btn-text mb-2">
-            {selectedNews.title}
-          </h2>
-          <p className="text-sm text-gray-400">
-            {new Date(selectedNews.created_at).toLocaleDateString('ru-RU', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {isAdmin && (
-            <button
-              onClick={() => deleteNews(selectedNews.id)}
-              className="text-red-500 hover:text-red-400"
-            >
-              <Trash2 size={20} />
-            </button>
-          )}
-          <button onClick={() => setShowNewsModal(false)} className="text-gray-400 hover:text-white">
-            <X size={24} />
-          </button>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',borderRadius:'14px',
+        backgroundImage:`radial-gradient(1px 1px at 5% 10%,rgba(255,255,255,0.3) 0%,transparent 100%),
+          radial-gradient(1px 1px at 90% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+          radial-gradient(1px 1px at 70% 90%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+        animation:'newsTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+
+      {/* Шапка */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(14px,3vw,24px)',paddingBottom:'clamp(10px,2vw,16px)',borderBottom:'1px solid rgba(147,112,219,0.15)',position:'relative',zIndex:2,flexShrink:0}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px'}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'clamp(0.8rem,2vw,1rem)',color:'rgba(180,100,255,0.4)',marginBottom:'6px'}}>✦</div>
+            <div style={{
+              fontFamily:'ppelganger, Georgia, serif',
+              fontSize:'clamp(1.1rem,4vw,1.7rem)',
+              background:'linear-gradient(90deg,#b3e7ef 0%,#ef01cb 50%,#9370db 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+              animation:'newsShimmer 3s linear infinite',
+              lineHeight:'1.3',marginBottom:'8px'
+            }}>{selectedNews.title}</div>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
+              <div style={{height:'1px',width:'40px',background:'linear-gradient(90deg,rgba(147,112,219,0.5),transparent)'}}/>
+              <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+            </div>
+            <p style={{color:'rgba(147,112,219,0.45)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.5vw,0.7rem)',letterSpacing:'1px'}}>
+              {new Date(selectedNews.created_at).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+            </p>
+          </div>
+          <div style={{display:'flex',gap:'8px',flexShrink:0}}>
+            {isAdmin&&(
+              <button onClick={()=>deleteNews(selectedNews.id)} style={{
+                background:'rgba(239,1,203,0.1)',border:'1px solid rgba(239,1,203,0.3)',
+                borderRadius:'6px',padding:'6px',cursor:'pointer',color:'rgba(239,1,203,0.7)',
+                display:'flex',alignItems:'center',justifyContent:'center'
+              }}><Trash2 size={16}/></button>
+            )}
+            <button onClick={()=>setShowNewsModal(false)} style={{
+              background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+              borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+              color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+              fontSize:'13px'
+            }}>✕</button>
+          </div>
         </div>
       </div>
 
-      <div className="text-white leading-relaxed whitespace-pre-wrap">
-        {selectedNews.content}
+      {/* Контент */}
+      <div className="news-dark-scroll" style={{overflowY:'auto',padding:'clamp(14px,3vw,22px)',position:'relative',zIndex:1,flex:1}}>
+        <div style={{
+          color:'rgba(200,185,230,0.8)',fontFamily:'Georgia,serif',fontSize:'clamp(0.85rem,2vw,1rem)',
+          lineHeight:'1.8',whiteSpace:'pre-wrap'
+        }}>{selectedNews.content}</div>
       </div>
     </div>
   </div>
@@ -5366,49 +5255,70 @@ onClick={() => {
 
 {/* МОДАЛЬНОЕ ОКНО ЧТЕНИЯ НОВОСТИ - СВЕТЛАЯ ТЕМА */}
 {showNewsModal && selectedNews && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-2xl p-6 relative max-h-[80vh] overflow-y-auto" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '2px solid #c2c2a8',
-      backdropFilter: 'blur(20px)',
-      boxShadow: 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes newsGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .news-light-scroll::-webkit-scrollbar{width:4px;}
+      .news-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .news-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .news-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'620px',
+      maxHeight:'min(88vh,700px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold mb-2" style={{
-            color: '#c9c6bb',
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontStyle: 'italic'
-          }}>
-            {selectedNews.title}
-          </h2>
-          <p className="text-sm" style={{ color: '#c9c6bb', opacity: 0.7 }}>
-            {new Date(selectedNews.created_at).toLocaleDateString('ru-RU', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {isAdmin && (
-            <button
-              onClick={() => deleteNews(selectedNews.id)}
-              style={{ color: '#c9c6bb' }}
-            >
-              <Trash2 size={20} />
-            </button>
-          )}
-          <button onClick={() => setShowNewsModal(false)} style={{ color: '#c9c6bb' }}>
-            <X size={24} />
-          </button>
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',bottom:'20px',right:'10px',
+        fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+      {/* Шапка */}
+      <div style={{padding:'clamp(14px,3vw,22px) clamp(18px,4vw,28px)',paddingBottom:'clamp(10px,2vw,14px)',borderBottom:'1px solid rgba(201,168,76,0.1)',position:'relative',zIndex:2,flexShrink:0}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px'}}>
+          <div style={{flex:1}}>
+            <div style={{
+              fontFamily:"'victiriya',Georgia,serif",
+              fontSize:'clamp(1.2rem,4vw,2rem)',
+              backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+              backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+              animation:'newsGold 4s linear infinite',letterSpacing:'2px',marginBottom:'10px',lineHeight:'1.3'
+            }}>{selectedNews.title}</div>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}}>
+              <div style={{height:'1px',width:'50px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+              <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+            </div>
+            <p style={{color:'rgba(201,168,76,0.35)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.5vw,0.7rem)'}}>
+              {new Date(selectedNews.created_at).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+            </p>
+          </div>
+          <div style={{display:'flex',gap:'8px',flexShrink:0}}>
+            {isAdmin&&(
+              <button onClick={()=>deleteNews(selectedNews.id)} style={{
+                background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+                borderRadius:'2px',padding:'6px',cursor:'pointer',color:'rgba(201,168,76,0.4)',
+                display:'flex',alignItems:'center',justifyContent:'center'
+              }}><Trash2 size={16}/></button>
+            )}
+            <button onClick={()=>setShowNewsModal(false)} style={{
+              background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+              borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+              color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+              fontSize:'13px'
+            }}>✕</button>
+          </div>
         </div>
       </div>
 
-      <div className="leading-relaxed whitespace-pre-wrap" style={{ color: '#c9c6bb' }}>
-        {selectedNews.content}
+      {/* Контент */}
+      <div className="news-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,3vw,22px) clamp(18px,4vw,28px)',position:'relative',zIndex:1,flex:1}}>
+        <div style={{
+          color:'rgba(201,168,76,0.65)',fontFamily:'Georgia,serif',fontSize:'clamp(0.85rem,2vw,1rem)',
+          lineHeight:'1.8',whiteSpace:'pre-wrap'
+        }}>{selectedNews.content}</div>
       </div>
     </div>
   </div>
@@ -5719,91 +5629,80 @@ onClick={() => {
 
 {/* NEWSLETTER MODAL - ТЕМНАЯ ТЕМА */}
 {showNewsletterModal && isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes nlTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.5;}}
+      @keyframes nlShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .nl-dark-scroll::-webkit-scrollbar{width:3px;}
+      .nl-dark-scroll::-webkit-scrollbar-track{background:transparent;}
+      .nl-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .nl-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+    `}}/>
+    <div style={{
+      background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+      border:'1px solid rgba(180,100,255,0.25)',
+      boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+      borderRadius:'14px',
+      width:'92vw', maxWidth:'380px',
+      maxHeight:'min(85vh,500px)',
+      display:'flex', flexDirection:'column',
+      position:'relative'
     }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Почтовая рассылка</h2>
-        <button onClick={() => setShowNewsletterModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+      <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',borderRadius:'14px 14px 0 0',
+        background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
 
-      <div className="mb-6 p-4 rounded-lg" style={{
-        background: 'rgba(147, 112, 219, 0.2)',
-        border: '1px solid rgba(147, 112, 219, 0.4)'
-      }}>
-        <p className="text-white text-sm leading-relaxed">
-          Подписавшись на рассылку, вы будете получать уведомления о новых главах и произведениях прямо на вашу почту (<span className="font-semibold">{userProfile?.email}</span>).
-          <br/><br/>
-          Вы можете отказаться от рассылки в любой момент через настройки.
-        </p>
-      </div>
+      <div className="nl-dark-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,28px) clamp(12px,4vw,24px)',paddingTop:'clamp(18px,4vw,32px)',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,0.35) 0%,transparent 100%),
+            radial-gradient(1px 1px at 85% 15%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 50% 75%,rgba(255,255,255,0.2) 0%,transparent 100%),
+            radial-gradient(1px 1px at 90% 60%,rgba(255,255,255,0.15) 0%,transparent 100%)`,
+          animation:'nlTwinkle 5s ease-in-out infinite',zIndex:0}}/>
 
-      <div className="space-y-3">
-        <button
-onClick={async () => {
-  try {
-    const { error } = await supabaseBlog
-      .from('newsletter_subscribers')
-      .upsert({
-        user_id: user.id,
-        email: userProfile.email,
-        nickname: userProfile.nickname,
-        is_active: true
-      }, { 
-        onConflict: 'user_id' 
-      });
+        <button onClick={()=>setShowNewsletterModal(false)} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
 
-    if (error) throw error;
-    
-    setIsSubscribed(true);
-    showConfirm('Вы успешно подписались на рассылку!');
-    setShowNewsletterModal(false);
-  } catch (err) {
-    showConfirm('Ошибка: ' + err.message);
-  }
-}}
-          className="w-full py-3 rounded-lg font-bold transition"
-          style={{
-            background: 'linear-gradient(135deg, #9370db 0%, #67327b 100%)',
-            boxShadow: '0 0 15px rgba(147, 112, 219, 0.6)',
-            color: '#ffffff'
-          }}
-        >
-          Получать уведомления
-        </button>
+        {/* Заголовок */}
+        <div style={{textAlign:'center',marginBottom:'clamp(14px,3vw,22px)',position:'relative',zIndex:1}}>
+          <div style={{fontSize:'clamp(1rem,3vw,1.4rem)',color:'rgba(180,100,255,0.4)',marginBottom:'6px'}}>✦</div>
+          <div style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.85rem,3vw,1.1rem)',letterSpacing:'clamp(3px,1vw,6px)',
+            background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Почтовая рассылка</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'8px'}}>
+            <div style={{height:'1px',width:'35px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+            <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+            <div style={{height:'1px',width:'35px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+          </div>
+        </div>
 
-        <button
-onClick={async () => {
-  try {
-    const { error } = await supabaseBlog
-      .from('newsletter_subscribers')
-      .update({ is_active: false })
-      .eq('user_id', user.id);
+        {/* Инфо-блок */}
+        <div style={{background:'rgba(147,112,219,0.06)',border:'1px solid rgba(147,112,219,0.18)',borderRadius:'6px',padding:'clamp(10px,2vw,14px)',marginBottom:'clamp(14px,3vw,20px)',position:'relative',zIndex:1}}>
+          <p style={{color:'rgba(200,185,230,0.65)',fontSize:'clamp(0.7rem,1.8vw,0.8rem)',lineHeight:'1.7',fontFamily:'Georgia,serif',fontStyle:'italic',textAlign:'center'}}>
+            Подписавшись, вы будете получать уведомления о новых главах и произведениях на почту:{' '}
+            <span style={{color:'#b3e7ef',fontStyle:'normal'}}>{userProfile?.email}</span>
+            <br/>
+            <span style={{fontSize:'clamp(0.62rem,1.5vw,0.7rem)',color:'rgba(180,100,255,0.4)'}}>
+              Отказаться можно в любой момент через настройки
+            </span>
+          </p>
+        </div>
 
-    if (error) throw error;
-    
-    setIsSubscribed(false);
-    showConfirm('Вы отказались от рассылки');
-    setShowNewsletterModal(false);
-  } catch (err) {
-    showConfirm('Ошибка: ' + err.message);
-  }
-}}
-          className="w-full py-3 rounded-lg font-bold transition border-2"
-          style={{
-            background: 'transparent',
-            borderColor: '#9333ea',
-            color: '#9370db'
-          }}
-        >
-          Отказаться
-        </button>
+        {/* Кнопки */}
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
+          <button onClick={async()=>{try{const{error}=await supabaseBlog.from('newsletter_subscribers').upsert({user_id:user.id,email:userProfile.email,nickname:userProfile.nickname,is_active:true},{onConflict:'user_id'});if(error)throw error;setIsSubscribed(true);showConfirm('Вы подписались на рассылку!');setShowNewsletterModal(false);}catch(err){showConfirm('Ошибка: '+err.message);}}}
+            style={{width:'100%',padding:'clamp(10px,2vw,12px)',background:'rgba(147,112,219,0.18)',border:'1px solid rgba(147,112,219,0.6)',borderRadius:'4px',cursor:'pointer',color:'#d8b4fe',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase',boxShadow:'0 0 15px rgba(147,112,219,0.2)'}}>
+            ✦ Получать уведомления
+          </button>
+          <button onClick={async()=>{try{const{error}=await supabaseBlog.from('newsletter_subscribers').update({is_active:false}).eq('user_id',user.id);if(error)throw error;setIsSubscribed(false);showConfirm('Вы отказались от рассылки');setShowNewsletterModal(false);}catch(err){showConfirm('Ошибка: '+err.message);}}}
+            style={{width:'100%',padding:'clamp(10px,2vw,12px)',background:'transparent',border:'1px solid rgba(147,112,219,0.2)',borderRadius:'4px',cursor:'pointer',color:'rgba(180,100,255,0.4)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отказаться
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -5811,133 +5710,207 @@ onClick={async () => {
 
 {/* NEWSLETTER MODAL - СВЕТЛАЯ ТЕМА */}
 {showNewsletterModal && !isDarkTheme && (
-  <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes nlGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .nl-light-scroll::-webkit-scrollbar{width:3px;}
+      .nl-light-scroll::-webkit-scrollbar-track{background:transparent;}
+      .nl-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .nl-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+    `}}/>
+    <div style={{
+      background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',
+      width:'92vw',maxWidth:'380px',
+      maxHeight:'min(85vh,500px)',
+      display:'flex',flexDirection:'column',
+      position:'relative',overflow:'hidden'
     }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
+      <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+        background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+      <div style={{position:'absolute',top:'50%',right:'8px',transform:'translateY(-50%)',
+        fontFamily:'serif',fontSize:'clamp(7rem,18vw,11rem)',color:'rgba(201,168,76,0.03)',
+        pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
 
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Почтовая рассылка</h2>
-        <button onClick={() => setShowNewsletterModal(false)} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
-      </div>
+      <div className="nl-light-scroll" style={{overflowY:'auto',padding:'clamp(14px,4vw,28px) clamp(14px,4vw,32px)',paddingTop:'clamp(18px,4vw,30px)',position:'relative',zIndex:1}}>
+        <button onClick={()=>setShowNewsletterModal(false)} style={{
+          position:'absolute',top:'10px',right:'10px',
+          background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+          borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',
+          color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+          fontSize:'13px',zIndex:10
+        }}>✕</button>
 
-      <div className="mb-6 p-4 rounded-lg" style={{
-        background: 'rgba(201, 198, 187, 0.15)',
-        border: '1px solid rgba(201, 198, 187, 0.3)'
-      }}>
-        <p className="text-sm leading-relaxed" style={{ color: '#c9c6bb' }}>
-          Подписавшись на рассылку, вы будете получать уведомления о новых главах и произведениях прямо на вашу почту (<span className="font-semibold">{userProfile?.email}</span>).
-          <br/><br/>
-          Вы можете отказаться от рассылки в любой момент через настройки.
-        </p>
-      </div>
+        {/* Заголовок */}
+        <div style={{marginBottom:'clamp(14px,3vw,22px)'}}>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.3rem,5vw,2rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'nlGold 4s linear infinite',letterSpacing:'3px',marginBottom:'10px'}}>Почтовая рассылка</div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'70px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.4)',fontSize:'0.7rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
+        </div>
 
- <div className="space-y-3">
-  <button
-    onClick={async () => {
-      try {
-        const { error } = await supabaseBlog
-          .from('newsletter_subscribers')
-          .upsert({
-            user_id: user.id,
-            email: userProfile.email,
-            nickname: userProfile.nickname,
-            is_active: true
-          }, { 
-            onConflict: 'user_id' 
-          });
+        {/* Инфо-блок */}
+        <div style={{background:'rgba(201,168,76,0.05)',border:'1px solid rgba(201,168,76,0.18)',borderRadius:'2px',padding:'clamp(10px,2vw,14px)',marginBottom:'clamp(14px,3vw,20px)'}}>
+          <p style={{color:'rgba(201,168,76,0.6)',fontSize:'clamp(0.7rem,1.8vw,0.8rem)',lineHeight:'1.7',fontFamily:'Georgia,serif',fontStyle:'italic'}}>
+            Подписавшись, вы будете получать уведомления о новых главах и произведениях на почту:{' '}
+            <span style={{color:'#c9a84c',fontStyle:'normal'}}>{userProfile?.email}</span>
+            <br/>
+            <span style={{fontSize:'clamp(0.62rem,1.5vw,0.7rem)',color:'rgba(201,168,76,0.35)'}}>
+              Отказаться можно в любой момент через настройки
+            </span>
+          </p>
+        </div>
 
-        if (error) throw error;
-        
-        setIsSubscribed(true);
-        showConfirm('Вы успешно подписались на рассылку!');
-        setShowNewsletterModal(false);
-      } catch (err) {
-        showConfirm('Ошибка: ' + err.message);
-      }
-    }}
-    className="w-full py-3 rounded-lg font-bold transition"
-    style={{
-      background: '#c9c6bb',
-      color: '#000000'
-    }}
-  >
-    Получать уведомления
-  </button>
-
-  <button
-    onClick={async () => {
-      try {
-        const { error } = await supabaseBlog
-          .from('newsletter_subscribers')
-          .update({ is_active: false })
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-        
-        setIsSubscribed(false);
-        showConfirm('Вы отказались от рассылки');
-        setShowNewsletterModal(false);
-      } catch (err) {
-        showConfirm('Ошибка: ' + err.message);
-      }
-    }}
-    className="w-full py-3 rounded-lg font-bold transition"
-    style={{
-      background: 'transparent',
-      border: '2px solid #c9c6bb',
-      color: '#c9c6bb'
-    }}
-  >
-    Отказаться
-  </button>
+        {/* Кнопки */}
+        <div style={{display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)'}}>
+          <button onClick={async()=>{try{const{error}=await supabaseBlog.from('newsletter_subscribers').upsert({user_id:user.id,email:userProfile.email,nickname:userProfile.nickname,is_active:true},{onConflict:'user_id'});if(error)throw error;setIsSubscribed(true);showConfirm('Вы подписались на рассылку!');setShowNewsletterModal(false);}catch(err){showConfirm('Ошибка: '+err.message);}}}
+            style={{width:'100%',padding:'clamp(10px,2vw,12px)',background:'transparent',border:'1px solid rgba(201,168,76,0.6)',borderRadius:'2px',cursor:'pointer',color:'#c9a84c',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            ⚜ Получать уведомления
+          </button>
+          <button onClick={async()=>{try{const{error}=await supabaseBlog.from('newsletter_subscribers').update({is_active:false}).eq('user_id',user.id);if(error)throw error;setIsSubscribed(false);showConfirm('Вы отказались от рассылки');setShowNewsletterModal(false);}catch(err){showConfirm('Ошибка: '+err.message);}}}
+            style={{width:'100%',padding:'clamp(10px,2vw,12px)',background:'transparent',border:'1px solid rgba(201,168,76,0.15)',borderRadius:'2px',cursor:'pointer',color:'rgba(201,168,76,0.35)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.3vw,0.65rem)',letterSpacing:'3px',textTransform:'uppercase'}}>
+            Отказаться
+          </button>
+        </div>
       </div>
     </div>
   </div>
 )}
 
-{/* FOOTER */}
-<footer className="py-6 sm:py-8 text-center text-gray-500 relative z-[5]" style={{
-  background: 'transparent',
-  borderTop: isDarkTheme ? '1px solid rgba(147, 112, 219, 0.3)' : '1px solid #1f2937'
+{/* ФУТЕР */}
+<footer className="py-8 sm:py-12 text-center relative z-[5]" style={{
+  background: isDarkTheme ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.35)',
+  backdropFilter: 'blur(10px)',
+  borderTop: 'none',
+  position: 'relative'
 }}>
-  <p className="text-sm sm:text-base mb-2">MelloStory © 2026</p>
-  <p className="text-xs sm:text-sm mb-4 px-4">Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.</p>
-  <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap px-4 text-xs sm:text-sm">
-    <Link href="/privacy" className="text-gray-400 hover:text-gray-300 transition underline">
-      Политика конфиденциальности
-    </Link>
-    <span className="text-gray-600">•</span>
-    <Link href="/terms" className="text-gray-400 hover:text-gray-300 transition underline">
-      Пользовательское соглашение
-    </Link>
-    <span className="text-gray-600">•</span>
-    <Link href="/mission" className="text-gray-400 hover:text-gray-300 transition underline">
-      Миссия сайта
-    </Link>
-  </div>
+  {/* Градиентная линия сверху */}
+  <div style={{
+    position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+    background: isDarkTheme
+      ? 'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)'
+      : 'linear-gradient(90deg, transparent, #c9a84c, #f0d080, transparent)'
+  }}/>
+  {isDarkTheme ? (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.3))'}}/>
+        <span style={{color:'rgba(179,231,239,0.25)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.3))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(179,231,239,0.35)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(147,112,219,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.25))'}}/>
+        <span style={{color:'rgba(147,112,219,0.2)',fontSize:'0.5rem',letterSpacing:'6px'}}>· · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.25))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15))'}}/>
+        <span style={{color:'rgba(147,112,219,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.15))'}}/>
+      </div>
+    </div>
+  ) : (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+        <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(201,168,76,0.45)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(201,168,76,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.2))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.6rem',letterSpacing:'5px',fontFamily:'serif'}}>· ⚜ ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.2))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15))'}}/>
+        <span style={{color:'rgba(201,168,76,0.15)',fontSize:'0.6rem',letterSpacing:'6px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.15))'}}/>
+      </div>
+    </div>
+  )}
 </footer>
       </div>
     </>

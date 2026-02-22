@@ -100,80 +100,6 @@ const res = await fetch('/api/ugc', {
   }
 };
 
-const colors = ['#35030e', '#6d1fe0', '#2932d1', '#727439', '#8f8f8f', '#64a081'];
-
-const applyFormatting = (format, isReply = false) => {
-  const textarea = isReply ? replyTextareaRef.current : textareaRef.current;
-  const text = isReply ? replyText : newDiscussion;
-  const setText = isReply ? setReplyText : setNewDiscussion;
-  
-  if (!textarea) return;
-  
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const selectedText = text.substring(start, end);
-  
-  if (!selectedText) {
-    showConfirm('Выделите текст для форматирования');
-    return;
-  }
-  
-  let formattedText = '';
-  
-  switch(format) {
-    case 'bold':
-      formattedText = `<b>${selectedText}</b>`;
-      break;
-    case 'italic':
-      formattedText = `<i>${selectedText}</i>`;
-      break;
-    case 'underline':
-      formattedText = `<u>${selectedText}</u>`;
-      break;
-    case 'spoiler':
-      formattedText = `<spoiler>${selectedText}</spoiler>`;
-      break;
-    default:
-      if (format.startsWith('#')) {
-        formattedText = `<color=${format}>${selectedText}</color>`;
-      }
-  }
-  
-  const newText = text.substring(0, start) + formattedText + text.substring(end);
-  setText(newText);
-  
-  setTimeout(() => {
-    textarea.focus();
-    textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
-  }, 0);
-  
-  setShowColorPicker(false);
-  setShowReplyColorPicker(false);
-};
-
-const renderFormattedText = (text) => {
-  if (!text) return text;
-  
-  let result = text;
-  
-  // Обработка жирного текста
-  result = result.replace(/<b>(.*?)<\/b>/g, '<strong>$1</strong>');
-  
-  // Обработка курсива
-  result = result.replace(/<i>(.*?)<\/i>/g, '<em>$1</em>');
-  
-  // Обработка подчеркнутого
-  result = result.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline;">$1</span>');
-  
-  // Обработка цветного текста
-  result = result.replace(/<color=(#[0-9a-fA-F]{6})>(.*?)<\/color>/g, '<span style="color: $1;">$2</span>');
-  
-  // Обработка спойлеров
-  result = result.replace(/<spoiler>(.*?)<\/spoiler>/g, '<span class="spoiler-text" onclick="this.classList.toggle(\'revealed\')">$1</span>');
-  
-  return result;
-};
-
 const showConfirm = (message, action = null) => {
   setConfirmMessage(message);
   setConfirmAction(() => action);
@@ -669,144 +595,213 @@ if (loading) {
 // Модальное окно проверки возраста
 if (showAgeVerification) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
-      background: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)'
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden" style={{
+      background: 'radial-gradient(ellipse at 30% 20%, #1a0035 0%, #07000f 50%, #000000 100%)',
     }}>
-      {/* Модальное окно */}
-      <div className="relative z-10 w-full max-w-md mx-4">
-        <div 
-          className="rounded-2xl p-8 border-2 relative"
-          style={{
-            background: 'rgba(0, 0, 0, 0.95)',
-            borderColor: '#9333ea',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.4)'
-          }}
-        >
-          {/* Заголовок MelloStory */}
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes shimmerAge {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .age-shimmer-mello {
-              background: linear-gradient(90deg, #a855f7 0%, #ec4899 33%, #06b6d4 66%, #a855f7 100%);
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmerAge 3s linear infinite;
-            }
-            .age-shimmer-story {
-              color: #8c32d2;
-              text-shadow: 0 0 20px rgba(140, 50, 210, 0.9), 0 0 40px rgba(140, 50, 210, 0.6);
-            }
-          `}} />
-          
-          <h1 className="text-4xl font-bold text-center mb-6" style={{
-            fontFamily: "'Playfair Display', Georgia, serif"
-          }}>
-            <span className="age-shimmer-mello">MELLO</span>
-            <span className="age-shimmer-story">STORY</span>
-          </h1>
-          
-          {/* Текст предупреждения */}
-          <div className="text-center mb-6">
-            <p className="text-white text-lg font-semibold mb-2">
-              Сайт содержит материалы 18+
-            </p>
-            <p className="text-gray-400 text-sm">
-              Для продолжения необходимо войти в аккаунт или зарегистрироваться
-            </p>
-          </div>
-          
-          {/* Кнопки */}
-<style dangerouslySetInnerHTML={{__html: `
-  @keyframes neonPurplePulse {
-    0%, 100% { 
-      box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
-                  0 0 20px rgba(183, 91, 205, 0.3),
-                  0 0 30px rgba(183, 91, 205, 0.2);
-    }
-    50% { 
-      box-shadow: 0 0 15px rgba(183, 91, 205, 0.6), 
-                  0 0 30px rgba(183, 91, 205, 0.5),
-                  0 0 45px rgba(183, 91, 205, 0.3);
-    }
-  }
-  
-  .pink-neon-button {
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: 2px solid rgba(183, 91, 205, 0.5) !important;
-    box-shadow: 0 0 10px rgba(183, 91, 205, 0.4), 
-                0 0 20px rgba(183, 91, 205, 0.3),
-                0 0 30px rgba(183, 91, 205, 0.2) !important;
-    animation: neonPurplePulse 3s ease-in-out infinite !important;
-    transition: all 0.3s ease !important;
-    color: #ffffff !important;
-  }
-  
-  .pink-neon-button:hover {
-    border-color: rgba(183, 91, 205, 0.9) !important;
-    box-shadow: 0 0 20px rgba(183, 91, 205, 0.8), 
-                0 0 40px rgba(183, 91, 205, 0.6),
-                0 0 60px rgba(183, 91, 205, 0.4) !important;
-    transform: translateY(-2px) !important;
-  }
-  
-  .pink-neon-button:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 0 30px rgba(183, 91, 205, 1), 
-                0 0 50px rgba(183, 91, 205, 0.8),
-                0 0 70px rgba(183, 91, 205, 0.5) !important;
-  }
-`}} />
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes ageStarTwinkle { 0%,100%{opacity:0.15;} 50%{opacity:0.7;} }
+        @keyframes ageLineFlow { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+        @keyframes ageOrb1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(40px,-30px) scale(1.2);} 66%{transform:translate(-25px,20px) scale(0.85);} }
+        @keyframes ageOrb2 { 0%,100%{transform:translate(0,0) scale(1.1);} 33%{transform:translate(-50px,25px) scale(0.8);} 66%{transform:translate(30px,-20px) scale(1.3);} }
+        @keyframes ageOrb3 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(20px,35px);} }
+        @keyframes ageFadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes agePulse { 0%,100%{box-shadow:0 0 40px rgba(147,51,234,0.3),0 0 80px rgba(147,51,234,0.1);} 50%{box-shadow:0 0 60px rgba(147,51,234,0.5),0 0 120px rgba(239,1,203,0.2);} }
+        @keyframes ageBtnGlow { 0%,100%{box-shadow:0 0 15px rgba(147,112,219,0.3);} 50%{box-shadow:0 0 25px rgba(147,112,219,0.6),0 0 50px rgba(239,1,203,0.2);} }
+      `}} />
 
-<div className="space-y-3 mb-6">
-  <button
-    onClick={() => {
-     window.location.href = '/welcome?login=true';
-    }}
-    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
-  >
-    Войти
-  </button>
-  
-  <button
-    onClick={() => {
-      window.location.href = '/welcome?register=true';
-    }}
-    className="pink-neon-button w-full py-3 rounded-lg font-bold text-base"
-  >
-    Регистрация
-  </button>
-</div>
-          
-{/* Логотип внизу */}
-<div className="flex justify-center">
-  <div style={{
-    width: '128px',
-    height: '128px',
-    borderRadius: '50%',
-    background: '#000000',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden'
-  }}>
-    <img 
-      src="/logo.png"
-      alt="MelloStory" 
-      style={{ 
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover'
-      }}
-    />
-  </div>
-</div>
+      {/* Плазменные орбы фон */}
+      <div style={{position:'absolute',width:'500px',height:'500px',
+        background:'radial-gradient(circle,rgba(147,51,234,0.12) 0%,rgba(109,5,200,0.06) 40%,transparent 70%)',
+        borderRadius:'40% 60% 70% 30%',filter:'blur(40px)',
+        animation:'ageOrb1 12s ease-in-out infinite',
+        top:'-10%',left:'-5%',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',width:'400px',height:'400px',
+        background:'radial-gradient(circle,rgba(239,1,203,0.1) 0%,rgba(147,51,234,0.05) 50%,transparent 80%)',
+        borderRadius:'60% 40% 30% 70%',filter:'blur(35px)',
+        animation:'ageOrb2 15s ease-in-out infinite',
+        bottom:'5%',right:'-5%',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',width:'300px',height:'300px',
+        background:'radial-gradient(circle,rgba(63,202,175,0.07) 0%,transparent 70%)',
+        borderRadius:'50%',filter:'blur(30px)',
+        animation:'ageOrb3 10s ease-in-out infinite',
+        top:'40%',left:'60%',pointerEvents:'none'}}/>
+
+      {/* Звёзды */}
+      {[...Array(40)].map((_,i)=>(
+        <div key={i} style={{
+          position:'absolute',
+          width: i%5===0 ? '2px' : '1px',
+          height: i%5===0 ? '2px' : '1px',
+          background:'#ffffff',
+          borderRadius:'50%',
+          left:`${(i*7+13)%100}%`,
+          top:`${(i*11+7)%100}%`,
+          animation:`ageStarTwinkle ${2+i%4}s ease-in-out infinite`,
+          animationDelay:`${(i*0.15)%3}s`,
+          opacity: 0.3,
+          pointerEvents:'none'
+        }}/>
+      ))}
+
+      {/* Горизонтальные декоративные линии */}
+      <div style={{position:'absolute',top:'18%',left:0,right:0,height:'1px',
+        background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15),rgba(239,1,203,0.1),rgba(147,112,219,0.15),transparent)',
+        pointerEvents:'none'}}/>
+      <div style={{position:'absolute',bottom:'18%',left:0,right:0,height:'1px',
+        background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.1),rgba(63,202,175,0.08),rgba(147,112,219,0.1),transparent)',
+        pointerEvents:'none'}}/>
+
+      {/* Основной блок */}
+      <div style={{
+        position:'relative',zIndex:10,
+        width:'100%',maxWidth:'420px',
+        margin:'0 16px',
+        animation:'ageFadeIn 0.6s ease-out'
+      }}>
+        {/* Верхняя линия */}
+        <div style={{height:'2px',background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,#3fcaaf,transparent)',marginBottom:'0',borderRadius:'2px 2px 0 0'}}/>
+
+        {/* Карточка */}
+        <div style={{
+          background:'radial-gradient(ellipse at top,#0d0020 0%,#050010 60%,#000000 100%)',
+          border:'1px solid rgba(147,112,219,0.25)',
+          borderTop:'none',
+          borderRadius:'0 0 16px 16px',
+          padding:'36px 32px 40px',
+          animation:'agePulse 4s ease-in-out infinite',
+          position:'relative',overflow:'hidden'
+        }}>
+
+          {/* Внутренние звёзды карточки */}
+          <div style={{position:'absolute',inset:0,pointerEvents:'none',
+            backgroundImage:`
+              radial-gradient(1px 1px at 8% 15%,rgba(255,255,255,0.5) 0%,transparent 100%),
+              radial-gradient(1px 1px at 92% 10%,rgba(255,255,255,0.4) 0%,transparent 100%),
+              radial-gradient(1px 1px at 75% 85%,rgba(255,255,255,0.3) 0%,transparent 100%),
+              radial-gradient(1px 1px at 15% 80%,rgba(255,255,255,0.35) 0%,transparent 100%),
+              radial-gradient(1px 1px at 50% 92%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+            animation:'ageStarTwinkle 5s ease-in-out infinite'}}/>
+
+          {/* Декор угловой — левый верх */}
+          <div style={{position:'absolute',top:'16px',left:'16px',
+            width:'20px',height:'20px',
+            borderTop:'1px solid rgba(147,112,219,0.4)',
+            borderLeft:'1px solid rgba(147,112,219,0.4)'}}/>
+          {/* Декор угловой — правый верх */}
+          <div style={{position:'absolute',top:'16px',right:'16px',
+            width:'20px',height:'20px',
+            borderTop:'1px solid rgba(147,112,219,0.4)',
+            borderRight:'1px solid rgba(147,112,219,0.4)'}}/>
+          {/* Декор угловой — левый низ */}
+          <div style={{position:'absolute',bottom:'16px',left:'16px',
+            width:'20px',height:'20px',
+            borderBottom:'1px solid rgba(147,112,219,0.4)',
+            borderLeft:'1px solid rgba(147,112,219,0.4)'}}/>
+          {/* Декор угловой — правый низ */}
+          <div style={{position:'absolute',bottom:'16px',right:'16px',
+            width:'20px',height:'20px',
+            borderBottom:'1px solid rgba(147,112,219,0.4)',
+            borderRight:'1px solid rgba(147,112,219,0.4)'}}/>
+
+          {/* Заголовок */}
+          <div style={{textAlign:'center',marginBottom:'28px',position:'relative',zIndex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+              <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.5))'}}/>
+              <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+              <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.5))'}}/>
+            </div>
+
+            <h1 style={{
+              fontFamily:"'plommir', Georgia, serif",
+              fontWeight:'300',
+              fontSize:'clamp(2.2rem,8vw,3.2rem)',
+              backgroundImage:'linear-gradient(90deg,#a72cc9 0%,#e6009b 33%,#68d3f3 66%,#a855f7 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text',
+              WebkitTextFillColor:'transparent',
+              backgroundClip:'text',
+              animation:'ageLineFlow 4s linear infinite',
+              lineHeight:1.1,
+              margin:'0 0 16px 0'
+            }}>MelloStory</h1>
+
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+              <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.25))'}}/>
+              <span style={{color:'rgba(147,112,219,0.25)',fontSize:'0.45rem',letterSpacing:'6px'}}>· · · · · · ·</span>
+              <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.25))'}}/>
+            </div>
+
+            <p style={{
+              fontFamily:'Cinzel,serif',
+              fontSize:'0.6rem',
+              letterSpacing:'4px',
+              textTransform:'uppercase',
+              color:'rgba(180,100,255,0.6)',
+              marginBottom:'8px'
+            }}>Контент 18+</p>
+            <p style={{
+              fontFamily:'Georgia,serif',
+              fontStyle:'italic',
+              fontSize:'0.8rem',
+              color:'rgba(200,185,230,0.45)',
+              lineHeight:'1.6',
+              maxWidth:'280px',
+              margin:'0 auto'
+            }}>Для продолжения необходимо войти в аккаунт</p>
+          </div>
+
+          {/* Кнопки */}
+          <div style={{display:'flex',flexDirection:'column',gap:'10px',position:'relative',zIndex:1}}>
+            <button
+              onClick={() => { window.location.href = '/welcome?login=true'; }}
+              style={{
+                width:'100%',padding:'13px',
+                background:'rgba(147,112,219,0.12)',
+                border:'1px solid rgba(147,112,219,0.5)',
+                borderRadius:'6px',cursor:'pointer',
+                fontFamily:'Cinzel,serif',fontSize:'0.68rem',letterSpacing:'4px',textTransform:'uppercase',
+                color:'#d8b4fe',
+                animation:'ageBtnGlow 3s ease-in-out infinite',
+                transition:'all 0.2s',
+                position:'relative',overflow:'hidden'
+              }}
+              onMouseEnter={e=>{
+                e.currentTarget.style.background='rgba(147,112,219,0.25)';
+                e.currentTarget.style.borderColor='rgba(192,132,252,0.8)';
+              }}
+              onMouseLeave={e=>{
+                e.currentTarget.style.background='rgba(147,112,219,0.12)';
+                e.currentTarget.style.borderColor='rgba(147,112,219,0.5)';
+              }}
+            >✦ Войти ✦</button>
+
+            <button
+              onClick={() => { window.location.href = '/welcome?register=true'; }}
+              style={{
+                width:'100%',padding:'13px',
+                background:'transparent',
+                border:'1px solid rgba(147,112,219,0.2)',
+                borderRadius:'6px',cursor:'pointer',
+                fontFamily:'Cinzel,serif',fontSize:'0.68rem',letterSpacing:'4px',textTransform:'uppercase',
+                color:'rgba(180,100,255,0.5)',
+                transition:'all 0.2s'
+              }}
+              onMouseEnter={e=>{
+                e.currentTarget.style.background='rgba(147,112,219,0.08)';
+                e.currentTarget.style.borderColor='rgba(147,112,219,0.4)';
+                e.currentTarget.style.color='rgba(200,180,255,0.8)';
+              }}
+              onMouseLeave={e=>{
+                e.currentTarget.style.background='transparent';
+                e.currentTarget.style.borderColor='rgba(147,112,219,0.2)';
+                e.currentTarget.style.color='rgba(180,100,255,0.5)';
+              }}
+            >Регистрация</button>
+          </div>
+
         </div>
+        {/* Нижняя линия */}
+        <div style={{height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.2),rgba(63,202,175,0.15),rgba(147,112,219,0.2),transparent)'}}/>
       </div>
     </div>
   );
@@ -814,9 +809,9 @@ if (showAgeVerification) {
 
 return (
  <div className="min-h-screen text-white" style={{ 
-  background: isDarkTheme 
-    ? 'linear-gradient(225deg, #000000 0%, #4d3370 20%, #987caf 40%, #523166 60%, #0d0020 80%, #000000 100%)'
-    : 'radial-gradient(circle at center, #1a0000 0%, #330514 35%, #50061b 65%, #000000 100%)'
+  background: isDarkTheme
+    ? 'radial-gradient(ellipse at 20% 0%, #1a0035 0%, #07000f 45%, #000000 100%)'
+    : 'radial-gradient(ellipse at 50% 0%, #0d0008 0%, #000000 60%)'
 }}>
     <style dangerouslySetInnerHTML={{__html: `
       .spoiler-text {
@@ -1218,302 +1213,316 @@ return (
     animation: workPageShimmer 3s linear infinite;
   }
 `}} />
-<h1 className="font-bold mb-3 sm:mb-4 break-words" style={{
-  fontSize: isDarkTheme ? 'clamp(2.75rem, 6vw, 5rem)' : 'clamp(1.55rem, 2vw, 2rem)',
-  fontFamily: isDarkTheme ? "'plommir', Georgia, serif" : "'kikamori', Georgia, serif",
-  fontStyle: !isDarkTheme ? 'italic' : 'normal',
-  color: 'transparent',
-  backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-  backgroundSize: '200% auto',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
+{/* ДЕКОРАТИВНЫЙ БЛОК НАЗВАНИЯ */}
+{isDarkTheme ? (
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:'20px',marginTop:'8px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+      <div style={{width:'70px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.5))'}}/>
+      <span style={{color:'rgba(179,231,239,0.3)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+      <div style={{width:'70px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.5))'}}/>
+    </div>
+    <h1 className="break-words" style={{
+      fontFamily:"'plommir', Georgia, serif",
+      fontWeight:'300',
+      fontSize:'clamp(2.4rem,6vw,5rem)',
+      backgroundImage:'linear-gradient(90deg, #a72cc9 0%, #e6009b 33%, #68d3f3 66%, #a855f7 100%)',
+      backgroundSize:'200% auto',
+      WebkitBackgroundClip:'text',
+      WebkitTextFillColor:'transparent',
+      backgroundClip:'text',
+      color:'transparent',
+      lineHeight:1.15,
+      textAlign:'center',
+      animation:'workPageShimmer 6s linear infinite',
+      marginBottom:'10px'
+    }}>
+      {work.title}
+    </h1>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.25))'}}/>
+      <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.5rem',letterSpacing:'10px'}}>· · · · · · ·</span>
+      <div style={{width:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.25))'}}/>
+    </div>
+  </div>
+) : (
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:'20px',marginTop:'8px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'10px'}}>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.6))'}}/>
+      <span style={{color:'rgba(201,168,76,0.45)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.6))'}}/>
+    </div>
+    <h1 className="break-words" style={{
+      fontFamily:"'victiriya', Georgia, serif",
+      fontWeight:'400',
+      fontSize:'clamp(2rem,5vw,4rem)',
+      backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+      backgroundSize:'200% auto',
+      WebkitBackgroundClip:'text',
+      WebkitTextFillColor:'transparent',
+      backgroundClip:'text',
+      color:'transparent',
+      lineHeight:1.2,
+      textAlign:'center',
+      animation:'ratingGoldShimmer 5s linear infinite',
+      marginBottom:'10px'
+    }}>
+      {work.title}
+    </h1>
+    <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.35))'}}/>
+      <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.65rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+      <div style={{width:'60px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.35))'}}/>
+    </div>
+  </div>
+)}
+
+{/* ХАРАКТЕРИСТИКИ */}
+<div style={{
+  marginBottom: '20px',
+  marginTop: '8px'
 }}>
-  {work.title}
-</h1>
+  {isDarkTheme ? (
+    <>
+      <style dangerouslySetInnerHTML={{__html:`
+        .meta-row {
+          display: flex;
+          gap: 8px;
+          padding: 7px 0;
+          border-bottom: 1px solid rgba(147,112,219,0.08);
+          align-items: baseline;
+        }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-label {
+          font-size: 0.6rem;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: rgba(180,100,255,0.45);
+          font-family: 'Cinzel', Georgia, serif;
+          white-space: nowrap;
+          flex-shrink: 0;
+          padding-top: 2px;
+        }
+        .meta-value {
+          font-size: 0.875rem;
+          color: rgba(220,210,240,0.75);
+          font-family: Georgia, serif;
+          font-style: italic;
+          line-height: 1.5;
+          word-break: break-word;
+        }
+      `}}/>
 
-{/* ФАНДОМ И ПЕЙРИНГ */}
-{(work.fandom || work.pairing) && (
-  <div className="mb-1 space-y-0.5">
-    {work.fandom && (
-      <div>
-        <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-          fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-         }}>Фандом: </span>
-        <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.fandom}</span>
+      {work.fandom && (
+        <div className="meta-row">
+          <span className="meta-label">Фандом</span>
+          <span className="meta-value">{work.fandom}</span>
+        </div>
+      )}
+      {work.pairing && (
+        <div className="meta-row">
+          <span className="meta-label">Пейринг</span>
+          <span className="meta-value">{work.pairing}</span>
+        </div>
+      )}
+      {work.slogan && (
+        <div className="meta-row">
+          <span className="meta-label">Слоган</span>
+          <span className="meta-value">{work.slogan}</span>
+        </div>
+      )}
+      <div className="meta-row">
+        <span className="meta-label">Направление</span>
+        <span className="meta-value">{work.direction}</span>
       </div>
-    )}
-    {work.pairing && (
-      <div>
-        <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-}}>Пейринг: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.pairing}</span>
-  </div>
-)}
-  </div>
-)}
-
-{work.slogan && (
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-      color: isDarkTheme ? '#670eb1' : '#adaa9c',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      fontSize: isDarkTheme 
-        ? (isMobile ? '1.30rem' : '1.35rem') 
-        : (isMobile ? '0.955rem' : '1rem'),
-      fontWeight: 'bold'
-    }}>Слоган: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ color: '#ffffff' }}>{work.slogan}</span>
-  </div>
-)}
-
-{/* ИНФОРМАЦИЯ О РАБОТЕ */}
-<div className="mb-1 space-y-0.5">
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-             color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                   fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
- }}>Направление: </span>
-  <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
-    {work.direction}
-  </span>
-</div>
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-            color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-  }}>Рейтинг: </span>
-  <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
-    {work.rating}
-  </span>
-</div>
-{work.category && (
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-          color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                    fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-     }}>Категория: </span>
-    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
-      {{
-        novel: 'Роман',
-        longfic: 'Лонгфик',
-        minific: 'Минифик'
-      }[work.category] || work.category}
-    </span>
-  </div>
-)}
-{work.status && (
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-           color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                   fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
-     }}>Статус: </span>
-    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>
-      {{
-        completed: 'Завершён',
-        ongoing: 'В процессе'
-      }[work.status] || work.status}
-    </span>
-  </div>
-)}
-  {work.total_pages > 0 && (
-    <div>
-      <span className="text-sm sm:text-base" style={{ 
-           color: isDarkTheme ? '#670eb1' : '#adaa9c',
-          fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-                   fontSize: isDarkTheme 
-  ? (isMobile ? '1.30rem' : '1.35rem') 
-  : (isMobile ? '0.955rem' : '1rem'),
-          fontWeight: 'bold'
- }}>Всего страниц: </span>
-    <span className="text-xs sm:text-sm" style={{ color: '#ffffff' }}>{work.total_pages.toLocaleString()}</span>
-  </div>
-)}
-
-{/* ЖАНРЫ */}
-{work.genres && (Array.isArray(work.genres) ? work.genres.length > 0 : work.genres.trim().length > 0) && (
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-      color: isDarkTheme ? '#670eb1' : '#adaa9c',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      fontSize: '0.875rem', // ← ФИКСИРОВАННЫЙ РАЗМЕР 14px
-      fontWeight: 'bold'
-    }}>{t.genres}: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ 
-      color: '#ffffff',
-      fontSize: '0.875rem' // ← ФИКСИРОВАННЫЙ РАЗМЕР 14px
-    }}>
-      {(Array.isArray(work.genres) ? work.genres : work.genres.split(',')).map((genre, i, arr) => {
-        const trimmedGenre = genre.trim();
-        if (!trimmedGenre) return null;
-        return (
-          <span key={i}>
-            <GenreTag name={trimmedGenre} />
-            {i < arr.length - 1 && ', '}
-          </span>
-        );
-      })}
-    </span>
-  </div>
-)}
-
-{/* ТЕГИ */}
-{work.tags && (Array.isArray(work.tags) ? work.tags.length > 0 : work.tags.trim().length > 0) && (
-  <div>
-    <span className="text-sm sm:text-base" style={{ 
-      color: isDarkTheme ? '#670eb1' : '#adaa9c',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      fontSize: '0.875rem', // ← ФИКСИРОВАННЫЙ РАЗМЕР
-      fontWeight: 'bold'
-    }}>{t.tags}: </span>
-    <span className="text-xs sm:text-sm break-words" style={{ 
-      color: '#ffffff',
-      fontSize: '0.875rem' // ← ФИКСИРОВАННЫЙ РАЗМЕР
-    }}>
-      {(Array.isArray(work.tags) ? work.tags : work.tags.split(',')).map((tag, i, arr) => {
-        const trimmedTag = tag.trim();
-        if (!trimmedTag) return null;
-        return (
-          <span key={i}>
-            <GenreTag name={trimmedTag} />
-            {i < arr.length - 1 && ', '}
-          </span>
-        );
-      })}
-    </span>
-  </div>
-)}
-</div>
-
-{/* СПОЙЛЕРНЫЕ МЕТКИ */}
-{spoilerTagsArray.length > 0 && (
-  <div className="mb-1">
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes arrowBounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(5px); }
-      }
-      .arrow-animated {
-        animation: arrowBounce 1.5s ease-in-out infinite;
-      }
-    `}} />
-    <button
-      onClick={() => setShowSpoilers(!showSpoilers)}
-      className="flex items-center gap-2 transition text-left mb-1"
-      style={{
-        backgroundColor: 'transparent',
-        padding: 0
-      }}
-    >
-      <span className="text-sm sm:text-base" style={{ 
-        color: isDarkTheme ? '#670eb1' : '#adaa9c',
-        fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-        fontSize: isDarkTheme 
-          ? (isMobile ? '1.30rem' : '1.35rem') 
-          : (isMobile ? '0.955rem' : '1rem'),
-        fontWeight: 'bold'
-      }}>
-        {t.spoilerTags}:
-      </span>
-      <div className={!showSpoilers ? 'arrow-animated' : ''} style={{
-        transform: showSpoilers ? 'rotate(180deg)' : 'rotate(0deg)',
-        transition: 'transform 0.3s ease',
-        color: isDarkTheme ? '#670eb1' : '#adaa9c'
-      }}>
-        <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+      <div className="meta-row">
+        <span className="meta-label">Рейтинг</span>
+        <span className="meta-value">{work.rating}</span>
       </div>
+      {work.category && (
+        <div className="meta-row">
+          <span className="meta-label">Категория</span>
+          <span className="meta-value">{{novel:'Роман',longfic:'Лонгфик',minific:'Минифик'}[work.category]||work.category}</span>
+        </div>
+      )}
+      {work.status && (
+        <div className="meta-row">
+          <span className="meta-label">Статус</span>
+          <span className="meta-value">{{completed:'Завершён',ongoing:'В процессе'}[work.status]||work.status}</span>
+        </div>
+      )}
+      {work.total_pages > 0 && (
+        <div className="meta-row">
+          <span className="meta-label">Страниц</span>
+          <span className="meta-value">{work.total_pages.toLocaleString()}</span>
+        </div>
+      )}
+{work.genres && (Array.isArray(work.genres)?work.genres.length>0:work.genres.trim().length>0) && (
+  <div>
+    <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Жанры: </span>
+    <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+     {(Array.isArray(work.genres)?work.genres:work.genres.split(',')).filter(g=>g.trim()).join(', ')}
+    </span>
+  </div>
+)}
+{work.tags && (Array.isArray(work.tags)?work.tags.length>0:work.tags.trim().length>0) && (
+  <div>
+    <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Теги: </span>
+    <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+      {(Array.isArray(work.tags)?work.tags:work.tags.split(',')).filter(t=>t.trim()).join(', ')}
+    </span>
+  </div>
+)}
+{spoilerTagsArray.length>0 && (
+  <div>
+    <button onClick={()=>setShowSpoilers(!showSpoilers)} style={{background:'none',border:'none',cursor:'pointer',padding:0,display:'inline'}}>
+      <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Спойлеры </span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)'} strokeWidth="2" style={{transform:showSpoilers?'rotate(180deg)':'rotate(0deg)',transition:'0.3s',display:'inline',verticalAlign:'middle'}}>
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
     </button>
-    
     {showSpoilers && (
-      <div className="text-xs sm:text-sm whitespace-pre-wrap break-words" style={{
-        backgroundColor: 'transparent',
-    color: '#ffffff',
-    fontSize: '0.875rem'
-      }}>
-        {spoilerTagsArray.map((spoiler, i, arr) => {
-          const trimmedSpoiler = spoiler.trim();
-          if (!trimmedSpoiler) return null;
-          return (
-            <span key={i}>
-              <GenreTag name={trimmedSpoiler} />
-              {i < arr.length - 1 && ', '}
-            </span>
-          );
-        })}
-      </div>
+      <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+        {spoilerTagsArray.filter(s=>s.trim()).join(', ')}
+      </span>
     )}
   </div>
 )}
-
-{/* ДИСКЛЕЙМЕР */}
-{work.disclaimer && work.disclaimer.trim() && (
-  <div className="mb-1">
-    <button
-      onClick={() => setShowDisclaimer(!showDisclaimer)}
-      className="flex items-center gap-2 transition text-left mb-1"
-      style={{
-        backgroundColor: 'transparent',
-        padding: 0
-      }}
-    >
-      <span className="text-sm sm:text-base" style={{ 
-        color: isDarkTheme ? '#670eb1' : '#adaa9c',
-        fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-        fontSize: isDarkTheme 
-          ? (isMobile ? '1.30rem' : '1.35rem') 
-          : (isMobile ? '0.955rem' : '1rem'),
-        fontWeight: 'bold'
-      }}>Дисклеймер:</span>
-      <div className={!showDisclaimer ? 'arrow-animated' : ''} style={{
-        transform: showDisclaimer ? 'rotate(180deg)' : 'rotate(0deg)',
-        transition: 'transform 0.3s ease',
-        color: isDarkTheme ? '#670eb1' : '#adaa9c'
-      }}>
-        <ChevronDown size={18} className="sm:w-5 sm:h-5" />
-      </div>
+{work.disclaimer&&work.disclaimer.trim()&&(
+  <div>
+    <button onClick={()=>setShowDisclaimer(!showDisclaimer)} style={{background:'none',border:'none',cursor:'pointer',padding:0,display:'inline'}}>
+      <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Дисклеймер </span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)'} strokeWidth="2" style={{transform:showDisclaimer?'rotate(180deg)':'rotate(0deg)',transition:'0.3s',display:'inline',verticalAlign:'middle'}}>
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
     </button>
-    
-    {showDisclaimer && (
-      <div className="whitespace-pre-wrap text-xs sm:text-sm break-words" style={{
-        backgroundColor: 'transparent',
-    color: '#ffffff',
-    fontSize: '0.875rem'
-      }}>
-        {work.disclaimer}
-      </div>
+    {showDisclaimer&&(
+      <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif',whiteSpace:'pre-wrap'}}>{work.disclaimer}</span>
     )}
   </div>
 )}
+    </>
+  ) : (
+    <>
+      <style dangerouslySetInnerHTML={{__html:`
+        .meta-row-light {
+          display: flex;
+          gap: 8px;
+          padding: 7px 0;
+          border-bottom: 1px solid rgba(201,168,76,0.1);
+          align-items: baseline;
+        }
+        .meta-row-light:last-child { border-bottom: none; }
+        .meta-label-light {
+          font-size: 0.6rem;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: rgba(201,168,76,0.45);
+          font-family: 'Cinzel', Georgia, serif;
+          white-space: nowrap;
+          flex-shrink: 0;
+          padding-top: 2px;
+        }
+        .meta-value-light {
+          font-size: 0.875rem;
+          color: rgba(201,168,76,0.65);
+          font-family: Georgia, serif;
+          font-style: italic;
+          line-height: 1.5;
+          word-break: break-word;
+        }
+      `}}/>
+
+      {work.fandom && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Фандом</span>
+          <span className="meta-value-light">{work.fandom}</span>
+        </div>
+      )}
+      {work.pairing && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Пейринг</span>
+          <span className="meta-value-light">{work.pairing}</span>
+        </div>
+      )}
+      {work.slogan && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Слоган</span>
+          <span className="meta-value-light">{work.slogan}</span>
+        </div>
+      )}
+      <div className="meta-row-light">
+        <span className="meta-label-light">Направление</span>
+        <span className="meta-value-light">{work.direction}</span>
+      </div>
+      <div className="meta-row-light">
+        <span className="meta-label-light">Рейтинг</span>
+        <span className="meta-value-light">{work.rating}</span>
+      </div>
+      {work.category && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Категория</span>
+          <span className="meta-value-light">{{novel:'Роман',longfic:'Лонгфик',minific:'Минифик'}[work.category]||work.category}</span>
+        </div>
+      )}
+      {work.status && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Статус</span>
+          <span className="meta-value-light">{{completed:'Завершён',ongoing:'В процессе'}[work.status]||work.status}</span>
+        </div>
+      )}
+      {work.total_pages > 0 && (
+        <div className="meta-row-light">
+          <span className="meta-label-light">Страниц</span>
+          <span className="meta-value-light">{work.total_pages.toLocaleString()}</span>
+        </div>
+      )}
+{work.genres && (Array.isArray(work.genres)?work.genres.length>0:work.genres.trim().length>0) && (
+  <div>
+    <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Жанры: </span>
+    <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+     {(Array.isArray(work.genres)?work.genres:work.genres.split(',')).filter(g=>g.trim()).join(', ')}
+    </span>
+  </div>
+)}
+{work.tags && (Array.isArray(work.tags)?work.tags.length>0:work.tags.trim().length>0) && (
+  <div>
+    <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Теги: </span>
+    <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+    {(Array.isArray(work.tags)?work.tags:work.tags.split(',')).filter(t=>t.trim()).join(', ')}
+    </span>
+  </div>
+)}
+{spoilerTagsArray.length>0 && (
+  <div>
+    <button onClick={()=>setShowSpoilers(!showSpoilers)} style={{background:'none',border:'none',cursor:'pointer',padding:0,display:'inline'}}>
+      <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Спойлеры </span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)'} strokeWidth="2" style={{transform:showSpoilers?'rotate(180deg)':'rotate(0deg)',transition:'0.3s',display:'inline',verticalAlign:'middle'}}>
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    {showSpoilers && (
+      <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif'}}>
+        {spoilerTagsArray.map((s,i,arr)=>{const t=s.trim();if(!t)return null;return(<span key={i}><GenreTag name={t}/>{i<arr.length-1&&', '}</span>);})}
+      </span>
+    )}
+  </div>
+)}
+{work.disclaimer&&work.disclaimer.trim()&&(
+  <div>
+    <button onClick={()=>setShowDisclaimer(!showDisclaimer)} style={{background:'none',border:'none',cursor:'pointer',padding:0,display:'inline'}}>
+      <span style={{fontSize:'0.6rem',letterSpacing:'3px',textTransform:'uppercase',fontFamily:'Cinzel,serif',color:isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)',fontWeight:'normal'}}>Дисклеймер </span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={isDarkTheme?'rgba(180,100,255,0.45)':'rgba(201,168,76,0.45)'} strokeWidth="2" style={{transform:showDisclaimer?'rotate(180deg)':'rotate(0deg)',transition:'0.3s',display:'inline',verticalAlign:'middle'}}>
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    {showDisclaimer&&(
+      <span className="break-words" style={{fontSize:'0.875rem',color:isDarkTheme?'rgba(210,200,230,0.75)':'rgba(201,168,76,0.65)',fontStyle:'italic',fontFamily:'Georgia,serif',whiteSpace:'pre-wrap'}}>{work.disclaimer}</span>
+    )}
+  </div>
+)}
+    </>
+  )}
+</div>
 
 <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6 items-center mt-4 justify-center">
   {/* Кнопка Прочтений */}
@@ -1525,7 +1534,7 @@ return (
         : 'rgba(255, 255, 255, 0.1)',
       border: isDarkTheme ? '2px solid #7f85db' : 'none',
       borderRadius: isDarkTheme ? '50px' : '0',
-      color: '#FFFFFF',
+      color: isDarkTheme ? 'rgba(200,185,225,0.8)' : 'rgba(201,168,76,0.8)',
       boxShadow: isDarkTheme ? '0 0 20px rgba(91, 109, 209, 0.5), inset 0 0 20px rgba(51, 124, 234, 0.3)' : '0 4px 15px rgba(0,0,0,0.2)',
       backdropFilter: 'blur(10px)',
       overflow: 'visible',
@@ -1546,11 +1555,11 @@ return (
         width: '200%',
         height: '200%',
         background: 'linear-gradient(90deg, transparent, rgba(114, 108, 110, 0.23), transparent)',
-        animation: 'glass-shine 8s infinite',
+        animation: 'glass-shine 10s infinite',
         pointerEvents: 'none'
       }} />
     )}
-    <BookOpen size={14} className="sm:w-4 sm:h-4" style={{ color: isDarkTheme ? '#ffffff' : '#FFFFFF', position: 'relative', zIndex: 1 }} />
+   <BookOpen size={14} className="sm:w-4 sm:h-4" style={{ color: isDarkTheme ? 'rgba(180,165,215,0.85)' : 'rgba(201,168,76,0.85)', position: 'relative', zIndex: 1 }} />
     <span className="hidden sm:inline" style={{ position: 'relative', zIndex: 1 }}>Прочтений: </span>
     <span style={{ position: 'relative', zIndex: 1 }}>{viewCount.toLocaleString()}</span>
   </div>
@@ -1640,7 +1649,7 @@ return (
         : 'rgba(255, 255, 255, 0.1)',
       border: isDarkTheme ? '2px solid #7526be' : 'none',
       borderRadius: isDarkTheme ? '50px' : '0',
-      color: '#FFFFFF',
+      color: isDarkTheme ? 'rgba(200,185,225,0.8)' : 'rgba(201,168,76,0.8)',
       boxShadow: isDarkTheme ? '0 0 20px rgba(147, 51, 234, 0.5), inset 0 0 20px rgba(147, 51, 234, 0.3)' : '0 4px 15px rgba(0,0,0,0.2)',
       backdropFilter: 'blur(10px)',
       overflow: 'visible',
@@ -1675,7 +1684,7 @@ return (
         width: '200%',
         height: '200%',
         background: 'linear-gradient(90deg, transparent, rgba(114, 108, 110, 0.23), transparent)',
-        animation: 'glass-shine 8s infinite',
+        animation: 'glass-shine 10s infinite',
         pointerEvents: 'none'
       }} />
     )}
@@ -1683,7 +1692,7 @@ return (
       size={14} 
       className="sm:w-4 sm:h-4" 
       fill={userRating ? '#FFFFFF' : 'none'} 
-      stroke="#FFFFFF"
+      stroke={isDarkTheme ? 'rgba(180,165,215,0.85)' : 'rgba(201,168,76,0.85)'}
       style={{ position: 'relative', zIndex: 1 }} 
     />
     <span className="hidden sm:inline" style={{ position: 'relative', zIndex: 1 }}>Оценка: {averageRating > 0 ? averageRating.toFixed(1) : '—'}</span>
@@ -1699,7 +1708,7 @@ return (
         : 'rgba(255, 255, 255, 0.1)',
       border: isDarkTheme ? '2px solid #ef01cb' : 'none',
       borderRadius: isDarkTheme ? '50px' : '0',
-      color: '#FFFFFF',
+      color: isDarkTheme ? 'rgba(200,185,225,0.8)' : 'rgba(201,168,76,0.8)',
       boxShadow: isDarkTheme ? '0 0 20px rgba(239, 1, 203, 0.5), inset 0 0 20px rgba(239, 1, 203, 0.3)' : '0 4px 15px rgba(0,0,0,0.2)',
       backdropFilter: 'blur(10px)',
       overflow: 'visible',
@@ -1734,7 +1743,7 @@ return (
         width: '200%',
         height: '200%',
         background: 'linear-gradient(90deg, transparent, rgba(114, 108, 110, 0.23), transparent)',
-        animation: 'glass-shine 8s infinite',
+        animation: 'glass-shine 10s infinite',
         pointerEvents: 'none'
       }} />
     )}
@@ -1744,7 +1753,7 @@ return (
       viewBox="0 0 24 24" 
       className="sm:w-4 sm:h-4" 
       fill={isFavorited ? '#FFFFFF' : 'none'} 
-      stroke="#FFFFFF"
+      stroke={isDarkTheme ? 'rgba(180,165,215,0.85)' : 'rgba(201,168,76,0.85)'}
       strokeWidth="2" 
       style={{ position: 'relative', zIndex: 1 }}
     >
@@ -1763,7 +1772,7 @@ return (
         : 'rgba(255, 255, 255, 0.1)',
       border: isDarkTheme ? '2px solid #b3e7ef' : 'none',
       borderRadius: isDarkTheme ? '50px' : '0',
-      color: '#FFFFFF',
+      color: isDarkTheme ? 'rgba(200,185,225,0.8)' : 'rgba(201,168,76,0.8)',
       boxShadow: isDarkTheme ? '0 0 20px rgba(179, 231, 239, 0.5), inset 0 0 20px rgba(179, 231, 239, 0.3)' : '0 4px 15px rgba(0,0,0,0.2)',
       backdropFilter: 'blur(10px)',
       overflow: 'visible',
@@ -1798,7 +1807,7 @@ return (
         width: '200%',
         height: '200%',
         background: 'linear-gradient(90deg, transparent, rgba(114, 108, 110, 0.23), transparent)',
-        animation: 'glass-shine 8s infinite',
+        animation: 'glass-shine 10s infinite',
         pointerEvents: 'none'
       }} />
     )}
@@ -1808,7 +1817,7 @@ return (
       viewBox="0 0 24 24" 
       className="sm:w-4 sm:h-4" 
       fill="none" 
-      stroke="#FFFFFF"
+      stroke={isDarkTheme ? 'rgba(180,165,215,0.85)' : 'rgba(201,168,76,0.85)'}
       strokeWidth="2" 
       style={{ position: 'relative', zIndex: 1 }}
     >
@@ -1819,327 +1828,232 @@ return (
 </div>
 
 {/* ОПИСАНИЕ */}
-<div className="rounded-lg mb-4 sm:mb-6" style={{ position: 'relative' }}>
-  {/* Верхняя линия */}
-  <div style={{
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
-    height: '2px',
-    background: isDarkTheme
-      ? 'linear-gradient(90deg, transparent 0%, rgba(101, 73, 128, 0.7) 15%, rgba(100, 48, 139, 0.97) 50%, rgba(77, 45, 107, 0.7) 85%, transparent 100%)'
-      : 'none',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
-  {/* Диамант */}
-  <div style={{
-    position: 'absolute',
-    top: '-6px',
-    left: '50%',
-    width: '8px',
-    height: '8px',
-    background: '#b685e4',
-    boxShadow: '0 0 8px #743fa5',
-    transform: 'translateX(-50%) rotate(45deg)',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
-  {/* Нижняя линия */}
-  <div style={{
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    height: '2px',
-    background: isDarkTheme
-      ? 'linear-gradient(90deg, transparent 0%, rgba(101, 73, 128, 0.7) 15%, rgba(100, 48, 139, 0.97) 50%, rgba(77, 45, 107, 0.7) 85%, transparent 100%)'
-      : 'none',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
+<div style={{marginBottom:'28px',position:'relative'}}>
+  {isDarkTheme ? (
+    <>
+      <style dangerouslySetInnerHTML={{__html:`
+        @keyframes descLineFlow {
+          0%{background-position:-200% center;}
+          100%{background-position:200% center;}
+        }
+      `}}/>
+      {/* Тонкая верхняя линия с точкой */}
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))'}}/>
+        <span style={{color:'rgba(179,231,239,0.25)',fontSize:'0.5rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))'}}/>
+      </div>
 
-  {/* Светлая тема — Тёмный молитвенник */}
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: 0,
-      border: '1px solid rgba(60,50,40,0.25)',
-      borderRadius: '4px',
-      pointerEvents: 'none'
-    }} />
+      <h2 style={{
+        fontFamily:'Cinzel, Georgia, serif',
+fontSize:'1rem',
+letterSpacing:'5px',
+        textTransform:'uppercase',
+        color:'rgba(180,100,255,0.4)',
+        marginBottom:'16px',
+        textAlign:'center'
+      }}>Описание</h2>
+
+      <p style={{
+        fontSize:'0.9rem',
+        color:'rgba(210,200,230,0.8)',
+        fontFamily:'Georgia, serif',
+        fontStyle:'italic',
+        lineHeight:'1.9',
+        whiteSpace:'pre-wrap',
+        wordBreak:'break-word',
+        textAlign:'justify'
+      }}>{work.description}</p>
+
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'20px'}}>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15))'}}/>
+        <span style={{color:'rgba(147,112,219,0.15)',fontSize:'0.45rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.15))'}}/>
+      </div>
+    </>
+  ) : (
+    <>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.35))'}}/>
+        <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.35))'}}/>
+      </div>
+
+      <h2 style={{
+        fontFamily:'Cinzel, Georgia, serif',
+fontSize:'0.95rem',
+letterSpacing:'5px',
+        textTransform:'uppercase',
+        color:'rgba(201,168,76,0.4)',
+        marginBottom:'16px',
+        textAlign:'center'
+      }}>Описание</h2>
+
+      <p style={{
+        fontSize:'0.9rem',
+        color:'rgba(201,168,76,0.65)',
+        fontFamily:'Georgia, serif',
+        fontStyle:'italic',
+        lineHeight:'1.9',
+        whiteSpace:'pre-wrap',
+        wordBreak:'break-word',
+        textAlign:'justify'
+      }}>{work.description}</p>
+
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'20px'}}>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'5px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+        <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.15))'}}/>
+      </div>
+    </>
   )}
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: '6px',
-      border: '1px solid rgba(165, 155, 135, 0.23)',
-      borderRadius: '2px',
-      pointerEvents: 'none'
-    }} />
-  )}
-
-  <div style={{ padding: '36px 34px 32px' }}>
-    <h2 className="font-bold mb-2 sm:mb-3" style={{
-      fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      color: 'transparent',
-      backgroundImage: isDarkTheme
-        ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-        : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-      backgroundSize: '200% auto',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none',
-      textAlign: !isDarkTheme ? 'center' : 'left'
-    }}>{t.description}</h2>
-
-    {/* Орнамент для светлой темы */}
-    {!isDarkTheme && (
-      <div style={{
-        textAlign: 'center',
-        color: 'rgba(223, 223, 223, 0.67)',
-        fontSize: '16px',
-        letterSpacing: '6px',
-        marginBottom: '16px'
-      }}>⊶۩━━━✟━━━۩⊷</div>
-    )}
-
-    <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{
-      fontSize: '14px',
-      color: isDarkTheme ? undefined : '#c8c0c2',
-      textAlign: !isDarkTheme ? 'justify' : 'left'
-    }}>{work.description}</p>
-  </div>
 </div>
 
 {/* ПРИМЕЧАНИЕ АВТОРА */}
 {work.author_note && work.author_note.trim() && (
-<div className="rounded-lg mb-4 sm:mb-6" style={{ position: 'relative' }}>
-  {/* Верхняя линия */}
-  <div style={{
-    position: 'absolute',
-   top: 0, left: 0, right: 0,
-    height: '2px',
-    background: isDarkTheme
-      ? 'linear-gradient(90deg, transparent 0%, rgba(101, 73, 128, 0.7) 15%, rgba(100, 48, 139, 0.97) 50%, rgba(77, 45, 107, 0.7) 85%, transparent 100%)'
-      : 'none',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
-  {/* Диамант */}
-  <div style={{
-    position: 'absolute',
-   top: '-6px',
-    left: '50%',
-    width: '8px',
-    height: '8px',
-    background: '#b685e4',
-    boxShadow: '0 0 8px #743fa5',
-    transform: 'translateX(-50%) rotate(45deg)',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
-  {/* Нижняя линия */}
-  <div style={{
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    height: '2px',
-    background: isDarkTheme
-      ? 'linear-gradient(90deg, transparent 0%, rgba(101, 73, 128, 0.7) 15%, rgba(100, 48, 139, 0.97) 50%, rgba(77, 45, 107, 0.7) 85%, transparent 100%)'
-      : 'none',
-    display: isDarkTheme ? 'block' : 'none'
-  }} />
+  <div style={{marginBottom:'28px',position:'relative'}}>
+    {isDarkTheme ? (
+      <>
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.3))'}}/>
+          <span style={{color:'rgba(179,231,239,0.25)',fontSize:'0.5rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.3))'}}/>
+        </div>
 
-  {/* Светлая тема — Тёмный молитвенник */}
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: 0,
-      border: '1px solid rgba(60,50,40,0.25)',
-      borderRadius: '4px',
-      pointerEvents: 'none'
-    }} />
-  )}
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: '6px',
-      border: '1px solid rgba(165, 155, 135, 0.23)',
-      borderRadius: '2px',
-      pointerEvents: 'none'
-    }} />
-  )}
-  {!isDarkTheme && (
-    <div style={{
-      position: 'absolute',
-      inset: '6px',
-      border: '1px solid rgba(165, 155, 135, 0.23)',
-      borderRadius: '2px',
-      pointerEvents: 'none'
-    }} />
-  )}
+        <h2 style={{
+          fontFamily:'Cinzel, Georgia, serif',
+          fontSize:'0.65rem',
+          letterSpacing:'6px',
+          textTransform:'uppercase',
+          color:'rgba(180,100,255,0.4)',
+          marginBottom:'16px',
+          textAlign:'center'
+        }}>Примечание автора</h2>
 
-  <div style={{ padding: '36px 34px 32px' }}>
-    <h2 className="font-bold mb-2" style={{
-      fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      color: 'transparent',
-      backgroundImage: isDarkTheme
-        ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-        : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-      backgroundSize: '200% auto',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none',
-      textAlign: !isDarkTheme ? 'center' : 'left'
-    }}>{t.authorNote}</h2>
+        <p style={{
+          fontSize:'0.9rem',
+          color:'rgba(210,200,230,0.8)',
+          fontFamily:'Georgia, serif',
+          fontStyle:'italic',
+          lineHeight:'1.9',
+          whiteSpace:'pre-wrap',
+          wordBreak:'break-word',
+          textAlign:'justify'
+        }}>{work.author_note}</p>
 
-    {/* Орнамент для светлой темы */}
-    {!isDarkTheme && (
-      <div style={{
-        textAlign: 'center',
-        color: 'rgba(223, 223, 223, 0.67)',
-        fontSize: '16px',
-        letterSpacing: '6px',
-        marginBottom: '16px'
-      }}>⊶۩━━━✟━━━۩⊷</div>
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'20px'}}>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15))'}}/>
+          <span style={{color:'rgba(147,112,219,0.15)',fontSize:'0.45rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.15))'}}/>
+        </div>
+      </>
+    ) : (
+      <>
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.35))'}}/>
+          <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'5px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.35))'}}/>
+        </div>
+
+        <h2 style={{
+          fontFamily:'Cinzel, Georgia, serif',
+          fontSize:'0.6rem',
+          letterSpacing:'6px',
+          textTransform:'uppercase',
+          color:'rgba(201,168,76,0.4)',
+          marginBottom:'16px',
+          textAlign:'center'
+        }}>Примечание автора</h2>
+
+        <p style={{
+          fontSize:'0.9rem',
+          color:'rgba(201,168,76,0.65)',
+          fontFamily:'Georgia, serif',
+          fontStyle:'italic',
+          lineHeight:'1.9',
+          whiteSpace:'pre-wrap',
+          wordBreak:'break-word',
+          textAlign:'justify'
+        }}>{work.author_note}</p>
+
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'20px'}}>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15))'}}/>
+          <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.55rem',letterSpacing:'5px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+          <div style={{flex:1,height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.15))'}}/>
+        </div>
+      </>
     )}
-
-    <p className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words" style={{
-      fontSize: '14px',
-      color: isDarkTheme ? undefined : '#c8c0c2',
-      textAlign: !isDarkTheme ? 'justify' : 'left'
-    }}>{work.author_note}</p>
   </div>
-</div>
 )}
 
 {work.character_profile_links && work.character_profile_links.length > 0 && (
-  <div className="mb-4 sm:mb-6">
-    <h3 className="font-bold mb-3 sm:mb-4" style={{
-      fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
-      fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-      color: 'transparent',
-      backgroundImage: isDarkTheme 
-        ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-        : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-      backgroundSize: '200% auto',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
-    }}>
-      Анкеты персонажей
-    </h3>
-    
-    <div className="relative">
-      <div 
-        ref={carouselRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800 px-10"
-        style={{ scrollbarWidth: 'thin' }}
-      >
-        {work.character_profile_links.map((link, index) => (
-          <div key={index} className="flex flex-col items-center gap-2 snap-start flex-shrink-0">
-            <Link href={link} target="_blank" rel="noopener noreferrer">
-              <div 
-                className="flex items-center justify-center w-16 h-16 rounded-full text-2xl cursor-pointer transition-all duration-300"
-                style={{
-                  background: isDarkTheme 
-                    ? 'radial-gradient(circle at center, #1a0033 0%, #000000 100%)'
-                    : 'rgba(255, 255, 255, 0.1)',
-                  border: isDarkTheme ? '2px solid #9333ea' : 'none',
-                  color: '#FFFFFF',
-                  boxShadow: isDarkTheme 
-                    ? '0 0 30px rgba(147, 51, 234, 0.9), inset 0 0 20px rgba(147, 51, 234, 0.4)' 
-                    : '0 4px 15px rgba(0,0,0,0.2)',
-                  backdropFilter: 'blur(10px)',
-                  clipPath: !isDarkTheme ? 'polygon(5% 0%, 15% 2%, 30% 0%, 45% 3%, 60% 0%, 75% 2%, 90% 0%, 100% 5%, 98% 20%, 100% 35%, 97% 50%, 100% 65%, 98% 80%, 100% 95%, 95% 100%, 85% 98%, 70% 100%, 55% 97%, 40% 100%, 25% 98%, 10% 100%, 0% 95%, 2% 80%, 0% 65%, 3% 50%, 0% 35%, 2% 20%, 0% 5%)' : 'none'
-                }}
-                onMouseEnter={(e) => {
-                  if (isDarkTheme) {
-                    e.currentTarget.style.boxShadow = '0 0 40px rgba(147, 51, 234, 1), inset 0 0 30px rgba(147, 51, 234, 0.6)';
-                    e.currentTarget.style.transform = 'scale(1.1)';
-                  } else {
-                    e.currentTarget.style.boxShadow = '0 6px 25px rgba(0,0,0,0.3)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isDarkTheme) {
-                    e.currentTarget.style.boxShadow = '0 0 30px rgba(147, 51, 234, 0.9), inset 0 0 20px rgba(147, 51, 234, 0.4)';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  } else {
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-                  }
-                }}
-              >
-                {isDarkTheme ? (
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                ) : '⚜'}
-              </div>
-            </Link>
+  <div style={{marginBottom:'28px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'16px'}}>
+      <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+      <span style={{color:isDarkTheme?'rgba(179,231,239,0.3)':'rgba(201,168,76,0.4)',fontSize:'0.65rem',letterSpacing:'6px',fontFamily:'serif'}}>
+        {isDarkTheme?'✦ · · · ✦':'⚜ · · ⚜'}
+      </span>
+      <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+    </div>
+    <h2 style={{
+      fontFamily:'Cinzel, Georgia, serif',
+      fontSize:'clamp(0.7rem,1.5vw,0.85rem)',
+      letterSpacing:'6px',
+      textTransform:'uppercase',
+      color:isDarkTheme?'rgba(180,100,255,0.5)':'rgba(201,168,76,0.5)',
+      textAlign:'center',
+      marginBottom:'20px'
+    }}>Анкеты персонажей</h2>
+
+    <div style={{display:'flex',gap:'10px',flexWrap:'wrap',justifyContent:'center'}}>
+      {work.character_profile_links.map((link, index) => (
+        <a key={index} href={link} target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
+          <div
+            style={{
+              display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',
+              padding:'14px 18px',
+              background:isDarkTheme?'rgba(147,112,219,0.06)':'rgba(201,168,76,0.06)',
+              border:isDarkTheme?'1px solid rgba(147,112,219,0.2)':'1px solid rgba(201,168,76,0.2)',
+              borderRadius:isDarkTheme?'4px':'2px',
+              transition:'all 0.25s',
+              minWidth:'80px',
+              cursor:'pointer'
+            }}
+            onMouseEnter={e=>{
+              e.currentTarget.style.background=isDarkTheme?'rgba(147,112,219,0.14)':'rgba(201,168,76,0.1)';
+              e.currentTarget.style.borderColor=isDarkTheme?'rgba(180,100,255,0.5)':'rgba(201,168,76,0.5)';
+            }}
+            onMouseLeave={e=>{
+              e.currentTarget.style.background=isDarkTheme?'rgba(147,112,219,0.06)':'rgba(201,168,76,0.06)';
+              e.currentTarget.style.borderColor=isDarkTheme?'rgba(147,112,219,0.2)':'rgba(201,168,76,0.2)';
+            }}
+          >
+            <span style={{fontFamily:'serif',fontSize:'1.1rem',color:isDarkTheme?'rgba(180,100,255,0.5)':'rgba(201,168,76,0.5)'}}>
+              {isDarkTheme?'✦':'⚜'}
+            </span>
             {work.character_profile_labels && work.character_profile_labels[index] && (
-              <span className="text-xs text-center max-w-[80px] break-words" style={{
-                color: isDarkTheme ? '#c084fc' : '#c9c6bb',
-                fontStyle: 'italic'
-              }}>
-                {work.character_profile_labels[index]}
-              </span>
+              <span style={{
+                fontFamily:'Cinzel, Georgia, serif',
+                fontSize:'0.55rem',
+                letterSpacing:'2px',
+                textTransform:'uppercase',
+                color:isDarkTheme?'rgba(200,185,230,0.6)':'rgba(201,168,76,0.6)',
+                textAlign:'center',
+                maxWidth:'80px',
+                lineHeight:'1.4'
+              }}>{work.character_profile_labels[index]}</span>
             )}
           </div>
-        ))}
-      </div>
+        </a>
+      ))}
+    </div>
 
-      {/* СТРЕЛКИ НАВИГАЦИИ */}
-      {work.character_profile_links.length > 3 && (
-        <>
-          <button
-            onClick={() => scrollCharacterCarousel('left')}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-            style={{
-              backgroundColor: isDarkTheme ? '#9333ea' : '#65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                : '0 0 15px rgba(101, 99, 93, 0.6)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = isDarkTheme ? '#a855f7' : '#c9c6bb';
-              e.currentTarget.style.boxShadow = isDarkTheme 
-                ? '0 0 30px rgba(147, 51, 234, 1)'
-                : '0 0 20px rgba(101, 99, 93, 0.8)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isDarkTheme ? '#9333ea' : '#65635d';
-              e.currentTarget.style.boxShadow = isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                : '0 0 15px rgba(101, 99, 93, 0.6)';
-            }}
-          >
-            <ChevronLeft size={20} color="#ffffff" />
-          </button>
-          <button
-            onClick={() => scrollCharacterCarousel('right')}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10"
-            style={{
-              backgroundColor: isDarkTheme ? '#9333ea' : '#65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                : '0 0 15px rgba(101, 99, 93, 0.6)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = isDarkTheme ? '#a855f7' : '#c9c6bb';
-              e.currentTarget.style.boxShadow = isDarkTheme 
-                ? '0 0 30px rgba(147, 51, 234, 1)'
-                : '0 0 20px rgba(101, 99, 93, 0.8)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isDarkTheme ? '#9333ea' : '#65635d';
-              e.currentTarget.style.boxShadow = isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                : '0 0 15px rgba(101, 99, 93, 0.6)';
-            }}
-          >
-            <ChevronRight size={20} color="#ffffff" />
-          </button>
-        </>
-      )}
+    <div style={{display:'flex',alignItems:'center',gap:'14px',marginTop:'20px'}}>
+      <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(90deg,transparent,rgba(147,112,219,0.2))':'linear-gradient(90deg,transparent,rgba(201,168,76,0.2))'}}/>
+      <span style={{color:isDarkTheme?'rgba(147,112,219,0.2)':'rgba(201,168,76,0.2)',fontSize:'0.5rem',letterSpacing:'6px',fontFamily:'serif'}}>
+        {isDarkTheme?'· · · · · · ·':'· · ⚜ · ·'}
+      </span>
+      <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(270deg,transparent,rgba(147,112,219,0.2))':'linear-gradient(270deg,transparent,rgba(201,168,76,0.2))'}}/>
     </div>
   </div>
 )}
@@ -2147,21 +2061,24 @@ return (
             {/* ИЗОБРАЖЕНИЯ ПЕРСОНАЖЕЙ */}
             {characterImagesArray.length > 0 && (
               <div className="mb-4 sm:mb-6">
-<h3 className="font-bold mb-3 sm:mb-4" style={{
-  fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-  color: 'transparent',
-  backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-  backgroundSize: '200% auto',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
-}}>
-  {t.characterImages}
-</h3>
+<div style={{marginBottom:'16px'}}>
+  <div style={{display:'flex',alignItems:'center',gap:'14px',marginBottom:'12px'}}>
+    <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+    <span style={{color:isDarkTheme?'rgba(179,231,239,0.3)':'rgba(201,168,76,0.4)',fontSize:'0.65rem',letterSpacing:'6px',fontFamily:'serif'}}>
+      {isDarkTheme?'✦ · · · ✦':'⚜ · · ⚜'}
+    </span>
+    <div style={{flex:1,height:'1px',background:isDarkTheme?'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))':'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+  </div>
+  <h2 style={{
+    fontFamily:'Cinzel, Georgia, serif',
+    fontSize:'clamp(0.7rem,1.5vw,0.85rem)',
+    letterSpacing:'6px',
+    textTransform:'uppercase',
+    color:isDarkTheme?'rgba(180,100,255,0.5)':'rgba(201,168,76,0.5)',
+    textAlign:'center',
+    margin:0
+  }}>Галерея</h2>
+</div>
                 
                 <div className="relative">
                   <div 
@@ -2174,8 +2091,7 @@ return (
     key={index} 
     className="flex-shrink-0 w-36 h-48 sm:w-48 sm:h-64 rounded-lg overflow-hidden border-2 transition shadow-lg snap-start relative cursor-pointer"
     style={{
-      borderColor: isDarkTheme ? '#7626b5' : '#414141',
-      boxShadow: isDarkTheme ? '0 0 10px rgba(118, 38, 181, 0.5)' : '0 0 10px rgba(17, 17, 16, 0.5)'
+    borderColor: isDarkTheme ? 'rgba(180,100,255,0.5)' : 'rgba(201,168,76,0.45)',
     }}
     onClick={() => setSelectedImage(img)}
                       >
@@ -2230,52 +2146,48 @@ return (
   <>
     <button
       onClick={() => scrollCharacterCarousel('left')}
-      className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10 hidden sm:flex"
+      className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 hidden sm:flex items-center justify-center"
       style={{
-        backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
-        boxShadow: isDarkTheme 
-          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-          : 'none'
+        background: isDarkTheme ? 'rgba(20,0,40,0.7)' : 'rgba(0,0,0,0.6)',
+        border: isDarkTheme ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(201,168,76,0.4)',
+        borderRadius: '50%', width:'36px', height:'36px',
+        cursor:'pointer', boxShadow: isDarkTheme ? '0 0 12px rgba(147,50,255,0.4)' : '0 0 12px rgba(201,168,76,0.3)',
+        color: isDarkTheme ? 'rgba(180,100,255,0.8)' : 'rgba(201,168,76,0.8)',
+        transition:'all 0.2s'
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
-        e.currentTarget.style.boxShadow = isDarkTheme 
-          ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-          : 'none';
+      onMouseEnter={e=>{
+        e.currentTarget.style.color = isDarkTheme ? '#d8b4fe' : '#f0d080';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 20px rgba(147,50,255,0.7)' : '0 0 20px rgba(201,168,76,0.6)';
       }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
-        e.currentTarget.style.boxShadow = isDarkTheme 
-          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-          : 'none';
+      onMouseLeave={e=>{
+        e.currentTarget.style.color = isDarkTheme ? 'rgba(180,100,255,0.8)' : 'rgba(201,168,76,0.8)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 12px rgba(147,50,255,0.4)' : '0 0 12px rgba(201,168,76,0.3)';
       }}
     >
-      <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+      <ChevronLeft size={20}/>
     </button>
 
     <button
       onClick={() => scrollCharacterCarousel('right')}
-      className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition z-10 hidden sm:flex"
+      className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 hidden sm:flex items-center justify-center"
       style={{
-        backgroundColor: isDarkTheme ? '#7626b5' : '#65635d',
-        boxShadow: isDarkTheme 
-          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-          : 'none'
+        background: isDarkTheme ? 'rgba(20,0,40,0.7)' : 'rgba(0,0,0,0.6)',
+        border: isDarkTheme ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(201,168,76,0.4)',
+        borderRadius: '50%', width:'36px', height:'36px',
+        cursor:'pointer', boxShadow: isDarkTheme ? '0 0 12px rgba(147,50,255,0.4)' : '0 0 12px rgba(201,168,76,0.3)',
+        color: isDarkTheme ? 'rgba(180,100,255,0.8)' : 'rgba(201,168,76,0.8)',
+        transition:'all 0.2s'
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = isDarkTheme ? '#8b34d9' : '#65635d';
-        e.currentTarget.style.boxShadow = isDarkTheme 
-          ? '0 0 20px rgba(118, 38, 181, 1), 0 0 40px rgba(118, 38, 181, 0.6)'
-          : 'none';
+      onMouseEnter={e=>{
+        e.currentTarget.style.color = isDarkTheme ? '#d8b4fe' : '#f0d080';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 20px rgba(147,50,255,0.7)' : '0 0 20px rgba(201,168,76,0.6)';
       }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = isDarkTheme ? '#7626b5' : '#65635d';
-        e.currentTarget.style.boxShadow = isDarkTheme 
-          ? '0 0 15px rgba(118, 38, 181, 0.8), 0 0 30px rgba(118, 38, 181, 0.4)'
-          : 'none';
+      onMouseLeave={e=>{
+        e.currentTarget.style.color = isDarkTheme ? 'rgba(180,100,255,0.8)' : 'rgba(201,168,76,0.8)';
+        e.currentTarget.style.boxShadow = isDarkTheme ? '0 0 12px rgba(147,50,255,0.4)' : '0 0 12px rgba(201,168,76,0.3)';
       }}
     >
-      <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+      <ChevronRight size={20}/>
     </button>
   </>
 )}
@@ -2286,1416 +2198,1206 @@ return (
         </div>
 
 {/* СОДЕРЖАНИЕ */}
-<div className="mb-4 sm:mb-6">
-<h2 className="font-bold mb-3 sm:mb-4 text-center" style={{
-  fontSize: isDarkTheme ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.25rem, 3vw, 1.5rem)',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-  color: 'transparent',
-  backgroundImage: isDarkTheme 
-    ? 'linear-gradient(90deg, #cf7dff 0%, #411975 50%, #953ff7 100%)'
-    : 'radial-gradient(ellipse at top left, #c8c0c2 0%, #797874 100%)',
-  backgroundSize: '200% auto',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  animation: isDarkTheme ? 'workPageShimmer 9s linear infinite' : 'none'
-}}>
-    {t.contents}
-  </h2>
-</div>
+<div style={{marginBottom:'32px'}}>
 
-{/* ГЛАВЫ */}
-<style dangerouslySetInnerHTML={{__html: `
-  @keyframes shimmer-chapter {
-    0% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
-    50% { box-shadow: 0 0 25px rgba(172, 64, 255, 0.8); }
-    100% { box-shadow: 0 0 15px rgba(118, 38, 181, 0.5); }
-  }
-`}} />
-<div style={{
-  background: 'transparent'
-}}>
-  {chapters.length === 0 ? (
-    <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">{t.noChapters}</p>
-  ) : (
-    <div className="space-y-2 sm:space-y-3">
-      {chapters.map((chapter) => (
- <Link
-  key={chapter.id}
-  href={`/work/${workId}/chapter/${chapter.id}`}
-  className="block rounded-lg p-3 sm:p-5 border-2 transition-all duration-300 group"
-  style={{
-    background: isDarkTheme ? 'transparent' : 'rgba(0, 0, 0, 0.3)',
-    borderColor: isDarkTheme ? '#9333ea' : '#47051e',
-    boxShadow: !isDarkTheme ? 'inset 0 0 30px rgba(0, 0, 0, 0.4)' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    if (isDarkTheme) {
-      e.currentTarget.style.backgroundColor = '#2700276e';
-      e.currentTarget.style.borderColor = '#9333ea';
-      e.currentTarget.style.animation = 'shimmer-chapter 2s ease-in-out infinite';
-    } else {
-      e.currentTarget.style.background = '#47051e38';
-      e.currentTarget.style.borderColor = '#47051e';
-      e.currentTarget.style.boxShadow = 'inset 0 0 30px rgb(0, 0, 0)';
-    }
-  }}
-  onMouseLeave={(e) => {
-    if (isDarkTheme) {
-      e.currentTarget.style.backgroundColor = 'transparent';
-      e.currentTarget.style.borderColor = '#9333ea';
-      e.currentTarget.style.animation = 'none';
-      e.currentTarget.style.boxShadow = 'none';
-    } else {
-      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)';
-      e.currentTarget.style.borderColor = 'rgba(83, 3, 36, 0.65)';
-      e.currentTarget.style.boxShadow = 'inset 0 0 30px rgba(0, 0, 0, 0.4)';
-    }
-  }}
->
-  <div className="flex justify-between items-start gap-2 sm:gap-4">
-    <div className="flex-1 min-w-0">
-<h3 className="font-semibold transition mb-1 sm:mb-2 break-words" style={{
-  color: '#bdb8b8',
-  fontFamily: isDarkTheme ? "'ppelganger', Georgia, serif" : "'miamanueva', Georgia, serif",
-  fontSize: isDarkTheme ? 'clamp(1.125rem, 2.5vw, 1.5rem)' : 'clamp(1rem, 2vw, 1.25rem)'
-}}>
-        {chapter.chapter_number}. {chapter.title}
-      </h3>
-              <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm" style={{ color: '#9ca3af' }}>
-                <span className="flex items-center gap-1">
-                  <Clock size={12} className="sm:w-4 sm:h-4" />
-                  {new Date(chapter.created_at).toLocaleDateString('ru-RU', { 
-                    day: '2-digit', 
-                    month: '2-digit',
-                    year: typeof window !== 'undefined' && window.innerWidth < 640 ? '2-digit' : 'numeric'
-                  })}
-                </span>
-              </div>
-            </div>
-            <div className="flex-shrink-0 transition" style={{
-              color: isDarkTheme ? '#9333ea' : '#49001c'
-            }}>
-              <ChevronLeft size={20} className="sm:w-6 sm:h-6 rotate-180" />
-            </div>
-          </div>
-        </Link>
-      ))}
+  {/* ЗАГОЛОВОК */}
+  <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:'32px'}}>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'14px',width:'100%'}}>
+      <div style={{flex:1,height:'1px',background: isDarkTheme ? 'linear-gradient(90deg,transparent,rgba(147,112,219,0.5))' : 'linear-gradient(90deg,transparent,rgba(201,168,76,0.5))'}}/>
+      <span style={{color: isDarkTheme ? 'rgba(179,231,239,0.3)' : 'rgba(201,168,76,0.4)', fontSize:'0.7rem', letterSpacing:'8px', fontFamily:'serif'}}>
+        {isDarkTheme ? '✦ · · · ✦' : '⚜ · · ⚜'}
+      </span>
+      <div style={{flex:1,height:'1px',background: isDarkTheme ? 'linear-gradient(270deg,transparent,rgba(147,112,219,0.5))' : 'linear-gradient(270deg,transparent,rgba(201,168,76,0.5))'}}/>
     </div>
+    <h2 style={{
+      fontFamily:'Cinzel, Georgia, serif',
+      fontSize:'clamp(1rem,2.5vw,1.4rem)',
+      letterSpacing:'8px',
+      textTransform:'uppercase',
+      color: isDarkTheme ? 'rgba(180,100,255,0.6)' : 'rgba(201,168,76,0.6)',
+      margin:0,
+      textAlign:'center'
+    }}>Содержание</h2>
+    <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'14px',width:'100%'}}>
+      <div style={{flex:1,height:'1px',background: isDarkTheme ? 'linear-gradient(90deg,transparent,rgba(147,112,219,0.25))' : 'linear-gradient(90deg,transparent,rgba(201,168,76,0.25))'}}/>
+      <span style={{color: isDarkTheme ? 'rgba(147,112,219,0.25)' : 'rgba(201,168,76,0.25)', fontSize:'0.5rem', letterSpacing:'6px', fontFamily:'serif'}}>
+        {isDarkTheme ? '· · · · · · ·' : '· · ⚜ · ·'}
+      </span>
+      <div style={{flex:1,height:'1px',background: isDarkTheme ? 'linear-gradient(270deg,transparent,rgba(147,112,219,0.25))' : 'linear-gradient(270deg,transparent,rgba(201,168,76,0.25))'}}/>
+    </div>
+  </div>
+
+  {/* ГЛАВЫ */}
+  {chapters.length === 0 ? (
+    <p style={{
+      textAlign:'center', padding:'32px 0',
+      color: isDarkTheme ? 'rgba(180,100,255,0.4)' : 'rgba(201,168,76,0.4)',
+      fontFamily:'Georgia, serif', fontStyle:'italic', fontSize:'1rem'
+    }}>Главы ещё не добавлены</p>
+  ) : (
+    <>
+      <style dangerouslySetInnerHTML={{__html:`
+        .chapter-link {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 0;
+          border-bottom: 1px solid ${isDarkTheme ? 'rgba(147,112,219,0.1)' : 'rgba(201,168,76,0.12)'};
+          text-decoration: none;
+          transition: all 0.25s;
+          position: relative;
+        }
+        .chapter-link:last-child { border-bottom: none; }
+        .chapter-link:hover .ch-num { color: ${isDarkTheme ? 'rgba(180,100,255,0.8)' : 'rgba(201,168,76,0.8)'}; }
+        .chapter-link:hover .ch-title { color: ${isDarkTheme ? 'rgba(235,220,255,1)' : 'rgba(201,168,76,1)'}; }
+        .chapter-link:hover .ch-arrow { opacity: 1; transform: translateX(5px); }
+        .ch-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .ch-num {
+          font-family: 'Cinzel', Georgia, serif;
+          font-size: 0.65rem;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: ${isDarkTheme ? 'rgba(180,100,255,0.5)' : 'rgba(201,168,76,0.5)'};
+          transition: color 0.25s;
+        }
+        .ch-title {
+          font-family: Georgia, serif;
+          font-style: italic;
+          font-size: clamp(0.95rem, 2vw, 1.1rem);
+          color: ${isDarkTheme ? 'rgba(220,205,245,0.88)' : 'rgba(201,168,76,0.85)'};
+          transition: color 0.25s;
+          line-height: 1.4;
+        }
+        .ch-date {
+          font-family: 'Cinzel', Georgia, serif;
+          font-size: 0.55rem;
+          letter-spacing: 2px;
+          color: ${isDarkTheme ? 'rgba(147,112,219,0.35)' : 'rgba(201,168,76,0.3)'};
+          margin-top: 2px;
+        }
+        .ch-arrow {
+          color: ${isDarkTheme ? 'rgba(180,100,255,0.4)' : 'rgba(201,168,76,0.4)'};
+          opacity: 0.5;
+          transition: all 0.25s;
+          flex-shrink: 0;
+          margin-left: 16px;
+        }
+      `}}/>
+
+      <div>
+        {chapters.map((chapter) => (
+          <Link
+            key={chapter.id}
+            href={`/work/${workId}/chapter/${chapter.id}`}
+            className="chapter-link"
+          >
+            <div className="ch-left">
+              <span className="ch-num">Глава {chapter.chapter_number}</span>
+              <span className="ch-title">{chapter.title}</span>
+              <span className="ch-date">
+                {new Date(chapter.created_at).toLocaleDateString('ru-RU', {
+                  day:'2-digit', month:'long', year:'numeric'
+                })}
+              </span>
+            </div>
+            <svg className="ch-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </Link>
+        ))}
+      </div>
+    </>
   )}
 </div>
+
       </main>
 {/* МОДАЛЬНОЕ ОКНО ОЦЕНКИ */}
 {showRatingModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="rounded-xl p-6 sm:p-8 max-w-md w-full relative" style={{
-      background: isDarkTheme 
-        ? 'rgba(147, 51, 234, 0.15)'
-        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: isDarkTheme 
-        ? '2px solid #9333ea'
-        : '3px solid transparent',
-      borderRadius: isDarkTheme ? '12px' : '16px',
-      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(147, 51, 234, 0.3)'
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-    }}>
-      {!isDarkTheme && (
-        <div style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: '16px',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #65635d 0%, #000000 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          pointerEvents: 'none',
-          zIndex: -1
-        }} />
-      )}
-
-      <button
-        onClick={() => setShowRatingModal(false)}
-        className="absolute top-4 right-4 transition"
-        style={{
-          color: isDarkTheme ? '#c084fc' : '#65635d'
-        }}
-      >
-        <X size={24} />
-      </button>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes shimmerRating {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-      `}} />
-      
-      <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center" style={{
-        color: isDarkTheme ? '#c084fc' : 'transparent',
-        textShadow: isDarkTheme ? '0 0 15px rgba(192, 132, 252, 0.8)' : 'none',
-        background: !isDarkTheme ? 'linear-gradient(90deg, #65635d 0%, #ffffff 50%, #65635d 100%)' : 'none',
-        backgroundSize: !isDarkTheme ? '200% auto' : 'auto',
-        WebkitBackgroundClip: !isDarkTheme ? 'text' : 'unset',
-        WebkitTextFillColor: !isDarkTheme ? 'transparent' : 'unset',
-        backgroundClip: !isDarkTheme ? 'text' : 'unset',
-        animation: !isDarkTheme ? 'shimmerRating 3s linear infinite' : 'none'
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    backdropFilter: 'blur(10px)'
+  }}>
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes ratingTwinkle { 0%,100% { opacity:0.15; } 50% { opacity:0.6; } }
+      @keyframes ratingGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    `}} />
+    {isDarkTheme ? (
+      /* ТЁМНАЯ — МИСТИКА */
+      <div style={{
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 80%)',
+        border: '1px solid rgba(180,100,255,0.25)',
+        boxShadow: '0 0 80px rgba(147,50,255,0.15), inset 0 0 80px rgba(0,0,0,0.5)',
+        borderRadius: '16px',
+        width: '100%', maxWidth: '480px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden'
       }}>
-        Оцените работу
-      </h3>
-      
-      {!currentUser ? (
-        <p className="text-center py-4" style={{ 
-          color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
-        }}>
-          Войдите, чтобы оставить оценку
-        </p>
-      ) : (
-        <>
-          <p className="mb-6 text-sm sm:text-base" style={{ 
-            color: isDarkTheme ? '#e9d5ff' : '#c9c6bb'
-          }}>
-            {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+        {/* Верхняя линия */}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px',
+          background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)' }}/>
+        {/* Звёзды */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+            radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.25) 0%, transparent 100%)`,
+          animation:'ratingTwinkle 4s ease-in-out infinite' }}/>
+
+        {/* Кнопка закрыть */}
+        <button onClick={() => setShowRatingModal(false)} style={{
+          position:'absolute', top:'14px', right:'14px',
+          background:'rgba(180,100,255,0.1)', border:'1px solid rgba(180,100,255,0.3)',
+          borderRadius:'50%', width:'32px', height:'32px', cursor:'pointer',
+          color:'rgba(180,100,255,0.8)', display:'flex', alignItems:'center', justifyContent:'center'
+        }}>✕</button>
+
+        {/* Заголовок */}
+        <div style={{ textAlign:'center', marginBottom:'20px', position:'relative', zIndex:1 }}>
+          <div style={{ fontSize:'1.5rem', color:'rgba(180,100,255,0.5)', marginBottom:'8px' }}>✦</div>
+          <div style={{ fontFamily:'Cinzel, serif', fontSize:'1.2rem',
+            background:'linear-gradient(90deg, #b3e7ef, #ef01cb, #9370db)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+            letterSpacing:'5px', marginBottom:'12px' }}>Оценить работу</div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'10px' }}>
+            <div style={{ height:'1px', width:'50px', background:'linear-gradient(90deg, transparent, rgba(147,112,219,0.5))' }}/>
+            <span style={{ color:'rgba(180,100,255,0.4)', fontSize:'0.6rem', letterSpacing:'5px' }}>✦ · · · ✦</span>
+            <div style={{ height:'1px', width:'50px', background:'linear-gradient(270deg, transparent, rgba(147,112,219,0.5))' }}/>
+          </div>
+        </div>
+
+        {!currentUser ? (
+          <p style={{ textAlign:'center', color:'rgba(200,185,230,0.7)', fontFamily:'Georgia, serif',
+            fontStyle:'italic', padding:'16px 0', position:'relative', zIndex:1 }}>
+            Войдите, чтобы оставить оценку
           </p>
-          
-          <div className="grid grid-cols-5 gap-2 sm:gap-3">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-              <button
-                key={num}
-                onClick={() => submitRating(num)}
-                className={`py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition ${
-                  userRating === num
-                    ? 'bg-purple-600 text-white'
-                    : 'text-purple-200 hover:text-white'
-                }`}
-                style={userRating === num ? (
-                  isDarkTheme ? {
-                    background: 'rgba(147, 51, 234, 0.8)',
-                    boxShadow: '0 0 15px rgba(147, 51, 234, 0.9)'
-                  } : {
-                    background: '#65635d',
-                    color: '#ffffff'
-                  }
-                ) : (
-                  isDarkTheme ? {
-                    background: 'rgba(147, 51, 234, 0.2)',
-                    border: '1px solid rgba(147, 51, 234, 0.4)'
-                  } : {
-                    background: 'rgba(101, 99, 93, 0.2)',
-                    border: '1px solid rgba(101, 99, 93, 0.4)',
-                    color: '#c9c6bb'
-                  }
-                )}
+        ) : (
+          <div style={{ position:'relative', zIndex:1 }}>
+            <p style={{ textAlign:'center', color:'rgba(200,185,230,0.6)', fontSize:'0.8rem',
+              fontFamily:'Georgia, serif', fontStyle:'italic', marginBottom:'20px', letterSpacing:'1px' }}>
+              {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+            </p>
+
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'8px', marginBottom:'20px' }}>
+              {[1,2,3,4,5,6,7,8,9,10].map((num) => (
+                <button key={num} onClick={() => submitRating(num)} style={{
+                  padding:'12px 4px',
+                  background: userRating === num ? 'rgba(147,112,219,0.5)' : 'rgba(147,112,219,0.08)',
+                  border: userRating === num ? '1px solid rgba(180,100,255,0.8)' : '1px solid rgba(147,112,219,0.2)',
+                  color: userRating === num ? '#e8d5ff' : 'rgba(200,185,230,0.5)',
+                  borderRadius:'4px', cursor:'pointer',
+                  fontFamily:'Cinzel, serif', fontSize:'0.85rem',
+                  boxShadow: userRating === num ? '0 0 15px rgba(147,112,219,0.4)' : 'none',
+                  transition:'all 0.2s'
+                }}
                 onMouseEnter={(e) => {
                   if (userRating !== num) {
-                    if (isDarkTheme) {
-                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.4)';
-                      e.currentTarget.style.boxShadow = '0 0 10px rgba(147, 51, 234, 0.6)';
-                    } else {
-                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.4)';
-                    }
+                    e.currentTarget.style.background = 'rgba(147,112,219,0.2)';
+                    e.currentTarget.style.color = '#d8b4fe';
+                    e.currentTarget.style.borderColor = 'rgba(180,100,255,0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (userRating !== num) {
-                    if (isDarkTheme) {
-                      e.currentTarget.style.background = 'rgba(147, 51, 234, 0.2)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    } else {
-                      e.currentTarget.style.background = 'rgba(101, 99, 93, 0.2)';
-                    }
+                    e.currentTarget.style.background = 'rgba(147,112,219,0.08)';
+                    e.currentTarget.style.color = 'rgba(200,185,230,0.5)';
+                    e.currentTarget.style.borderColor = 'rgba(147,112,219,0.2)';
                   }
-                }}
-              >
-                {num}
-              </button>
-            ))}
+                }}>
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            {totalRatings > 0 && (
+              <div style={{ textAlign:'center', borderTop:'1px solid rgba(147,112,219,0.15)', paddingTop:'14px' }}>
+                <span style={{ color:'rgba(180,100,255,0.4)', fontSize:'0.7rem',
+                  fontFamily:'Georgia, serif', fontStyle:'italic', letterSpacing:'1px' }}>
+                  Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+                </span>
+              </div>
+            )}
           </div>
-          
-          {totalRatings > 0 && (
-            <p className="text-center mt-4 text-xs sm:text-sm" style={{ 
-              color: isDarkTheme ? '#d8b4fe' : '#c9c6bb'
-            }}>
-              Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+        )}
+      </div>
+    ) : (
+      /* СВЕТЛАЯ — ЗОЛОТО */
+      <div style={{
+        background: '#080808',
+        border: '1px solid #2a2218',
+        borderRadius: '4px',
+        width: '100%', maxWidth: '480px',
+        position: 'relative', overflow: 'hidden'
+      }}>
+        {/* Левая золотая полоса */}
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+          background:'linear-gradient(180deg, transparent, #c9a84c, transparent)' }}/>
+        {/* ⚜ фоном */}
+        <div style={{ position:'absolute', top:'50%', right:'20px',
+          transform:'translateY(-50%)', fontFamily:'serif', fontSize:'12rem',
+          color:'rgba(201,168,76,0.04)', pointerEvents:'none', userSelect:'none', lineHeight:1 }}>⚜</div>
+
+        <div style={{ padding:'32px 36px', position:'relative', zIndex:1 }}>
+          {/* Кнопка закрыть */}
+          <button onClick={() => setShowRatingModal(false)} style={{
+            position:'absolute', top:'16px', right:'16px',
+            background:'transparent', border:'1px solid rgba(201,168,76,0.3)',
+            borderRadius:'50%', width:'32px', height:'32px', cursor:'pointer',
+            color:'rgba(201,168,76,0.7)', display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:'14px'
+          }}>✕</button>
+
+          {/* Заголовок */}
+          <div style={{ marginBottom:'20px' }}>
+            <div style={{ fontFamily:"'victiriya', Georgia, serif", fontSize:'2rem',
+              backgroundImage:'linear-gradient(90deg, #c9a84c 0%, #f0d080 40%, #c9a84c 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+              animation:'ratingGoldShimmer 4s linear infinite',
+              letterSpacing:'4px', fontWeight:400, marginBottom:'10px' }}>Оценить работу</div>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+              <div style={{ height:'1px', width:'80px', background:'linear-gradient(90deg, rgba(201,168,76,0.5), transparent)' }}/>
+              <span style={{ color:'rgba(201,168,76,0.5)', fontSize:'0.8rem', letterSpacing:'5px', fontFamily:'serif' }}>⚜ · · ⚜</span>
+            </div>
+          </div>
+
+          {!currentUser ? (
+            <p style={{ color:'#d0c8b8', fontFamily:'Georgia, serif', fontStyle:'italic', padding:'16px 0' }}>
+              Войдите, чтобы оставить оценку
             </p>
+          ) : (
+            <div>
+              <p style={{ color:'rgba(201,168,76,0.5)', fontSize:'0.8rem',
+                fontFamily:'Georgia, serif', fontStyle:'italic', marginBottom:'20px', letterSpacing:'1px' }}>
+                {userRating ? `Ваша оценка: ${userRating}` : 'Выберите оценку от 1 до 10'}
+              </p>
+
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'8px', marginBottom:'20px' }}>
+                {[1,2,3,4,5,6,7,8,9,10].map((num) => (
+                  <button key={num} onClick={() => submitRating(num)} style={{
+                    padding:'12px 4px',
+                    background: userRating === num ? 'rgba(201,168,76,0.2)' : 'transparent',
+                    border: userRating === num ? '1px solid rgba(201,168,76,0.8)' : '1px solid rgba(201,168,76,0.2)',
+                    color: userRating === num ? '#c9a84c' : 'rgba(201,168,76,0.4)',
+                    borderRadius:'1px', cursor:'pointer',
+                    fontFamily:'Cinzel, serif', fontSize:'0.85rem',
+                    transition:'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (userRating !== num) {
+                      e.currentTarget.style.background = 'rgba(201,168,76,0.1)';
+                      e.currentTarget.style.color = '#c9a84c';
+                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (userRating !== num) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'rgba(201,168,76,0.4)';
+                      e.currentTarget.style.borderColor = 'rgba(201,168,76,0.2)';
+                    }
+                  }}>
+                    {num}
+                  </button>
+                ))}
+              </div>
+
+              {totalRatings > 0 && (
+                <div style={{ borderTop:'1px solid rgba(201,168,76,0.15)', paddingTop:'14px', textAlign:'center' }}>
+                  <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.7rem',
+                    fontFamily:'Georgia, serif', fontStyle:'italic' }}>
+                    Средняя оценка: {averageRating.toFixed(1)} ({totalRatings} {totalRatings === 1 ? 'оценка' : 'оценок'})
+                  </span>
+                </div>
+              )}
+            </div>
           )}
-        </>
-      )}
-    </div>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
 {/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */}
 {showConfirmModal && (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0,0,0,0.92)',
     backdropFilter: 'blur(10px)'
   }}>
-    <div className="rounded-2xl w-full max-w-md p-6" style={{
-      background: isDarkTheme 
-        ? 'rgba(147, 51, 234, 0.15)' 
-        : 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: isDarkTheme 
-        ? '2px solid #9333ea' 
-        : '3px solid transparent',
-      borderRadius: '16px',
-      backgroundClip: isDarkTheme ? 'border-box' : 'padding-box',
-      position: 'relative',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDarkTheme 
-        ? '0 0 30px rgba(147, 51, 234, 0.6)' 
-        : 'inset 0 0 50px rgba(0, 0, 0, 0.6)'
-    }}>
-      {!isDarkTheme && (
-        <div style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: '16px',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          pointerEvents: 'none',
-          zIndex: -1
-        }} />
-      )}
-      <p className="text-center text-base sm:text-lg mb-6 whitespace-pre-wrap" style={{
-        color: isDarkTheme ? '#ffffff' : '#c9c6bb'
+    <style dangerouslySetInnerHTML={{__html: `
+      @keyframes confirmTwinkle { 0%,100% { opacity:0.15; } 50% { opacity:0.6; } }
+      @keyframes confirmGoldShimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    `}} />
+    {isDarkTheme ? (
+      <div style={{
+        background: 'radial-gradient(ellipse at top, #1a0a2e 0%, #08080f 80%)',
+        border: '1px solid rgba(180,100,255,0.25)',
+        boxShadow: '0 0 60px rgba(147,50,255,0.2)',
+        borderRadius: '12px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
       }}>
-        {confirmMessage}
-      </p>
-      
-<div className="flex gap-3">
-        {confirmAction ? (
-          <>
-            <button
-              onClick={() => {
-                confirmAction();
-                setShowConfirmModal(false);
-              }}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: isDarkTheme 
-                  ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                  : '#c9c6bb',
-                color: isDarkTheme ? '#ffffff' : '#000000',
-                boxShadow: isDarkTheme 
-                  ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                  : '0 0 15px rgba(216, 197, 162, 0.4)',
-                border: 'none'
-              }}
-            >
-              Да
-            </button>
-            <button
-              onClick={() => setShowConfirmModal(false)}
-              className="flex-1 py-3 rounded-lg font-bold transition"
-              style={{
-                background: isDarkTheme ? 'transparent' : 'rgba(216, 197, 162, 0.15)',
-                borderColor: isDarkTheme ? '#9370db' : '#65635d',
-                border: isDarkTheme ? '2px solid #9370db' : '2px solid #c9c6bb',
-                color: isDarkTheme ? '#9370db' : '#c9c6bb'
-              }}
-            >
-              Отмена
-            </button>
-          </>
-) : (
-          <button
-            onClick={() => setShowConfirmModal(false)}
-            className="w-full py-3 rounded-lg font-bold transition"
-            style={{
-              background: isDarkTheme 
-                ? 'linear-gradient(135deg, #9370db 0%, #67327b 100%)' 
-                : '#c9c6bb',
-              color: isDarkTheme ? '#ffffff' : '#000000',
-              boxShadow: isDarkTheme 
-                ? '0 0 15px rgba(147, 112, 219, 0.6)' 
-                : '0 0 15px rgba(216, 197, 162, 0.4)',
-              border: 'none'
-            }}
-          >
-            ОК
-          </button>
-        )}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px',
+          background:'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)' }}/>
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+            radial-gradient(1px 1px at 75% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 75%, rgba(255,255,255,0.15) 0%, transparent 100%)`,
+          animation:'confirmTwinkle 4s ease-in-out infinite' }}/>
+
+        <div style={{ fontSize:'1.5rem', marginBottom:'8px', color:'rgba(180,100,255,0.5)' }}>✦</div>
+        <p style={{ color:'#e8d5ff', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+          <span style={{ color:'rgba(180,100,255,0.3)', fontSize:'0.6rem', letterSpacing:'4px' }}>· · ·</span>
+          <div style={{ height:'1px', width:'30px', background:'rgba(147,112,219,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'rgba(147,112,219,0.2)',
+                border:'1px solid rgba(147,112,219,0.6)',
+                color:'#d8b4fe',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px',
+                boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+              }}>✦ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(147,112,219,0.25)',
+                color:'rgba(180,100,255,0.5)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'4px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'rgba(147,112,219,0.15)',
+              border:'1px solid rgba(147,112,219,0.5)',
+              color:'#d8b4fe',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'4px',
+              boxShadow:'0 0 15px rgba(147,112,219,0.2)'
+            }}>✦ ОК ✦</button>
+          )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <div style={{
+        background: '#080808',
+        border: '1px solid #2a2218',
+        borderRadius: '2px',
+        width: '100%', maxWidth: '420px',
+        padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+        textAlign: 'center'
+      }}>
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'3px',
+          background:'linear-gradient(180deg, transparent, #c9a84c, transparent)' }}/>
+        <div style={{ position:'absolute', top:'50%', right:'20px', transform:'translateY(-50%)',
+          fontFamily:'serif', fontSize:'8rem', color:'rgba(201,168,76,0.04)',
+          pointerEvents:'none', userSelect:'none', lineHeight:1 }}>⚜</div>
+
+        <div style={{ fontSize:'1.2rem', marginBottom:'8px', color:'rgba(201,168,76,0.5)', fontFamily:'serif' }}>⚜</div>
+        <p style={{ color:'#d0c8b8', fontSize:'1rem', lineHeight:'1.7', marginBottom:'8px',
+          fontFamily:'Georgia, serif', fontStyle:'italic', position:'relative', zIndex:1 }}>
+          {confirmMessage}
+        </p>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginBottom:'24px' }}>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+          <span style={{ color:'rgba(201,168,76,0.4)', fontSize:'0.7rem', letterSpacing:'4px', fontFamily:'serif' }}>· ⚜ ·</span>
+          <div style={{ height:'1px', width:'40px', background:'rgba(201,168,76,0.3)' }}/>
+        </div>
+
+        <div className="flex gap-3" style={{ position:'relative', zIndex:1 }}>
+          {confirmAction ? (
+            <>
+              <button onClick={() => { confirmAction(); setShowConfirmModal(false); }} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.6)',
+                color:'#c9a84c',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>⚜ Да</button>
+              <button onClick={() => setShowConfirmModal(false)} style={{
+                flex:1, padding:'10px',
+                background:'transparent',
+                border:'1px solid rgba(201,168,76,0.2)',
+                color:'rgba(201,168,76,0.4)',
+                fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'3px', textTransform:'uppercase',
+                cursor:'pointer', borderRadius:'1px'
+              }}>Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setShowConfirmModal(false)} style={{
+              width:'100%', padding:'10px',
+              background:'transparent',
+              border:'1px solid rgba(201,168,76,0.5)',
+              color:'#c9a84c',
+              fontFamily:'Cinzel, serif', fontSize:'0.65rem', letterSpacing:'4px', textTransform:'uppercase',
+              cursor:'pointer', borderRadius:'1px'
+            }}>⚜ ОК ⚜</button>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
 
       {/* ЧИТАТЕЛЬСКАЯ ПАНЕЛЬ */}
 {showReaderPanel && userProfile && (
   <>
-    {/* ТЕМНАЯ ПАНЕЛЬ */}
-{isDarkTheme && (
- <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl border-2" style={{
-    background: 'rgba(147, 51, 234, 0.15)',
-    borderColor: '#9333ea',
-    backdropFilter: 'blur(20px)',
-    boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-  }}>
-<div className="sticky top-0 p-4 sm:p-5 flex justify-center items-center relative overflow-hidden" style={{
-  background: 'rgba(139, 60, 200, 0.3)',
-  backdropFilter: 'blur(10px)',
-  borderBottom: '2px solid rgba(147, 112, 219, 0.6)'
-}}>
-      <h2 className="text-2xl sm:text-4xl font-bold" style={{
-  color: '#fff',
-  textShadow: '0 0 30px rgba(179, 231, 239, 1)',
-  position: 'relative',
-  zIndex: 1,
-  fontFamily: "'ppelganger', Georgia, serif"
-}}>{userProfile.nickname}</h2>
-          <button onClick={() => setShowReaderPanel(false)} className="text-gray-400 hover:text-white absolute right-3 sm:right-4">
-            <X size={20} className="sm:w-6 sm:h-6" />
-          </button>
+    {isDarkTheme && (
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl" style={{
+        background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+        borderLeft:'1px solid rgba(180,100,255,0.25)',
+        boxShadow:'-5px 0 60px rgba(147,50,255,0.15)'
+      }}>
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpTwinkle{0%,100%{opacity:0.12;}50%{opacity:0.55;}}
+          @keyframes rpShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          .rp-dark-scroll::-webkit-scrollbar{width:4px;}
+          .rp-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+          .rp-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+          .rp-dark-scroll{scrollbar-width:thin;scrollbar-color:#9370db transparent;}
+          .rp-btn-dark{transition:all 0.2s;}
+          .rp-btn-dark:hover{border-color:rgba(179,231,239,0.8)!important;box-shadow:0 0 20px rgba(179,231,239,0.4)!important;transform:translateY(-2px);}
+        `}}/>
+
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',
+          background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+
+        <div style={{position:'fixed',top:0,right:0,width:'inherit',height:'100%',pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,0.35) 0%,transparent 100%),
+            radial-gradient(1px 1px at 80% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 55% 70%,rgba(255,255,255,0.2) 0%,transparent 100%),
+            radial-gradient(1px 1px at 90% 55%,rgba(255,255,255,0.15) 0%,transparent 100%),
+            radial-gradient(1px 1px at 20% 90%,rgba(255,255,255,0.2) 0%,transparent 100%)`,
+          animation:'rpTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+
+        <div style={{
+          padding:'clamp(16px,3vw,24px) clamp(14px,3vw,22px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(147,112,219,0.15)',
+          position:'relative',zIndex:2,
+          background:'rgba(147,50,255,0.08)'
+        }}>
+          <button onClick={()=>setShowReaderPanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
+
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:'clamp(0.8rem,2vw,1rem)',color:'rgba(180,100,255,0.4)',marginBottom:'8px'}}>✦</div>
+            <div style={{
+              fontFamily:'ppelganger, Georgia, serif',
+              fontSize:'clamp(1.6rem,5vw,2.8rem)',
+              background:'linear-gradient(90deg,#b3e7ef 0%,#ef01cb 50%,#9370db 100%)',
+              backgroundSize:'200% auto',
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+              animation:'rpShimmer 3s linear infinite',
+              marginBottom:'10px',lineHeight:'1.2'
+            }}>{userProfile.nickname}</div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+              <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+            </div>
+          </div>
         </div>
 
-        <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
- <button
-onClick={() => {
-  setShowUpdatesModal(true);
-  loadSiteUpdates();
-  setShowReaderPanel(false);
-}}
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid',
-    borderColor: siteUpdates.length > 0 ? '#ef01cb' : '#a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)',
-    boxShadow: siteUpdates.length > 0 ? '0 0 25px rgba(239, 1, 203, 0.8)' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    if (siteUpdates.length === 0) {
-      e.currentTarget.style.borderColor = '#fff';
-      e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    }
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = siteUpdates.length > 0 ? '#ef01cb' : '#a063cf';
-    e.currentTarget.style.boxShadow = siteUpdates.length > 0 ? '0 0 25px rgba(239, 1, 203, 0.8)' : 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="sm:w-5 sm:h-5">
-    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-    <path d="M2 17l10 5 10-5"/>
-    <path d="M2 12l10 5 10-5"/>
-  </svg>
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Обновления</span>
-</button>
+        <div className="rp-dark-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
 
-<Link
-  href="/collection"
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base overflow-hidden block"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid #a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#fff';
-    e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = '#a063cf';
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <Heart size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Моя коллекция</span>
-</Link>
-
-<Link
-  href="/my-messages"
-  className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 relative text-sm sm:text-base overflow-hidden block"
-  style={{
-    background: 'rgba(160, 99, 207, 0.4)',
-    border: '2px solid #a063cf',
-    borderRadius: '12px',
-    backdropFilter: 'blur(10px)'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#fff';
-    e.currentTarget.style.boxShadow = '0 0 25px rgba(179, 231, 239, 0.8)';
-    e.currentTarget.style.transform = 'translateY(-2px)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = '#a063cf';
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.transform = 'translateY(0)';
-  }}
->
-  <MessageSquare size={18} className="sm:w-5 sm:h-5" style={{ color: '#ffffff' }} />
-  <span style={{ 
-    color: '#ffffff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-  }}>Мои сообщения</span>
-</Link>
-
-          <button
-            onClick={() => {
-  setShowManagementModal(true);
-  setShowReaderPanel(false);
-}}
-            className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-            style={{
-              background: 'rgba(160, 99, 207, 0.4)',
-              border: '2px solid #a063cf',
-              borderRadius: '12px',
-              backdropFilter: 'blur(10px)',
-              color: '#ffffff'
-            }}
-          >
-            <Settings size={18} className="sm:w-5 sm:h-5" />
-            Настройки
+          <button onClick={()=>{setShowUpdatesModal(true);loadSiteUpdates();}} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:siteUpdates.length>0?'rgba(239,1,203,0.12)':'rgba(147,112,219,0.08)',
+            border:siteUpdates.length>0?'1px solid rgba(239,1,203,0.5)':'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',
+            boxShadow:siteUpdates.length>0?'0 0 15px rgba(239,1,203,0.2)':'none'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length>0?'#ef01cb':'#9370db'} strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:siteUpdates.length>0?'#ef01cb':'rgba(200,185,230,0.7)'}}>Обновления</span>
           </button>
 
-          <div className="mt-4">
-            <button
-              onClick={handleLogout}
-              className="w-full py-2 sm:py-3 font-bold transition flex items-center justify-center gap-2 text-sm sm:text-base"
-              style={{
-                background: 'rgba(160, 99, 207, 0.4)',
-                border: '2px solid #a063cf',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                color: '#ffffff'
-              }}
-            >
-              <LogOut size={18} className="sm:w-5 sm:h-5" />
-              Выход
-            </button>
+          <Link href="/collection" className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>Моя коллекция</span>
+          </Link>
+
+          <Link href="/my-messages" className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>Мои сообщения</span>
+          </Link>
+
+          <button onClick={()=>setShowManagementModal(true)} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.08)',border:'1px solid rgba(147,112,219,0.25)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9370db" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(200,185,230,0.7)'}}>Настройки</span>
+          </button>
+
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
+            <span style={{color:'rgba(180,100,255,0.25)',fontSize:'0.5rem',letterSpacing:'3px'}}>✦ · · · ✦</span>
+            <div style={{flex:1,height:'1px',background:'rgba(147,112,219,0.15)'}}/>
           </div>
+
+          <button onClick={handleLogout} className="rp-btn-dark" style={{
+            width:'100%',padding:'clamp(10px,2vw,13px) 16px',
+            background:'rgba(147,112,219,0.05)',border:'1px solid rgba(147,112,219,0.15)',
+            borderRadius:'6px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(147,112,219,0.5)" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(180,100,255,0.4)'}}>Выход</span>
+          </button>
+
+<button onClick={toggleTheme} style={{
+  width:'100%',position:'relative',
+  background:'radial-gradient(ellipse at center,#1a0033 0%,#000000 100%)',
+  border:'1px solid rgba(147,51,234,0.5)',
+  borderRadius:'50px',
+  boxShadow:'0 0 20px rgba(147,51,234,0.15)',
+  padding:'clamp(8px,2vw,14px) 16px',
+  overflow:'hidden',cursor:'pointer'
+}}>
+  {[...Array(10)].map((_,i)=>(
+    <div key={i} style={{
+      position:'absolute',width:'2px',height:'2px',
+      background:i%2===0?'#9333ea':'#a855f7',borderRadius:'50%',
+      boxShadow:`0 0 5px ${i%2===0?'#9333ea':'#a855f7'}`,
+      left:`${10+i*8}%`,top:`${20+(i%3)*25}%`,
+      animation:'starFloat 3s ease-in-out infinite',
+      animationDelay:`${i*0.2}s`,pointerEvents:'none'
+    }}/>
+  ))}
+  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',position:'relative',zIndex:1}}>
+    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <span style={{color:'#c084fc',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.7rem)',letterSpacing:'2px'}}>HD 189733</span>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(192,132,252,0.2)" strokeWidth="2">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    </svg>
+  </div>
+</button>
+
         </div>
       </div>
     )}
 
-   {/* СВЕТЛАЯ ПАНЕЛЬ */}
     {!isDarkTheme && (
-     <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-3xl" style={{
-        borderLeft: '12px solid',
-        borderImage: 'linear-gradient(to bottom, #000000 0%, #000000 20%, #000000 40%, #000000 60%, #000000 80%, #000000 100%) 1',
-        boxShadow: 'inset 8px 0 15px hsla(0, 0%, 0%, 0.50), -3px 0 10px rgba(0, 0, 0, 0.3)',
-         background: 'linear-gradient(135deg, #1f0213 0%, #27030e 25%, #3b0724 50%, #000000 75%, #290e1d 100%)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+      <div className="fixed top-0 right-0 h-full w-75 sm:w-90 z-30 overflow-y-auto shadow-2xl" style={{
+        background:'#080808',
+        borderLeft:'1px solid #2a2218',
+        boxShadow:'-5px 0 40px rgba(0,0,0,0.8)'
       }}>
-        <div className="sticky top-0 p-6 backdrop-blur-xl relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(2, 2, 2, 0.25) 0%, rgba(63, 2, 20, 0.5) 100%)',
-borderBottom: '1px solid rgba(29, 29, 29, 0.35)',
-boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+        <style dangerouslySetInnerHTML={{__html:`
+          @keyframes rpGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+          .rp-light-scroll::-webkit-scrollbar{width:4px;}
+          .rp-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+          .rp-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+          .rp-light-scroll{scrollbar-width:thin;scrollbar-color:#c9a84c transparent;}
+          .rp-btn-light{transition:all 0.2s;}
+          .rp-btn-light:hover{border-color:rgba(201,168,76,0.5)!important;background:rgba(201,168,76,0.06)!important;}
+        `}}/>
 
+        <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',
+          background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+
+        <div style={{position:'fixed',top:'50%',right:'5px',transform:'translateY(-50%)',
+          fontFamily:'serif',fontSize:'clamp(8rem,20vw,14rem)',color:'rgba(201,168,76,0.025)',
+          pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+
+        <div style={{
+          padding:'clamp(16px,3vw,26px) clamp(18px,4vw,28px)',
+          paddingBottom:'clamp(12px,2vw,18px)',
+          borderBottom:'1px solid rgba(201,168,76,0.1)',
+          position:'relative',zIndex:2
         }}>
+          <button onClick={()=>setShowReaderPanel(false)} style={{
+            position:'absolute',top:'12px',right:'12px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.25)',
+            borderRadius:'50%',width:'28px',height:'28px',cursor:'pointer',
+            color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'14px',zIndex:10
+          }}>✕</button>
 
-<h2 className="text-4xl sm:text-5xl font-bold text-center mb-4" style={{
-  color: '#757162',
-  fontFamily: "'sooonsi', Georgia, serif"
-}}>{userProfile.nickname}</h2>
-
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes champagneBubbles {
-              0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-              50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-            }
-            @keyframes shimmerGold {
-              0% { background-position: -200% center; }
-              100% { background-position: 200% center; }
-            }
-            .champagne-text {
-              background: linear-gradient(90deg, #c9c6bb 0%, #3a3a3a 50%, #bcbbae 100%;
-              background-size: 200% auto;
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              background-clip: text;
-              animation: shimmerGold 3s linear infinite;
-              font-family: 'Playfair Display', Georgia, serif;
-            }
-          `}} />
-          
-<button 
-  onClick={() => setShowReaderPanel(false)}
-  className="absolute right-4 top-4 p-2 rounded-full transition-all z-20"
-            style={{
-              background: 'rgba(26, 26, 26, 0.35)',
-              backdropFilter: 'blur(1px)',
-              border: '1px solid rgba(10, 10, 10, 0.15)'
-            }}
-          >
-            <X size={20} color="#c9c6bb" />
-          </button>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'clamp(1.6rem,5vw,2.8rem)',
+            backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'rpGold 4s linear infinite',letterSpacing:'3px',marginBottom:'10px',lineHeight:'1.2'}}>
+            {userProfile.nickname}
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
         </div>
 
-        <div className="p-6 space-y-4 flex flex-col h-[calc(100vh-120px)]">
-<button
-  onClick={() => {
-    setShowUpdatesModal(true);
-    loadSiteUpdates();
-  }}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length > 0 ? "#e9e6d8" : "#61031b"} strokeWidth="2" className="relative z-10">
-    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-    <path d="M2 17l10 5 10-5"/>
-    <path d="M2 12l10 5 10-5"/>
-  </svg>
-  <span className="relative z-10" style={{ 
-    color: siteUpdates.length > 0 ? '#e9e6d8' : '#68021c',
-    fontStyle: 'italic'
-  }}>
-    Обновления
-  </span>
+        <div className="rp-light-scroll" style={{overflowY:'auto',padding:'clamp(12px,3vw,20px)',display:'flex',flexDirection:'column',gap:'clamp(8px,2vw,10px)',position:'relative',zIndex:1}}>
+
+          <button onClick={()=>{setShowUpdatesModal(true);loadSiteUpdates();}} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:siteUpdates.length>0?'rgba(201,168,76,0.1)':'transparent',
+            border:siteUpdates.length>0?'1px solid rgba(201,168,76,0.55)':'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={siteUpdates.length>0?'#c9a84c':'rgba(201,168,76,0.45)'} strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:siteUpdates.length>0?'#c9a84c':'rgba(201,168,76,0.5)'}}>Обновления</span>
+          </button>
+
+          <Link href="/collection" className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>Моя коллекция</span>
+          </Link>
+
+          <Link href="/my-messages" className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',textDecoration:'none'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>Мои сообщения</span>
+          </Link>
+
+          <button onClick={()=>setShowManagementModal(true)} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.2)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.5)'}}>Настройки</span>
+          </button>
+
+          <div style={{display:'flex',alignItems:'center',gap:'8px',margin:'2px 0'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+            <span style={{color:'rgba(201,168,76,0.25)',fontSize:'0.55rem',letterSpacing:'3px',fontFamily:'serif'}}>· ⚜ ·</span>
+            <div style={{flex:1,height:'1px',background:'rgba(201,168,76,0.12)'}}/>
+          </div>
+
+          <button onClick={handleLogout} className="rp-btn-light" style={{
+            width:'100%',padding:'clamp(10px,2vw,12px) 16px',
+            background:'transparent',border:'1px solid rgba(201,168,76,0.1)',
+            borderRadius:'2px',cursor:'pointer',
+            display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.3)" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.65rem)',letterSpacing:'2px',textTransform:'uppercase',
+              color:'rgba(201,168,76,0.3)'}}>Выход</span>
+          </button>
+
+<button onClick={toggleTheme} style={{
+  width:'100%',position:'relative',
+  background:'#000000',
+  border:'1px solid rgba(201,168,76,0.3)',
+  borderRadius:'2px',
+  boxShadow:'none',
+  padding:'clamp(8px,2vw,14px) 16px',
+  overflow:'hidden',cursor:'pointer'
+}}>
+  <div style={{position:'absolute',width:'120px',height:'120px',
+    background:'radial-gradient(circle,rgba(114,17,49,0.9) 0%,rgba(109,5,31,0.5) 40%,transparent 70%)',
+    borderRadius:'40% 60% 70% 30%',filter:'blur(12px)',
+    animation:'plasmaMove1 7s ease-in-out infinite',
+    pointerEvents:'none',top:'10%',left:'20%'}}/>
+  <div style={{position:'absolute',width:'100px',height:'100px',
+    background:'radial-gradient(circle,rgba(114,17,49,0.9) 0%,rgba(126,9,44,0.6) 50%,transparent 80%)',
+    borderRadius:'60% 40% 30% 70%',filter:'blur(10px)',
+    animation:'plasmaMove2 9s ease-in-out infinite',
+    pointerEvents:'none',top:'40%',right:'15%'}}/>
+  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',position:'relative',zIndex:1}}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.2)" strokeWidth="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+      <span style={{color:'rgba(201,168,76,0.7)',fontFamily:'Cinzel,serif',fontSize:'clamp(0.55rem,1.5vw,0.68rem)',letterSpacing:'2px'}}>Лилия и Роза</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      </svg>
+    </div>
+  </div>
 </button>
 
-<Link
-  href="/collection"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
- <Heart size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    Моя коллекция
-  </span>
-</Link>
-
-<Link
-  href="/my-messages"
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group block"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <MessageSquare size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-    background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    Мои сообщения
-  </span>
-</Link>
-
- <button
-  onClick={() => setShowManagementModal(true)}
-  className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-  style={{
-    background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-  
-  <style dangerouslySetInnerHTML={{__html: `
-    @keyframes shimmerGoldBtn {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-  `}} />
-  
-  <Settings size={20} color="#d8d7d7" className="relative z-10" />
-  <span className="relative z-10" style={{ 
-   background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-    backgroundSize: '200% auto',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    animation: 'shimmerGoldBtn 3s linear infinite',
-    fontStyle: 'normal',
-    fontWeight: '600'
-  }}>
-    Настройки
-  </span>
-</button>
-
-<div className="mt-4">
-  <button
-    onClick={handleLogout}
-    className="w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
-    style={{
-   background: siteUpdates.length > 0 ? '#d8d7d7' : 'linear-gradient(135deg, rgba(7, 7, 7, 0.35), rgba(188, 187, 174, 0.15))',
-    border: '1px solid rgba(27, 27, 27, 0.15)',
-    backdropFilter: 'blur(1px)',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.57)'
-  }}
->
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-    background: 'radial-gradient(circle at center, rgba(73, 1, 13, 0.3), transparent)'
-  }} />
-    
-    <LogOut size={20} color="#d8d7d7" className="relative z-10" />
-<span className="relative z-10" style={{ 
-      background: 'linear-gradient(90deg, #857f6a 0%, #dfdede 50%, #857f6a 100%)',
-      backgroundSize: '200% auto',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      animation: 'shimmerGoldBtn 3s linear infinite',
-      fontStyle: 'normal',
-      fontWeight: '600'
-    }}>
-      Выход
-    </span>
-  </button>
-</div>
         </div>
       </div>
     )}
   </>
 )}
 
-{/* МОДАЛЬНОЕ ОКНО НАСТРОЕК - ТЕМНАЯ ТЕМА */}
-{showManagementModal && isDarkTheme && (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-md p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          background: 'linear-gradient(90deg, #b3e7ef 0%, #ef01cb 50%, #b3e7ef 100%)',
-          backgroundSize: '200% auto',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}>Настройки</h2>
-        <button onClick={() => setShowManagementModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="text-white mb-2 text-sm">Интерфейс сайта:</p>
-  <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: 'radial-gradient(ellipse at center, #1a0033 0%, #000000 100%)',
-      border: '2px solid #9333ea',
-      boxShadow: '0 0 20px rgba(147, 51, 234, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes starFloat {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-          opacity: 0.4;
-        }
-        50% {
-          transform: translate(5px, -5px) scale(1.2);
-          opacity: 1;
-        }
-      }
-    `}} />
-    
-    {/* Звездные частицы */}
-    {[...Array(12)].map((_, i) => (
-      <div key={i} style={{
-        position: 'absolute',
-        width: '2px',
-        height: '2px',
-        background: i % 2 === 0 ? '#9333ea' : '#a855f7',
-        borderRadius: '50%',
-        boxShadow: `0 0 6px ${i % 2 === 0 ? '#9333ea' : '#a855f7'}`,
-        left: `${10 + i * 7}%`,
-        top: `${20 + (i % 3) * 25}%`,
-        animation: 'starFloat 3s ease-in-out infinite',
-        animationDelay: `${i * 0.2}s`,
-        pointerEvents: 'none'
-      }} />
-    ))}
-    
-    <div className="flex items-center justify-between relative z-10">
-      <div className="flex items-center gap-3">
-        {/* Иконка Луны */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <span style={{ color: '#c084fc', fontWeight: '600' }}>HD 189733</span>
-      </div>
-      
-      {/* Иконка Солнца (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(192, 132, 252, 0.3)" strokeWidth="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </div>
-  </button>
-</div>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* МОДАЛЬНОЕ ОКНО НАСТРОЕК - СВЕТЛАЯ ТЕМА */}
-{showManagementModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-md p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
-      <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Настройки</h2>
-        <button onClick={() => setShowManagementModal(false)} className="absolute right-0" style={{ color: '#c9c6bb' }}>
-          <X size={24} />
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="mb-2 text-sm" style={{ color: '#65635d' }}>Интерфейс сайта:</p>
-  <button
-    onClick={toggleTheme}
-    className="w-full relative rounded-full p-4 transition-all duration-300 overflow-hidden"
-    style={{
-      background: '#000000',
-      border: '2px solid #65635d',
-      boxShadow: '0 0 15px rgba(101, 99, 93, 0.6)'
-    }}
-  >
-    <style dangerouslySetInnerHTML={{__html: `
-      @keyframes plasmaMove1 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1);
-        }
-        33% {
-          transform: translate(30px, -20px) scale(1.3);
-        }
-        66% {
-          transform: translate(-25px, 15px) scale(0.9);
-        }
-      }
-      @keyframes plasmaMove2 {
-        0%, 100% {
-          transform: translate(0, 0) scale(1.2);
-        }
-        33% {
-          transform: translate(-35px, 25px) scale(0.8);
-        }
-        66% {
-          transform: translate(20px, -15px) scale(1.4);
-        }
-      }
-      @keyframes plasmaMove3 {
-        0%, 100% {
-          transform: translate(0, 0) scale(0.9);
-        }
-        33% {
-          transform: translate(15px, 30px) scale(1.5);
-        }
-        66% {
-          transform: translate(-30px, -20px) scale(1.1);
-        }
-      }
-    `}} />
-    
-    {/* Плазма крови - капли жидкости */}
-    <div style={{
-      position: 'absolute',
-      width: '120px',
-      height: '120px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(109, 5, 31, 0.5) 40%, rgba(114, 17, 49, 0.9) 70%, transparent 100%)',
-      borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
-      filter: 'blur(12px)',
-      animation: 'plasmaMove1 7s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '10%',
-      left: '20%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '100px',
-      height: '100px',
-      background: 'radial-gradient(circle, rgba(114, 17, 49, 0.9) 0%, rgba(126, 9, 44, 0.6) 50%, transparent 80%)',
-      borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-      filter: 'blur(10px)',
-      animation: 'plasmaMove2 9s ease-in-out infinite',
-      pointerEvents: 'none',
-      top: '40%',
-      right: '15%'
-    }} />
-    
-    <div style={{
-      position: 'absolute',
-      width: '90px',
-      height: '90px',
-      background: 'radial-gradient(circle, rgba(130, 15, 30, 0.65) 0%, rgba(90, 8, 20, 0.45) 45%, transparent 75%)',
-      borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-      filter: 'blur(14px)',
-      animation: 'plasmaMove3 8s ease-in-out infinite',
-      pointerEvents: 'none',
-      bottom: '15%',
-      left: '30%'
-    }} />
-    
-    <div className="flex items-center justify-between relative z-10">
-      {/* Иконка Луны (неактивная) */}
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201, 198, 187, 0.3)" strokeWidth="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      
-      <div className="flex items-center gap-3">
-        <span style={{ color: '#c9c6bb', fontWeight: '600' }}>Лилия и Роза</span>
-        {/* Иконка Солнца */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9c6bb" strokeWidth="2">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-      </div>
-    </div>
-  </button>
-</div>
-      </div>
-    </div>
-  </div>
-)}
 
 {/* UPDATES MODAL */}
 {showUpdatesModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 border-2" style={{
-      background: 'rgba(147, 51, 234, 0.15)',
-      borderColor: '#9333ea',
-      backdropFilter: 'blur(20px)',
-      boxShadow: '0 0 30px rgba(147, 51, 234, 0.6)'
-    }}>
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold shimmer-btn-text">Обновления</h2>
-        <button onClick={() => setShowUpdatesModal(false)} className="text-gray-400 hover:text-white absolute right-0">
-          <X size={24} />
-        </button>
-      </div>
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{backgroundColor:'rgba(0,0,0,0.92)',backdropFilter:'blur(10px)'}}>
+    <style dangerouslySetInnerHTML={{__html:`
+      @keyframes updTwinkle{0%,100%{opacity:0.1;}50%{opacity:0.5;}}
+      @keyframes updGold{0%{background-position:-200% center;}100%{background-position:200% center;}}
+      .upd-dark-scroll::-webkit-scrollbar{width:4px;}
+      .upd-dark-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .upd-dark-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#9370db,#ef01cb,#9370db);border-radius:10px;box-shadow:0 0 8px rgba(147,112,219,0.8);}
+      .upd-light-scroll::-webkit-scrollbar{width:4px;}
+      .upd-light-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px;}
+      .upd-light-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,transparent,#c9a84c,transparent);border-radius:10px;box-shadow:0 0 6px rgba(201,168,76,0.5);}
+      .upd-card-dark:hover{border-color:#ef01cb !important;box-shadow:0 0 20px rgba(239,1,203,0.4) !important;}
+      .upd-card-light:hover{border-color:rgba(201,168,76,0.5) !important;background:rgba(201,168,76,0.06) !important;}
+    `}}/>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        {siteUpdates.length === 0 ? (
-          <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-gray-700">
-            <p className="text-gray-500">Пока нет обновлений</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {siteUpdates.map((update) => (
-<div 
-  key={update.id}
-  className="rounded-lg p-4 border-2 transition cursor-pointer bg-black"
-  style={{
-    borderColor: update.type === 'new_work' ? '#ef01cb' : '#9370db',
-    boxShadow: update.type === 'new_work' ? '0 0 15px rgba(239, 1, 203, 0.4)' : 'none'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = '#ef01cb';
-    e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 1, 203, 0.6)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = update.type === 'new_work' ? '#ef01cb' : '#9370db';
-    e.currentTarget.style.boxShadow = update.type === 'new_work' ? '0 0 15px rgba(239, 1, 203, 0.4)' : 'none';
-  }}
-                onClick={async () => {
-
-                  loadSiteUpdates();
-                  if (update.work_id === workId) {
-  setShowUpdatesModal(false);
-} else {
-  window.location.href = `/work/${update.work_id}`;
-}
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ 
-  color: '#ef01cb',
-  filter: 'drop-shadow(0 0 5px rgba(239, 1, 203, 0.6))'
-}}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    {update.type === 'new_work' ? (
-                      <>
-           <span className="inline-block text-xs font-bold px-2 py-1 rounded mb-2" style={{
-  background: 'linear-gradient(135deg, #ef01cb 0%, #bc0897 100%)',
-  boxShadow: '0 0 15px rgba(239, 1, 203, 0.8)',
-  color: '#ffffff'
-}}>
-  НОВАЯ РАБОТА
-</span>
-                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
-                          {update.work_title}
-                        </h3>
-                        <p className="text-gray-400 text-sm">
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
-                          {update.work_title}
-                        </h3>
-                        <p className="text-gray-300 text-sm mb-1">
-                          {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
-                        </p>
-                        <p className="text-gray-400 text-xs">
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long'
-                          })}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-{/* UPDATES MODAL - СВЕТЛАЯ ТЕМА */}
-{showUpdatesModal && !isDarkTheme && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(10px)'
-  }}>
-    <div className="rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col p-6 relative" style={{
-      background: 'radial-gradient(ellipse at center, #000000 0%, #000000 100%)',
-      border: '3px solid transparent',
-      borderRadius: '24px',
-      backgroundClip: 'padding-box',
-      boxShadow: '0 0 0 3px #000000, inset 0 0 40px rgba(0, 0, 0, 0.5)'
-    }}>
+    {isDarkTheme ? (
       <div style={{
-        position: 'absolute',
-        inset: '-3px',
-        borderRadius: '24px',
-        padding: '3px',
-        background: 'linear-gradient(135deg, #c9c6bb 0%, #000000 100%)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-        zIndex: -1
-      }} />
-      
-      <div className="flex justify-center items-center mb-6 relative">
-        <h2 className="text-2xl font-bold" style={{
-          color: '#c9c6bb',
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontStyle: 'italic'
-        }}>Обновления</h2>
-        <button onClick={() => setShowUpdatesModal(false)} className="absolute right-0" style={{ color: '#c2ab75' }}>
-          <X size={24} />
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        {siteUpdates.length === 0 ? (
-          <div className="text-center py-12 rounded-lg" style={{
-            background: 'rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(180, 154, 95, 0.3)'
-          }}>
-            <p style={{ color: '#c9c6bb' }}>Пока нет обновлений</p>
+        background:'radial-gradient(ellipse at top,#1a0a2e 0%,#08080f 85%)',
+        border:'1px solid rgba(180,100,255,0.25)',
+        boxShadow:'0 0 60px rgba(147,50,255,0.15)',
+        borderRadius:'14px',
+        width:'92vw',maxWidth:'560px',
+        maxHeight:'min(88vh,640px)',
+        display:'flex',flexDirection:'column',
+        position:'relative',overflow:'hidden'
+      }}>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',
+          background:'linear-gradient(90deg,transparent,#9370db,#ef01cb,transparent)',zIndex:3}}/>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',
+          backgroundImage:`radial-gradient(1px 1px at 5% 10%,rgba(255,255,255,0.3) 0%,transparent 100%),
+            radial-gradient(1px 1px at 90% 8%,rgba(255,255,255,0.25) 0%,transparent 100%),
+            radial-gradient(1px 1px at 70% 90%,rgba(255,255,255,0.2) 0%,transparent 100%),
+            radial-gradient(1px 1px at 15% 85%,rgba(255,255,255,0.15) 0%,transparent 100%)`,
+          animation:'updTwinkle 6s ease-in-out infinite',zIndex:0}}/>
+        <div style={{padding:'20px 22px 14px',borderBottom:'1px solid rgba(147,112,219,0.15)',position:'relative',zIndex:2,flexShrink:0}}>
+          <button onClick={()=>setShowUpdatesModal(false)} style={{position:'absolute',top:'12px',right:'12px',background:'rgba(180,100,255,0.1)',border:'1px solid rgba(180,100,255,0.3)',borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',color:'rgba(180,100,255,0.8)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',zIndex:10}}>✕</button>
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:'1.1rem',color:'rgba(180,100,255,0.4)',marginBottom:'4px'}}>✦</div>
+            <div style={{fontFamily:'Cinzel,serif',fontSize:'1rem',letterSpacing:'5px',background:'linear-gradient(90deg,#b3e7ef,#ef01cb,#9370db)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Обновления</div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',marginTop:'6px'}}>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.4))'}}/>
+              <span style={{color:'rgba(180,100,255,0.3)',fontSize:'0.5rem',letterSpacing:'4px'}}>✦ · · · ✦</span>
+              <div style={{height:'1px',width:'30px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.4))'}}/>
+            </div>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {siteUpdates.map((update) => (
-              <div 
-                key={update.id}
-                className="rounded-lg p-4 transition cursor-pointer"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: update.type === 'new_work' ? '2px solid #c9c6bb' : '1px solid rgba(180, 154, 95, 0.3)'
-                }}
-                onClick={async () => {
-                  loadSiteUpdates();
-                  window.location.href = `/work/${update.work_id}`;
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c9c6bb" style={{ 
-                      filter: 'drop-shadow(0 0 5px rgba(194, 171, 117, 0.4))'
-                    }}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+        </div>
+        <div className="upd-dark-scroll" style={{overflowY:'auto',padding:'16px 18px',position:'relative',zIndex:1,flex:1}}>
+          {siteUpdates.length===0 ? (
+            <div style={{textAlign:'center',padding:'40px 20px',background:'rgba(147,112,219,0.05)',border:'1px solid rgba(147,112,219,0.15)',borderRadius:'8px'}}>
+              <div style={{fontSize:'1.8rem',marginBottom:'8px',opacity:0.3}}>✦</div>
+              <p style={{color:'rgba(180,100,255,0.4)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem'}}>Пока нет обновлений</p>
+            </div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+              {siteUpdates.map((update)=>(
+                <div key={update.id} className="upd-card-dark"
+                  onClick={()=>{loadSiteUpdates();if(update.work_id===workId){setShowUpdatesModal(false);}else{window.location.href=`/work/${update.work_id}`;}}}
+                  style={{background:'rgba(0,0,0,0.4)',border:update.type==='new_work'?'1px solid rgba(239,1,203,0.4)':'1px solid rgba(147,112,219,0.2)',borderRadius:'8px',padding:'12px 14px',cursor:'pointer',boxShadow:update.type==='new_work'?'0 0 12px rgba(239,1,203,0.15)':'none',transition:'all 0.2s'}}>
+                  <div style={{display:'flex',alignItems:'flex-start',gap:'12px'}}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={update.type==='new_work'?'#ef01cb':'#9370db'} style={{flexShrink:0,marginTop:'2px',filter:`drop-shadow(0 0 4px ${update.type==='new_work'?'rgba(239,1,203,0.6)':'rgba(147,112,219,0.5)'})`}}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                     </svg>
-                  </div>
-                  <div className="flex-1">
-                    {update.type === 'new_work' ? (
-                      <>
-                        <span className="inline-block text-xs font-bold px-2 py-1 rounded mb-2" style={{
-                          background: '#c9c6bb',
-                          color: '#000000'
-                        }}>
-                          НОВАЯ РАБОТА
-                        </span>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.work_title}
-                        </h3>
-                        <p className="text-sm" style={{ color: '#c9c6bb', opacity: 0.8 }}>
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="font-semibold text-base sm:text-lg mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.work_title}
-                        </h3>
-                        <p className="text-sm mb-1" style={{ color: '#c9c6bb' }}>
-                          {update.chapter_number} глава {update.chapter_title && `- ${update.chapter_title}`}
-                        </p>
-                        <p className="text-xs" style={{ color: '#c9c6bb', opacity: 0.7 }}>
-                          Опубликовано {new Date(update.published_date).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long'
-                          })}
-                        </p>
-                      </>
-                    )}
+                    <div style={{flex:1,minWidth:0}}>
+                      {update.type==='new_work'?(
+                        <>
+                          <span style={{display:'inline-block',background:'linear-gradient(135deg,#ef01cb,#bc0897)',color:'#fff',fontSize:'0.55rem',fontFamily:'Cinzel,serif',letterSpacing:'2px',padding:'2px 8px',borderRadius:'2px',marginBottom:'6px',boxShadow:'0 0 10px rgba(239,1,203,0.6)'}}>НОВАЯ РАБОТА</span>
+                          <p style={{color:'#e8d5ff',fontFamily:'Georgia,serif',fontSize:'0.9rem',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                          <p style={{color:'rgba(180,100,255,0.4)',fontSize:'0.65rem',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}</p>
+                        </>
+                      ):(
+                        <>
+                          <p style={{color:'rgba(200,185,230,0.8)',fontFamily:'Georgia,serif',fontSize:'0.88rem',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                          <p style={{color:'rgba(180,100,255,0.5)',fontSize:'0.7rem',marginBottom:'3px',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{update.chapter_number} глава{update.chapter_title&&` · ${update.chapter_title}`}</p>
+                          <p style={{color:'rgba(147,112,219,0.35)',fontSize:'0.62rem',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}</p>
+                        </>
+                      )}
+                    </div>
+                    <span style={{flexShrink:0,color:'rgba(180,100,255,0.3)',fontSize:'0.7rem',alignSelf:'center'}}>→</span>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <div style={{background:'#080808',border:'1px solid #2a2218',borderRadius:'4px',width:'92vw',maxWidth:'560px',maxHeight:'min(88vh,640px)',display:'flex',flexDirection:'column',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',left:0,top:0,bottom:0,width:'3px',background:'linear-gradient(180deg,transparent,#c9a84c,#c9a84c,transparent)',zIndex:2}}/>
+        <div style={{position:'absolute',bottom:'10px',right:'10px',fontFamily:'serif',fontSize:'10rem',color:'rgba(201,168,76,0.025)',pointerEvents:'none',userSelect:'none',lineHeight:1,zIndex:0}}>⚜</div>
+        <div style={{padding:'20px 26px 14px',borderBottom:'1px solid rgba(201,168,76,0.1)',position:'relative',zIndex:2,flexShrink:0}}>
+          <button onClick={()=>setShowUpdatesModal(false)} style={{position:'absolute',top:'12px',right:'12px',background:'transparent',border:'1px solid rgba(201,168,76,0.25)',borderRadius:'50%',width:'26px',height:'26px',cursor:'pointer',color:'rgba(201,168,76,0.6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',zIndex:10}}>✕</button>
+          <div style={{fontFamily:"'victiriya',Georgia,serif",fontSize:'1.8rem',backgroundImage:'linear-gradient(90deg,#c9a84c 0%,#f0d080 40%,#c9a84c 100%)',backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',animation:'updGold 4s linear infinite',letterSpacing:'3px',marginBottom:'8px'}}>Обновления</div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{height:'1px',width:'60px',background:'linear-gradient(90deg,rgba(201,168,76,0.5),transparent)'}}/>
+            <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',letterSpacing:'4px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+          </div>
+        </div>
+        <div className="upd-light-scroll" style={{overflowY:'auto',padding:'16px 22px',position:'relative',zIndex:1,flex:1}}>
+          {siteUpdates.length===0 ? (
+            <div style={{textAlign:'center',padding:'40px 20px',background:'rgba(201,168,76,0.03)',border:'1px solid rgba(201,168,76,0.12)',borderRadius:'2px'}}>
+              <div style={{fontSize:'1.8rem',marginBottom:'8px',color:'rgba(201,168,76,0.2)',fontFamily:'serif'}}>⚜</div>
+              <p style={{color:'rgba(201,168,76,0.35)',fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'0.85rem'}}>Пока нет обновлений</p>
+            </div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+              {siteUpdates.map((update)=>(
+                <div key={update.id} className="upd-card-light"
+                  onClick={()=>{loadSiteUpdates();if(update.work_id===workId){setShowUpdatesModal(false);}else{window.location.href=`/work/${update.work_id}`;}}}
+                  style={{background:'rgba(201,168,76,0.03)',border:update.type==='new_work'?'1px solid rgba(201,168,76,0.35)':'1px solid rgba(201,168,76,0.12)',borderRadius:'2px',padding:'12px 14px',cursor:'pointer',transition:'all 0.2s',position:'relative'}}>
+                  {update.type==='new_work'&&(<div style={{position:'absolute',left:0,top:0,bottom:0,width:'2px',background:'linear-gradient(180deg,transparent,#c9a84c,transparent)'}}/>)}
+                  <div style={{display:'flex',alignItems:'flex-start',gap:'12px',paddingLeft:update.type==='new_work'?'8px':'0'}}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(201,168,76,0.6)" style={{flexShrink:0,marginTop:'2px',filter:'drop-shadow(0 0 3px rgba(201,168,76,0.3))'}}>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <div style={{flex:1,minWidth:0}}>
+                      {update.type==='new_work'?(
+                        <>
+                          <span style={{display:'inline-block',background:'rgba(201,168,76,0.15)',border:'1px solid rgba(201,168,76,0.4)',color:'#c9a84c',fontSize:'0.55rem',fontFamily:'Cinzel,serif',letterSpacing:'2px',padding:'2px 8px',borderRadius:'1px',marginBottom:'6px'}}>НОВАЯ РАБОТА</span>
+                          <p style={{color:'rgba(201,168,76,0.85)',fontFamily:'Georgia,serif',fontSize:'0.9rem',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                          <p style={{color:'rgba(201,168,76,0.35)',fontSize:'0.65rem',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}</p>
+                        </>
+                      ):(
+                        <>
+                          <p style={{color:'rgba(201,168,76,0.7)',fontFamily:'Georgia,serif',fontSize:'0.88rem',marginBottom:'4px',fontWeight:'600'}}>{update.work_title}</p>
+                          <p style={{color:'rgba(201,168,76,0.4)',fontSize:'0.68rem',marginBottom:'3px',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{update.chapter_number} глава{update.chapter_title&&` · ${update.chapter_title}`}</p>
+                          <p style={{color:'rgba(201,168,76,0.25)',fontSize:'0.6rem',fontFamily:'Georgia,serif',fontStyle:'italic'}}>{new Date(update.published_date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}</p>
+                        </>
+                      )}
+                    </div>
+                    <span style={{flexShrink:0,color:'rgba(201,168,76,0.25)',fontSize:'0.7rem',alignSelf:'center'}}>→</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 )}
 
 
-{/* МОДАЛЬНОЕ ОКНО КАРТИНКИ - 3D ВАРИАНТ */}
 {selectedImage && (
-  <div 
-    className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style={{
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(8px)',
-      perspective: '1000px'
-    }}
+  <div className="fixed inset-0 z-[100] flex items-center justify-center"
+    style={{ background: 'rgba(0,0,0,0.97)', backdropFilter: 'blur(6px)' }}
     onClick={() => setSelectedImage(null)}
-  >
-    <div className="relative w-full max-w-6xl h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-      
-      {/* ЛЕВОЕ ПРЕВЬЮ */}
-      {characterImagesArray.indexOf(selectedImage) > 0 && (
-        <div 
-          className="absolute left-0 cursor-pointer transition-all duration-300"
-          style={{
-            width: '250px',
-            height: '350px',
-            transform: 'rotateY(15deg) scale(0.85)',
-            filter: 'blur(2px)',
-            opacity: 0.5,
-            zIndex: 1
-          }}
-          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1])}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8';
-            e.currentTarget.style.filter = 'blur(1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.5';
-            e.currentTarget.style.filter = 'blur(2px)';
-          }}
-        >
-          <img 
-            src={characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1]} 
-            alt="Previous" 
-            className="w-full h-full object-cover rounded-lg"
-            style={{
-              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
-                : '0 0 20px rgba(101, 99, 93, 0.4)'
-            }}
-          />
-        </div>
-      )}
-
-      {/* ЦЕНТРАЛЬНОЕ ИЗОБРАЖЕНИЕ */}
-      <div className="relative z-10" style={{ maxWidth: '600px', maxHeight: '80vh' }}>
-        <img 
-          src={selectedImage} 
-          alt="Main" 
-          className="rounded-lg"
-          style={{
-            maxWidth: '100%',
-            maxHeight: '70vh',
-            objectFit: 'contain',
-            border: isDarkTheme ? '3px solid #ec4899' : '3px solid #c9c6bb',
-            boxShadow: isDarkTheme 
-              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 120px rgba(236, 72, 153, 0.4)' 
-              : '0 0 40px rgba(201, 198, 187, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.3)'
-          }}
-        />
-        
-        {/* ОПИСАНИЕ ПОД КАРТИНКОЙ */}
-        {work.character_image_descriptions && work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)] && (
-          <div className="mt-4 text-center px-4">
-            <p className="text-lg font-semibold" style={{
-              color: isDarkTheme ? '#c084fc' : '#c9c6bb',
-             textShadow: isDarkTheme ? '0 0 10px rgba(192, 132, 252, 0.6)' : 'none',
-      fontStyle: 'italic'
+    onTouchStart={(e) => { window._tX = e.touches[0].clientX; }}
+    onTouchEnd={(e) => {
+      const diff = window._tX - e.changedTouches[0].clientX;
+      const idx = characterImagesArray.indexOf(selectedImage);
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && idx < characterImagesArray.length - 1) setSelectedImage(characterImagesArray[idx + 1]);
+        if (diff < 0 && idx > 0) setSelectedImage(characterImagesArray[idx - 1]);
+      }
     }}>
-              {work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)]}
-            </p>
-          </div>
+  <div className="flex flex-col items-center w-full max-w-2xl px-12"
+      onClick={e => e.stopPropagation()}>
+
+      {/* СТРЕЛКИ + ФОТО */}
+      <div className="relative flex items-center justify-center w-full">
+        {!isMobile && characterImagesArray.indexOf(selectedImage) > 0 && (
+          <button
+            onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) - 1])}
+            style={{ position:'absolute', left:0, background:'none', border:'none', cursor:'pointer', zIndex:10,
+              color: isDarkTheme ? 'rgba(180,100,255,0.7)' : 'rgba(201,168,76,0.7)' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
         )}
 
-        {/* КНОПКА СОХРАНЕНИЯ */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSaveImage(selectedImage);
-            }}
-            className="px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
-            style={{
-              background: isDarkTheme 
-                ? (savedImages.includes(selectedImage) ? 'rgba(236, 72, 153, 0.9)' : 'rgba(147, 51, 234, 0.6)')
-                : (savedImages.includes(selectedImage) ? '#65635d' : 'rgba(201, 198, 187, 0.3)'),
-              border: `2px solid ${isDarkTheme 
-                ? (savedImages.includes(selectedImage) ? '#ec4899' : '#9333ea')
-                : (savedImages.includes(selectedImage) ? '#c9c6bb' : '#65635d')}`,
-              boxShadow: savedImages.includes(selectedImage)
-                ? (isDarkTheme 
-                    ? '0 0 25px rgba(236, 72, 153, 0.8)'
-                    : '0 0 15px rgba(101, 99, 93, 0.6)')
-                : 'none',
-              color: '#ffffff'
-            }}
-            onMouseEnter={(e) => {
-              if (!savedImages.includes(selectedImage)) {
-                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.9)' : 'rgba(101, 99, 93, 0.6)';
-                e.currentTarget.style.boxShadow = isDarkTheme 
-                  ? '0 0 20px rgba(147, 51, 234, 0.8)'
-                  : '0 0 15px rgba(101, 99, 93, 0.6)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!savedImages.includes(selectedImage)) {
-                e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.6)' : 'rgba(201, 198, 187, 0.3)';
-                e.currentTarget.style.boxShadow = 'none';
-              }
-            }}
-          >
-            <svg 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
-              stroke="#ffffff"
-              strokeWidth="2"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
+        {/* ОБЁРТКА КАРТИНКИ */}
+        <div style={{
+          position:'relative',
+          width: isMobile ? '85vw' : '360px',
+          height: isMobile ? '127vw' : '520px',
+          borderRadius:'8px', overflow:'hidden',
+          border: isDarkTheme ? '2px solid rgba(180,100,255,0.4)' : '2px solid rgba(201,168,76,0.4)',
+          boxShadow: isDarkTheme ? '0 0 60px rgba(147,50,255,0.3)' : '0 0 60px rgba(201,168,76,0.2)'
+        }}>
+          <img src={selectedImage} alt=""
+            style={{ width:'100%', height:'100%', objectFit:'cover' }}
+          />
+
+          {/* КРЕСТИК НА КАРТИНКЕ */}
+          <button onClick={() => setSelectedImage(null)}
+            style={{ position:'absolute', top:'8px', right:'8px', zIndex:20,
+              background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%',
+              padding:'4px', cursor:'pointer',
+              color: isDarkTheme ? '#dccbe2' : '#c9c3b2' }}>
+            <X size={22}/>
           </button>
+
+          {/* ОПИСАНИЕ ВНИЗУ КАРТИНКИ */}
+          {work.character_image_descriptions && work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)] && (
+            <div style={{ position:'absolute', bottom:0, left:0, right:0,
+              background:'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+              padding:'32px 12px 12px' }}>
+              <p style={{ textAlign:'center',
+                color: isDarkTheme ? 'rgba(220,180,255,0.95)' : 'rgba(230,210,160,0.95)',
+                fontStyle:'italic', fontSize:'0.9rem',
+                textShadow: isDarkTheme ? '0 0 10px rgba(180,100,255,0.5)' : 'none'
+              }}>
+                {work.character_image_descriptions[characterImagesArray.indexOf(selectedImage)]}
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* ПРОГРЕСС-БАР */}
-        <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 w-64 h-1 rounded-full overflow-hidden" style={{
-          background: isDarkTheme ? 'rgba(147, 51, 234, 0.3)' : 'rgba(101, 99, 93, 0.3)'
-        }}>
-          <div 
-            className="h-full"
-            style={{
-              width: `${((characterImagesArray.indexOf(selectedImage) + 1) / characterImagesArray.length) * 100}%`,
-              background: isDarkTheme 
-                ? 'linear-gradient(90deg, #9333ea, #ec4899)'
-                : 'linear-gradient(90deg, #c9c6bb, #65635d)',
-              boxShadow: isDarkTheme ? '0 0 10px #ec4899' : '0 0 10px #c9c6bb',
-              transition: 'width 0.3s ease'
-            }}
-          />
-        </div>
+        {!isMobile && characterImagesArray.indexOf(selectedImage) < characterImagesArray.length - 1 && (
+          <button
+            onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1])}
+            style={{ position:'absolute', right:0, background:'none', border:'none', cursor:'pointer', zIndex:10,
+              color: isDarkTheme ? 'rgba(180,100,255,0.7)' : 'rgba(201,168,76,0.7)' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        )}
       </div>
 
-      {/* ПРАВОЕ ПРЕВЬЮ */}
-      {characterImagesArray.indexOf(selectedImage) < characterImagesArray.length - 1 && (
-        <div 
-          className="absolute right-0 cursor-pointer transition-all duration-300"
-          style={{
-            width: '250px',
-            height: '350px',
-            transform: 'rotateY(-15deg) scale(0.85)',
-            filter: 'blur(2px)',
-            opacity: 0.5,
-            zIndex: 1
-          }}
-          onClick={() => setSelectedImage(characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1])}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8';
-            e.currentTarget.style.filter = 'blur(1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.5';
-            e.currentTarget.style.filter = 'blur(2px)';
-          }}
-        >
-          <img 
-            src={characterImagesArray[characterImagesArray.indexOf(selectedImage) + 1]} 
-            alt="Next" 
-            className="w-full h-full object-cover rounded-lg"
-            style={{
-              border: isDarkTheme ? '2px solid #9333ea' : '2px solid #65635d',
-              boxShadow: isDarkTheme 
-                ? '0 0 20px rgba(147, 51, 234, 0.4)' 
-                : '0 0 20px rgba(101, 99, 93, 0.4)'
-            }}
-          />
+      {/* ТОЧКИ */}
+      {characterImagesArray.length > 1 && (
+        <div style={{ display:'flex', gap:'6px', marginTop:'12px' }}>
+          {characterImagesArray.map((img, i) => (
+            <div key={i} onClick={() => setSelectedImage(characterImagesArray[i])}
+              style={{
+                width: characterImagesArray.indexOf(selectedImage) === i ? '18px' : '7px',
+                height:'7px', borderRadius:'4px', cursor:'pointer',
+                background: characterImagesArray.indexOf(selectedImage) === i
+                  ? (isDarkTheme ? 'rgba(180,100,255,0.9)' : 'rgba(201,168,76,0.9)')
+                  : (isDarkTheme ? 'rgba(180,100,255,0.3)' : 'rgba(201,168,76,0.25)'),
+                transition:'all 0.3s'
+              }}
+            />
+          ))}
         </div>
       )}
 
-      {/* КНОПКА ЗАКРЫТИЯ */}
-      <button
-        onClick={() => setSelectedImage(null)}
-        className="absolute top-4 right-4 p-3 rounded-full transition-all z-20"
+      {/* КНОПКА СОХРАНЕНИЯ */}
+      <button onClick={(e) => { e.stopPropagation(); toggleSaveImage(selectedImage); }}
         style={{
-          background: isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)',
-          border: isDarkTheme ? '2px solid #9333ea' : '2px solid #c9c6bb',
-          boxShadow: isDarkTheme 
-            ? '0 0 20px rgba(147, 51, 234, 0.6)'
-            : '0 0 15px rgba(101, 99, 93, 0.4)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? '#9333ea' : '#65635d';
-          e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 30px rgba(147, 51, 234, 0.9)'
-            : '0 0 20px rgba(101, 99, 93, 0.6)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isDarkTheme ? 'rgba(147, 51, 234, 0.8)' : 'rgba(101, 99, 93, 0.8)';
-          e.currentTarget.style.boxShadow = isDarkTheme 
-            ? '0 0 20px rgba(147, 51, 234, 0.6)'
-            : '0 0 15px rgba(101, 99, 93, 0.4)';
-        }}
-      >
-        <X size={24} color="#ffffff" />
+          marginTop:'14px', padding:'8px 24px', borderRadius:'50px', cursor:'pointer',
+          display:'flex', alignItems:'center', gap:'8px', fontWeight:'600',
+          background: savedImages.includes(selectedImage)
+            ? (isDarkTheme ? 'rgba(236,72,153,0.9)' : 'rgba(201,168,76,0.9)')
+            : 'rgba(0,0,0,0.5)',
+          border: isDarkTheme
+            ? `2px solid ${savedImages.includes(selectedImage) ? '#ec4899' : 'rgba(180,100,255,0.5)'}`
+            : `2px solid ${savedImages.includes(selectedImage) ? '#c9a84c' : 'rgba(201,168,76,0.4)'}`,
+          boxShadow: savedImages.includes(selectedImage)
+            ? (isDarkTheme ? '0 0 25px rgba(236,72,153,0.8)' : '0 0 25px rgba(201,168,76,0.6)')
+            : 'none',
+          color: '#ffffff'
+        }}>
+        <svg width="18" height="18" viewBox="0 0 24 24"
+          fill={savedImages.includes(selectedImage) ? '#ffffff' : 'none'}
+          stroke="#ffffff" strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        {savedImages.includes(selectedImage) ? 'В галерее' : 'Сохранить'}
       </button>
     </div>
   </div>
 )}
+
+{/* ФУТЕР */}
+<footer className="py-8 sm:py-12 text-center relative z-[5]" style={{
+  background: isDarkTheme ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.35)',
+  backdropFilter: 'blur(10px)',
+  borderTop: 'none',
+  position: 'relative'
+}}>
+  {/* Градиентная линия сверху */}
+  <div style={{
+    position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+    background: isDarkTheme
+      ? 'linear-gradient(90deg, transparent, #9370db, #ef01cb, transparent)'
+      : 'linear-gradient(90deg, transparent, #c9a84c, #f0d080, transparent)'
+  }}/>
+  {isDarkTheme ? (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(179,231,239,0.3))'}}/>
+        <span style={{color:'rgba(179,231,239,0.25)',fontSize:'0.55rem',letterSpacing:'8px'}}>✦ · · · ✦</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(179,231,239,0.3))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(179,231,239,0.35)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(147,112,219,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.25))'}}/>
+        <span style={{color:'rgba(147,112,219,0.2)',fontSize:'0.5rem',letterSpacing:'6px'}}>· · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.25))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(179,231,239,0.2)',fontSize:'0.7rem',letterSpacing:'4px'}}>✦</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(147,112,219,0.45)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(179,231,239,0.7)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(147,112,219,0.45)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(147,112,219,0.15))'}}/>
+        <span style={{color:'rgba(147,112,219,0.15)',fontSize:'0.5rem',letterSpacing:'8px'}}>· · · · · · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(147,112,219,0.15))'}}/>
+      </div>
     </div>
+  ) : (
+    <div>
+      {/* Верхний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginBottom:'16px'}}>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.4))'}}/>
+        <span style={{color:'rgba(201,168,76,0.35)',fontSize:'0.7rem',letterSpacing:'6px',fontFamily:'serif'}}>⚜ · · ⚜</span>
+        <div style={{flex:1,maxWidth:'120px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.4))'}}/>
+      </div>
+
+      <p style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.7rem,1.5vw,0.85rem)',letterSpacing:'4px',
+        color:'rgba(201,168,76,0.45)',marginBottom:'8px'}}>MelloStory © 2026</p>
+
+      <p style={{fontFamily:'Georgia,serif',fontStyle:'italic',fontSize:'clamp(0.6rem,1.2vw,0.7rem)',
+        color:'rgba(201,168,76,0.3)',marginBottom:'20px',maxWidth:'500px',margin:'0 auto 20px',lineHeight:'1.8',padding:'0 16px'}}>
+        Все права защищены. Копирование, распространение и любое иное использование материалов без разрешения автора запрещены.
+      </p>
+
+      {/* Разделитель */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',margin:'16px 0'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.2))'}}/>
+        <span style={{color:'rgba(201,168,76,0.2)',fontSize:'0.6rem',letterSpacing:'5px',fontFamily:'serif'}}>· ⚜ ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.2))'}}/>
+      </div>
+
+      {/* Ссылки */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',padding:'0 16px'}}>
+        <Link href="/privacy" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Политика конфиденциальности
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/mission" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Миссия сайта
+        </Link>
+        <span style={{color:'rgba(201,168,76,0.3)',fontSize:'0.75rem',letterSpacing:'3px',fontFamily:'serif'}}>⚜</span>
+        <Link href="/terms" style={{fontFamily:'Cinzel,serif',fontSize:'clamp(0.5rem,1.2vw,0.6rem)',
+          letterSpacing:'2px',textTransform:'uppercase',color:'rgba(201,168,76,0.4)',
+          textDecoration:'none',transition:'color 0.2s'}}
+          onMouseEnter={e=>e.currentTarget.style.color='rgba(201,168,76,0.8)'}
+          onMouseLeave={e=>e.currentTarget.style.color='rgba(201,168,76,0.4)'}>
+          Пользовательское соглашение
+        </Link>
+      </div>
+
+      {/* Нижний декор */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',marginTop:'16px'}}>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15))'}}/>
+        <span style={{color:'rgba(201,168,76,0.15)',fontSize:'0.6rem',letterSpacing:'6px',fontFamily:'serif'}}>· · ⚜ · ·</span>
+        <div style={{flex:1,maxWidth:'80px',height:'1px',background:'linear-gradient(270deg,transparent,rgba(201,168,76,0.15))'}}/>
+      </div>
+    </div>
+  )}
+</footer>
+    </div>
+  
   );
 }
